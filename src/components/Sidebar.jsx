@@ -11,13 +11,13 @@ const NAV_ITEMS = [
   { path: '/dashboard', label: 'Overview', icon: LayoutDashboard, exact: true },
   { path: '/dashboard/track', label: '4D Track Visualizer', icon: Compass },
   { path: '/dashboard/satellite', label: 'Satellite Ingestion', icon: Satellite },
-  { path: '/dashboard/detection', label: 'Vision Detection', icon: Target },
+  { path: '/dashboard/detection', label: 'Vision Detection (CNN)', icon: Target },
   { path: '/dashboard/classification', label: 'Dvorak Classification', icon: Layers },
-  { path: '/dashboard/prediction', label: '72h Trajectory', icon: Activity },
+  { path: '/dashboard/prediction', label: '72h Trajectory Studio', icon: Activity },
   { path: '/dashboard/alerts', label: 'CAP Early Warnings', icon: ShieldAlert, badge: 'Live' },
-  { path: '/dashboard/analytics', label: 'Historical Analytics', icon: BarChart3 },
+  { path: '/dashboard/analytics', label: 'Historical Database', icon: BarChart3 },
   { path: '/dashboard/performance', label: 'Model Benchmarks', icon: Gauge },
-  { path: '/dashboard/architecture', label: 'System Architecture', icon: Cpu },
+  { path: '/dashboard/architecture', label: 'Pipeline Architecture', icon: Cpu },
 ];
 
 const Sidebar = ({ isCollapsed, onToggle }) => {
@@ -26,7 +26,7 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
   const [showUserModal, setShowUserModal] = useState(false);
   const [officerName, setOfficerName] = useState('Dr. Harsh Vardhan');
   const [officerRole, setOfficerRole] = useState('Lead AI Meteorologist');
-  const [stationJurisdiction, setStationJurisdiction] = useState('RSMC New Delhi • North Indian Ocean Desk');
+  const [stationDesk, setStationDesk] = useState('RSMC New Delhi • IMD');
 
   const isActive = (path, exact) => {
     if (exact) {
@@ -38,25 +38,29 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
   return (
     <>
       <aside 
-        className={`bg-white text-slate-700 flex flex-col fixed top-0 left-0 h-screen z-50 transition-all duration-200 border-r border-slate-200 select-none shadow-xs ${
-          isCollapsed ? 'w-[72px]' : 'w-64'
+        className={`bg-white text-slate-700 flex flex-col fixed top-0 left-0 h-screen z-50 transition-all duration-200 border-r border-slate-200/90 select-none ${
+          isCollapsed ? 'w-[68px]' : 'w-60'
         }`}
       >
-        {/* Brand Header */}
-        <div className="h-16 px-4 flex items-center justify-between border-b border-slate-100">
+        {/* VAYU Brand Header */}
+        <div className="h-14 px-4 flex items-center justify-between border-b border-slate-100">
           <div 
             onClick={() => navigate('/dashboard')}
             className={`flex items-center gap-2.5 cursor-pointer overflow-hidden ${isCollapsed ? 'justify-center w-full' : ''}`}
-            title="VAYU AI"
+            title="VAYU AI - Cyclone Intelligence"
           >
-            <div className="w-8 h-8 rounded-lg bg-slate-900 text-white flex items-center justify-center flex-shrink-0 shadow-sm">
-              <Wind className="w-4 h-4 text-sky-400" />
+            <div className="w-6 h-6 rounded-md bg-slate-900 text-white flex items-center justify-center flex-shrink-0">
+              <Wind className="w-3.5 h-3.5 text-sky-400" />
             </div>
             
             {!isCollapsed && (
-              <div className="min-w-0">
-                <span className="font-heading font-black text-sm text-slate-900 tracking-tight block">VAYU AI</span>
-                <span className="text-[10px] font-mono text-slate-400 block tracking-tight">Cyclone Intelligence</span>
+              <div className="flex items-center gap-1.5">
+                <span className="font-heading font-black text-sm text-slate-900 tracking-tight block">
+                  VAYU <span className="text-sky-600">AI</span>
+                </span>
+                <span className="text-[10px] font-mono text-slate-400 font-bold bg-slate-100 px-1 py-0.2 rounded border border-slate-200">
+                  v2.1
+                </span>
               </div>
             )}
           </div>
@@ -67,18 +71,18 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
               className="text-slate-400 hover:text-slate-700 p-1 rounded-md hover:bg-slate-100 transition-colors"
               title="Collapse Sidebar"
             >
-              <PanelLeftClose className="w-4 h-4" />
+              <PanelLeftClose className="w-3.5 h-3.5" />
             </button>
           )}
         </div>
 
-        {/* Workspace Dropdown Pill (Autonex Style) */}
+        {/* Workspace Dropdown Pill (Autonex Style with VAYU/IMD Org) */}
         {!isCollapsed && (
           <div className="px-3 py-3 border-b border-slate-100">
-            <button className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg border border-slate-200 bg-slate-50/80 hover:bg-slate-100/80 transition-colors text-left text-xs font-medium text-slate-800">
+            <button className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-slate-100/70 transition-colors text-left text-xs font-medium text-slate-800">
               <div className="flex items-center gap-2 min-w-0 truncate">
                 <div className="w-5 h-5 rounded bg-sky-600 text-white font-mono font-bold text-[10px] flex items-center justify-center flex-shrink-0">
-                  U
+                  V
                 </div>
                 <span className="truncate text-xs font-semibold text-slate-800">IMD National Desk</span>
               </div>
@@ -88,7 +92,7 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
         )}
 
         {/* Navigation Items List */}
-        <nav className="flex-1 px-3 py-3 space-y-1 overflow-y-auto">
+        <nav className="flex-1 px-2.5 py-3 space-y-0.5 overflow-y-auto">
           {NAV_ITEMS.map((item, idx) => {
             const active = isActive(item.path, item.exact);
             const Icon = item.icon;
@@ -97,19 +101,19 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
                 key={idx}
                 to={item.path}
                 title={isCollapsed ? item.label : undefined}
-                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition-all duration-150 relative ${
+                className={`flex items-center gap-3 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 relative ${
                   active
-                    ? 'bg-slate-900 text-white font-semibold shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                    ? 'bg-slate-100 text-slate-900 font-semibold'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
                 } ${isCollapsed ? 'justify-center px-2' : ''}`}
               >
-                <Icon className={`w-4 h-4 flex-shrink-0 ${active ? 'text-white' : 'text-slate-500'}`} />
+                <Icon className={`w-4 h-4 flex-shrink-0 ${active ? 'text-sky-600 font-bold' : 'text-slate-400'}`} />
                 
                 {!isCollapsed && (
                   <div className="flex items-center justify-between flex-1 truncate">
                     <span className="truncate">{item.label}</span>
                     {item.badge && (
-                      <span className="text-[10px] font-mono px-1.5 py-0.2 rounded font-bold uppercase bg-red-100 text-red-700 border border-red-200">
+                      <span className="text-[9px] font-mono px-1.5 py-0.2 rounded font-bold uppercase bg-red-100 text-red-700 border border-red-200">
                         {item.badge}
                       </span>
                     )}
@@ -120,15 +124,15 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
           })}
         </nav>
 
-        {/* Bottom Profile Footer (Autonex Style) */}
-        <div className="p-3 border-t border-slate-100 bg-slate-50/50">
+        {/* Bottom Profile Footer (Autonex Style for Meteorologist) */}
+        <div className="p-3 border-t border-slate-100 bg-slate-50/30">
           {!isCollapsed ? (
             <button
               onClick={() => setShowUserModal(true)}
-              className="w-full flex items-center justify-between p-1.5 rounded-lg hover:bg-slate-100 border border-transparent hover:border-slate-200 transition-colors text-left"
+              className="w-full flex items-center justify-between p-1.5 rounded-lg hover:bg-slate-100 transition-colors text-left"
             >
               <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-7 h-7 rounded-lg bg-slate-900 text-white font-mono font-bold text-xs flex items-center justify-center flex-shrink-0">
+                <div className="w-6 h-6 rounded bg-slate-900 text-white font-mono font-bold text-[11px] flex items-center justify-center flex-shrink-0">
                   H
                 </div>
                 <div className="min-w-0">
@@ -136,7 +140,7 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
                   <p className="text-[10px] text-slate-400 font-mono truncate">{officerRole}</p>
                 </div>
               </div>
-              <MoreHorizontal className="w-4 h-4 text-slate-400 flex-shrink-0" />
+              <MoreHorizontal className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
             </button>
           ) : (
             <button 
@@ -160,7 +164,7 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
                   <User className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="font-heading font-bold text-sm text-slate-900">Meteorological Officer Profile</h3>
+                  <h3 className="font-heading font-bold text-sm text-slate-900">Meteorologist Officer Profile</h3>
                   <p className="text-[11px] text-slate-500">Ministry of Earth Sciences • National Cyclone Desk</p>
                 </div>
               </div>
@@ -179,27 +183,27 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
                   type="text"
                   value={officerName}
                   onChange={(e) => setOfficerName(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-slate-900 transition-all"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Role / Designation:</label>
+                <label className="font-semibold text-slate-700">Designation / Role:</label>
                 <input
                   type="text"
                   value={officerRole}
                   onChange={(e) => setOfficerRole(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-slate-900 transition-all"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Jurisdiction:</label>
+                <label className="font-semibold text-slate-700">Jurisdiction Desk:</label>
                 <input
                   type="text"
-                  value={stationJurisdiction}
-                  onChange={(e) => setStationJurisdiction(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
+                  value={stationDesk}
+                  onChange={(e) => setStationDesk(e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-slate-900 transition-all"
                 />
               </div>
             </div>
@@ -207,9 +211,9 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
             <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
               <button
                 onClick={() => setShowUserModal(false)}
-                className="btn-primary text-xs py-2 px-5"
+                className="btn-primary text-xs py-1.5 px-4"
               >
-                Save & Close
+                Save Changes
               </button>
             </div>
           </div>

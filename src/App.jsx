@@ -16,8 +16,8 @@ import Architecture from './pages/Architecture';
 function App() {
   return (
     <Routes>
-      {/* Official Home & Portal Entry */}
-      <Route path="/" element={<Landing />} />
+      {/* Official Home & Portal Entry directly to Dashboard */}
+      <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
       {/* Unified AI/ML Command & Prediction Platform */}
       <Route path="/dashboard" element={<DashboardLayout />}>
