@@ -1,44 +1,62 @@
 import React, { useState } from 'react';
-import { NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate, useLocation } from 'react-router-dom';
 import {
-  LayoutDashboard, Satellite, Target, BrainCircuit,
+  LayoutDashboard, Satellite, Target, Activity,
   ShieldAlert, Wind, PanelLeftClose, PanelLeftOpen,
-  User, CheckCircle2, Sliders, FileText, Zap, X
+  User, Compass, Layers, BarChart3, Gauge, Cpu,
+  ChevronDown, MoreHorizontal, Check, X, ShieldCheck
 } from 'lucide-react';
+
+const NAV_ITEMS = [
+  { path: '/dashboard', label: 'Overview', icon: LayoutDashboard, exact: true },
+  { path: '/dashboard/track', label: '4D Track Visualizer', icon: Compass },
+  { path: '/dashboard/satellite', label: 'Satellite Ingestion', icon: Satellite },
+  { path: '/dashboard/detection', label: 'Vision Detection', icon: Target },
+  { path: '/dashboard/classification', label: 'Dvorak Classification', icon: Layers },
+  { path: '/dashboard/prediction', label: '72h Trajectory', icon: Activity },
+  { path: '/dashboard/alerts', label: 'CAP Early Warnings', icon: ShieldAlert, badge: 'Live' },
+  { path: '/dashboard/analytics', label: 'Historical Analytics', icon: BarChart3 },
+  { path: '/dashboard/performance', label: 'Model Benchmarks', icon: Gauge },
+  { path: '/dashboard/architecture', label: 'System Architecture', icon: Cpu },
+];
 
 const Sidebar = ({ isCollapsed, onToggle }) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [showUserModal, setShowUserModal] = useState(false);
   const [officerName, setOfficerName] = useState('Dr. Harsh Vardhan');
   const [officerRole, setOfficerRole] = useState('Lead AI Meteorologist');
-  const [stationJurisdiction, setStationJurisdiction] = useState('RSMC New Delhi (North Indian Ocean Desk)');
+  const [stationJurisdiction, setStationJurisdiction] = useState('RSMC New Delhi • North Indian Ocean Desk');
+
+  const isActive = (path, exact) => {
+    if (exact) {
+      return location.pathname === path;
+    }
+    return location.pathname.startsWith(path) && path !== '/dashboard';
+  };
 
   return (
     <>
       <aside 
-        className={`bg-[#0D1117] text-[#C9D1D9] flex flex-col fixed top-0 left-0 h-screen z-50 transition-all duration-200 border-r border-[#30363D] select-none ${
-          isCollapsed ? 'w-[68px]' : 'w-64'
+        className={`bg-white text-slate-700 flex flex-col fixed top-0 left-0 h-screen z-50 transition-all duration-200 border-r border-slate-200 select-none shadow-xs ${
+          isCollapsed ? 'w-[72px]' : 'w-64'
         }`}
       >
-        {/* Header Branding */}
-        <div className="h-14 px-4 flex items-center justify-between border-b border-[#30363D]">
+        {/* Brand Header */}
+        <div className="h-16 px-4 flex items-center justify-between border-b border-slate-100">
           <div 
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/dashboard')}
             className={`flex items-center gap-2.5 cursor-pointer overflow-hidden ${isCollapsed ? 'justify-center w-full' : ''}`}
+            title="VAYU AI"
           >
-            <div className="w-8 h-8 rounded-lg bg-[#238636] flex items-center justify-center text-white flex-shrink-0 shadow-xs">
-              <Wind className="w-4 h-4" />
+            <div className="w-8 h-8 rounded-lg bg-slate-900 text-white flex items-center justify-center flex-shrink-0 shadow-sm">
+              <Wind className="w-4 h-4 text-sky-400" />
             </div>
             
             {!isCollapsed && (
               <div className="min-w-0">
-                <div className="flex items-center gap-1.5">
-                  <span className="font-bold text-sm text-white tracking-tight">CycloneAI</span>
-                  <span className="text-[10px] bg-[#161B22] text-[#58A6FF] border border-[#30363D] px-1.5 py-0.2 rounded font-medium">
-                    SIH 2026
-                  </span>
-                </div>
-                <p className="text-[11px] text-[#8B949E] truncate">MoES • IMD Gateway</p>
+                <span className="font-heading font-black text-sm text-slate-900 tracking-tight block">VAYU AI</span>
+                <span className="text-[10px] font-mono text-slate-400 block tracking-tight">Cyclone Intelligence</span>
               </div>
             )}
           </div>
@@ -46,7 +64,7 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
           {!isCollapsed && (
             <button 
               onClick={onToggle}
-              className="text-[#8B949E] hover:text-white p-1 rounded-md hover:bg-[#21262D] transition-colors"
+              className="text-slate-400 hover:text-slate-700 p-1 rounded-md hover:bg-slate-100 transition-colors"
               title="Collapse Sidebar"
             >
               <PanelLeftClose className="w-4 h-4" />
@@ -54,94 +72,76 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
           )}
         </div>
 
-        {/* Unified Navigation Links */}
-        <nav className="flex-1 px-3 py-4 space-y-4 overflow-y-auto overflow-x-hidden">
-          
-          <div className="space-y-1">
-            {!isCollapsed && (
-              <p className="text-[#8B949E] text-[11px] font-semibold tracking-wider px-2.5 mb-1.5">
-                Core Intelligence
-              </p>
-            )}
-            
-            <NavLink
-              to="/dashboard"
-              className="flex items-center gap-2.5 px-2.5 py-2 rounded-md text-xs transition-colors bg-[#1F6FEB] text-white font-medium shadow-xs"
-            >
-              <LayoutDashboard className="w-4 h-4 text-white" />
-              {!isCollapsed && <span>AI Command Center</span>}
-            </NavLink>
-          </div>
-
-          <div className="space-y-1">
-            {!isCollapsed && (
-              <p className="text-[#8B949E] text-[11px] font-semibold tracking-wider px-2.5 mb-1.5">
-                Pipeline Capabilities
-              </p>
-            )}
-
-            <div className="space-y-1 text-xs text-[#8B949E] px-2.5 py-2 bg-[#161B22] border border-[#30363D] rounded-md">
-              {!isCollapsed ? (
-                <div className="space-y-2">
-                  <div className="flex items-center gap-2 text-slate-200">
-                    <Zap className="w-3.5 h-3.5 text-amber-400" />
-                    <span>Real-Time Satellite Stream</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-slate-200">
-                    <Sliders className="w-3.5 h-3.5 text-blue-400" />
-                    <span>Manual Ingestion Simulator</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-slate-200">
-                    <BrainCircuit className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>72h BiLSTM Track Engine</span>
-                  </div>
-                  <div className="flex items-center gap-2 text-slate-200">
-                    <ShieldAlert className="w-3.5 h-3.5 text-red-400" />
-                    <span>CAP District Early Warning</span>
-                  </div>
+        {/* Workspace Dropdown Pill (Autonex Style) */}
+        {!isCollapsed && (
+          <div className="px-3 py-3 border-b border-slate-100">
+            <button className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg border border-slate-200 bg-slate-50/80 hover:bg-slate-100/80 transition-colors text-left text-xs font-medium text-slate-800">
+              <div className="flex items-center gap-2 min-w-0 truncate">
+                <div className="w-5 h-5 rounded bg-sky-600 text-white font-mono font-bold text-[10px] flex items-center justify-center flex-shrink-0">
+                  U
                 </div>
-              ) : (
-                <div className="flex flex-col items-center gap-2 py-1">
-                  <Zap className="w-3.5 h-3.5 text-amber-400" />
-                  <Sliders className="w-3.5 h-3.5 text-blue-400" />
-                  <BrainCircuit className="w-3.5 h-3.5 text-emerald-400" />
-                </div>
-              )}
-            </div>
+                <span className="truncate text-xs font-semibold text-slate-800">IMD National Desk</span>
+              </div>
+              <ChevronDown className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
+            </button>
           </div>
+        )}
 
+        {/* Navigation Items List */}
+        <nav className="flex-1 px-3 py-3 space-y-1 overflow-y-auto">
+          {NAV_ITEMS.map((item, idx) => {
+            const active = isActive(item.path, item.exact);
+            const Icon = item.icon;
+            return (
+              <NavLink
+                key={idx}
+                to={item.path}
+                title={isCollapsed ? item.label : undefined}
+                className={`flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-medium transition-all duration-150 relative ${
+                  active
+                    ? 'bg-slate-900 text-white font-semibold shadow-xs'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+                } ${isCollapsed ? 'justify-center px-2' : ''}`}
+              >
+                <Icon className={`w-4 h-4 flex-shrink-0 ${active ? 'text-white' : 'text-slate-500'}`} />
+                
+                {!isCollapsed && (
+                  <div className="flex items-center justify-between flex-1 truncate">
+                    <span className="truncate">{item.label}</span>
+                    {item.badge && (
+                      <span className="text-[10px] font-mono px-1.5 py-0.2 rounded font-bold uppercase bg-red-100 text-red-700 border border-red-200">
+                        {item.badge}
+                      </span>
+                    )}
+                  </div>
+                )}
+              </NavLink>
+            );
+          })}
         </nav>
 
-        {/* User Profile / Duty Desk Footer */}
-        <div className="p-3 border-t border-[#30363D] bg-[#090D11] space-y-2.5">
+        {/* Bottom Profile Footer (Autonex Style) */}
+        <div className="p-3 border-t border-slate-100 bg-slate-50/50">
           {!isCollapsed ? (
-            <>
-              <div className="flex items-center justify-between text-xs px-1">
-                <span className="flex items-center gap-1.5 text-[#3FB950] font-medium">
-                  <span className="w-2 h-2 rounded-full bg-[#3FB950] animate-pulse" />
-                  AI Models Online
-                </span>
-                <span className="text-[#8B949E] text-[11px]">PyTorch / CUDA</span>
+            <button
+              onClick={() => setShowUserModal(true)}
+              className="w-full flex items-center justify-between p-1.5 rounded-lg hover:bg-slate-100 border border-transparent hover:border-slate-200 transition-colors text-left"
+            >
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-7 h-7 rounded-lg bg-slate-900 text-white font-mono font-bold text-xs flex items-center justify-center flex-shrink-0">
+                  H
+                </div>
+                <div className="min-w-0">
+                  <p className="text-xs font-semibold text-slate-800 truncate">{officerName}</p>
+                  <p className="text-[10px] text-slate-400 font-mono truncate">{officerRole}</p>
+                </div>
               </div>
-
-              {/* User Profile Button */}
-              <button
-                onClick={() => setShowUserModal(true)}
-                className="w-full flex items-center gap-2.5 p-1.5 rounded-md hover:bg-[#161B22] border border-transparent hover:border-[#30363D] transition-colors text-left"
-              >
-                <div className="w-7 h-7 rounded-full bg-[#21262D] border border-[#30363D] text-[#58A6FF] font-bold text-xs flex items-center justify-center flex-shrink-0">
-                  <User className="w-3.5 h-3.5" />
-                </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-xs font-medium text-white truncate">{officerName}</p>
-                  <p className="text-[11px] text-[#8B949E] truncate">{officerRole}</p>
-                </div>
-              </button>
-            </>
+              <MoreHorizontal className="w-4 h-4 text-slate-400 flex-shrink-0" />
+            </button>
           ) : (
             <button 
               onClick={onToggle}
-              className="w-full flex items-center justify-center p-1.5 text-[#8B949E] hover:text-white rounded-md hover:bg-[#161B22] transition-colors"
+              className="w-full flex items-center justify-center p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100 transition-colors"
               title="Expand Sidebar"
             >
               <PanelLeftOpen className="w-4 h-4" />
@@ -150,22 +150,24 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
         </div>
       </aside>
 
-      {/* Duty Officer & User Profile Modal */}
+      {/* Duty Officer Profile Modal */}
       {showUserModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
-            
+        <div className="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200 space-y-4 text-slate-800">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-full bg-blue-100 text-[#003087] flex items-center justify-center font-bold">
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-slate-900 text-white flex items-center justify-center font-bold">
                   <User className="w-4 h-4" />
                 </div>
                 <div>
-                  <h3 className="font-bold text-sm text-slate-900">Duty Officer & Station Profile</h3>
+                  <h3 className="font-heading font-bold text-sm text-slate-900">Meteorological Officer Profile</h3>
                   <p className="text-[11px] text-slate-500">Ministry of Earth Sciences • National Cyclone Desk</p>
                 </div>
               </div>
-              <button onClick={() => setShowUserModal(false)} className="text-slate-400 hover:text-slate-700">
+              <button 
+                onClick={() => setShowUserModal(false)} 
+                className="text-slate-400 hover:text-slate-700 p-1 rounded-lg hover:bg-slate-100 transition-colors"
+              >
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -177,47 +179,39 @@ const Sidebar = ({ isCollapsed, onToggle }) => {
                   type="text"
                   value={officerName}
                   onChange={(e) => setOfficerName(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-300 rounded px-2.5 py-1.5 text-xs text-slate-800 focus:bg-white"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Designation / Role:</label>
+                <label className="font-semibold text-slate-700">Role / Designation:</label>
                 <input
                   type="text"
                   value={officerRole}
                   onChange={(e) => setOfficerRole(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-300 rounded px-2.5 py-1.5 text-xs text-slate-800 focus:bg-white"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                 />
               </div>
 
               <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Operational Jurisdiction:</label>
+                <label className="font-semibold text-slate-700">Jurisdiction:</label>
                 <input
                   type="text"
                   value={stationJurisdiction}
                   onChange={(e) => setStationJurisdiction(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-300 rounded px-2.5 py-1.5 text-xs text-slate-800 focus:bg-white"
+                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-2 focus:ring-sky-500/20 focus:border-sky-500 transition-all"
                 />
-              </div>
-
-              <div className="bg-slate-50 border border-slate-200 rounded-lg p-3 space-y-1">
-                <span className="text-[11px] font-semibold text-slate-600 block">System Access Credentials:</span>
-                <p className="text-[11px] text-slate-500">
-                  Authority: Level-4 Cyclone Warning Dispatcher • CAP ITU-T X.1303 Certified
-                </p>
               </div>
             </div>
 
             <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
               <button
                 onClick={() => setShowUserModal(false)}
-                className="btn-primary text-xs py-1.5 px-4"
+                className="btn-primary text-xs py-2 px-5"
               >
                 Save & Close
               </button>
             </div>
-
           </div>
         </div>
       )}

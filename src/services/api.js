@@ -17,7 +17,6 @@ export async function checkBackendHealth() {
 
 /**
  * Sends satellite image bytes to the CycloneVision-CNN v2.1 model for inference.
- * If backend is offline, provides calibrated radiometric fallback so the UI never crashes.
  */
 export async function detectCycloneFromImage(imageFileOrBlob, basin = 'Bay of Bengal') {
   try {
@@ -36,21 +35,15 @@ export async function detectCycloneFromImage(imageFileOrBlob, basin = 'Bay of Be
     }
     throw new Error(`API returned ${response.status}`);
   } catch (err) {
-    console.warn('[CycloneAI API] Backend unreachable, using calibrated model inference fallback:', err);
-    // Graceful offline fallback
+    console.warn('[CycloneAI API] Detection inference using fallback:', err);
     return {
       success: true,
       isLiveApi: false,
-      model_version: 'CycloneVision-CNN v2.1 (Calibrated Local Engine)',
+      model_version: 'CycloneVision-CNN v2.1 (Local Fallback)',
       architecture: 'ResNet-50 + Spatial Pyramid Pooling (SPP)',
       cyclone_detected: true,
       confidence_percentage: 96.4,
-      coordinates: {
-        latitude: 15.4,
-        longitude: 87.8,
-        formatted: '15.4°N, 87.8°E',
-        basin: basin
-      },
+      coordinates: { latitude: 15.4, longitude: 87.8, formatted: '15.4°N, 87.8°E', basin: basin },
       dvorak_classification: {
         t_number: 'T3.0',
         ci_number: 3.0,
@@ -68,16 +61,37 @@ export async function detectCycloneFromImage(imageFileOrBlob, basin = 'Bay of Be
         spiral_curvature_deg: 260.0,
         eye_status: 'Forming Warm Core Eye detected in IR Band'
       },
-      bounding_box: {
-        ymin: 0.22,
-        xmin: 0.25,
-        ymax: 0.78,
-        xmax: 0.75,
-        center_x_norm: 0.50,
-        center_y_norm: 0.50
-      },
+      bounding_box: { ymin: 0.22, xmin: 0.25, ymax: 0.78, xmax: 0.75, center_x_norm: 0.50, center_y_norm: 0.50 },
       inference_time_ms: 142.5
     };
+  }
+}
+
+/**
+ * Classifies satellite frame into the 5 Dvorak morphological patterns.
+ */
+export async function classifyMorphologyPattern(imageFileOrBlob, basin = 'Bay of Bengal', shearKnots = 12.0) {
+  try {
+    const formData = new FormData();
+    if (imageFileOrBlob) {
+      formData.append('file', imageFileOrBlob, 'morphology_frame.png');
+    }
+    formData.append('basin', basin);
+    formData.append('shear_knots', shearKnots);
+
+    const response = await fetch(`${API_BASE_URL}/api/classify`, {
+      method: 'POST',
+      body: formData,
+    });
+
+    if (response.ok) {
+      const json = await response.json();
+      return { success: true, isLiveApi: true, ...json.data };
+    }
+    throw new Error(`API returned ${response.status}`);
+  } catch (err) {
+    console.warn('[CycloneAI API] Classification fallback:', err);
+    return null;
   }
 }
 
@@ -114,9 +128,7 @@ export async function predictCycloneTrack(params = {}) {
     }
     throw new Error(`API returned ${response.status}`);
   } catch (err) {
-    console.warn('[CycloneAI API] Track prediction using client-side BiLSTM fallback:', err);
-    
-    // Client-side BiLSTM Spatiotemporal Calculation
+    console.warn('[CycloneAI API] Track prediction using client fallback:', err);
     const latStep = basin === 'Bay of Bengal' ? 0.68 : 0.60;
     const lonStep = basin === 'Bay of Bengal' ? -0.52 : 0.22;
     const intensification = (sst >= 28.5 && shear < 15.0) ? 1.35 : 1.0;
@@ -131,16 +143,6 @@ export async function predictCycloneTrack(params = {}) {
     ];
 
     const landfallPt = steps[3];
-    const peakWind = landfallPt.wind;
-
-    let category = 'Severe Cyclonic Storm';
-    let dvorakT = 'T3.5';
-    let severity = 'HIGH THREAT';
-    if (peakWind >= 166) { category = 'Super Cyclonic Storm'; dvorakT = 'T6.0'; severity = 'CRITICAL (Cat 5)'; }
-    else if (peakWind >= 118) { category = 'Very Severe Cyclonic Storm'; dvorakT = 'T4.5'; severity = 'HIGH THREAT'; }
-    else if (peakWind >= 89) { category = 'Severe Cyclonic Storm'; dvorakT = 'T3.5'; severity = 'SIGNIFICANT'; }
-    else if (peakWind >= 62) { category = 'Cyclonic Storm'; dvorakT = 'T2.5'; severity = 'MODERATE'; }
-
     return {
       success: true,
       isLiveApi: false,
@@ -148,10 +150,10 @@ export async function predictCycloneTrack(params = {}) {
       basin: basin,
       initial_fix: { latitude: currentLat, longitude: currentLon, wind_kmh: currentWind, pressure_hpa: currentMslp },
       classification: {
-        category,
-        dvorak_t_number: dvorakT,
-        severity_level: severity,
-        peak_sustained_wind_kmh: peakWind,
+        category: 'Severe Cyclonic Storm',
+        dvorak_t_number: 'T3.5',
+        severity_level: 'HIGH THREAT',
+        peak_sustained_wind_kmh: landfallPt.wind,
         lowest_mslp_hpa: landfallPt.pressure
       },
       landfall_prediction: {
@@ -182,6 +184,61 @@ export async function predictCycloneTrack(params = {}) {
       ],
       error_envelope: { track_error_24h_km: 32.4, track_error_48h_km: 68.5, track_error_72h_km: 112.0 }
     };
+  }
+}
+
+/**
+ * Multi-source data fusion API call.
+ */
+export async function fuseMultiSourceData(params) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/fuse`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(params),
+    });
+    if (response.ok) {
+      const json = await response.json();
+      return json.data;
+    }
+    return null;
+  } catch (err) {
+    console.warn('[CycloneAI API] Fusion call error:', err);
+    return null;
+  }
+}
+
+/**
+ * Fetches active disaster alerts from backend.
+ */
+export async function fetchActiveAlerts() {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/alerts`, { method: 'GET' });
+    if (response.ok) {
+      const json = await response.json();
+      return json.alerts || [];
+    }
+    return [];
+  } catch (err) {
+    console.warn('[CycloneAI API] Alerts fetch error:', err);
+    return [];
+  }
+}
+
+/**
+ * Fetches AI inference execution history from database.
+ */
+export async function fetchInferenceHistory(limit = 15) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/api/history/inferences?limit=${limit}`, { method: 'GET' });
+    if (response.ok) {
+      const json = await response.json();
+      return json.logs || [];
+    }
+    return [];
+  } catch (err) {
+    console.warn('[CycloneAI API] Inference history fetch error:', err);
+    return [];
   }
 }
 
@@ -233,7 +290,7 @@ export async function downloadOfficialBulletinPdf(cycloneData = {}) {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        cyclone_name: cycloneData.name || 'Cyclone ALPHA (TC-2026-ALPHA)',
+        cyclone_name: cycloneData.name || 'Severe Cyclonic Storm DANA',
         basin: cycloneData.basin || 'Bay of Bengal',
         category: cycloneData.classification || 'Severe Cyclonic Storm',
         latitude: cycloneData.lat || 15.4,
@@ -258,7 +315,7 @@ export async function downloadOfficialBulletinPdf(cycloneData = {}) {
     throw new Error(`PDF API error: ${response.status}`);
   } catch (err) {
     console.error('Error downloading PDF bulletin:', err);
-    window.print(); // Fallback to print
+    window.print();
     return false;
   }
 }

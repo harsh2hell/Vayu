@@ -1,0 +1,283 @@
+import sqlite3
+import json
+import os
+import time
+from typing import List, Dict, Any, Optional
+
+DB_PATH = os.path.join(os.path.dirname(__file__), "cyclone_intel.db")
+
+class DatabaseManager:
+    def __init__(self, db_path: str = DB_PATH):
+        self.db_path = db_path
+        self._init_db()
+
+    def _get_connection(self) -> sqlite3.Connection:
+        conn = sqlite3.connect(self.db_path, check_same_thread=False)
+        conn.row_factory = sqlite3.Row
+        return conn
+
+    def _init_db(self):
+        """Initializes tables for cyclone tracking, AI inference logs, alerts, and telemetry."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            
+            # Cyclone Systems Table
+            cursor.execute("""
+            CREATE TABLE IF NOT EXISTS cyclone_events (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                system_id TEXT UNIQUE NOT NULL,
+                name TEXT NOT NULL,
+                season TEXT NOT NULL,
+                basin TEXT NOT NULL,
+                category TEXT NOT NULL,
+                status TEXT DEFAULT 'ACTIVE',
+                peak_intensity_kmh REAL NOT NULL,
+                peak_intensity_knots REAL NOT NULL,
+                lowest_mslp_hpa REAL NOT NULL,
+                landfall_location TEXT,
+                landfall_time TEXT,
+                landfall_lat REAL,
+                landfall_lon REAL,
+                surge_height_m REAL,
+                dvorak_ci TEXT,
+                description TEXT,
+                track_history_json TEXT,
+                track_forecast_json TEXT,
+                cone_polygon_json TEXT,
+                impact_districts_json TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+            """)
+
+            # AI Inference Runs Log Table
+            cursor.execute("""
+            CREATE TABLE IF NOT EXISTS inference_logs (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                model_name TEXT NOT NULL,
+                model_version TEXT NOT NULL,
+                inference_type TEXT NOT NULL,
+                basin TEXT NOT NULL,
+                input_source TEXT NOT NULL,
+                detected_lat REAL,
+                detected_lon REAL,
+                confidence REAL NOT NULL,
+                dvorak_t TEXT,
+                dvorak_ci REAL,
+                estimated_wind_kmh REAL,
+                estimated_mslp_hpa REAL,
+                morphology_pattern TEXT,
+                execution_time_ms REAL NOT NULL,
+                metadata_json TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+            """)
+
+            # Early Warning & Disaster Alerts Table
+            cursor.execute("""
+            CREATE TABLE IF NOT EXISTS disaster_alerts (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                alert_level TEXT NOT NULL,
+                basin TEXT NOT NULL,
+                cyclone_name TEXT NOT NULL,
+                affected_districts_json TEXT,
+                affected_states_json TEXT,
+                wind_gust_forecast_kmh REAL,
+                surge_height_m TEXT,
+                rainfall_24h_mm REAL,
+                evacuation_recommendation TEXT,
+                issued_by TEXT,
+                active INTEGER DEFAULT 1,
+                issued_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+            """)
+
+            # Multi-Source Telemetry Snapshots Table
+            cursor.execute("""
+            CREATE TABLE IF NOT EXISTS telemetry_snapshots (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                satellite_source TEXT NOT NULL,
+                basin TEXT NOT NULL,
+                center_lat REAL,
+                center_lon REAL,
+                sst_celsius REAL,
+                vertical_wind_shear_knots REAL,
+                mslp_hpa REAL,
+                surface_wind_kmh REAL,
+                raw_payload_json TEXT,
+                captured_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+            """)
+            conn.commit()
+
+    # --- Cyclone Events CRUD ---
+    def upsert_cyclone_event(self, event_data: Dict[str, Any]) -> int:
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+            INSERT INTO cyclone_events (
+                system_id, name, season, basin, category, status,
+                peak_intensity_kmh, peak_intensity_knots, lowest_mslp_hpa,
+                landfall_location, landfall_time, landfall_lat, landfall_lon, surge_height_m,
+                dvorak_ci, description, track_history_json, track_forecast_json,
+                cone_polygon_json, impact_districts_json, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+            ON CONFLICT(system_id) DO UPDATE SET
+                name=excluded.name,
+                category=excluded.category,
+                status=excluded.status,
+                peak_intensity_kmh=excluded.peak_intensity_kmh,
+                peak_intensity_knots=excluded.peak_intensity_knots,
+                lowest_mslp_hpa=excluded.lowest_mslp_hpa,
+                landfall_location=excluded.landfall_location,
+                landfall_time=excluded.landfall_time,
+                landfall_lat=excluded.landfall_lat,
+                landfall_lon=excluded.landfall_lon,
+                surge_height_m=excluded.surge_height_m,
+                dvorak_ci=excluded.dvorak_ci,
+                description=excluded.description,
+                track_history_json=excluded.track_history_json,
+                track_forecast_json=excluded.track_forecast_json,
+                cone_polygon_json=excluded.cone_polygon_json,
+                impact_districts_json=excluded.impact_districts_json,
+                updated_at=CURRENT_TIMESTAMP
+            """, (
+                event_data["system_id"],
+                event_data["name"],
+                event_data["season"],
+                event_data["basin"],
+                event_data["category"],
+                event_data.get("status", "ACTIVE"),
+                event_data["peak_intensity_kmh"],
+                event_data["peak_intensity_knots"],
+                event_data["lowest_mslp_hpa"],
+                event_data.get("landfall_location"),
+                event_data.get("landfall_time"),
+                event_data.get("landfall_lat"),
+                event_data.get("landfall_lon"),
+                event_data.get("surge_height_m"),
+                event_data.get("dvorak_ci", "T3.5"),
+                event_data.get("description", ""),
+                json.dumps(event_data.get("track_history", [])),
+                json.dumps(event_data.get("track_forecast", [])),
+                json.dumps(event_data.get("cone_polygon", [])),
+                json.dumps(event_data.get("impact_districts", []))
+            ))
+            conn.commit()
+            return cursor.lastrowid
+
+    def get_all_cyclones(self, basin: Optional[str] = None) -> List[Dict[str, Any]]:
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            if basin:
+                cursor.execute("SELECT * FROM cyclone_events WHERE basin = ? ORDER BY created_at DESC", (basin,))
+            else:
+                cursor.execute("SELECT * FROM cyclone_events ORDER BY created_at DESC")
+            rows = cursor.fetchall()
+            
+            results = []
+            for r in rows:
+                item = dict(r)
+                item["track_history"] = json.loads(item["track_history_json"] or "[]")
+                item["track_forecast"] = json.loads(item["track_forecast_json"] or "[]")
+                item["cone_polygon"] = json.loads(item["cone_polygon_json"] or "[]")
+                item["impact_districts"] = json.loads(item["impact_districts_json"] or "[]")
+                results.append(item)
+            return results
+
+    def get_cyclone_by_id(self, system_id: str) -> Optional[Dict[str, Any]]:
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM cyclone_events WHERE system_id = ?", (system_id,))
+            row = cursor.fetchone()
+            if not row:
+                return None
+            item = dict(row)
+            item["track_history"] = json.loads(item["track_history_json"] or "[]")
+            item["track_forecast"] = json.loads(item["track_forecast_json"] or "[]")
+            item["cone_polygon"] = json.loads(item["cone_polygon_json"] or "[]")
+            item["impact_districts"] = json.loads(item["impact_districts_json"] or "[]")
+            return item
+
+    # --- AI Inference Logs ---
+    def log_inference_run(self, log_data: Dict[str, Any]) -> int:
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+            INSERT INTO inference_logs (
+                model_name, model_version, inference_type, basin, input_source,
+                detected_lat, detected_lon, confidence, dvorak_t, dvorak_ci,
+                estimated_wind_kmh, estimated_mslp_hpa, morphology_pattern,
+                execution_time_ms, metadata_json
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                log_data["model_name"],
+                log_data["model_version"],
+                log_data["inference_type"],
+                log_data.get("basin", "Bay of Bengal"),
+                log_data.get("input_source", "MANUAL"),
+                log_data.get("detected_lat"),
+                log_data.get("detected_lon"),
+                log_data["confidence"],
+                log_data.get("dvorak_t"),
+                log_data.get("dvorak_ci"),
+                log_data.get("estimated_wind_kmh"),
+                log_data.get("estimated_mslp_hpa"),
+                log_data.get("morphology_pattern"),
+                log_data["execution_time_ms"],
+                json.dumps(log_data.get("metadata", {}))
+            ))
+            conn.commit()
+            return cursor.lastrowid
+
+    def get_recent_inferences(self, limit: int = 15) -> List[Dict[str, Any]]:
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM inference_logs ORDER BY created_at DESC LIMIT ?", (limit,))
+            rows = cursor.fetchall()
+            results = []
+            for r in rows:
+                item = dict(r)
+                item["metadata"] = json.loads(item["metadata_json"] or "{}")
+                results.append(item)
+            return results
+
+    # --- Disaster Alerts ---
+    def create_alert(self, alert_data: Dict[str, Any]) -> int:
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+            INSERT INTO disaster_alerts (
+                alert_level, basin, cyclone_name, affected_districts_json, affected_states_json,
+                wind_gust_forecast_kmh, surge_height_m, rainfall_24h_mm, evacuation_recommendation, issued_by
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                alert_data["alert_level"],
+                alert_data["basin"],
+                alert_data["cyclone_name"],
+                json.dumps(alert_data.get("affected_districts", [])),
+                json.dumps(alert_data.get("affected_states", [])),
+                alert_data.get("wind_gust_forecast_kmh", 120.0),
+                alert_data.get("surge_height_m", "2.0m"),
+                alert_data.get("rainfall_24h_mm", 150.0),
+                alert_data.get("evacuation_recommendation", "Immediate evacuation of low-lying coastal areas advised."),
+                alert_data.get("issued_by", "CycloneAI Disaster Intelligence Gateway")
+            ))
+            conn.commit()
+            return cursor.lastrowid
+
+    def get_active_alerts(self) -> List[Dict[str, Any]]:
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM disaster_alerts WHERE active = 1 ORDER BY issued_at DESC")
+            rows = cursor.fetchall()
+            results = []
+            for r in rows:
+                item = dict(r)
+                item["affected_districts"] = json.loads(item["affected_districts_json"] or "[]")
+                item["affected_states"] = json.loads(item["affected_states_json"] or "[]")
+                results.append(item)
+            return results
+
+# Singleton database instance
+db = DatabaseManager()
