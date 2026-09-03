@@ -7,6 +7,11 @@ from typing import List, Dict, Any, Optional
 DB_PATH = os.path.join(os.path.dirname(__file__), "cyclone_intel.db")
 
 class DatabaseManager:
+    """
+    Enterprise SQLite / Embedded Persistence Layer for CycloneAI (SIH 2026).
+    Handles thread-safe transactions, schema migrations, and high-performance querying
+    for satellite feeds, ocean buoys, deep learning inference logs, and CAP alerts.
+    """
     def __init__(self, db_path: str = DB_PATH):
         self.db_path = db_path
         self._init_db()
@@ -17,11 +22,69 @@ class DatabaseManager:
         return conn
 
     def _init_db(self):
-        """Initializes tables for cyclone tracking, AI inference logs, alerts, and telemetry."""
+        """Initializes full enterprise database schema."""
         with self._get_connection() as conn:
             cursor = conn.cursor()
             
-            # Cyclone Systems Table
+            # 1. Satellite Sources Table
+            cursor.execute("""
+            CREATE TABLE IF NOT EXISTS satellite_data_sources (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                source_id TEXT UNIQUE NOT NULL,
+                agency TEXT NOT NULL,
+                satellite_name TEXT NOT NULL,
+                orbit_type TEXT NOT NULL,
+                spectral_channels_json TEXT NOT NULL,
+                spatial_resolution_km REAL NOT NULL,
+                temporal_cadence_min INTEGER NOT NULL,
+                status TEXT DEFAULT 'ONLINE',
+                data_format TEXT DEFAULT 'HDF5 / NetCDF-4',
+                coverage_basin TEXT DEFAULT 'North Indian Ocean',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+            """)
+
+            # 2. Ingested Satellite Multi-Spectral Frames
+            cursor.execute("""
+            CREATE TABLE IF NOT EXISTS satellite_frames (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                source_id TEXT NOT NULL,
+                channel TEXT NOT NULL,
+                timestamp TEXT NOT NULL,
+                basin TEXT NOT NULL,
+                center_lat REAL NOT NULL,
+                center_lon REAL NOT NULL,
+                min_brightness_temp_c REAL NOT NULL,
+                avg_brightness_temp_c REAL NOT NULL,
+                convective_cloud_fraction REAL NOT NULL,
+                storage_path TEXT,
+                metadata_json TEXT,
+                ingested_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+            """)
+
+            # 3. Ocean Buoy & Marine Scatterometer Telemetry
+            cursor.execute("""
+            CREATE TABLE IF NOT EXISTS ocean_buoy_telemetry (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                buoy_id TEXT NOT NULL,
+                agency TEXT DEFAULT 'INCOIS / NIOT',
+                latitude REAL NOT NULL,
+                longitude REAL NOT NULL,
+                basin TEXT NOT NULL,
+                sea_surface_temp_c REAL NOT NULL,
+                sea_surface_pressure_hpa REAL NOT NULL,
+                surface_wind_speed_kmh REAL NOT NULL,
+                surface_wind_direction_deg REAL NOT NULL,
+                significant_wave_height_m REAL NOT NULL,
+                ocean_heat_content_kj_cm2 REAL NOT NULL,
+                salinity_psu REAL DEFAULT 34.5,
+                timestamp TEXT NOT NULL,
+                recorded_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+            """)
+
+            # 4. Cyclone Systems Table
             cursor.execute("""
             CREATE TABLE IF NOT EXISTS cyclone_events (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -50,7 +113,7 @@ class DatabaseManager:
             );
             """)
 
-            # AI Inference Runs Log Table
+            # 5. AI Inference Runs Log Table
             cursor.execute("""
             CREATE TABLE IF NOT EXISTS inference_logs (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -73,7 +136,7 @@ class DatabaseManager:
             );
             """)
 
-            # Early Warning & Disaster Alerts Table
+            # 6. Early Warning & OASIS CAP Disaster Alerts
             cursor.execute("""
             CREATE TABLE IF NOT EXISTS disaster_alerts (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -86,13 +149,17 @@ class DatabaseManager:
                 surge_height_m TEXT,
                 rainfall_24h_mm REAL,
                 evacuation_recommendation TEXT,
+                cap_identifier TEXT,
+                cap_urgency TEXT DEFAULT 'Immediate',
+                cap_severity TEXT DEFAULT 'Extreme',
+                cap_certainty TEXT DEFAULT 'Observed',
                 issued_by TEXT,
                 active INTEGER DEFAULT 1,
                 issued_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
             """)
 
-            # Multi-Source Telemetry Snapshots Table
+            # 7. Multi-Source Telemetry Snapshots Table
             cursor.execute("""
             CREATE TABLE IF NOT EXISTS telemetry_snapshots (
                 id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -108,9 +175,172 @@ class DatabaseManager:
                 captured_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
             """)
+
+            # 8. Advisory Bulletins Archive
+            cursor.execute("""
+            CREATE TABLE IF NOT EXISTS advisory_bulletins (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                bulletin_no TEXT UNIQUE NOT NULL,
+                cyclone_name TEXT NOT NULL,
+                basin TEXT NOT NULL,
+                category TEXT NOT NULL,
+                issued_by TEXT NOT NULL,
+                pdf_size_bytes INTEGER NOT NULL,
+                issued_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+            """)
+
+            # 9. AI Models Registry
+            cursor.execute("""
+            CREATE TABLE IF NOT EXISTS ai_models_registry (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                model_key TEXT UNIQUE NOT NULL,
+                model_name TEXT NOT NULL,
+                version TEXT NOT NULL,
+                backbone TEXT NOT NULL,
+                dataset_trained TEXT NOT NULL,
+                mae_track_km REAL,
+                accuracy_pct REAL,
+                parameters_count TEXT,
+                is_active INTEGER DEFAULT 1,
+                registered_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+            """)
+
             conn.commit()
 
-    # --- Cyclone Events CRUD ---
+    # =========================================================
+    # SATELLITE SOURCES & FRAMES CRUD
+    # =========================================================
+    def upsert_satellite_source(self, source: Dict[str, Any]) -> int:
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+            INSERT INTO satellite_data_sources (
+                source_id, agency, satellite_name, orbit_type, spectral_channels_json,
+                spatial_resolution_km, temporal_cadence_min, status, data_format, coverage_basin
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(source_id) DO UPDATE SET
+                status=excluded.status,
+                spatial_resolution_km=excluded.spatial_resolution_km,
+                temporal_cadence_min=excluded.temporal_cadence_min
+            """, (
+                source["source_id"],
+                source["agency"],
+                source["satellite_name"],
+                source["orbit_type"],
+                json.dumps(source.get("spectral_channels", [])),
+                source["spatial_resolution_km"],
+                source["temporal_cadence_min"],
+                source.get("status", "ONLINE"),
+                source.get("data_format", "HDF5 / NetCDF-4"),
+                source.get("coverage_basin", "North Indian Ocean")
+            ))
+            conn.commit()
+            return cursor.lastrowid
+
+    def get_all_satellite_sources(self) -> List[Dict[str, Any]]:
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM satellite_data_sources ORDER BY agency, satellite_name")
+            rows = cursor.fetchall()
+            results = []
+            for r in rows:
+                item = dict(r)
+                item["spectral_channels"] = json.loads(item["spectral_channels_json"] or "[]")
+                results.append(item)
+            return results
+
+    def log_satellite_frame(self, frame: Dict[str, Any]) -> int:
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+            INSERT INTO satellite_frames (
+                source_id, channel, timestamp, basin, center_lat, center_lon,
+                min_brightness_temp_c, avg_brightness_temp_c, convective_cloud_fraction,
+                storage_path, metadata_json
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                frame["source_id"],
+                frame["channel"],
+                frame["timestamp"],
+                frame.get("basin", "Bay of Bengal"),
+                frame["center_lat"],
+                frame["center_lon"],
+                frame["min_brightness_temp_c"],
+                frame["avg_brightness_temp_c"],
+                frame["convective_cloud_fraction"],
+                frame.get("storage_path"),
+                json.dumps(frame.get("metadata", {}))
+            ))
+            conn.commit()
+            return cursor.lastrowid
+
+    def get_recent_satellite_frames(self, source_id: Optional[str] = None, limit: int = 20) -> List[Dict[str, Any]]:
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            if source_id:
+                cursor.execute("SELECT * FROM satellite_frames WHERE source_id = ? ORDER BY ingested_at DESC LIMIT ?", (source_id, limit))
+            else:
+                cursor.execute("SELECT * FROM satellite_frames ORDER BY ingested_at DESC LIMIT ?", (limit,))
+            rows = cursor.fetchall()
+            results = []
+            for r in rows:
+                item = dict(r)
+                item["metadata"] = json.loads(item["metadata_json"] or "{}")
+                results.append(item)
+            return results
+
+    # =========================================================
+    # OCEAN BUOY TELEMETRY CRUD
+    # =========================================================
+    def insert_buoy_telemetry(self, buoy: Dict[str, Any]) -> int:
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+            INSERT INTO ocean_buoy_telemetry (
+                buoy_id, agency, latitude, longitude, basin, sea_surface_temp_c,
+                sea_surface_pressure_hpa, surface_wind_speed_kmh, surface_wind_direction_deg,
+                significant_wave_height_m, ocean_heat_content_kj_cm2, salinity_psu, timestamp
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                buoy["buoy_id"],
+                buoy.get("agency", "INCOIS / NIOT"),
+                buoy["latitude"],
+                buoy["longitude"],
+                buoy["basin"],
+                buoy["sea_surface_temp_c"],
+                buoy["sea_surface_pressure_hpa"],
+                buoy["surface_wind_speed_kmh"],
+                buoy["surface_wind_direction_deg"],
+                buoy["significant_wave_height_m"],
+                buoy["ocean_heat_content_kj_cm2"],
+                buoy.get("salinity_psu", 34.5),
+                buoy["timestamp"]
+            ))
+            conn.commit()
+            return cursor.lastrowid
+
+    def get_latest_buoy_telemetry(self, basin: Optional[str] = None) -> List[Dict[str, Any]]:
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            if basin:
+                cursor.execute("""
+                SELECT * FROM ocean_buoy_telemetry WHERE id IN (
+                    SELECT MAX(id) FROM ocean_buoy_telemetry WHERE basin = ? GROUP BY buoy_id
+                ) ORDER BY buoy_id
+                """, (basin,))
+            else:
+                cursor.execute("""
+                SELECT * FROM ocean_buoy_telemetry WHERE id IN (
+                    SELECT MAX(id) FROM ocean_buoy_telemetry GROUP BY buoy_id
+                ) ORDER BY basin, buoy_id
+                """)
+            return [dict(r) for r in cursor.fetchall()]
+
+    # =========================================================
+    # CYCLONE EVENTS CRUD
+    # =========================================================
     def upsert_cyclone_event(self, event_data: Dict[str, Any]) -> int:
         with self._get_connection() as conn:
             cursor = conn.cursor()
@@ -174,7 +404,6 @@ class DatabaseManager:
             else:
                 cursor.execute("SELECT * FROM cyclone_events ORDER BY created_at DESC")
             rows = cursor.fetchall()
-            
             results = []
             for r in rows:
                 item = dict(r)
@@ -199,7 +428,9 @@ class DatabaseManager:
             item["impact_districts"] = json.loads(item["impact_districts_json"] or "[]")
             return item
 
-    # --- AI Inference Logs ---
+    # =========================================================
+    # AI INFERENCE LOGS CRUD
+    # =========================================================
     def log_inference_run(self, log_data: Dict[str, Any]) -> int:
         with self._get_connection() as conn:
             cursor = conn.cursor()
@@ -242,15 +473,19 @@ class DatabaseManager:
                 results.append(item)
             return results
 
-    # --- Disaster Alerts ---
+    # =========================================================
+    # DISASTER ALERTS (CAP v1.2) CRUD
+    # =========================================================
     def create_alert(self, alert_data: Dict[str, Any]) -> int:
         with self._get_connection() as conn:
             cursor = conn.cursor()
+            cap_id = alert_data.get("cap_identifier") or f"IN-IMD-CAP-{int(time.time())}"
             cursor.execute("""
             INSERT INTO disaster_alerts (
                 alert_level, basin, cyclone_name, affected_districts_json, affected_states_json,
-                wind_gust_forecast_kmh, surge_height_m, rainfall_24h_mm, evacuation_recommendation, issued_by
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                wind_gust_forecast_kmh, surge_height_m, rainfall_24h_mm, evacuation_recommendation,
+                cap_identifier, cap_urgency, cap_severity, cap_certainty, issued_by
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (
                 alert_data["alert_level"],
                 alert_data["basin"],
@@ -260,8 +495,12 @@ class DatabaseManager:
                 alert_data.get("wind_gust_forecast_kmh", 120.0),
                 alert_data.get("surge_height_m", "2.0m"),
                 alert_data.get("rainfall_24h_mm", 150.0),
-                alert_data.get("evacuation_recommendation", "Immediate evacuation of low-lying coastal areas advised."),
-                alert_data.get("issued_by", "CycloneAI Disaster Intelligence Gateway")
+                alert_data.get("evacuation_recommendation", "Immediate evacuation of coastal habitations."),
+                cap_id,
+                alert_data.get("cap_urgency", "Immediate"),
+                alert_data.get("cap_severity", "Extreme"),
+                alert_data.get("cap_certainty", "Observed"),
+                alert_data.get("issued_by", "CycloneAI Early Warning Gateway (SIH 2026)")
             ))
             conn.commit()
             return cursor.lastrowid
@@ -279,5 +518,41 @@ class DatabaseManager:
                 results.append(item)
             return results
 
-# Singleton database instance
+    # =========================================================
+    # AI MODELS REGISTRY CRUD
+    # =========================================================
+    def register_ai_model(self, model_info: Dict[str, Any]) -> int:
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+            INSERT INTO ai_models_registry (
+                model_key, model_name, version, backbone, dataset_trained,
+                mae_track_km, accuracy_pct, parameters_count, is_active
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+            ON CONFLICT(model_key) DO UPDATE SET
+                version=excluded.version,
+                mae_track_km=excluded.mae_track_km,
+                accuracy_pct=excluded.accuracy_pct,
+                is_active=excluded.is_active
+            """, (
+                model_info["model_key"],
+                model_info["model_name"],
+                model_info["version"],
+                model_info["backbone"],
+                model_info["dataset_trained"],
+                model_info.get("mae_track_km"),
+                model_info.get("accuracy_pct"),
+                model_info.get("parameters_count", "24.5M"),
+                1 if model_info.get("is_active", True) else 0
+            ))
+            conn.commit()
+            return cursor.lastrowid
+
+    def get_registered_models(self) -> List[Dict[str, Any]]:
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM ai_models_registry ORDER BY id")
+            return [dict(r) for r in cursor.fetchall()]
+
+# Singleton Database Instance
 db = DatabaseManager()

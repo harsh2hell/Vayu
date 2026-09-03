@@ -1,221 +1,131 @@
-import React, { useState } from 'react';
-import { NavLink, useNavigate, useLocation } from 'react-router-dom';
-import {
-  LayoutDashboard, Satellite, Target, Activity,
-  ShieldAlert, Wind, PanelLeftClose, PanelLeftOpen,
-  User, Compass, Layers, BarChart3, Gauge, Cpu,
-  ChevronDown, MoreHorizontal, Check, X, ShieldCheck
-} from 'lucide-react';
+import React, { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { User, LogOut, MoreVertical, Shield } from 'lucide-react';
 
-const NAV_ITEMS = [
-  { path: '/dashboard', label: 'Overview', icon: LayoutDashboard, exact: true },
-  { path: '/dashboard/track', label: '4D Track Visualizer', icon: Compass },
-  { path: '/dashboard/satellite', label: 'Satellite Ingestion', icon: Satellite },
-  { path: '/dashboard/detection', label: 'Vision Detection (CNN)', icon: Target },
-  { path: '/dashboard/classification', label: 'Dvorak Classification', icon: Layers },
-  { path: '/dashboard/prediction', label: '72h Trajectory Studio', icon: Activity },
-  { path: '/dashboard/alerts', label: 'CAP Early Warnings', icon: ShieldAlert, badge: 'Live' },
-  { path: '/dashboard/analytics', label: 'Historical Database', icon: BarChart3 },
-  { path: '/dashboard/performance', label: 'Model Benchmarks', icon: Gauge },
-  { path: '/dashboard/architecture', label: 'Pipeline Architecture', icon: Cpu },
-];
-
-const Sidebar = ({ isCollapsed, onToggle }) => {
+const Sidebar = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const [showUserModal, setShowUserModal] = useState(false);
-  const [officerName, setOfficerName] = useState('Dr. Harsh Vardhan');
-  const [officerRole, setOfficerRole] = useState('Lead AI Meteorologist');
-  const [stationDesk, setStationDesk] = useState('RSMC New Delhi • IMD');
+  const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
+  const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
+  const menuRef = useRef(null);
 
-  const isActive = (path, exact) => {
-    if (exact) {
-      return location.pathname === path;
-    }
-    return location.pathname.startsWith(path) && path !== '/dashboard';
-  };
+  // Close account menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (menuRef.current && !menuRef.current.contains(event.target)) {
+        setIsAccountMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   return (
     <>
-      <aside 
-        className={`bg-white text-slate-700 flex flex-col fixed top-0 left-0 h-screen z-50 transition-all duration-200 border-r border-slate-200/90 select-none ${
-          isCollapsed ? 'w-[68px]' : 'w-60'
-        }`}
-      >
-        {/* VAYU Brand Header */}
-        <div className="h-14 px-4 flex items-center justify-between border-b border-slate-100">
-          <div 
+      {/* Left Column: Pure White Background, VAYU Logo at top, Account at bottom */}
+      <aside className="bg-white text-slate-700 flex flex-col justify-between fixed top-0 left-0 h-screen z-40 border-r border-slate-200 w-56 select-none shadow-xs">
+        
+        {/* Top Left: Authentic VAYU Logo on White Background */}
+        <div className="h-16 px-5 flex items-center border-b border-slate-100">
+          <img 
+            src="/vayu.png" 
+            alt="VAYU" 
+            className="h-9 w-auto object-contain filter drop-shadow-xs transition-transform duration-300 hover:scale-105 cursor-pointer" 
             onClick={() => navigate('/dashboard')}
-            className={`flex items-center gap-2.5 cursor-pointer overflow-hidden ${isCollapsed ? 'justify-center w-full' : ''}`}
-            title="VAYU AI - Cyclone Intelligence"
+            title="VAYU Command Center"
+          />
+        </div>
+
+        {/* Empty Middle Space */}
+        <div className="flex-1" />
+
+        {/* Bottom Left Account Trigger */}
+        <div className="p-3 border-t border-slate-100 relative" ref={menuRef}>
+          <button
+            type="button"
+            onClick={() => setIsAccountMenuOpen((prev) => !prev)}
+            className="w-full flex items-center gap-3 p-2 rounded-xl text-left hover:bg-slate-100/80 text-slate-800 transition-all cursor-pointer group"
+            title="Account & Session"
           >
-            <div className="w-6 h-6 rounded-md bg-slate-900 text-white flex items-center justify-center flex-shrink-0">
-              <Wind className="w-3.5 h-3.5 text-sky-400" />
+            <div className="w-9 h-9 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700 font-bold text-xs shrink-0 group-hover:bg-slate-200 transition-colors">
+              <User className="w-4 h-4 text-slate-600" />
             </div>
-            
-            {!isCollapsed && (
-              <div className="flex items-center gap-1.5">
-                <span className="font-heading font-black text-sm text-slate-900 tracking-tight block">
-                  VAYU <span className="text-sky-600">AI</span>
-                </span>
-                <span className="text-[10px] font-mono text-slate-400 font-bold bg-slate-100 px-1 py-0.2 rounded border border-slate-200">
-                  v2.1
-                </span>
-              </div>
-            )}
-          </div>
+            <div className="flex flex-col min-w-0 flex-1">
+              <span className="text-xs font-semibold text-slate-900 truncate">IMD Officer</span>
+              <span className="text-[10px] text-slate-500 truncate">officer.cyclone@imd.gov.in</span>
+            </div>
+            <MoreVertical className="w-4 h-4 text-slate-400 group-hover:text-slate-600 shrink-0" />
+          </button>
 
-          {!isCollapsed && (
-            <button 
-              onClick={onToggle}
-              className="text-slate-400 hover:text-slate-700 p-1 rounded-md hover:bg-slate-100 transition-colors"
-              title="Collapse Sidebar"
-            >
-              <PanelLeftClose className="w-3.5 h-3.5" />
-            </button>
+          {/* Account Sub-menu Popover */}
+          {isAccountMenuOpen && (
+            <div className="absolute bottom-full left-3 right-3 mb-2 bg-white border border-slate-200 rounded-2xl shadow-xl p-1.5 z-50 animate-in fade-in slide-in-from-bottom-2 duration-150">
+              <div className="px-3 py-2 border-b border-slate-100">
+                <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
+                  <Shield className="w-3 h-3 text-sky-600" />
+                  <span>Central Operations Desk</span>
+                </div>
+                <div className="text-[10px] text-slate-500 mt-0.5">IMD • Cyclone Warning Division</div>
+              </div>
+              
+              <div className="pt-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsAccountMenuOpen(false);
+                    setIsLogoutDialogOpen(true);
+                  }}
+                  className="w-full flex items-center gap-2.5 px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 rounded-xl transition-all cursor-pointer"
+                >
+                  <LogOut className="w-4 h-4 text-red-600" />
+                  <span>Logout</span>
+                </button>
+              </div>
+            </div>
           )}
         </div>
 
-        {/* Workspace Dropdown Pill (Autonex Style with VAYU/IMD Org) */}
-        {!isCollapsed && (
-          <div className="px-3 py-3 border-b border-slate-100">
-            <button className="w-full flex items-center justify-between px-2.5 py-1.5 rounded-lg border border-slate-200 bg-slate-50/70 hover:bg-slate-100/70 transition-colors text-left text-xs font-medium text-slate-800">
-              <div className="flex items-center gap-2 min-w-0 truncate">
-                <div className="w-5 h-5 rounded bg-sky-600 text-white font-mono font-bold text-[10px] flex items-center justify-center flex-shrink-0">
-                  V
-                </div>
-                <span className="truncate text-xs font-semibold text-slate-800">IMD National Desk</span>
-              </div>
-              <ChevronDown className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
-            </button>
-          </div>
-        )}
-
-        {/* Navigation Items List */}
-        <nav className="flex-1 px-2.5 py-3 space-y-0.5 overflow-y-auto">
-          {NAV_ITEMS.map((item, idx) => {
-            const active = isActive(item.path, item.exact);
-            const Icon = item.icon;
-            return (
-              <NavLink
-                key={idx}
-                to={item.path}
-                title={isCollapsed ? item.label : undefined}
-                className={`flex items-center gap-3 px-3 py-1.5 rounded-lg text-xs font-medium transition-all duration-150 relative ${
-                  active
-                    ? 'bg-slate-100 text-slate-900 font-semibold'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
-                } ${isCollapsed ? 'justify-center px-2' : ''}`}
-              >
-                <Icon className={`w-4 h-4 flex-shrink-0 ${active ? 'text-sky-600 font-bold' : 'text-slate-400'}`} />
-                
-                {!isCollapsed && (
-                  <div className="flex items-center justify-between flex-1 truncate">
-                    <span className="truncate">{item.label}</span>
-                    {item.badge && (
-                      <span className="text-[9px] font-mono px-1.5 py-0.2 rounded font-bold uppercase bg-red-100 text-red-700 border border-red-200">
-                        {item.badge}
-                      </span>
-                    )}
-                  </div>
-                )}
-              </NavLink>
-            );
-          })}
-        </nav>
-
-        {/* Bottom Profile Footer (Autonex Style for Meteorologist) */}
-        <div className="p-3 border-t border-slate-100 bg-slate-50/30">
-          {!isCollapsed ? (
-            <button
-              onClick={() => setShowUserModal(true)}
-              className="w-full flex items-center justify-between p-1.5 rounded-lg hover:bg-slate-100 transition-colors text-left"
-            >
-              <div className="flex items-center gap-2.5 min-w-0">
-                <div className="w-6 h-6 rounded bg-slate-900 text-white font-mono font-bold text-[11px] flex items-center justify-center flex-shrink-0">
-                  H
-                </div>
-                <div className="min-w-0">
-                  <p className="text-xs font-semibold text-slate-800 truncate">{officerName}</p>
-                  <p className="text-[10px] text-slate-400 font-mono truncate">{officerRole}</p>
-                </div>
-              </div>
-              <MoreHorizontal className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
-            </button>
-          ) : (
-            <button 
-              onClick={onToggle}
-              className="w-full flex items-center justify-center p-1.5 text-slate-400 hover:text-slate-700 rounded-lg hover:bg-slate-100 transition-colors"
-              title="Expand Sidebar"
-            >
-              <PanelLeftOpen className="w-4 h-4" />
-            </button>
-          )}
-        </div>
       </aside>
 
-      {/* Duty Officer Profile Modal */}
-      {showUserModal && (
-        <div className="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200 space-y-4 text-slate-800">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-slate-900 text-white flex items-center justify-center font-bold">
-                  <User className="w-4 h-4" />
-                </div>
-                <div>
-                  <h3 className="font-heading font-bold text-sm text-slate-900">Meteorologist Officer Profile</h3>
-                  <p className="text-[11px] text-slate-500">Ministry of Earth Sciences • National Cyclone Desk</p>
-                </div>
+      {/* Logout Confirmation Dialog Modal */}
+      {isLogoutDialogOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-150">
+          <div className="w-full max-w-sm bg-white border border-slate-200 rounded-3xl p-6 shadow-2xl space-y-4">
+            
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600 shrink-0">
+                <LogOut className="w-5 h-5" />
               </div>
-              <button 
-                onClick={() => setShowUserModal(false)} 
-                className="text-slate-400 hover:text-slate-700 p-1 rounded-lg hover:bg-slate-100 transition-colors"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="space-y-3 text-xs">
-              <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Officer Name:</label>
-                <input
-                  type="text"
-                  value={officerName}
-                  onChange={(e) => setOfficerName(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-slate-900 transition-all"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Designation / Role:</label>
-                <input
-                  type="text"
-                  value={officerRole}
-                  onChange={(e) => setOfficerRole(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-slate-900 transition-all"
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Jurisdiction Desk:</label>
-                <input
-                  type="text"
-                  value={stationDesk}
-                  onChange={(e) => setStationDesk(e.target.value)}
-                  className="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-slate-900 transition-all"
-                />
+              <div>
+                <h3 className="text-base font-bold text-slate-900">
+                  Confirm Logout
+                </h3>
+                <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">
+                  Are you sure you want to end your operational session and return to the public website?
+                </p>
               </div>
             </div>
 
-            <div className="flex justify-end gap-2 pt-2 border-t border-slate-100">
+            <div className="flex items-center justify-end gap-2.5 pt-2">
               <button
-                onClick={() => setShowUserModal(false)}
-                className="btn-primary text-xs py-1.5 px-4"
+                type="button"
+                onClick={() => setIsLogoutDialogOpen(false)}
+                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-100 border border-slate-200 transition-all cursor-pointer"
               >
-                Save Changes
+                Cancel
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsLogoutDialogOpen(false);
+                  navigate('/');
+                }}
+                className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-red-600 hover:bg-red-700 shadow-md transition-all cursor-pointer flex items-center gap-1.5"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>Logout</span>
               </button>
             </div>
+
           </div>
         </div>
       )}

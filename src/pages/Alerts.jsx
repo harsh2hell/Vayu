@@ -1,77 +1,82 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   AlertTriangle, AlertOctagon, Info, Bell, CheckCircle, 
   Clock, ShieldAlert, FileText, Download, Printer, 
-  Send, Radio, Building2, Users, Anchor, X, CheckCheck
+  Send, Radio, Building2, Users, Anchor, X, CheckCheck,
+  MapPin, Waves, Wind, Copy, Code
 } from 'lucide-react';
-import { ALERTS, ACTIVE_CYCLONES } from '../data/mockData';
+import { 
+  MapContainer, TileLayer, Marker, Popup, Circle
+} from 'react-leaflet';
+import 'leaflet/dist/leaflet.css';
 import { useNavigate } from 'react-router-dom';
-import { downloadOfficialBulletinPdf } from '../services/api';
+import { downloadOfficialBulletinPdf, fetchActiveAlerts } from '../services/api';
+import L from 'leaflet';
 
-const DETAILED_ALERTS = [
+const createSectorIcon = (severity) => L.divIcon({
+  className: 'custom-alert-marker',
+  html: `
+    <div class="relative flex items-center justify-center">
+      <div class="w-8 h-8 rounded-full ${severity.includes('RED') ? 'bg-red-500/30' : severity.includes('ORANGE') ? 'bg-orange-500/30' : 'bg-amber-500/30'} animate-ping absolute"></div>
+      <div class="w-6 h-6 rounded-full ${severity.includes('RED') ? 'bg-red-600' : severity.includes('ORANGE') ? 'bg-orange-600' : 'bg-amber-600'} border-2 border-white shadow-md flex items-center justify-center text-white text-[10px] font-bold">
+        ⚠️
+      </div>
+    </div>
+  `,
+  iconSize: [24, 24],
+  iconAnchor: [12, 12]
+});
+
+const DEFAULT_ALERTS = [
   {
-    id: 'WARN-2026-001',
-    severity: 'RED',
-    cyclone: 'TC-2026-ALPHA',
+    id: 1,
+    alert_level: 'RED_ALERT',
+    cyclone_name: 'Severe Cyclonic Storm DANA',
+    basin: 'Bay of Bengal',
+    lat: 19.26,
+    lon: 84.91,
     title: 'RED ALERT: Severe Cyclonic Storm Landfall Warning',
-    message: 'Rapid intensification observed. High probability of landfall between Gopalpur (Odisha) and Kalingapatnam (Andhra Pradesh) within 24–30 hours. Peak wind gusts reaching 125 km/h.',
-    issuedAt: '2026-08-29 14:00 IST',
-    region: 'Coastal Odisha (Ganjam, Puri) & North Coastal AP (Srikakulam)',
-    surge: '2.5 to 3.2 meters above astronomical tide',
-    rain: 'Extremely Heavy Rainfall (>204.4 mm) in isolated places',
-    ports: 'Hoist Great Danger Signal No. 8 at Gopalpur & Paradip Ports',
-    action: 'Total evacuation of low-lying coastal villages within 5 km of shoreline.'
-  },
-  {
-    id: 'WARN-2026-002',
-    severity: 'ORANGE',
-    cyclone: 'TC-2026-ALPHA',
-    title: 'ORANGE ALERT: Gale Wind & Inundation Advisory',
-    message: 'Squally wind speed reaching 55-65 km/h gusting to 75 km/h prevailing along and off West Bengal and remaining Odisha coast, gradually increasing to 80-90 km/h from tonight.',
-    issuedAt: '2026-08-29 13:15 IST',
-    region: 'Gangetic West Bengal (Digha, Sagar Island) & Balasore',
-    surge: '1.0 to 1.5 meters',
-    rain: 'Heavy to Very Heavy Rainfall (115.6 to 204.4 mm)',
-    ports: 'Hoist Local Warning Signal No. 4',
-    action: 'Fishermen strictly advised not to venture into deep sea.'
-  },
-  {
-    id: 'WARN-2026-003',
-    severity: 'YELLOW',
-    cyclone: 'TC-2026-BETA',
-    title: 'YELLOW WATCH: Tropical Disturbance Development Advisory',
-    message: 'Low pressure system over East-Central Arabian Sea is likely to concentrate into a Depression during next 24 hours. Moving North-Northwestwards.',
-    issuedAt: '2026-08-29 11:30 IST',
-    region: 'Saurashtra & Kutch Coast (Gujarat)',
-    surge: 'Normal / Rough Sea conditions',
-    rain: 'Light to Moderate Rainfall at most places',
-    ports: 'Hoist Distant Cautionary Signal No. 1',
-    action: 'Keep standby search and rescue units on alert.'
+    affected_districts: ['Bhadrak', 'Kendrapara', 'Balasore', 'Jagatsinghpur', 'Purba Medinipur'],
+    affected_states: ['Odisha', 'West Bengal'],
+    wind_gust_forecast_kmh: 120.0,
+    surge_height_m: '2.0 – 2.8m',
+    rainfall_24h_mm: 240.0,
+    evacuation_recommendation: 'High priority evacuation in progress for 1.2M residents across coastal Odisha.',
+    cap_identifier: 'IN-IMD-CAP-2026-DANA-01',
+    issued_at: '2026-09-02 14:00 IST'
   }
 ];
 
 const STAKEHOLDERS_BROADCAST = [
-  { name: 'National Disaster Response Force (NDRF)', status: 'Dispatched (12 Battalions Deployed)', icon: Building2 },
-  { name: 'Odisha State Disaster Management (OSDMA)', status: 'Control Room Active • 24/7 Red Alert', icon: ShieldAlert },
-  { name: 'Indian Coast Guard (Eastern Fleet)', status: 'Maritime Patrol Warning Broadcast Active', icon: Anchor },
-  { name: 'Coastal District Collectors & SDRF', status: 'Shelter Evacuation Protocol Initialized', icon: Users },
+  { name: 'National Disaster Response Force (NDRF)', status: 'Dispatched (12 Battalions Deployed in Coastal Odisha & WB)', icon: Building2 },
+  { name: 'State Disaster Management Authorities (OSDMA / APSDMA)', status: 'Control Room Active • 24/7 Red Alert Mode', icon: ShieldAlert },
+  { name: 'Indian Coast Guard (Eastern Seaboard)', status: 'Maritime Patrol Warning & Fishermen Recall Active', icon: Anchor },
+  { name: 'District Emergency Operations Centres (DEOC)', status: 'Shelter Evacuation Protocol 100% Initialized', icon: Users },
 ];
 
 const Alerts = () => {
   const navigate = useNavigate();
   const [filter, setFilter] = useState('ALL');
   const [acknowledged, setAcknowledged] = useState({});
-  const [showBulletinModal, setShowBulletinModal] = useState(false);
-  const [showSubscribeModal, setShowSubscribeModal] = useState(false);
   const [broadcastSent, setBroadcastSent] = useState(false);
-  const [subEmail, setSubEmail] = useState('');
+  const [alertsList, setAlertsList] = useState(DEFAULT_ALERTS);
+  const [selectedCapAlert, setSelectedCapAlert] = useState(null);
+  const [copiedCap, setCopiedCap] = useState(false);
 
-  const primary = ACTIVE_CYCLONES[0];
+  useEffect(() => {
+    const loadAlerts = async () => {
+      const liveAlerts = await fetchActiveAlerts();
+      if (liveAlerts && liveAlerts.length > 0) {
+        setAlertsList(liveAlerts);
+      }
+    };
+    loadAlerts();
+  }, []);
 
   const handleAcknowledge = (id) => {
     setAcknowledged(prev => ({
       ...prev,
-      [id]: new Date().toLocaleTimeString('en-IN') + ' IST (NDRF Duty Officer)'
+      [id]: new Date().toLocaleTimeString('en-IN') + ' IST (Duty Officer)'
     }));
   };
 
@@ -81,204 +86,249 @@ const Alerts = () => {
   };
 
   const filtered = filter === 'ALL' 
-    ? DETAILED_ALERTS 
-    : DETAILED_ALERTS.filter(a => a.severity === filter);
+    ? alertsList 
+    : alertsList.filter(a => (a.alert_level || '').includes(filter));
+
+  const generateCapXmlString = (alert) => {
+    return `<?xml version="1.0" encoding="UTF-8"?>
+<alert xmlns="urn:oasis:names:tc:emergency:cap:1.2">
+  <identifier>${alert.cap_identifier || 'IN-IMD-CAP-2026-01'}</identifier>
+  <sender>imd.cyclone.warning@nic.in</sender>
+  <sent>${new Date().toISOString()}</sent>
+  <status>Actual</status>
+  <msgType>Alert</msgType>
+  <scope>Public</scope>
+  <info>
+    <category>Met</category>
+    <event>Tropical Cyclone ${alert.alert_level || 'RED ALERT'}</event>
+    <urgency>Immediate</urgency>
+    <severity>Extreme</severity>
+    <certainty>Observed</certainty>
+    <headline>${alert.cyclone_name} COASTAL STRIKE WARNING</headline>
+    <description>Sustained wind gusts up to ${alert.wind_gust_forecast_kmh} km/h. Surge: ${alert.surge_height_m}. 24h Rain: ${alert.rainfall_24h_mm} mm.</description>
+    <instruction>${alert.evacuation_recommendation}</instruction>
+    <area>
+      <areaDesc>${(alert.affected_districts || []).join(', ')}</areaDesc>
+    </area>
+  </info>
+</alert>`;
+  };
 
   return (
-    <div className="space-y-6 max-w-[1400px] mx-auto pb-10">
+    <div className="space-y-6 max-w-7xl mx-auto pb-10">
       
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2">
-            <ShieldAlert className="w-6 h-6 text-red-600" />
-            <h1 className="text-xl sm:text-2xl font-bold text-slate-900">National Early Warning & Risk Intelligence Center</h1>
-            <span className="badge badge-red">CAP Standard Active</span>
+          <div className="flex items-center gap-2 mb-1">
+            <h1 className="text-xl sm:text-2xl font-heading font-black text-slate-900 tracking-tight">
+              CAP Early Warning & Disaster Operations Center
+            </h1>
+            <span className="badge badge-red">OASIS CAP v1.2 Protocol</span>
           </div>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Common Alerting Protocol (CAP) automated dissemination system for disaster management authorities
+          <p className="text-xs text-slate-500 font-normal">
+            Automated Common Alerting Protocol (CAP v1.2) emergency bulletin generator and geospatial evacuation zone dispatcher.
           </p>
         </div>
 
-        <div className="flex items-center gap-2 flex-wrap">
-          <button 
-            onClick={() => setShowBulletinModal(true)}
-            className="btn-secondary text-xs sm:text-sm py-2 px-3 gap-1.5"
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => downloadOfficialBulletinPdf({ name: 'Severe Cyclonic Storm DANA', basin: 'Bay of Bengal' })}
+            className="btn-primary text-xs py-1.5 px-3.5 shadow-xs gap-1.5"
           >
-            <FileText className="w-3.5 h-3.5 text-slate-600" />
-            <span>Generate Official IMD Bulletin</span>
-          </button>
-
-          <button 
-            onClick={() => setShowSubscribeModal(true)}
-            className="btn-primary text-xs sm:text-sm py-2 px-4 gap-2 shadow-sm"
-          >
-            <Bell className="w-4 h-4 text-amber-300" />
-            <span>Subscribe to CAP Feeds</span>
+            <Download className="w-3.5 h-3.5" />
+            <span>Download Official Bulletin PDF</span>
           </button>
         </div>
       </div>
 
-      {/* Alert Severity Filter Counters */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        {[
-          { key: 'RED', label: 'RED WARNING', sub: 'Take Action Immediately', count: 1, border: 'border-red-500', bg: 'bg-red-50', text: 'text-red-700' },
-          { key: 'ORANGE', label: 'ORANGE ALERT', sub: 'Be Prepared / Ready', count: 1, border: 'border-orange-500', bg: 'bg-orange-50', text: 'text-orange-700' },
-          { key: 'YELLOW', label: 'YELLOW WATCH', sub: 'Be Updated / Monitor', count: 1, border: 'border-amber-500', bg: 'bg-amber-50', text: 'text-amber-700' },
-          { key: 'ALL', label: 'TOTAL ACTIVE', sub: 'All National Warnings', count: 3, border: 'border-blue-500', bg: 'bg-blue-50', text: 'text-[#003087]' },
-        ].map((item) => (
-          <button
-            key={item.key}
-            onClick={() => setFilter(item.key)}
-            className={`p-4 rounded-xl border-2 text-left transition-all ${item.bg} ${
-              filter === item.key 
-                ? `${item.border} shadow-md scale-102` 
-                : 'border-transparent hover:border-slate-300'
-            }`}
+      {/* Geospatial Coastal Warning GIS Map */}
+      <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-4 shadow-2xs">
+        <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div>
+            <span className="text-[11px] font-mono font-bold text-slate-800 uppercase">// GEOSPATIAL_EVACUATION_ZONES_MAP</span>
+            <p className="text-xs text-slate-500 font-normal">Live coastal storm surge inundation and district warning polygons.</p>
+          </div>
+          <div className="flex items-center gap-2 font-mono text-xs">
+            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-red-500" /> Red Alert</span>
+            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-orange-500" /> Orange Alert</span>
+            <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-amber-500" /> Yellow Watch</span>
+          </div>
+        </div>
+
+        <div className="h-72 w-full rounded-lg overflow-hidden border border-slate-200 relative">
+          <MapContainer
+            center={[19.8, 85.8]}
+            zoom={6}
+            style={{ width: '100%', height: '100%' }}
           >
-            <div className="flex items-center justify-between mb-1">
-              <span className={`text-xs font-bold uppercase tracking-wider ${item.text}`}>{item.label}</span>
-              <span className={`text-2xl font-black ${item.text}`}>{item.count}</span>
-            </div>
-            <p className="text-[11px] text-slate-500 font-medium">{item.sub}</p>
-          </button>
-        ))}
+            <TileLayer
+              url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{x}/{y}"
+              attribution="Tiles &copy; Esri &mdash; Earthstar Geographics"
+            />
+
+            {/* Red Alert Coastal Zone */}
+            <Circle
+              center={[20.80, 86.95]}
+              radius={95000}
+              pathOptions={{ fillColor: '#EF4444', fillOpacity: 0.25, color: '#DC2626', weight: 2 }}
+            />
+
+            {/* Orange Alert Coastal Zone */}
+            <Circle
+              center={[21.68, 87.52]}
+              radius={80000}
+              pathOptions={{ fillColor: '#F97316', fillOpacity: 0.2, color: '#EA580C', weight: 1.5 }}
+            />
+
+            {/* Alert Location Marker */}
+            <Marker
+              position={[20.80, 86.95]}
+              icon={createSectorIcon('RED')}
+            >
+              <Popup>
+                <div className="p-1 text-xs space-y-1 font-sans">
+                  <p className="font-bold text-slate-900">Cyclone DANA Landfall Strike Zone</p>
+                  <p className="text-slate-600 font-mono text-[10px]">Dhamra Port &amp; Bhadrak Coast</p>
+                  <p className="text-red-600 font-semibold text-[11px]">Surge: 2.0 – 2.8 meters</p>
+                </div>
+              </Popup>
+            </Marker>
+          </MapContainer>
+        </div>
       </div>
 
-      {/* Main Grid: Alert Cards (8 Cols) + Multi-Agency Dispatcher (4 Cols) */}
+      {/* Main 2-Column Grid */}
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
         
-        {/* Left Column: Active Alert Dossiers (8 Cols) */}
+        {/* Left Column: Active Alert Feed (8 Cols) */}
         <div className="xl:col-span-8 space-y-4">
           
-          <div className="flex items-center justify-between px-1">
-            <h3 className="text-sm font-bold text-slate-800">
-              Active Bulletins ({filtered.length} Displayed)
-            </h3>
-            <span className="text-xs text-slate-400 font-mono">Protocol: ITU-T X.1303 CAP v1.2</span>
-          </div>
-
-          {filtered.map((alert) => {
-            const isAck = acknowledged[alert.id];
-            return (
-              <div 
-                key={alert.id}
-                className={`card p-5 border-l-6 space-y-4 transition-all ${
-                  alert.severity === 'RED' 
-                    ? 'border-l-red-600 bg-gradient-to-r from-red-50/60 to-white' 
-                    : alert.severity === 'ORANGE'
-                    ? 'border-l-orange-500 bg-gradient-to-r from-orange-50/40 to-white'
-                    : 'border-l-amber-500 bg-gradient-to-r from-amber-50/40 to-white'
+          {/* Filter Bar */}
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-mono text-slate-500">Filter:</span>
+            {['ALL', 'RED', 'ORANGE', 'YELLOW'].map((f) => (
+              <button
+                key={f}
+                onClick={() => setFilter(f)}
+                className={`px-3 py-1 rounded text-xs font-mono font-medium transition-all border ${
+                  filter === f
+                    ? 'bg-slate-900 text-white border-slate-900 font-bold shadow-2xs'
+                    : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
                 }`}
               >
-                {/* Alert Card Header */}
-                <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-100 pb-3">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <span className={`badge ${
-                        alert.severity === 'RED' ? 'badge-red' : alert.severity === 'ORANGE' ? 'badge-orange' : 'badge-amber'
-                      }`}>
-                        {alert.severity} ADVISORY
-                      </span>
-                      <span className="text-xs font-mono text-slate-500">{alert.id}</span>
-                      <span className="text-xs text-slate-400">• {alert.issuedAt}</span>
-                    </div>
-                    <h4 className="font-bold text-base text-slate-900">{alert.title}</h4>
-                    <p className="text-xs font-semibold text-[#003087]">Target System: {alert.cyclone}</p>
-                  </div>
+                {f}
+              </button>
+            ))}
+          </div>
 
+          {/* Alert Cards */}
+          <div className="space-y-4">
+            {filtered.map((alert, idx) => (
+              <div 
+                key={alert.id || idx} 
+                className={`bg-white border rounded-xl p-5 space-y-3.5 shadow-2xs transition-all ${
+                  (alert.alert_level || '').includes('RED') ? 'border-red-200' :
+                  (alert.alert_level || '').includes('ORANGE') ? 'border-orange-200' : 'border-amber-200'
+                }`}
+              >
+                <div className="flex items-center justify-between border-b border-slate-100 pb-2">
                   <div className="flex items-center gap-2">
-                    {isAck ? (
-                      <span className="inline-flex items-center gap-1.5 text-xs text-emerald-700 bg-emerald-100 px-3 py-1.5 rounded-lg font-semibold">
+                    <span className={`badge ${
+                      (alert.alert_level || '').includes('RED') ? 'badge-red' :
+                      (alert.alert_level || '').includes('ORANGE') ? 'badge-orange' : 'badge-amber'
+                    }`}>
+                      {alert.alert_level || 'RED_ALERT'}
+                    </span>
+                    <span className="text-xs font-mono text-slate-400">{alert.cap_identifier || `CAP-WARN-${alert.id}`}</span>
+                  </div>
+                  <span className="text-xs font-mono text-slate-500">{alert.issued_at || 'Just Now'}</span>
+                </div>
+
+                <h3 className="font-heading font-bold text-sm text-slate-900">
+                  {alert.cyclone_name} — Coastal Warning Directive
+                </h3>
+                <p className="text-xs text-slate-600 leading-relaxed">{alert.evacuation_recommendation}</p>
+
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                  <div>
+                    <span className="text-[10px] text-slate-400 block uppercase">Wind Gusts</span>
+                    <span className="font-bold text-sky-700">{alert.wind_gust_forecast_kmh} km/h</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-400 block uppercase">Storm Surge</span>
+                    <span className="font-bold text-red-600">{alert.surge_height_m}</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-400 block uppercase">24h Rainfall</span>
+                    <span className="font-bold text-slate-800">{alert.rainfall_24h_mm} mm</span>
+                  </div>
+                  <div>
+                    <span className="text-[10px] text-slate-400 block uppercase">Target Districts</span>
+                    <span className="font-bold text-slate-800 truncate block">{(alert.affected_districts || []).join(', ')}</span>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap items-center justify-between pt-1 gap-2 text-xs">
+                  <div className="flex items-center gap-2">
+                    {acknowledged[alert.id] ? (
+                      <span className="text-emerald-600 font-medium flex items-center gap-1">
                         <CheckCheck className="w-3.5 h-3.5" />
-                        <span>Ack: {isAck}</span>
+                        <span>Acknowledged: {acknowledged[alert.id]}</span>
                       </span>
                     ) : (
-                      <button 
+                      <button
                         onClick={() => handleAcknowledge(alert.id)}
-                        className="btn-secondary text-xs py-1.5 px-3 hover:bg-emerald-50 hover:text-emerald-700 hover:border-emerald-300"
+                        className="btn-secondary text-xs py-1 px-3"
                       >
-                        <CheckCircle className="w-3.5 h-3.5" />
-                        <span>Acknowledge</span>
+                        <CheckCircle className="w-3 h-3" />
+                        <span>Acknowledge Protocol</span>
                       </button>
                     )}
-                  </div>
-                </div>
 
-                {/* Body Details */}
-                <p className="text-xs sm:text-sm text-slate-700 leading-relaxed">
-                  {alert.message}
-                </p>
-
-                {/* Specific Action Directives Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-1 text-xs">
-                  <div className="bg-white p-2.5 rounded-lg border border-slate-200">
-                    <span className="text-slate-400 block text-[10px] uppercase font-bold">Vulnerable Impact Corridor:</span>
-                    <span className="font-semibold text-slate-800">{alert.region}</span>
+                    <button
+                      onClick={() => setSelectedCapAlert(alert)}
+                      className="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-mono text-[11px] flex items-center gap-1"
+                    >
+                      <Code className="w-3 h-3" />
+                      <span>CAP v1.2 Payload</span>
+                    </button>
                   </div>
 
-                  <div className="bg-white p-2.5 rounded-lg border border-slate-200">
-                    <span className="text-slate-400 block text-[10px] uppercase font-bold">Estimated Storm Surge:</span>
-                    <span className="font-semibold text-red-600">{alert.surge}</span>
-                  </div>
-
-                  <div className="bg-white p-2.5 rounded-lg border border-slate-200">
-                    <span className="text-slate-400 block text-[10px] uppercase font-bold">Precipitation Warning:</span>
-                    <span className="font-semibold text-slate-800">{alert.rain}</span>
-                  </div>
-
-                  <div className="bg-white p-2.5 rounded-lg border border-slate-200">
-                    <span className="text-slate-400 block text-[10px] uppercase font-bold">Port Signals:</span>
-                    <span className="font-semibold text-amber-700">{alert.ports}</span>
-                  </div>
-                </div>
-
-                {/* Mandatory Directives */}
-                <div className="bg-red-50 border-l-3 border-red-500 p-2.5 rounded-r-lg text-xs text-red-800">
-                  <strong>Civil Protection Directive:</strong> {alert.action}
-                </div>
-
-                <div className="flex items-center justify-between pt-1 border-t border-slate-100">
-                  <button 
+                  <button
                     onClick={() => navigate('/dashboard/track')}
-                    className="text-xs font-semibold text-[#003087] hover:underline"
+                    className="text-sky-600 font-semibold hover:underline flex items-center gap-1"
                   >
-                    View Geospatial Impact Zone on Map →
-                  </button>
-                  <button 
-                    onClick={() => setShowBulletinModal(true)}
-                    className="text-xs font-semibold text-slate-600 hover:text-slate-900"
-                  >
-                    Print Bulletin PDF
+                    <span>View 4D Track Visualizer</span>
+                    <ChevronRight className="w-3.5 h-3.5" />
                   </button>
                 </div>
               </div>
-            );
-          })}
+            ))}
+          </div>
 
         </div>
 
         {/* Right Column: Multi-Agency Broadcast & Ingestion Activity (4 Cols) */}
-        <div className="xl:col-span-4 space-y-6">
+        <div className="xl:col-span-4 space-y-4">
           
-          {/* Multi-Agency Broadcast Dispatcher Card */}
-          <div className="card p-5 space-y-4">
+          <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-4 shadow-2xs">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
-                <Radio className="w-5 h-5 text-[#003087]" />
-                <h3 className="font-bold text-sm text-slate-900">Multi-Agency Broadcast Feeds</h3>
+                <Radio className="w-4 h-4 text-sky-600" />
+                <h3 className="font-heading font-bold text-xs text-slate-900 uppercase">// MULTI_AGENCY_DISPATCH</h3>
               </div>
-              <span className="badge badge-green">Connected</span>
+              <span className="badge badge-green">Operational</span>
             </div>
 
-            <div className="space-y-3">
+            <div className="space-y-2.5">
               {STAKEHOLDERS_BROADCAST.map((agency, idx) => (
-                <div key={idx} className="bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-1">
+                <div key={idx} className="bg-slate-50 border border-slate-100 rounded-lg p-2.5 space-y-1">
                   <div className="flex items-center gap-2">
-                    <agency.icon className="w-4 h-4 text-[#003087] flex-shrink-0" />
+                    <agency.icon className="w-3.5 h-3.5 text-slate-700 flex-shrink-0" />
                     <h4 className="font-bold text-xs text-slate-900">{agency.name}</h4>
                   </div>
-                  <p className="text-[11px] text-slate-600 pl-6 font-medium">{agency.status}</p>
+                  <p className="text-[11px] text-slate-500 pl-5">{agency.status}</p>
                 </div>
               ))}
             </div>
@@ -287,33 +337,11 @@ const Alerts = () => {
               <button 
                 onClick={handleBroadcast}
                 disabled={broadcastSent}
-                className="btn-primary w-full text-xs py-2.5 justify-center gap-2"
+                className="w-full btn-primary text-xs py-2 justify-center gap-2"
               >
                 <Send className="w-3.5 h-3.5" />
-                <span>{broadcastSent ? 'Emergency Broadcast Transmitted!' : 'Dispatch Immediate Red Alert Push'}</span>
+                <span>{broadcastSent ? 'Emergency Push Dispatched to NDRF/SDMA!' : 'Transmit Immediate CAP Push'}</span>
               </button>
-            </div>
-          </div>
-
-          {/* Real-Time Alert Log */}
-          <div className="card p-5 space-y-3">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-              <h4 className="font-bold text-xs text-slate-800 uppercase tracking-wider">Automated Event Log</h4>
-              <span className="text-[10px] text-slate-400 font-mono">Today, 29 Aug</span>
-            </div>
-
-            <div className="space-y-3 text-xs">
-              {[
-                { time: '14:30 IST', event: 'AI re-inference confirms Rapid Intensification rate (+30 km/h in 24h).' },
-                { time: '14:00 IST', event: 'RED BULLETIN issued for Ganjam & Srikakulam districts.' },
-                { time: '13:15 IST', event: 'ORANGE WARNING disseminated to West Bengal Disaster Authority.' },
-                { time: '11:30 IST', event: 'Arabian Sea system designated TC-2026-BETA (Depression Watch).' },
-              ].map((log, idx) => (
-                <div key={idx} className="flex items-start gap-2.5">
-                  <span className="font-mono text-[10px] text-slate-400 flex-shrink-0 mt-0.5">{log.time}</span>
-                  <p className="text-slate-600 leading-snug">{log.event}</p>
-                </div>
-              ))}
             </div>
           </div>
 
@@ -321,146 +349,36 @@ const Alerts = () => {
 
       </div>
 
-      {/* Official IMD Bulletin Print / PDF Modal */}
-      {showBulletinModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl border border-slate-200">
-            
-            <div className="bg-[#002266] text-white p-5 flex items-center justify-between rounded-t-2xl">
-              <div className="flex items-center gap-3">
-                <FileText className="w-6 h-6 text-amber-400" />
-                <div>
-                  <h3 className="font-bold text-base">National Tropical Cyclone Bulletin (Official)</h3>
-                  <p className="text-xs text-blue-200">Cyclone Warning Division • Regional Specialized Meteorological Centre (RSMC)</p>
-                </div>
+      {/* CAP v1.2 XML / JSON Modal */}
+      {selectedCapAlert && (
+        <div className="fixed inset-0 z-[1000] bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 space-y-4 shadow-2xl border border-slate-200">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <Code className="w-5 h-5 text-[#003087]" />
+                <h3 className="font-bold text-sm text-slate-900">OASIS CAP v1.2 XML Emergency Payload</h3>
               </div>
-              <button 
-                onClick={() => setShowBulletinModal(false)}
-                className="text-white/80 hover:text-white p-1 rounded-lg hover:bg-white/10"
-              >
+              <button onClick={() => setSelectedCapAlert(null)} className="text-slate-400 hover:text-slate-600">
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="p-6 space-y-5 text-xs sm:text-sm text-slate-700 font-sans">
-              <div className="border border-slate-300 p-4 rounded-xl space-y-1.5 font-mono text-xs bg-slate-50">
-                <div className="text-center font-bold text-slate-900 pb-1 border-b border-slate-200">
-                  INDIA METEOROLOGICAL DEPARTMENT / CYCLONEAI INTELLIGENCE REPORT
-                </div>
-                <div className="flex justify-between pt-1">
-                  <span><strong>BULLETIN NO.:</strong> RSMC-04/2026</span>
-                  <span><strong>TIME OF ISSUE:</strong> 1430 HRS IST / 29-08-2026</span>
-                </div>
-                <div><strong>FROM:</strong> CYCLONE WARNING DIVISION, NEW DELHI</div>
-                <div><strong>TO:</strong> CONTROL ROOM, NDMA / SDMA ODISHA & ANDHRA PRADESH / COAST GUARD</div>
-              </div>
+            <pre className="bg-slate-950 text-emerald-400 p-4 rounded-xl text-xs font-mono overflow-x-auto max-h-96">
+              {generateCapXmlString(selectedCapAlert)}
+            </pre>
 
-              <div className="space-y-2">
-                <h4 className="font-bold text-slate-900 text-sm">1. SYNOPTIC SYSTEM INTENSITY</h4>
-                <p className="text-xs text-slate-600 leading-relaxed">
-                  The Severe Cyclonic Storm <strong>"{primary.name}"</strong> lay centered at 0830 UTC near Latitude {primary.lat}°N and Longitude {primary.lon}°E over the West-Central {primary.basin}. Current maximum sustained surface wind is estimated at {primary.windSpeed} km/h (46 knots) gusting to {primary.windSpeed + 20} km/h. Estimated Central Pressure is {primary.pressure} hPa.
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <h4 className="font-bold text-slate-900 text-sm">2. 72-HOUR AI FORECAST TRACK & INTENSITY</h4>
-                <div className="overflow-x-auto">
-                  <table className="table text-xs">
-                    <thead>
-                      <tr>
-                        <th>Date/Time</th>
-                        <th>Position</th>
-                        <th>Max Wind (km/h)</th>
-                        <th>Category</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr><td>29-08 / 1430 IST</td><td>15.4°N, 87.8°E</td><td>85</td><td>Cyclonic Storm</td></tr>
-                      <tr><td>30-08 / 0230 IST</td><td>16.9°N, 86.5°E</td><td>101</td><td>Severe Cyclonic Storm</td></tr>
-                      <tr className="bg-red-50 font-bold text-red-700"><td>30-08 / 1430 IST (Landfall)</td><td>18.2°N, 85.6°E</td><td>115</td><td>Very Severe Cyclone</td></tr>
-                      <tr><td>31-08 / 1430 IST</td><td>20.1°N, 84.2°E</td><td>105</td><td>Inland Weakening</td></tr>
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <h4 className="font-bold text-slate-900 text-sm">3. WARNING & SECTOR ADVISORIES</h4>
-                <div className="bg-red-50 border-l-4 border-red-600 p-3 rounded-r-lg space-y-1 text-xs text-red-800">
-                  <div>• <strong>Storm Surge Warning:</strong> Inundation of low-lying coastal areas of Ganjam, Srikakulam up to 3.0m at landfall.</div>
-                  <div>• <strong>Fishermen Advisory:</strong> Total ban on marine fishing operations along Bay of Bengal.</div>
-                  <div>• <strong>Infrastructure Alert:</strong> Damage expected to thatched huts, power transmission poles, and standing paddy crops.</div>
-                </div>
-              </div>
-            </div>
-
-            <div className="bg-slate-50 px-6 py-4 border-t border-slate-200 flex items-center justify-between rounded-b-2xl">
-              <span className="text-[11px] text-slate-400 font-mono">CycloneAI Automated Decision-Support Bulletin</span>
-              <div className="flex gap-2">
-                <button 
-                  onClick={() => downloadOfficialBulletinPdf(primary)}
-                  className="btn-secondary text-xs py-2 px-3 gap-1.5"
-                >
-                  <Download className="w-3.5 h-3.5 text-[#003087]" /> Download Official PDF
-                </button>
-                <button 
-                  onClick={() => setShowBulletinModal(false)}
-                  className="btn-primary text-xs py-2 px-4"
-                >
-                  Close
-                </button>
-              </div>
-            </div>
-
-          </div>
-        </div>
-      )}
-
-      {/* Subscribe to CAP Feed Modal */}
-      {showSubscribeModal && (
-        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-200 space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-              <div className="flex items-center gap-2">
-                <Bell className="w-5 h-5 text-[#003087]" />
-                <h3 className="font-bold text-sm text-slate-900">Subscribe to Real-Time Alerts</h3>
-              </div>
-              <button onClick={() => setShowSubscribeModal(false)} className="text-slate-400 hover:text-slate-700">
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <div className="space-y-3 text-xs text-slate-600">
-              <p>Receive automated SMS & Email alerts based on Common Alerting Protocol (CAP) standards for your coastal district.</p>
-
-              <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Email Address / SMS Number:</label>
-                <input 
-                  type="text" 
-                  placeholder="e.g. controlroom@osdma.gov.in"
-                  value={subEmail}
-                  onChange={(e) => setSubEmail(e.target.value)}
-                  className="form-input w-full text-xs" 
-                />
-              </div>
-
-              <div className="space-y-1">
-                <label className="font-semibold text-slate-700">Select Monitoring Jurisdiction:</label>
-                <select className="form-select w-full text-xs">
-                  <option>Odisha Coastal Districts (Ganjam, Puri, Balasore)</option>
-                  <option>Andhra Pradesh (Srikakulam, Visakhapatnam)</option>
-                  <option>West Bengal (South 24 Parganas, Digha)</option>
-                  <option>All North Indian Ocean Basins</option>
-                </select>
-              </div>
-            </div>
-
-            <div className="pt-2 flex gap-2">
+            <div className="flex justify-between items-center pt-2">
+              <span className="text-xs text-slate-500">Standard: OASIS CAP v1.2 / ITU-T X.1303</span>
               <button 
-                onClick={() => { alert('Subscribed to CAP Alert Feeds!'); setShowSubscribeModal(false); }}
-                className="btn-primary w-full text-xs py-2.5 justify-center"
+                onClick={() => {
+                  navigator.clipboard.writeText(generateCapXmlString(selectedCapAlert));
+                  setCopiedCap(true);
+                  setTimeout(() => setCopiedCap(false), 2000);
+                }}
+                className="btn-primary text-xs py-1.5 px-3 gap-1.5"
               >
-                Confirm Subscription
+                <Copy className="w-3.5 h-3.5" />
+                <span>{copiedCap ? 'Copied to Clipboard!' : 'Copy XML Payload'}</span>
               </button>
             </div>
           </div>

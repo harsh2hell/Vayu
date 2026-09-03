@@ -94,7 +94,7 @@ const LoadingScreen = () => {
                 <span className="w-2 h-2 rounded-full bg-[#003087] animate-pulse" />
                 Initializing Multi-Source Telemetry Feeds...
               </span>
-              <span className="font-mono font-bold text-[#003087]">{progress}%</span>
+              <span className="font-bold text-[#003087]">{progress}%</span>
             </div>
             
             <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
@@ -119,7 +119,7 @@ const LoadingScreen = () => {
                     <span className={`font-medium transition-colors ${isChecked ? 'text-slate-800' : 'text-slate-400'}`}>
                       {check.label}
                     </span>
-                    <span className="flex items-center gap-1.5 text-[11px] font-mono">
+                    <span className="flex items-center gap-1.5 text-[11px] font-medium">
                       {isChecked ? (
                         <>
                           <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />

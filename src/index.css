@@ -1,9 +1,11 @@
 @import "tailwindcss";
 
+@custom-variant dark (&:where(.dark, .dark *));
+
 @theme {
   --font-sans: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-  --font-heading: 'Outfit', 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
-  --font-mono: 'JetBrains Mono', 'SFMono-Regular', Menlo, Monaco, Consolas, monospace;
+  --font-heading: 'Plus Jakarta Sans', 'Inter', sans-serif;
+  --font-mono: 'Plus Jakarta Sans', 'Inter', sans-serif;
 
   --color-brand-primary: #0284C7;
   --color-brand-dark: #0369A1;
@@ -36,8 +38,9 @@
   }
   
   h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-heading);
-    letter-spacing: -0.025em;
+    font-family: var(--font-sans);
+    font-weight: 600;
+    letter-spacing: -0.02em;
   }
 
   code, pre, kbd, samp {
@@ -45,74 +48,47 @@
   }
 }
 
-/* Light Theme Clean Grid & Dots */
-.bg-light-grid {
-  background-size: 32px 32px;
-  background-image: 
-    linear-gradient(to right, rgba(226, 232, 240, 0.7) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(226, 232, 240, 0.7) 1px, transparent 1px);
-}
-
-.bg-dot-pattern {
-  background-image: radial-gradient(#CBD5E1 1px, transparent 1px);
-  background-size: 20px 20px;
-}
-
-/* Autonex-Style Light Cards */
-.autonex-card {
+/* Modern Enterprise Cards */
+.card {
   background: #FFFFFF;
   border: 1px solid #E2E8F0;
-  border-radius: 0.875rem;
+  border-radius: 1rem;
   box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04), 0 1px 2px -1px rgba(0, 0, 0, 0.02);
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-.autonex-card:hover {
+.card-header {
+  padding: 1rem 1.25rem;
+  border-bottom: 1px solid #F1F5F9;
+}
+
+.card:hover {
   border-color: #CBD5E1;
-  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.06), 0 2px 4px -2px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.03);
 }
 
-/* Section Monospace Header */
-.section-tag {
-  font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  font-weight: 700;
-  letter-spacing: 0.05em;
-  color: #64748B;
-  text-transform: uppercase;
-}
-
-/* Autonex Metric Sparkline Container */
-.data-badge-index {
-  font-family: var(--font-mono);
-  font-size: 0.6875rem;
-  color: #94A3B8;
-  font-weight: 600;
-  letter-spacing: 0.05em;
-}
-
-/* Buttons */
+/* Modern Buttons */
 .btn-primary {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  font-family: var(--font-heading);
+  font-family: var(--font-sans);
   font-weight: 600;
   font-size: 0.8125rem;
-  border-radius: 0.5rem;
-  padding: 0.5rem 0.95rem;
+  border-radius: 0.625rem;
+  padding: 0.55rem 1rem;
   background-color: #0F172A;
   color: #FFFFFF;
   border: 1px solid #0F172A;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.15s ease-in-out;
   cursor: pointer;
 }
 .btn-primary:hover {
   background-color: #1E293B;
   border-color: #1E293B;
-  box-shadow: 0 4px 8px 0 rgba(15, 23, 42, 0.15);
+  box-shadow: 0 4px 8px 0 rgba(15, 23, 42, 0.12);
   transform: translateY(-0.5px);
 }
 .btn-primary:active {
@@ -124,16 +100,16 @@
   align-items: center;
   justify-content: center;
   gap: 0.5rem;
-  font-family: var(--font-heading);
+  font-family: var(--font-sans);
   font-weight: 600;
   font-size: 0.8125rem;
-  border-radius: 0.5rem;
-  padding: 0.5rem 0.95rem;
+  border-radius: 0.625rem;
+  padding: 0.55rem 1rem;
   background-color: #FFFFFF;
   color: #334155;
   border: 1px solid #E2E8F0;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
-  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
+  transition: all 0.15s ease-in-out;
   cursor: pointer;
 }
 .btn-secondary:hover {
@@ -146,40 +122,22 @@
   transform: scale(0.98);
 }
 
-.btn-cyan {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  font-family: var(--font-heading);
-  font-weight: 600;
-  font-size: 0.8125rem;
-  border-radius: 0.5rem;
-  padding: 0.5rem 0.95rem;
-  background: linear-gradient(135deg, #0284C7 0%, #0EA5E9 100%);
-  color: #FFFFFF;
-  border: 1px solid #0284C7;
-  box-shadow: 0 2px 8px rgba(2, 132, 199, 0.25);
-  transition: all 0.15s cubic-bezier(0.16, 1, 0.3, 1);
-  cursor: pointer;
-}
-.btn-cyan:hover {
-  background: linear-gradient(135deg, #0369A1 0%, #0284C7 100%);
-  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35);
-  transform: translateY(-0.5px);
-}
-
 /* Badges */
 .badge {
   display: inline-flex;
   align-items: center;
   gap: 0.375rem;
-  padding: 0.2rem 0.6rem;
+  padding: 0.2rem 0.625rem;
   border-radius: 9999px;
   font-size: 0.6875rem;
   font-weight: 600;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
   font-family: var(--font-mono);
+}
+
+.badge-navy {
+  background-color: #0F172A;
+  color: #FFFFFF;
 }
 
 .badge-red {
@@ -218,6 +176,21 @@
   border: 1px solid #E2E8F0;
 }
 
+/* Progress bar */
+.progress-bar {
+  width: 100%;
+  height: 6px;
+  background-color: #F1F5F9;
+  border-radius: 9999px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  border-radius: 9999px;
+  transition: width 0.3s ease;
+}
+
 /* Custom Scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
@@ -234,7 +207,7 @@
   background: #94A3B8;
 }
 
-/* Map Containers */
+/* Leaflet container */
 .leaflet-container {
   width: 100%;
   height: 100%;
@@ -243,3 +216,25 @@
   z-index: 10;
   background-color: #E2E8F0 !important;
 }
+
+/* Continuous Right-to-Left Marquee Ticker */
+@keyframes ticker-rtl {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-ticker-rtl {
+  display: flex;
+  width: max-content;
+  will-change: transform;
+  animation: ticker-rtl 38s linear infinite;
+}
+
+.animate-ticker-rtl:hover {
+  animation-play-state: paused;
+}
+

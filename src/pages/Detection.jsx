@@ -196,9 +196,10 @@ const Detection = () => {
           {/* Visual Canvas Area */}
           <div className="relative bg-slate-950 flex items-center justify-center min-h-[460px] overflow-hidden">
             <img 
-              src="https://images.unsplash.com/photo-1543722530-d2c3201371e7?q=80&w=2074&auto=format&fit=crop" 
+              src="https://wvs.earthdata.nasa.gov/api/v1/snapshot?REQUEST=GetSnapshot&LAYERS=VIIRS_SNPP_CorrectedReflectance_TrueColor&BBOX=8,75,23,95&TIME=2024-10-24&WIDTH=1024&HEIGHT=768&FORMAT=image/png" 
               alt="Model Inference View" 
               className={`w-full h-full object-cover filter transition-all duration-300 ${
+
                 viewMode === 'raw' 
                   ? 'brightness-90 contrast-110 saturate-50' 
                   : viewMode === 'cam'
