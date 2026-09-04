@@ -51,13 +51,18 @@ const Topbar = () => {
         
         {/* Left Section: Mobile Brand / Desktop Title */}
         <div className="flex items-center gap-3 min-w-0">
-          {/* Mobile Logo on White Background */}
-          <div className="lg:hidden flex items-center shrink-0">
+          {/* Mobile Logo on White Background with Continuous Sheen */}
+          <div 
+            className="lg:hidden relative overflow-hidden rounded-lg p-0.5 flex items-center shrink-0 cursor-pointer"
+            onClick={() => navigate('/dashboard')}
+          >
             <img 
               src="/vayu.png" 
               alt="VAYU" 
-              className="h-8 w-auto object-contain cursor-pointer" 
-              onClick={() => navigate('/dashboard')}
+              className="h-9 w-auto object-contain" 
+            />
+            <div 
+              className="animate-vayu-sheen absolute inset-y-0 w-16 bg-gradient-to-r from-transparent via-white/85 to-transparent pointer-events-none" 
             />
           </div>
 

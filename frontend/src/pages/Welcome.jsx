@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getDashboardUrl } from '../utils/domain';
 import { 
@@ -9,6 +9,7 @@ import {
   ArrowUpRight, BarChart2, ShieldAlert, Play, Pause, Sliders, Crosshair, CloudRain, Maximize2,
   Search, Waves, Bell, Navigation2, Menu, X
 } from 'lucide-react';
+import LanguageWelcomeAnimation from '../components/LanguageWelcomeAnimation';
 import { 
   MapContainer, 
   TileLayer, 
@@ -489,6 +490,39 @@ const Welcome = () => {
   const [isHindi, setIsHindi] = useState(() => {
     return localStorage.getItem('vayu_is_hindi') === 'true';
   });
+
+  // Opening & Language Transition Animation state
+  const [animState, setAnimState] = useState(() => {
+    const hasSeenIntro = sessionStorage.getItem('vayu_intro_animated');
+    if (!hasSeenIntro) {
+      sessionStorage.setItem('vayu_intro_animated', 'true');
+      return { isOpen: true, mode: 'first-visit', targetLang: 'en', animKey: 1 };
+    }
+    return { isOpen: false, mode: 'first-visit', targetLang: 'en', animKey: 0 };
+  });
+
+  const handleLanguageToggle = (nextVal) => {
+    setAnimState(prev => {
+      const nextIsHindi = typeof nextVal === 'boolean' 
+        ? nextVal 
+        : (prev.isOpen ? prev.targetLang !== 'hi' : !isHindi);
+      return {
+        isOpen: true,
+        mode: 'switch',
+        targetLang: nextIsHindi ? 'hi' : 'en',
+        animKey: (prev.animKey || 0) + 1
+      };
+    });
+  };
+
+  const handleLanguageSwitchImmediate = useCallback((toHindi) => {
+    setIsHindi(toHindi);
+    localStorage.setItem('vayu_is_hindi', String(toHindi));
+  }, []);
+
+  const handleAnimationComplete = useCallback(() => {
+    setAnimState(prev => ({ ...prev, isOpen: false }));
+  }, []);
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [fontSizeOffset, setFontSizeOffset] = useState(0);
   const [stateFilter, setStateFilter] = useState('All');
@@ -759,29 +793,47 @@ const Welcome = () => {
 
   return (
     <div 
-      className="min-h-screen bg-[#fafbfc] dark:bg-black text-slate-900 dark:text-slate-100 font-sans antialiased selection:bg-sky-500 selection:text-white flex flex-col transition-colors duration-500 overflow-x-hidden w-full max-w-full"
+      className="min-h-screen bg-[#fafbfc] dark:bg-black text-slate-900 dark:text-slate-100 font-sans antialiased selection:bg-sky-500 selection:text-white flex flex-col transition-colors duration-500 w-full max-w-full"
     >
+      {/* Cinematic Opening & Language Translation Morph Animation */}
+      <LanguageWelcomeAnimation
+        key={animState.animKey}
+        isOpen={animState.isOpen}
+        mode={animState.mode}
+        targetLanguage={animState.targetLang}
+        onLanguageSwitch={handleLanguageSwitchImmediate}
+        onComplete={handleAnimationComplete}
+      />
       
-      {/* TOP APEX BAR (MINIMAL, ELEGANT, EXECUTIVE - ALWAYS AT TOP) */}
-      <header className={`sticky top-0 z-[1000] w-full transition-all duration-300 ${
-        isScrolled 
-          ? 'bg-white/85 dark:bg-black/90 backdrop-blur-2xl border-b border-slate-200/60 dark:border-white/10 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.7)]'
-          : 'bg-white/80 dark:bg-black/85 backdrop-blur-xl border-b border-slate-200/80 dark:border-neutral-800/80'
-      }`}>
+      {/* TOP APEX BAR WITH STICKY NATIONAL ADVISORY (PERMANENTLY FIXED AT TOP OF VIEWPORT) */}
+      <header className="fixed top-0 left-0 right-0 z-[1000] w-full">
         {/* 2px National Tricolor Stripe */}
         <div className="h-0.5 bg-gradient-to-r from-[#FF9933] via-slate-300 dark:via-slate-700 to-[#138808]" />
-        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between gap-2 sm:gap-4 flex-nowrap">
+        
+        {/* Main Navigation Bar */}
+        <div className={`w-full transition-all duration-300 ${
+          isScrolled 
+            ? 'bg-white/85 dark:bg-black/90 backdrop-blur-2xl border-b border-slate-200/60 dark:border-white/10 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.7)]'
+            : 'bg-white/80 dark:bg-black/85 backdrop-blur-xl border-b border-slate-200/80 dark:border-neutral-800/80'
+        }`}>
+          <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between gap-2 sm:gap-4 flex-nowrap">
           
-          {/* VAYU Brand: Standalone Authentic Design Logo */}
-          <div className="flex items-center shrink-0">
+          {/* VAYU Brand: Standalone Authentic Design Logo with Continuous Sheen */}
+          <div 
+            className="relative overflow-hidden group rounded-xl p-1 -m-1 flex items-center shrink-0 cursor-pointer"
+            onClick={() => {
+              scrollToSection('three-globe-hero');
+              setIsMobileMenuOpen(false);
+            }}
+          >
             <img 
               src={isDarkMode ? "/vayu-white.png?v=2" : "/vayu.png"} 
               alt="VAYU" 
-              className="h-8 sm:h-10 w-auto object-contain filter drop-shadow-xs transition-transform duration-300 hover:scale-105 cursor-pointer" 
-              onClick={() => {
-                scrollToSection('three-globe-hero');
-                setIsMobileMenuOpen(false);
-              }}
+              className="h-10 sm:h-12 md:h-12.5 w-auto object-contain filter drop-shadow-sm transition-transform duration-300 group-hover:scale-105" 
+            />
+            {/* Continuous Specular Shining Light Sweep */}
+            <div 
+              className="animate-vayu-sheen absolute inset-y-0 w-24 bg-gradient-to-r from-transparent via-white/85 dark:via-sky-200/50 to-transparent pointer-events-none" 
             />
           </div>
 
@@ -867,7 +919,7 @@ const Welcome = () => {
 
             {/* Language Switcher (Desktop Only) */}
             <button
-              onClick={() => setIsHindi(!isHindi)}
+              onClick={() => handleLanguageToggle(!isHindi)}
               className="hidden sm:inline-flex px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-700 transition-all cursor-pointer"
               title={isHindi ? "Switch to English" : "हिन्दी में बदलें"}
             >
@@ -1068,7 +1120,8 @@ const Welcome = () => {
               </span>
               <button
                 onClick={() => {
-                  setIsHindi(!isHindi);
+                  setIsMobileMenuOpen(false);
+                  handleLanguageToggle(!isHindi);
                 }}
                 className="px-3 py-1 rounded-lg text-xs font-bold text-sky-700 dark:text-sky-300 bg-slate-100 dark:bg-neutral-800 border border-slate-200 dark:border-neutral-700 cursor-pointer"
               >
@@ -1078,62 +1131,66 @@ const Welcome = () => {
 
           </div>
         )}
-      </header>
+        </div>
 
-      {/* MOVING NATIONAL ADVISORY TICKER (RIGHT TO LEFT) */}
-      <div className="bg-amber-500/10 dark:bg-amber-950/30 border-b border-amber-200/80 dark:border-amber-900/50 py-2.5 text-xs text-amber-950 dark:text-amber-200 transition-colors duration-500 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-3">
-          {/* Pinned Authority Tag */}
-          <div className="flex items-center gap-2 shrink-0 bg-amber-500/20 dark:bg-amber-500/25 px-2.5 py-1 rounded-md z-10 select-none border border-amber-300/50 dark:border-amber-700/50">
-            <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-500 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-600 dark:bg-amber-400"></span>
-            </span>
-            <span className="font-bold text-amber-950 dark:text-amber-200 tracking-wider text-[11px] uppercase whitespace-nowrap">
-              {isHindi ? 'राष्ट्रीय चेतावनी' : 'NATIONAL ADVISORY'}
-            </span>
-          </div>
-
-          {/* Continuous Right-to-Left Scrolling Marquee */}
-          <div className="relative flex-1 overflow-hidden flex items-center group cursor-default">
-            <div className="animate-ticker-rtl flex items-center gap-12 font-medium">
-              <span className="inline-flex items-center gap-3 whitespace-nowrap">
-                <span>{isHindi 
-                  ? 'बंगाल की खाड़ी (13.5°N, 88.5°E) में चक्रवाती परिसंचरण इन्वेस्ट 92B सक्रिय। 48 घंटों में चक्रवात बनने की संभावना: 68%।' 
-                  : 'Incipient cyclonic circulation Invest 92B in Bay of Bengal (13.5°N, 88.5°E). 48h cyclogenesis potential: 68%.'}</span>
-                <span className="text-amber-500/60 dark:text-amber-400/60">•</span>
-                <span>{isHindi 
-                  ? 'आपदा प्रबंधन बल (NDRF/SDRF) तटीय क्षेत्रों में अलर्ट पर।' 
-                  : 'Disaster response authorities on vigil across coastal corridors.'}</span>
-                <span className="text-amber-500/60 dark:text-amber-400/60">•</span>
-                <span>{isHindi 
-                  ? 'मछुआरों को गहरे समुद्र में न जाने की आधिकारिक सलाह।' 
-                  : 'Fishermen advised not to venture into deep sea.'}</span>
+        {/* MOVING NATIONAL ADVISORY TICKER (RIGHT TO LEFT) - STICKY TOGETHER WITH HEADER */}
+        <div className="bg-amber-500/15 dark:bg-amber-950/40 backdrop-blur-xl border-b border-amber-200/80 dark:border-amber-900/60 py-2 sm:py-2.5 text-xs text-amber-950 dark:text-amber-200 transition-colors duration-500 overflow-hidden shadow-xs">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-3">
+            {/* Pinned Authority Tag */}
+            <div className="flex items-center gap-2 shrink-0 bg-amber-500/20 dark:bg-amber-500/25 px-2.5 py-1 rounded-md z-10 select-none border border-amber-300/50 dark:border-amber-700/50">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-500 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-600 dark:bg-amber-400"></span>
               </span>
-
-              {/* Seamless loop duplication */}
-              <span className="inline-flex items-center gap-3 whitespace-nowrap">
-                <span>{isHindi 
-                  ? 'बंगाल की खाड़ी (13.5°N, 88.5°E) में चक्रवाती परिसंचरण इन्वेस्ट 92B सक्रिय। 48 घंटों में चक्रवात बनने की संभावना: 68%।' 
-                  : 'Incipient cyclonic circulation Invest 92B in Bay of Bengal (13.5°N, 88.5°E). 48h cyclogenesis potential: 68%.'}</span>
-                <span className="text-amber-500/60 dark:text-amber-400/60">•</span>
-                <span>{isHindi 
-                  ? 'आपदा प्रबंधन बल (NDRF/SDRF) तटीय क्षेत्रों में अलर्ट पर।' 
-                  : 'Disaster response authorities on vigil across coastal corridors.'}</span>
-                <span className="text-amber-500/60 dark:text-amber-400/60">•</span>
-                <span>{isHindi 
-                  ? 'मछुआरों को गहरे समुद्र में न जाने की आधिकारिक सलाह।' 
-                  : 'Fishermen advised not to venture into deep sea.'}</span>
+              <span className="font-bold text-amber-950 dark:text-amber-200 tracking-wider text-[11px] uppercase whitespace-nowrap">
+                {isHindi ? 'राष्ट्रीय चेतावनी' : 'NATIONAL ADVISORY'}
               </span>
             </div>
-          </div>
 
-          {/* Pinned Observation Timestamp */}
-          <span className="text-xs text-amber-800 dark:text-amber-400 shrink-0 hidden md:inline font-medium pl-2.5 border-l border-amber-300/40 dark:border-amber-800/40 z-10 whitespace-nowrap">
-            {isHindi ? `अवलोकन: ${istTime}` : `Observation: ${istTime}`}
-          </span>
+            {/* Continuous Right-to-Left Scrolling Marquee */}
+            <div className="relative flex-1 overflow-hidden flex items-center group cursor-default">
+              <div className="animate-ticker-rtl flex items-center gap-12 font-medium">
+                <span className="inline-flex items-center gap-3 whitespace-nowrap">
+                  <span>{isHindi 
+                    ? 'बंगाल की खाड़ी (13.5°N, 88.5°E) में चक्रवाती परिसंचरण इन्वेस्ट 92B सक्रिय। 48 घंटों में चक्रवात बनने की संभावना: 68%।' 
+                    : 'Incipient cyclonic circulation Invest 92B in Bay of Bengal (13.5°N, 88.5°E). 48h cyclogenesis potential: 68%.'}</span>
+                  <span className="text-amber-500/60 dark:text-amber-400/60">•</span>
+                  <span>{isHindi 
+                    ? 'आपदा प्रबंधन बल (NDRF/SDRF) तटीय क्षेत्रों में अलर्ट पर।' 
+                    : 'Disaster response authorities on vigil across coastal corridors.'}</span>
+                  <span className="text-amber-500/60 dark:text-amber-400/60">•</span>
+                  <span>{isHindi 
+                    ? 'मछुआरों को गहरे समुद्र में न जाने की आधिकारिक सलाह।' 
+                    : 'Fishermen advised not to venture into deep sea.'}</span>
+                </span>
+
+                {/* Seamless loop duplication */}
+                <span className="inline-flex items-center gap-3 whitespace-nowrap">
+                  <span>{isHindi 
+                    ? 'बंगाल की खाड़ी (13.5°N, 88.5°E) में चक्रवाती परिसंचरण इन्वेस्ट 92B सक्रिय। 48 घंटों में चक्रवात बनने की संभावना: 68%।' 
+                    : 'Incipient cyclonic circulation Invest 92B in Bay of Bengal (13.5°N, 88.5°E). 48h cyclogenesis potential: 68%.'}</span>
+                  <span className="text-amber-500/60 dark:text-amber-400/60">•</span>
+                  <span>{isHindi 
+                    ? 'आपदा प्रबंधन बल (NDRF/SDRF) तटीय क्षेत्रों में अलर्ट पर।' 
+                    : 'Disaster response authorities on vigil across coastal corridors.'}</span>
+                  <span className="text-amber-500/60 dark:text-amber-400/60">•</span>
+                  <span>{isHindi 
+                    ? 'मछुआरों को गहरे समुद्र में न जाने की आधिकारिक सलाह।' 
+                    : 'Fishermen advised not to venture into deep sea.'}</span>
+                </span>
+              </div>
+            </div>
+
+            {/* Pinned Observation Timestamp */}
+            <span className="text-xs text-amber-800 dark:text-amber-400 shrink-0 hidden md:inline font-medium pl-2.5 border-l border-amber-300/40 dark:border-amber-800/40 z-10 whitespace-nowrap">
+              {isHindi ? `अवलोकन: ${istTime}` : `Observation: ${istTime}`}
+            </span>
+          </div>
         </div>
-      </div>
+      </header>
+
+      {/* Spacer to preserve layout flow under fixed top header */}
+      <div className="h-[96px] sm:h-[104px] w-full shrink-0 pointer-events-none" aria-hidden="true" />
 
       {/* =========================================================================
            HERO SECTION: EXECUTIVE CYCLONE INTEL (RIGHT PART KEPT CLEAN)
