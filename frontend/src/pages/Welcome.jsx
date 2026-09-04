@@ -920,7 +920,6 @@ const Welcome = () => {
         onComplete={handleAnimationComplete}
       />
       
-<<<<<<< HEAD
       {/* TOP APEX BAR WITH STICKY NATIONAL ADVISORY (PERMANENTLY FIXED AT TOP OF VIEWPORT) */}
       <header className="fixed top-0 left-0 right-0 z-[1000] w-full">
         {/* 2px National Tricolor Stripe */}
@@ -1248,18 +1247,6 @@ const Welcome = () => {
           </div>
         )}
         </div>
-=======
-      {/* TOP APEX BAR (MINIMAL, ELEGANT, EXECUTIVE - ALWAYS AT TOP) */}
-      <PublicNavbar
-        isHindi={isHindi}
-        setIsHindi={setIsHindi}
-        isDarkMode={isDarkMode}
-        setIsDarkMode={setIsDarkMode}
-        fontSizeOffset={fontSizeOffset}
-        setFontSizeOffset={setFontSizeOffset}
-        isScrolled={isScrolled}
-      />
->>>>>>> 4771e87eb96402f7882701bc6c78880c0d41c911
 
         {/* MOVING NATIONAL ADVISORY TICKER (RIGHT TO LEFT) - STICKY TOGETHER WITH HEADER */}
         <div className="bg-amber-500/15 dark:bg-amber-950/40 backdrop-blur-xl border-b border-amber-200/80 dark:border-amber-900/60 py-2 sm:py-2.5 text-xs text-amber-950 dark:text-amber-200 transition-colors duration-500 overflow-hidden shadow-xs">

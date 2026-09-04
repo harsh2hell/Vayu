@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import React, { useState, useMemo, useCallback } from 'react';
-=======
-import React, { useState, useEffect, useMemo } from 'react';
->>>>>>> 4771e87eb96402f7882701bc6c78880c0d41c911
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { 
   ArrowLeft, ArrowUpRight, Search, MapPin, 
@@ -34,7 +30,6 @@ const CityTracker = () => {
     return localStorage.getItem('vayu_is_hindi') === 'true';
   });
 
-<<<<<<< HEAD
   const [animState, setAnimState] = useState({ isOpen: false, mode: 'switch', targetLang: 'hi', animKey: 0 });
 
   const toggleHindi = () => {
@@ -49,6 +44,15 @@ const CityTracker = () => {
     });
   };
 
+  const handleSetHindi = (val) => {
+    setAnimState(prev => ({
+      isOpen: true,
+      mode: 'switch',
+      targetLang: val ? 'hi' : 'en',
+      animKey: (prev.animKey || 0) + 1
+    }));
+  };
+
   const handleLanguageSwitchImmediate = useCallback((toHindi) => {
     setIsHindi(toHindi);
     localStorage.setItem('vayu_is_hindi', String(toHindi));
@@ -56,11 +60,7 @@ const CityTracker = () => {
 
   const handleAnimationComplete = useCallback(() => {
     setAnimState(prev => ({ ...prev, isOpen: false }));
-=======
-  const handleSetHindi = (val) => {
-    setIsHindi(val);
-    localStorage.setItem('vayu_is_hindi', String(val));
-  };
+  }, []);
 
   // Dark mode state
   const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -88,7 +88,6 @@ const CityTracker = () => {
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
->>>>>>> 4771e87eb96402f7882701bc6c78880c0d41c911
   }, []);
 
   const [searchQuery, setSearchQuery] = useState('');
