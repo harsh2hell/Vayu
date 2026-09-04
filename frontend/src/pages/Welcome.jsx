@@ -1345,11 +1345,8 @@ const Welcome = () => {
             </div>
           </div>
 
-          {/* 2-Column Grid: Executive Intel on Left, Right Part Kept Clean */}
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-            
-            {/* Left Column: Authoritative Editorial Presentation */}
-            <div className="lg:col-span-7 xl:col-span-8 space-y-6">
+          {/* Hero Intel Presentation */}
+          <div className="space-y-6">
               
               <div>
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg text-xs font-semibold border mb-3 bg-sky-50 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300 border-sky-200 dark:border-sky-800">
@@ -1486,7 +1483,7 @@ const Welcome = () => {
               {/* Fast Actions */}
               <div className="flex flex-wrap items-center gap-3 pt-1">
                 <button
-                  onClick={() => navigate('/threat-map')}
+                  onClick={() => scrollToSection('geospatial-map')}
                   className="px-5 py-2.5 rounded-xl bg-slate-950 hover:bg-slate-800 text-white dark:bg-white dark:text-slate-950 dark:hover:bg-slate-100 font-semibold text-xs transition-all shadow-xs flex items-center gap-2 cursor-pointer"
                 >
                   <Eye className="w-4 h-4" />
@@ -1494,275 +1491,13 @@ const Welcome = () => {
                 </button>
 
                 <button
-                  onClick={() => navigate('/threat-map')}
+                  onClick={() => scrollToSection('threat-matrix')}
                   className="px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 font-semibold text-xs transition-all shadow-xs flex items-center gap-2 cursor-pointer"
                 >
                   <ShieldAlert className="w-4 h-4 text-red-600 dark:text-red-400" />
                   <span>{isHindi ? 'तटीय जिला आपदा मैट्रिक्स' : 'View District Threat Matrix'}</span>
                 </button>
               </div>
-
-            </div>
-
-            {/* Right Column: Real-time Information Accuracy & Model Reliability Gauge */}
-            <div className="lg:col-span-5 xl:col-span-4 w-full">
-              {(() => {
-                const acc = ACCURACY_METRICS[activeId] || ACCURACY_METRICS.invest92b;
-                const radius = 46;
-                const circumference = 2 * Math.PI * radius; // ~289.03
-                const strokeDashoffset = circumference - (acc.overall / 100) * circumference;
-
-                return (
-                  <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs transition-colors relative overflow-hidden">
-                    {/* Top ambient glow subtle gradient */}
-                    <div className="absolute top-0 right-0 w-44 h-44 bg-gradient-to-br from-emerald-500/10 via-sky-500/5 to-transparent rounded-full blur-2xl pointer-events-none" />
-
-                    {/* Header */}
-                    <div className="flex items-center justify-between gap-2 mb-4 relative z-10">
-                      <div className="flex items-center gap-2">
-                        <div className="w-8 h-8 rounded-xl bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200/80 dark:border-emerald-800 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
-                          <ShieldCheck className="w-4.5 h-4.5" />
-                        </div>
-                        <div>
-                          <h3 className="text-sm font-bold text-slate-900 dark:text-white leading-tight">
-                            {isHindi ? 'सूचना सटीकता एवं विश्वसनीयता' : 'Information Accuracy & Confidence'}
-                          </h3>
-                          <span className="text-[11px] text-slate-500 dark:text-slate-400 block font-medium">
-                            {isHindi ? 'मल्टी-मॉडल सत्यापन इंडेक्स' : 'Multi-Model Cross-Verification'}
-                          </span>
-                        </div>
-                      </div>
-
-                      <button
-                        onClick={() => setShowAccuracyInfo(!showAccuracyInfo)}
-                        className="p-1.5 rounded-lg text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-                        title={isHindi ? "सत्यापन विवरण" : "Verification Methodology"}
-                      >
-                        <Info className="w-4 h-4" />
-                      </button>
-                    </div>
-
-                    {/* Methodology Collapsible Info */}
-                    {showAccuracyInfo && (
-                      <div className="mb-4 p-3 rounded-xl bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed space-y-1 relative z-10 animate-in fade-in duration-200">
-                        <p className="font-semibold text-slate-900 dark:text-white">
-                          {isHindi ? 'सटीकता मापन पद्धति:' : 'Ground-Truth Verification Index:'}
-                        </p>
-                        <p>
-                          {isHindi
-                            ? 'यह सटीकता स्कोर इसरो मोसडैक (ISRO MOSDAC), ४८ आईएमडी एडब्ल्यूएस (IMD AWS) तटीय मौसम केंद्रों और ईसीएमडब्ल्यूएफ/जीएफएस एनसेंबल डेटा के साथ वास्तविक समय तुलना पर आधारित है।'
-                            : 'Accuracy is computed via continuous spatial-temporal cross-validation between ISRO MOSDAC INSAT-3DR Rapid-Scan IR, 48 IMD Coastal AWS Stations, and Doppler Radar vortex fixes.'}
-                        </p>
-                      </div>
-                    )}
-
-                    {/* Circular Percentage Meter (Hero Gauge) */}
-                    <div className="flex items-center gap-5 p-4 rounded-xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-800/80 mb-5 relative z-10">
-                      {/* SVG Gauge */}
-                      <div className="relative w-28 h-28 shrink-0 flex items-center justify-center">
-                        <svg className="w-full h-full -rotate-90 transform" viewBox="0 0 110 110">
-                          {/* Background Track */}
-                          <circle
-                            cx="55"
-                            cy="55"
-                            r={radius}
-                            className="stroke-slate-200 dark:stroke-slate-700/60"
-                            strokeWidth="9"
-                            fill="transparent"
-                          />
-                          {/* Gradient definition */}
-                          <defs>
-                            <linearGradient id="accuracyGaugeGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                              <stop offset="0%" stopColor="#10b981" />
-                              <stop offset="50%" stopColor="#06b6d4" />
-                              <stop offset="100%" stopColor="#3b82f6" />
-                            </linearGradient>
-                          </defs>
-                          {/* Progress Arc */}
-                          <circle
-                            cx="55"
-                            cy="55"
-                            r={radius}
-                            stroke="url(#accuracyGaugeGradient)"
-                            strokeWidth="9"
-                            strokeDasharray={circumference}
-                            strokeDashoffset={strokeDashoffset}
-                            strokeLinecap="round"
-                            fill="transparent"
-                            style={{
-                              transition: 'stroke-dashoffset 1s ease-in-out',
-                            }}
-                          />
-                        </svg>
-
-                        {/* Center Percentage Display */}
-                        <div className="absolute inset-0 flex flex-col items-center justify-center text-center">
-                          <span className="text-2xl font-black font-heading tracking-tight text-slate-950 dark:text-white leading-none">
-                            {acc.overall}%
-                          </span>
-                          <span className="text-[9px] uppercase tracking-wider font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">
-                            {isHindi ? 'सटीक' : 'ACCURATE'}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Gauge Summary Text */}
-                      <div className="space-y-1.5 flex-1 min-w-0">
-                        <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded-md bg-emerald-100/70 dark:bg-emerald-950/70 text-emerald-800 dark:text-emerald-300 text-[10px] font-bold border border-emerald-300/60 dark:border-emerald-800/80">
-                          <CheckCircle2 className="w-3 h-3 shrink-0" />
-                          <span className="truncate">{isHindi ? acc.confidenceTierHindi : acc.confidenceTier}</span>
-                        </div>
-                        <h4 className="text-xs font-semibold text-slate-900 dark:text-white">
-                          {isHindi ? 'उच्च विश्वसनीयता दर' : 'High Operational Reliability'}
-                        </h4>
-                        <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-tight">
-                          {isHindi 
-                            ? 'संख्यात्मक मौसम मॉडल और सैटेलाइट टेलीमेट्री का सामूहिक विश्लेषण' 
-                            : 'Multi-satellite consensus & numerical assimilation index'}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Breakdown Graphs (Dimensional Accuracy) */}
-                    <div className="space-y-3 mb-5 relative z-10">
-                      <div className="flex items-center justify-between text-[11px] font-semibold text-slate-700 dark:text-slate-300 mb-1">
-                        <span className="flex items-center gap-1.5">
-                          <Target className="w-3.5 h-3.5 text-sky-500" />
-                          <span>{isHindi ? 'पैरामीटर-वार सटीकता' : 'Dimensional Accuracy Breakdown'}</span>
-                        </span>
-                        <span className="text-[10px] text-slate-400 font-normal">
-                          {isHindi ? 'प्रमाणित स्कोर' : 'Benchmark'}
-                        </span>
-                      </div>
-
-                      {/* Metric 1: Eye Fix */}
-                      <div className="space-y-1">
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="text-slate-600 dark:text-slate-300 font-medium">
-                            {isHindi ? acc.eyeFixLabelHindi : acc.eyeFixLabel}
-                          </span>
-                          <span className="font-bold text-slate-900 dark:text-white font-mono">
-                            {acc.eyeFix}%
-                          </span>
-                        </div>
-                        <div className="w-full h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
-                          <div
-                            className="h-full rounded-full bg-gradient-to-r from-emerald-500 to-teal-400 transition-all duration-700"
-                            style={{ width: `${acc.eyeFix}%` }}
-                          />
-                        </div>
-                        <div className="flex justify-between text-[10px] text-slate-400">
-                          <span>{isHindi ? 'सटीक केंद्र निर्धारण' : 'Radar/IR Core Fix'}</span>
-                          <span className="text-emerald-600 dark:text-emerald-400 font-medium">{isHindi ? acc.eyeErrorKmHindi : acc.eyeErrorKm}</span>
-                        </div>
-                      </div>
-
-                      {/* Metric 2: Intensity & Wind Velocity */}
-                      <div className="space-y-1">
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="text-slate-600 dark:text-slate-300 font-medium">
-                            {isHindi ? acc.intensityLabelHindi : acc.intensityLabel}
-                          </span>
-                          <span className="font-bold text-slate-900 dark:text-white font-mono">
-                            {acc.intensity}%
-                          </span>
-                        </div>
-                        <div className="w-full h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
-                          <div
-                            className="h-full rounded-full bg-gradient-to-r from-sky-500 to-blue-500 transition-all duration-700"
-                            style={{ width: `${acc.intensity}%` }}
-                          />
-                        </div>
-                        <div className="flex justify-between text-[10px] text-slate-400">
-                          <span>{isHindi ? 'पवन वेग पूर्वानुमान' : 'Dvorak & ViT Calc'}</span>
-                          <span className="text-sky-600 dark:text-sky-400 font-medium">{isHindi ? acc.intensityMarginHindi : acc.intensityMargin}</span>
-                        </div>
-                      </div>
-
-                      {/* Metric 3: 72h Track Trajectory */}
-                      <div className="space-y-1">
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="text-slate-600 dark:text-slate-300 font-medium">
-                            {isHindi ? acc.track72hLabelHindi : acc.track72hLabel}
-                          </span>
-                          <span className="font-bold text-slate-900 dark:text-white font-mono">
-                            {acc.track72h}%
-                          </span>
-                        </div>
-                        <div className="w-full h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
-                          <div
-                            className="h-full rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 transition-all duration-700"
-                            style={{ width: `${acc.track72h}%` }}
-                          />
-                        </div>
-                        <div className="flex justify-between text-[10px] text-slate-400">
-                          <span>{isHindi ? 'प्रक्षेपवक्र सहमति' : 'Ensemble Trajectory'}</span>
-                          <span className="text-indigo-600 dark:text-indigo-400 font-medium">{isHindi ? acc.trackMarginHindi : acc.trackMargin}</span>
-                        </div>
-                      </div>
-
-                      {/* Metric 4: Coastal Impact Corridor */}
-                      <div className="space-y-1">
-                        <div className="flex items-center justify-between text-xs">
-                          <span className="text-slate-600 dark:text-slate-300 font-medium">
-                            {isHindi ? acc.corridorLabelHindi : acc.corridorLabel}
-                          </span>
-                          <span className="font-bold text-slate-900 dark:text-white font-mono">
-                            {acc.corridor}%
-                          </span>
-                        </div>
-                        <div className="w-full h-2 rounded-full bg-slate-100 dark:bg-slate-800 overflow-hidden">
-                          <div
-                            className="h-full rounded-full bg-gradient-to-r from-amber-500 to-emerald-500 transition-all duration-700"
-                            style={{ width: `${acc.corridor}%` }}
-                          />
-                        </div>
-                        <div className="flex justify-between text-[10px] text-slate-400">
-                          <span>{isHindi ? 'तटीय प्रभाव पूर्वानुमान' : 'Landfall Zone Accuracy'}</span>
-                          <span className="text-emerald-600 dark:text-emerald-400 font-medium">{isHindi ? acc.corridorStatusHindi : acc.corridorStatus}</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Model Ensemble Comparison Grid */}
-                    <div className="pt-3 border-t border-slate-100 dark:border-slate-800 relative z-10">
-                      <div className="text-[10px] uppercase font-bold tracking-wider text-slate-400 mb-2 flex items-center justify-between">
-                        <span>{isHindi ? 'मॉडल सहमति तुलना' : 'Model Ensemble Consensus'}</span>
-                        <span className="text-emerald-600 dark:text-emerald-400 font-semibold">4/4 Agree</span>
-                      </div>
-                      <div className="grid grid-cols-2 gap-2">
-                        {acc.models && acc.models.map((m, idx) => (
-                          <div
-                            key={idx}
-                            className="p-2 rounded-lg bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 flex items-center justify-between"
-                          >
-                            <span className="text-[11px] text-slate-600 dark:text-slate-400 font-medium truncate mr-1">
-                              {m.code}: {m.name.split(' ')[0]}
-                            </span>
-                            <span className="text-xs font-bold text-slate-900 dark:text-white font-mono">
-                              {m.acc}%
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    {/* Verification Footer Badge */}
-                    <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-[10px] text-slate-400 relative z-10">
-                      <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
-                        <span className="inline-block w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                        <span>{isHindi ? '४८ आईएमडी एडब्ल्यूएस स्टेशनों द्वारा सत्यापित' : 'Validated vs 48 IMD AWS Stations'}</span>
-                      </div>
-                      <span className="font-mono text-slate-400">
-                        {isHindi ? 'विलंबता <45s' : 'Latency <45s'}
-                      </span>
-                    </div>
-
-                  </div>
-                );
-              })()}
-            </div>
-
 
           </div>
 
