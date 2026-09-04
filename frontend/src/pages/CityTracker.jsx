@@ -81,7 +81,7 @@ const CityTracker = () => {
   }, [selectedState, activeCategoryFilter, searchQuery]);
 
   return (
-    <div className="min-h-screen bg-[#fafbfc] dark:bg-black text-slate-900 dark:text-slate-100 font-sans antialiased flex flex-col transition-colors duration-500">
+    <div className="min-h-screen bg-[#fafbfc] dark:bg-black text-slate-900 dark:text-slate-100 font-sans antialiased flex flex-col transition-colors duration-500 overflow-x-hidden w-full max-w-full">
       
       {/* =========================================================================
            TOP APEX NAVIGATION BAR (ALWAYS AT TOP)
@@ -89,16 +89,17 @@ const CityTracker = () => {
       <header className="sticky top-0 z-[1000] w-full bg-white/80 dark:bg-black/90 backdrop-blur-xl border-b border-slate-200/80 dark:border-neutral-800/80 transition-colors duration-500">
         {/* 2px National Tricolor Stripe */}
         <div className="h-0.5 bg-gradient-to-r from-[#FF9933] via-slate-300 dark:via-slate-700 to-[#138808]" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between gap-2 sm:gap-4">
           
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <button
               onClick={() => navigate('/')}
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-slate-950 hover:text-white dark:hover:bg-white dark:hover:text-slate-950 transition-all text-xs font-semibold cursor-pointer shadow-2xs"
+              className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-slate-950 hover:text-white dark:hover:bg-white dark:hover:text-slate-950 transition-all text-xs font-semibold cursor-pointer shadow-2xs shrink-0"
               title={isHindi ? "राष्ट्रीय चक्रवात पोर्टल पर वापस जाएं" : "Return to National Cyclone Portal"}
             >
               <ArrowLeft className="w-3.5 h-3.5" />
-              <span>{isHindi ? 'राष्ट्रीय पोर्टल पर वापस जाएं' : 'Back to National Portal'}</span>
+              <span className="hidden sm:inline">{isHindi ? 'राष्ट्रीय पोर्टल पर वापस जाएं' : 'Back to National Portal'}</span>
+              <span className="sm:hidden">{isHindi ? 'वापस' : 'Back'}</span>
             </button>
 
             <div className="h-5 w-px bg-slate-200 dark:bg-slate-800 hidden sm:block" />
@@ -113,7 +114,7 @@ const CityTracker = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             <div className="hidden md:flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
               <span>{isHindi ? 'सार्वजनिक मौसम सूचना • शून्य लॉगिन' : 'Open Public Intelligence • Zero Login Required'}</span>
@@ -122,7 +123,7 @@ const CityTracker = () => {
             {/* Language Switcher */}
             <button
               onClick={toggleHindi}
-              className="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-700 transition-all cursor-pointer shadow-2xs"
+              className="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-700 transition-all cursor-pointer shadow-2xs"
               title={isHindi ? "Switch to English" : "हिन्दी में बदलें"}
             >
               {isHindi ? 'English' : 'हिन्दी'}
@@ -130,10 +131,11 @@ const CityTracker = () => {
 
             <a
               href="tel:112"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 hover:bg-red-100 dark:hover:bg-red-900/60 transition-all shadow-2xs"
+              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 hover:bg-red-100 dark:hover:bg-red-900/60 transition-all shadow-2xs"
             >
               <PhoneCall className="w-3.5 h-3.5 text-red-600 dark:text-red-400" />
-              <span>{isHindi ? 'हेल्पलाइन: 112' : 'Helpline: 112'}</span>
+              <span className="hidden sm:inline">{isHindi ? 'हेल्पलाइन: 112' : 'Helpline: 112'}</span>
+              <span className="sm:hidden">112</span>
             </a>
           </div>
 

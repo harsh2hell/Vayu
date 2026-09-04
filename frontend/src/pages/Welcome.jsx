@@ -7,7 +7,7 @@ import {
   XCircle, ChevronRight, Clock, MapPin, Eye, Radio,
   Activity, Info, Layers, RefreshCw, Sun, Moon, Sparkles,
   ArrowUpRight, BarChart2, ShieldAlert, Play, Pause, Sliders, Crosshair, CloudRain, Maximize2,
-  Search, Waves, Bell, Navigation2
+  Search, Waves, Bell, Navigation2, Menu, X
 } from 'lucide-react';
 import { 
   MapContainer, 
@@ -485,6 +485,7 @@ const Welcome = () => {
   const [activeId, setActiveId] = useState('invest92b');
   const [activeNav, setActiveNav] = useState(null);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isHindi, setIsHindi] = useState(() => {
     return localStorage.getItem('vayu_is_hindi') === 'true';
   });
@@ -758,7 +759,7 @@ const Welcome = () => {
 
   return (
     <div 
-      className="min-h-screen bg-[#fafbfc] dark:bg-black text-slate-900 dark:text-slate-100 font-sans antialiased selection:bg-sky-500 selection:text-white flex flex-col transition-colors duration-500"
+      className="min-h-screen bg-[#fafbfc] dark:bg-black text-slate-900 dark:text-slate-100 font-sans antialiased selection:bg-sky-500 selection:text-white flex flex-col transition-colors duration-500 overflow-x-hidden w-full max-w-full"
     >
       
       {/* TOP APEX BAR (MINIMAL, ELEGANT, EXECUTIVE - ALWAYS AT TOP) */}
@@ -769,19 +770,22 @@ const Welcome = () => {
       }`}>
         {/* 2px National Tricolor Stripe */}
         <div className="h-0.5 bg-gradient-to-r from-[#FF9933] via-slate-300 dark:via-slate-700 to-[#138808]" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3 sm:gap-4 flex-nowrap">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between gap-2 sm:gap-4 flex-nowrap">
           
           {/* VAYU Brand: Standalone Authentic Design Logo */}
           <div className="flex items-center shrink-0">
             <img 
               src={isDarkMode ? "/vayu-white.png?v=2" : "/vayu.png"} 
               alt="VAYU" 
-              className="h-9 sm:h-10 w-auto object-contain filter drop-shadow-xs transition-transform duration-300 hover:scale-105 cursor-pointer" 
-              onClick={() => scrollToSection('three-globe-hero')}
+              className="h-8 sm:h-10 w-auto object-contain filter drop-shadow-xs transition-transform duration-300 hover:scale-105 cursor-pointer" 
+              onClick={() => {
+                scrollToSection('three-globe-hero');
+                setIsMobileMenuOpen(false);
+              }}
             />
           </div>
 
-          {/* Ultra-Glossy & Shiny Apple 3D Glass Pill Track */}
+          {/* Ultra-Glossy & Shiny Apple 3D Glass Pill Track (Desktop) */}
           <nav className={`hidden md:flex items-center gap-1.5 p-1 rounded-full backdrop-blur-xl transition-all duration-300 shrink-0 flex-nowrap ${
             isScrolled
               ? 'bg-slate-100/90 dark:bg-neutral-900/60 border border-slate-200/80 dark:border-white/10 shadow-xs'
@@ -838,69 +842,68 @@ const Welcome = () => {
             })}
           </nav>
 
-          {/* RIGHT SIDE: HELPLINE, OFFICER LOGIN, LANGUAGE, FONT CONTROLLER, THEME TOGGLE */}
-          <div className="flex items-center gap-2 sm:gap-2.5 shrink-0 flex-nowrap">
+          {/* RIGHT SIDE: CONTROLS */}
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 flex-nowrap">
             
-            {/* Official Officer Gateway / Login */}
+            {/* Official Officer Gateway / Login (Desktop Only, in mobile menu on mobile) */}
             <button
               onClick={() => navigate('/login')}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-slate-900 dark:bg-sky-600 hover:bg-slate-800 dark:hover:bg-sky-500 transition-all shadow-xs cursor-pointer"
+              className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-slate-900 dark:bg-sky-600 hover:bg-slate-800 dark:hover:bg-sky-500 transition-all shadow-xs cursor-pointer"
               title={isHindi ? "आधिकारिक आईएमडी / एमओईएस अधिकारी लॉगिन पोर्टल" : "Official IMD / MoES Officer Login Gateway"}
             >
               <Shield className="w-3.5 h-3.5 text-amber-400 dark:text-sky-200" />
-              <span className="hidden sm:inline">{isHindi ? 'अधिकारी लॉगिन' : 'Officer Login'}</span>
-              <span className="sm:hidden">{isHindi ? 'लॉगिन' : 'Login'}</span>
+              <span>{isHindi ? 'अधिकारी लॉगिन' : 'Officer Login'}</span>
             </button>
 
-            {/* National Emergency Hotline */}
+            {/* National Emergency Hotline (Desktop Only) */}
             <a 
               href="tel:112" 
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-red-700 dark:text-red-300 bg-red-50/90 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 hover:bg-red-100 dark:hover:bg-red-900/60 transition-all shadow-2xs"
+              className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-red-700 dark:text-red-300 bg-red-50/90 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 hover:bg-red-100 dark:hover:bg-red-900/60 transition-all shadow-2xs"
               title={isHindi ? "राष्ट्रीय आपातकालीन हेल्पलाइन" : "National Emergency Helpline"}
             >
               <PhoneCall className="w-3.5 h-3.5 text-red-600 dark:text-red-400" />
               <span>112 / 1078</span>
             </a>
 
-            {/* Language Switcher */}
+            {/* Language Switcher (Desktop Only) */}
             <button
               onClick={() => setIsHindi(!isHindi)}
-              className="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-700 transition-all cursor-pointer"
+              className="hidden sm:inline-flex px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-700 transition-all cursor-pointer"
               title={isHindi ? "Switch to English" : "हिन्दी में बदलें"}
             >
               {isHindi ? 'English' : 'हिन्दी'}
             </button>
 
-            {/* Font Size Scaling Controls */}
+            {/* Compact Font Size Scaling Controls */}
             <div className="flex items-center rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 p-0.5">
               <button
                 onClick={() => setFontSizeOffset(p => Math.max(-2, p - 1))}
-                className="px-2 py-1 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white rounded-md hover:bg-white dark:hover:bg-slate-700 transition-all cursor-pointer"
+                className="px-1.5 sm:px-2 py-0.5 sm:py-1 text-[11px] sm:text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white rounded hover:bg-white dark:hover:bg-slate-700 transition-all cursor-pointer"
                 title={isHindi ? "फ़ॉन्ट आकार घटाएं" : "Decrease font size"}
               >
                 A-
               </button>
               <button
                 onClick={() => setFontSizeOffset(0)}
-                className="text-[11px] font-bold text-slate-500 dark:text-slate-400 px-1.5 hover:text-sky-600 dark:hover:text-sky-400 cursor-pointer select-none transition-colors"
+                className="hidden sm:inline-block text-[10px] font-bold text-slate-500 dark:text-slate-400 px-1.5 hover:text-sky-600 dark:hover:text-sky-400 cursor-pointer select-none transition-colors"
                 title={isHindi ? "फ़ॉन्ट स्केल रीसेट करें (100%)" : "Click to reset font scale to 100%"}
               >
                 {fontSizeOffset === 0 ? '100%' : `${100 + Math.round(fontSizeOffset * 6.25)}%`}
               </button>
               <button
                 onClick={() => setFontSizeOffset(p => Math.min(4, p + 1))}
-                className="px-2 py-1 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white rounded-md hover:bg-white dark:hover:bg-slate-700 transition-all cursor-pointer"
+                className="px-1.5 sm:px-2 py-0.5 sm:py-1 text-[11px] sm:text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white rounded hover:bg-white dark:hover:bg-slate-700 transition-all cursor-pointer"
                 title={isHindi ? "फ़ॉन्ट आकार बढ़ाएं" : "Increase font size"}
               >
                 A+
               </button>
             </div>
 
-            {/* ANIMATED SUN & MOON THEME SWITCHER */}
+            {/* Compact Theme Switcher */}
             <button
               onClick={() => setIsDarkMode(!isDarkMode)}
               aria-label="Toggle light/dark theme"
-              className="relative p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 shadow-xs hover:bg-white dark:hover:bg-slate-700 text-slate-700 dark:text-amber-400 transition-all duration-300 overflow-hidden group cursor-pointer"
+              className="relative p-1.5 sm:p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 shadow-xs hover:bg-white dark:hover:bg-slate-700 text-slate-700 dark:text-amber-400 transition-all duration-300 overflow-hidden group cursor-pointer shrink-0"
               title={isDarkMode ? (isHindi ? "लाइट थीम पर स्विच करें" : "Switch to Light Theme") : (isHindi ? "डार्क थीम पर स्विच करें" : "Switch to Dark Theme")}
             >
               <div className="relative w-4 h-4 flex items-center justify-center">
@@ -919,9 +922,162 @@ const Welcome = () => {
               </div>
             </button>
 
+            {/* Mobile Menu Hamburger Toggle */}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label={isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+              className="md:hidden p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-all cursor-pointer shrink-0"
+            >
+              {isMobileMenuOpen ? (
+                <X className="w-5 h-5 text-slate-900 dark:text-white" />
+              ) : (
+                <Menu className="w-5 h-5 text-slate-900 dark:text-white" />
+              )}
+            </button>
+
           </div>
 
         </div>
+
+        {/* MOBILE NAVIGATION DRAWER */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden border-t border-slate-200/80 dark:border-white/10 bg-white/95 dark:bg-black/95 backdrop-blur-2xl px-4 py-4 space-y-3 shadow-2xl animate-in slide-in-from-top-2 duration-200">
+            
+            {/* 1. OFFICER LOGIN BUTTON (PROMINENT & HIGHLIGHTED) */}
+            <button
+              onClick={() => {
+                setIsMobileMenuOpen(false);
+                navigate('/login');
+              }}
+              className="w-full flex items-center justify-between p-3 rounded-xl text-white bg-gradient-to-r from-slate-900 via-sky-950 to-slate-900 dark:from-sky-700 dark:via-blue-600 dark:to-indigo-700 shadow-md border border-slate-700/50 dark:border-white/20 active:scale-[0.99] transition-all cursor-pointer"
+            >
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-lg bg-amber-400/20 dark:bg-white/20 flex items-center justify-center shrink-0">
+                  <Shield className="w-4 h-4 text-amber-400 dark:text-white" />
+                </div>
+                <div className="text-left">
+                  <div className="text-xs font-bold tracking-tight">
+                    {isHindi ? 'अधिकारी लॉगिन पोर्टल' : 'Official Officer Login'}
+                  </div>
+                  <div className="text-[10px] text-slate-300 dark:text-sky-100 font-medium">
+                    {isHindi ? 'आईएमडी / एमओईएस प्राधिकृत' : 'IMD / MoES Operational Gateway'}
+                  </div>
+                </div>
+              </div>
+              <ChevronRight className="w-4 h-4 text-slate-400 dark:text-sky-200" />
+            </button>
+
+            {/* 2. EMERGENCY HELPLINE */}
+            <a
+              href="tel:112"
+              className="flex items-center justify-between p-2.5 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 text-red-700 dark:text-red-300 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <PhoneCall className="w-4 h-4 text-red-600 dark:text-red-400 shrink-0" />
+                <span className="text-xs font-bold">
+                  {isHindi ? 'राष्ट्रीय हेल्पलाइन: 112 / 1078' : 'Emergency Helpline: 112 / 1078'}
+                </span>
+              </div>
+              <span className="text-[10px] font-bold bg-red-600 text-white px-2 py-0.5 rounded-full">24x7</span>
+            </a>
+
+            {/* 3. NAVIGATION PAGES & MODULES */}
+            <div className="space-y-1 pt-1 border-t border-slate-100 dark:border-neutral-800">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 px-2 py-1">
+                {isHindi ? 'नेविगेशन एवं निगरानी पेज' : 'Navigation & Live Watch'}
+              </div>
+
+              {[
+                { 
+                  key: '/city-tracker', 
+                  path: '/city-tracker', 
+                  label: isHindi ? 'शहर व तटीय क्षेत्र निगरानी (110+)' : 'City & Area Watch (110+)', 
+                  desc: isHindi ? 'ज़िला और बंदरगाह स्तर का रीयल-टाइम डेटा' : 'District & Port-level Real-Time Tracker',
+                  badge: 'LIVE',
+                  isRoute: true 
+                },
+                { 
+                  key: 'geospatial-map', 
+                  id: 'geospatial-map', 
+                  label: isHindi ? 'जीआईएस डॉपलर रडार' : 'GIS Radar & Doppler Map', 
+                  desc: isHindi ? 'मौसम उपग्रह, हवा का दायरा और शंकु' : 'Satellite IR, Wind Radii & Track Cone'
+                },
+                { 
+                  key: 'threat-matrix', 
+                  id: 'threat-matrix', 
+                  label: isHindi ? 'तटीय खतरा मैट्रिक्स' : 'Coastal Threat Matrix', 
+                  desc: isHindi ? 'तटीय ज़िलों की जोखिम सूची व हवा की गति' : 'Port threat levels & preparedness status'
+                },
+                { 
+                  key: 'bulletins', 
+                  id: 'bulletins', 
+                  label: isHindi ? 'सरकारी मौसम बुलेटिन' : 'Official Weather Bulletins', 
+                  desc: isHindi ? 'आईएमडी के आधिकारिक परामर्श एवं चेतावनी' : 'IMD advisories and official updates'
+                },
+                { 
+                  key: 'safety-protocol', 
+                  id: 'safety-protocol', 
+                  label: isHindi ? 'सुरक्षा और निकासी गाइड' : 'Safety & Evacuation Guide', 
+                  desc: isHindi ? 'चक्रवात से पहले, दौरान और बाद के दिशा-निर्देश' : 'Actionable protocols for citizen safety'
+                },
+                { 
+                  key: '/state/odisha', 
+                  path: '/state/odisha', 
+                  label: isHindi ? 'राज्य आपदा नियंत्रण केंद्र' : 'State Disaster Cells', 
+                  desc: isHindi ? 'ओडिशा, प. बंगाल, आंध्र प्रदेश, गुजरात' : 'Odisha, WB, AP, Gujarat Control Rooms',
+                  isRoute: true 
+                }
+              ].map((item) => (
+                <button
+                  key={item.key}
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    setActiveNav(item.key);
+                    if (item.isRoute) {
+                      navigate(item.path);
+                    } else {
+                      scrollToSection(item.id);
+                    }
+                  }}
+                  className="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-neutral-900 transition-colors text-left group cursor-pointer"
+                >
+                  <div className="min-w-0 pr-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 group-hover:text-sky-600 dark:group-hover:text-sky-400 truncate">
+                        {item.label}
+                      </span>
+                      {item.badge && (
+                        <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-red-100 dark:bg-red-900/60 text-red-600 dark:text-red-300">
+                          {item.badge}
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-[10px] text-slate-400 dark:text-slate-500 truncate mt-0.5">
+                      {item.desc}
+                    </div>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-slate-400 dark:text-slate-600 group-hover:text-slate-600 dark:group-hover:text-slate-400 shrink-0" />
+                </button>
+              ))}
+            </div>
+
+            {/* 4. MOBILE LANGUAGE SWITCHER */}
+            <div className="pt-2 border-t border-slate-100 dark:border-neutral-800 flex items-center justify-between">
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                {isHindi ? 'वेबसाइट भाषा / Language:' : 'Portal Language / भाषा:'}
+              </span>
+              <button
+                onClick={() => {
+                  setIsHindi(!isHindi);
+                }}
+                className="px-3 py-1 rounded-lg text-xs font-bold text-sky-700 dark:text-sky-300 bg-slate-100 dark:bg-neutral-800 border border-slate-200 dark:border-neutral-700 cursor-pointer"
+              >
+                {isHindi ? 'English में देखें' : 'हिन्दी में देखें'}
+              </button>
+            </div>
+
+          </div>
+        )}
       </header>
 
       {/* MOVING NATIONAL ADVISORY TICKER (RIGHT TO LEFT) */}

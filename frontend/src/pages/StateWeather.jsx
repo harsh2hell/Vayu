@@ -486,7 +486,7 @@ const StateWeather = () => {
   }, [stateInfo, searchQuery, selectedFilter]);
 
   return (
-    <div className="min-h-screen bg-[#fafbfc] dark:bg-black text-slate-900 dark:text-slate-100 font-sans antialiased flex flex-col transition-colors duration-500">
+    <div className="min-h-screen bg-[#fafbfc] dark:bg-black text-slate-900 dark:text-slate-100 font-sans antialiased flex flex-col transition-colors duration-500 overflow-x-hidden w-full max-w-full">
       
       {/* =========================================================================
            TOP NAVIGATION BAR (ALWAYS AT TOP)
@@ -494,12 +494,12 @@ const StateWeather = () => {
       <header className="sticky top-0 z-[1000] w-full bg-white/80 dark:bg-black/90 backdrop-blur-xl border-b border-slate-200/80 dark:border-neutral-800/80 transition-colors duration-500">
         {/* 2px National Tricolor Stripe */}
         <div className="h-0.5 bg-gradient-to-r from-[#FF9933] via-slate-300 dark:via-slate-700 to-[#138808]" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between gap-2 sm:gap-4">
           
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4 min-w-0">
             <button
               onClick={() => navigate('/')}
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-slate-950 hover:text-white dark:hover:bg-white dark:hover:text-slate-950 transition-all text-xs font-semibold cursor-pointer shadow-2xs"
+              className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-slate-950 hover:text-white dark:hover:bg-white dark:hover:text-slate-950 transition-all text-xs font-semibold cursor-pointer shadow-2xs shrink-0"
               title="Return to National Cyclone Portal"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
@@ -509,10 +509,10 @@ const StateWeather = () => {
 
             <div className="h-5 w-px bg-slate-200 dark:bg-slate-800 hidden sm:block" />
 
-            <div className="flex items-center gap-2">
-              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 hidden md:inline">State Focus:</span>
+            <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 hidden md:inline shrink-0">State Focus:</span>
               {/* Quick State Switcher Pills */}
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1 sm:gap-1.5 overflow-x-auto scrollbar-none py-1">
                 {[
                   { slug: 'odisha', name: 'Odisha' },
                   { slug: 'west-bengal', name: 'West Bengal' },
@@ -525,7 +525,7 @@ const StateWeather = () => {
                       setSearchQuery('');
                       navigate(`/state/${st.slug}`);
                     }}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                    className={`px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap shrink-0 ${
                       currentSlug === st.slug
                         ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs'
                         : 'text-slate-600 dark:text-slate-400 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -538,7 +538,7 @@ const StateWeather = () => {
             </div>
           </div>
 
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
             <button
               onClick={() => navigate('/city-tracker')}
               className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-950/50 border border-sky-200 dark:border-sky-800/80 hover:bg-sky-100 dark:hover:bg-sky-900/60 transition-all cursor-pointer shadow-2xs whitespace-nowrap"
@@ -549,10 +549,11 @@ const StateWeather = () => {
 
             <a
               href={`tel:${stateInfo.emergencyNumber}`}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 hover:bg-red-100 dark:hover:bg-red-900/60 transition-all shadow-2xs whitespace-nowrap"
+              className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-bold text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 hover:bg-red-100 dark:hover:bg-red-900/60 transition-all shadow-2xs whitespace-nowrap"
             >
               <PhoneCall className="w-3.5 h-3.5 text-red-600 dark:text-red-400" />
-              <span>Emergency: 112 / 1070</span>
+              <span className="hidden sm:inline">Emergency: 112 / 1070</span>
+              <span className="sm:hidden">112</span>
             </a>
           </div>
 
