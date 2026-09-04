@@ -16,6 +16,11 @@ const PublicNavbar = ({
 
   const NAV_LINKS = [
     { 
+      path: '/', 
+      label: isHindi ? 'होम' : 'Home',
+      match: ['/']
+    },
+    { 
       path: '/city-tracker', 
       label: isHindi ? 'शहर व तटीय क्षेत्र (110+)' : 'City & Area Watch',
       match: ['/city-tracker', '/cities']
@@ -54,7 +59,13 @@ const PublicNavbar = ({
             src={isDarkMode ? "/vayu-white.png?v=2" : "/vayu.png"} 
             alt="VAYU" 
             className="h-9 sm:h-10 w-auto object-contain filter drop-shadow-xs transition-transform duration-300 hover:scale-105 cursor-pointer" 
-            onClick={() => navigate('/')}
+            onClick={() => {
+              if (location.pathname === '/') {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              } else {
+                navigate('/');
+              }
+            }}
             title={isHindi ? "राष्ट्रीय चक्रवात पोर्टल होमपेज पर जाएं" : "Go to National Cyclone Portal Home"}
           />
         </div>
@@ -70,8 +81,14 @@ const PublicNavbar = ({
             return (
               <button
                 key={link.path}
-                onClick={() => navigate(link.path)}
-                className={`group relative overflow-hidden px-3.5 py-1.5 rounded-full text-xs transition-all duration-200 cursor-pointer whitespace-nowrap shrink-0 flex items-center gap-1.5 transform-gpu ${
+                onClick={() => {
+                  if (link.path === '/' && location.pathname === '/') {
+                    window.scrollTo({ top: 0, behavior: 'smooth' });
+                  } else {
+                    navigate(link.path);
+                  }
+                }}
+                className={`group relative overflow-hidden px-3 lg:px-3.5 py-1.5 rounded-full text-xs transition-all duration-200 cursor-pointer whitespace-nowrap shrink-0 flex items-center gap-1.5 transform-gpu ${
                   isSelected
                     ? 'bg-gradient-to-b from-white/95 via-white/85 to-white/70 dark:from-white/30 dark:via-white/15 dark:to-white/5 text-slate-950 dark:text-white border border-white/80 dark:border-white/40 shadow-[0_4px_16px_rgba(0,0,0,0.12),0_1px_3px_rgba(0,0,0,0.08),inset_0_2px_1px_rgba(255,255,255,1),inset_0_-1.5px_2px_rgba(255,255,255,0.4)] dark:shadow-[0_0_20px_rgba(255,255,255,0.15),0_6px_24px_rgba(0,0,0,0.8),inset_0_2px_1px_rgba(255,255,255,0.7),inset_0_-1.5px_2px_rgba(255,255,255,0.2)] backdrop-blur-2xl font-bold -translate-y-0.5 scale-[1.02]'
                     : 'border border-transparent bg-transparent text-slate-700 dark:text-white hover:text-slate-950 dark:hover:text-white hover:bg-white/60 dark:hover:bg-white/10 hover:border-slate-200/60 dark:hover:border-white/15 hover:shadow-2xs font-medium'
