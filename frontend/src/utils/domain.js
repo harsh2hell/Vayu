@@ -1,5 +1,5 @@
 // Domain & Subdomain routing utilities for autonex.studio
-// Handles www.autonex.studio, auth.autonex.studio, dashboard.autonex.studio, and localhost
+// Handles www.autonex.studio, auth.autonex.studio, dept.autonex.studio, and localhost
 
 export const getHostname = () => {
   if (typeof window === 'undefined') return '';
@@ -13,8 +13,13 @@ export const isProductionDomain = () => {
 
 export const isDashboardSubdomain = () => {
   const host = getHostname();
-  // Support dashboard.autonex.studio or local test dashboard.localhost
-  return host.startsWith('dashboard.') || host.includes('dashboard-');
+  // Support dept.autonex.studio (Primary) or dashboard.autonex.studio (Legacy alias)
+  return (
+    host.startsWith('dept.') ||
+    host.includes('dept-') ||
+    host.startsWith('dashboard.') ||
+    host.includes('dashboard-')
+  );
 };
 
 export const isAuthSubdomain = () => {
@@ -34,13 +39,13 @@ export const getWebsiteUrl = (path = '/') => {
 export const getDashboardUrl = (subPath = '') => {
   const cleanPath = subPath ? (subPath.startsWith('/') ? subPath : `/${subPath}`) : '';
   if (isProductionDomain()) {
-    return `https://dashboard.autonex.studio${cleanPath}`;
+    return `https://dept.autonex.studio${cleanPath}`;
   }
   return `/dashboard${cleanPath}`;
 };
 
 export const getAuthUrl = (redirectTarget) => {
-  const target = redirectTarget || (isProductionDomain() ? 'https://dashboard.autonex.studio' : '/dashboard');
+  const target = redirectTarget || (isProductionDomain() ? 'https://dept.autonex.studio' : '/dashboard');
   if (isProductionDomain()) {
     return `https://auth.autonex.studio/sign-in?redirect_url=${encodeURIComponent(target)}`;
   }
