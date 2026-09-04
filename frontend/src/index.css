@@ -29,7 +29,7 @@
   }
 
 html, body {
-    overflow-x: hidden;
+    overflow-x: clip;
     max-width: 100%;
     width: 100%;
   }
@@ -40,7 +40,7 @@ html, body {
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    overflow-x: hidden;
+    overflow-x: clip;
     transition: background-color 0.3s ease, color 0.3s ease;
   }
 
@@ -267,6 +267,26 @@ html.dark,
   animation-play-state: paused;
 }
 
+<<<<<<< HEAD
+/* Continuous Specular Shining Light Sweep for Header Logo */
+@keyframes vayu-header-shine {
+  0% {
+    transform: translateX(-170%) skewX(-25deg);
+    opacity: 0;
+  }
+  12% {
+    opacity: 0.95;
+  }
+  50% {
+    transform: translateX(260%) skewX(-25deg);
+    opacity: 0.95;
+  }
+  60% {
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(260%) skewX(-25deg);
+=======
 /* =========================================================================
    ANIMATED BLINKING VORTEX POINT FOR TIMELAPSE RADAR (CLASSY & SMOOTH)
    ========================================================================= */
@@ -300,10 +320,15 @@ html.dark,
   }
   100% {
     transform: scale(3.2);
+>>>>>>> 4771e87eb96402f7882701bc6c78880c0d41c911
     opacity: 0;
   }
 }
 
+<<<<<<< HEAD
+.animate-vayu-sheen {
+  animation: vayu-header-shine 2.8s cubic-bezier(0.25, 1, 0.5, 1) infinite;
+=======
 .vortex-blinking-wrapper {
   background: transparent !important;
   border: none !important;
@@ -366,5 +391,6 @@ html.dark,
 .vortex-marker-pin:not(.is-timelapse-playing) .vortex-ping-outer,
 .vortex-marker-pin:not(.is-timelapse-playing) .vortex-ping-inner {
   display: none;
+>>>>>>> 4771e87eb96402f7882701bc6c78880c0d41c911
 }
 

@@ -1,9 +1,14 @@
+<<<<<<< HEAD
+import React, { useState, useMemo, useCallback } from 'react';
+=======
 import React, { useState, useEffect, useMemo } from 'react';
+>>>>>>> 4771e87eb96402f7882701bc6c78880c0d41c911
 import { useNavigate, Link } from 'react-router-dom';
 import { 
   ArrowLeft, ArrowUpRight, Search, MapPin, 
   PhoneCall, Filter
 } from 'lucide-react';
+import LanguageWelcomeAnimation from '../components/LanguageWelcomeAnimation';
 import { COASTAL_CITIES_DATA } from '../data/coastalCitiesData';
 import PublicNavbar from '../components/PublicNavbar';
 
@@ -29,6 +34,29 @@ const CityTracker = () => {
     return localStorage.getItem('vayu_is_hindi') === 'true';
   });
 
+<<<<<<< HEAD
+  const [animState, setAnimState] = useState({ isOpen: false, mode: 'switch', targetLang: 'hi', animKey: 0 });
+
+  const toggleHindi = () => {
+    setAnimState(prev => {
+      const next = prev.isOpen ? prev.targetLang !== 'hi' : !isHindi;
+      return {
+        isOpen: true,
+        mode: 'switch',
+        targetLang: next ? 'hi' : 'en',
+        animKey: (prev.animKey || 0) + 1
+      };
+    });
+  };
+
+  const handleLanguageSwitchImmediate = useCallback((toHindi) => {
+    setIsHindi(toHindi);
+    localStorage.setItem('vayu_is_hindi', String(toHindi));
+  }, []);
+
+  const handleAnimationComplete = useCallback(() => {
+    setAnimState(prev => ({ ...prev, isOpen: false }));
+=======
   const handleSetHindi = (val) => {
     setIsHindi(val);
     localStorage.setItem('vayu_is_hindi', String(val));
@@ -60,6 +88,7 @@ const CityTracker = () => {
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
+>>>>>>> 4771e87eb96402f7882701bc6c78880c0d41c911
   }, []);
 
   const [searchQuery, setSearchQuery] = useState('');
@@ -108,6 +137,14 @@ const CityTracker = () => {
 
   return (
     <div className="min-h-screen bg-[#fafbfc] dark:bg-black text-slate-900 dark:text-slate-100 font-sans antialiased flex flex-col transition-colors duration-500 overflow-x-hidden w-full max-w-full">
+      <LanguageWelcomeAnimation
+        key={animState.animKey}
+        isOpen={animState.isOpen}
+        mode={animState.mode}
+        targetLanguage={animState.targetLang}
+        onLanguageSwitch={handleLanguageSwitchImmediate}
+        onComplete={handleAnimationComplete}
+      />
       
       {/* Top Navbar */}
       <PublicNavbar
