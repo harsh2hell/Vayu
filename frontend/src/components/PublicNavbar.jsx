@@ -1,6 +1,10 @@
 import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+<<<<<<< HEAD
 import { Shield, PhoneCall, Sun, Moon, Menu, X, ChevronRight } from 'lucide-react';
+=======
+import { PhoneCall, Sun, Moon, Menu, X, ChevronRight } from 'lucide-react';
+>>>>>>> 1a84afc6e5d4411510be97d324177520d1d45523
 
 const PublicNavbar = ({
   isHindi,
@@ -71,7 +75,7 @@ const PublicNavbar = ({
           />
         </div>
 
-        {/* Ultra-Glossy 3D Glass Pill Track */}
+        {/* Ultra-Glossy 3D Glass Pill Track (Desktop) */}
         <nav className={`hidden md:flex items-center gap-1.5 p-1 rounded-full backdrop-blur-xl transition-all duration-300 shrink-0 flex-nowrap ${
           isScrolled
             ? 'bg-slate-100/90 dark:bg-neutral-900/60 border border-slate-200/80 dark:border-white/10 shadow-xs'
@@ -121,6 +125,7 @@ const PublicNavbar = ({
           })}
         </nav>
 
+<<<<<<< HEAD
         {/* RIGHT SIDE CONTROLS: OFFICER LOGIN, HELPLINE, LANGUAGE, FONT, THEME, MOBILE HAMBURGER */}
         <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0 flex-nowrap">
           
@@ -135,6 +140,11 @@ const PublicNavbar = ({
             <span className="sm:hidden">{isHindi ? 'लॉगिन' : 'Login'}</span>
           </button>
 
+=======
+        {/* RIGHT SIDE CONTROLS: HELPLINE, LANGUAGE, FONT, THEME, MOBILE HAMBURGER */}
+        <div className="flex items-center gap-2 sm:gap-2.5 shrink-0 flex-nowrap">
+          
+>>>>>>> 1a84afc6e5d4411510be97d324177520d1d45523
           {/* National Emergency Hotline */}
           <a 
             href="tel:112" 
@@ -204,16 +214,26 @@ const PublicNavbar = ({
             </button>
           )}
 
+<<<<<<< HEAD
           {/* Mobile Menu Hamburger Toggle */}
+=======
+          {/* Mobile Menu Toggle */}
+>>>>>>> 1a84afc6e5d4411510be97d324177520d1d45523
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label={isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
             className="md:hidden p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-all cursor-pointer shrink-0"
           >
             {isMobileMenuOpen ? (
+<<<<<<< HEAD
               <X className="w-4 h-4 text-slate-900 dark:text-white" />
             ) : (
               <Menu className="w-4 h-4 text-slate-900 dark:text-white" />
+=======
+              <X className="w-5 h-5 text-slate-900 dark:text-white" />
+            ) : (
+              <Menu className="w-5 h-5 text-slate-900 dark:text-white" />
+>>>>>>> 1a84afc6e5d4411510be97d324177520d1d45523
             )}
           </button>
 
@@ -221,6 +241,7 @@ const PublicNavbar = ({
 
       </div>
 
+<<<<<<< HEAD
       {/* Mobile Navigation Drawer */}
       {isMobileMenuOpen && (
         <div className="md:hidden border-t border-slate-200/80 dark:border-white/10 bg-white/95 dark:bg-black/95 backdrop-blur-2xl px-4 py-4 space-y-3 shadow-2xl animate-in slide-in-from-top-2 duration-200">
@@ -250,6 +271,12 @@ const PublicNavbar = ({
           </button>
 
           {/* Emergency Helpline */}
+=======
+      {/* MOBILE NAVIGATION DRAWER */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden border-t border-slate-200/80 dark:border-white/10 bg-white/95 dark:bg-black/95 backdrop-blur-2xl px-4 py-4 space-y-3 shadow-2xl">
+          {/* Emergency Hotline in mobile */}
+>>>>>>> 1a84afc6e5d4411510be97d324177520d1d45523
           <a
             href="tel:112"
             className="flex items-center justify-between p-2.5 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 text-red-700 dark:text-red-300 transition-colors"
@@ -263,12 +290,17 @@ const PublicNavbar = ({
             <span className="text-[10px] font-bold bg-red-600 text-white px-2 py-0.5 rounded-full">24x7</span>
           </a>
 
+<<<<<<< HEAD
           {/* Navigation Pages */}
           <div className="space-y-1 pt-1 border-t border-slate-100 dark:border-neutral-800">
             <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 px-2 py-1">
               {isHindi ? 'नेविगेशन पेज' : 'Navigation'}
             </div>
 
+=======
+          {/* Nav links */}
+          <div className="space-y-1 pt-1 border-t border-slate-100 dark:border-neutral-800">
+>>>>>>> 1a84afc6e5d4411510be97d324177520d1d45523
             {NAV_LINKS.map((link) => {
               const isSelected = link.match.includes(location.pathname);
               return (
@@ -282,24 +314,42 @@ const PublicNavbar = ({
                       navigate(link.path);
                     }
                   }}
+<<<<<<< HEAD
                   className={`w-full flex items-center justify-between p-2.5 rounded-xl transition-colors text-left cursor-pointer ${
                     isSelected
                       ? 'bg-sky-50 dark:bg-sky-950/50 text-sky-700 dark:text-sky-300 font-bold border border-sky-200/60 dark:border-sky-800/60'
                       : 'hover:bg-slate-100 dark:hover:bg-neutral-900 text-slate-800 dark:text-slate-200 font-medium'
+=======
+                  className={`w-full flex items-center justify-between p-2.5 rounded-xl transition-colors text-left group cursor-pointer ${
+                    isSelected 
+                      ? 'bg-slate-100 dark:bg-neutral-800 font-bold text-sky-600 dark:text-sky-400' 
+                      : 'hover:bg-slate-50 dark:hover:bg-neutral-900 text-slate-800 dark:text-slate-200 font-medium'
+>>>>>>> 1a84afc6e5d4411510be97d324177520d1d45523
                   }`}
                 >
                   <div className="flex items-center gap-2">
                     {isSelected && (
+<<<<<<< HEAD
                       <span className="w-1.5 h-1.5 rounded-full bg-sky-500" />
                     )}
                     <span className="text-xs truncate">{link.label}</span>
                   </div>
                   <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
+=======
+                      <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+                    )}
+                    <span className="text-xs">{link.label}</span>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-slate-600 shrink-0" />
+>>>>>>> 1a84afc6e5d4411510be97d324177520d1d45523
                 </button>
               );
             })}
           </div>
+<<<<<<< HEAD
 
+=======
+>>>>>>> 1a84afc6e5d4411510be97d324177520d1d45523
         </div>
       )}
     </header>

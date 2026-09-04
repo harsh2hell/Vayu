@@ -848,6 +848,7 @@ const Welcome = () => {
         isScrolled={isScrolled}
       />
 
+<<<<<<< HEAD
       {/* MOVING NATIONAL ADVISORY TICKER (RIGHT TO LEFT) */}
       <div className="bg-amber-500/10 dark:bg-amber-950/30 border-b border-amber-200/80 dark:border-amber-900/50 py-2.5 text-xs text-amber-950 dark:text-amber-200 transition-colors duration-500 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-3">
@@ -859,6 +860,308 @@ const Welcome = () => {
             </span>
             <span className="font-bold text-amber-950 dark:text-amber-200 tracking-wider text-[11px] uppercase whitespace-nowrap">
               {isHindi ? 'राष्ट्रीय चेतावनी' : 'NATIONAL ADVISORY'}
+=======
+          {/* Ultra-Glossy & Shiny Apple 3D Glass Pill Track (Desktop) */}
+          <nav className={`hidden md:flex items-center gap-1.5 p-1 rounded-full backdrop-blur-xl transition-all duration-300 shrink-0 flex-nowrap ${
+            isScrolled
+              ? 'bg-slate-100/90 dark:bg-neutral-900/60 border border-slate-200/80 dark:border-white/10 shadow-xs'
+              : 'bg-slate-100/80 dark:bg-neutral-950/40 border border-slate-200/60 dark:border-white/10'
+          }`}>
+            {[
+              { path: '/', label: isHindi ? 'होम' : 'Home' },
+              { path: '/city-tracker', label: isHindi ? 'शहर व तटीय क्षेत्र (110+)' : 'City & Area Watch' },
+              { path: '/threat-map', label: isHindi ? 'तटीय खतरा मानचित्र' : 'Threat Map' },
+              { path: '/bulletins', label: isHindi ? 'सरकारी बुलेटिन' : 'Bulletins' },
+              { path: '/safety-guide', label: isHindi ? 'सुरक्षा गाइड' : 'Safety Guide' }
+            ].map((link) => {
+              const isSelected = link.path === '/';
+              return (
+                <button
+                  key={link.path}
+                  onClick={() => {
+                    if (link.path === '/') {
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    } else {
+                      navigate(link.path);
+                    }
+                  }}
+                  className={`group relative overflow-hidden px-3.5 py-1.5 rounded-full text-xs transition-all duration-200 cursor-pointer whitespace-nowrap shrink-0 flex items-center gap-1.5 transform-gpu ${
+                    isSelected
+                      ? 'bg-gradient-to-b from-white/95 via-white/85 to-white/70 dark:from-white/30 dark:via-white/15 dark:to-white/5 text-slate-950 dark:text-white border border-white/80 dark:border-white/40 shadow-[0_4px_16px_rgba(0,0,0,0.12),0_1px_3px_rgba(0,0,0,0.08),inset_0_2px_1px_rgba(255,255,255,1),inset_0_-1.5px_2px_rgba(255,255,255,0.4)] dark:shadow-[0_0_20px_rgba(255,255,255,0.15),0_6px_24px_rgba(0,0,0,0.8),inset_0_2px_1px_rgba(255,255,255,0.7),inset_0_-1.5px_2px_rgba(255,255,255,0.2)] backdrop-blur-2xl font-bold -translate-y-0.5 scale-[1.02]'
+                      : 'border border-transparent bg-transparent text-slate-700 dark:text-white hover:text-slate-950 dark:hover:text-white hover:bg-white/60 dark:hover:bg-white/10 hover:border-slate-200/60 dark:hover:border-white/15 hover:shadow-2xs font-medium'
+                  }`}
+                >
+                  {/* Glossy Upper Dome Reflection & Bottom Rim - Active on Selected */}
+                  {isSelected && (
+                    <>
+                      <span className="absolute inset-x-1 top-0 h-[48%] rounded-t-full bg-gradient-to-b from-white/80 via-white/30 to-transparent dark:from-white/50 dark:via-white/15 pointer-events-none" />
+                      <span className="absolute inset-x-2.5 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-white/90 dark:via-white/70 to-transparent pointer-events-none" />
+                    </>
+                  )}
+
+                  {/* Luminous Jewel Status Dot */}
+                  <span 
+                    className={`relative flex items-center justify-center transition-all duration-200 ${
+                      isSelected ? 'opacity-100 scale-100' : 'opacity-0 group-hover:opacity-75 scale-75 group-hover:scale-100'
+                    }`} 
+                  >
+                    <span className="absolute w-2 h-2 rounded-full bg-cyan-400 dark:bg-cyan-300 animate-ping opacity-65" />
+                    <span className="relative w-1.5 h-1.5 rounded-full bg-slate-900 dark:bg-white shadow-[0_0_8px_rgba(255,255,255,1),0_0_12px_rgba(34,211,238,0.9)] ring-1 ring-cyan-400/90" />
+                  </span>
+
+                  <span className="relative z-10">
+                    {link.label}
+                  </span>
+                </button>
+              );
+            })}
+          </nav>
+
+          {/* RIGHT SIDE: CONTROLS */}
+          <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 flex-nowrap">
+
+
+            {/* National Emergency Hotline (Desktop Only) */}
+            <a 
+              href="tel:112" 
+              className="hidden lg:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-red-700 dark:text-red-300 bg-red-50/90 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 hover:bg-red-100 dark:hover:bg-red-900/60 transition-all shadow-2xs"
+              title={isHindi ? "राष्ट्रीय आपातकालीन हेल्पलाइन" : "National Emergency Helpline"}
+            >
+              <PhoneCall className="w-3.5 h-3.5 text-red-600 dark:text-red-400" />
+              <span>112 / 1078</span>
+            </a>
+
+            {/* Language Switcher (Desktop Only) */}
+            <button
+              onClick={() => handleLanguageToggle(!isHindi)}
+              className="hidden sm:inline-flex px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-700 transition-all cursor-pointer"
+              title={isHindi ? "Switch to English" : "हिन्दी में बदलें"}
+            >
+              {isHindi ? 'English' : 'हिन्दी'}
+            </button>
+
+            {/* Compact Font Size Scaling Controls */}
+            <div className="flex items-center rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 p-0.5">
+              <button
+                onClick={() => setFontSizeOffset(p => Math.max(-2, p - 1))}
+                className="px-1.5 sm:px-2 py-0.5 sm:py-1 text-[11px] sm:text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white rounded hover:bg-white dark:hover:bg-slate-700 transition-all cursor-pointer"
+                title={isHindi ? "फ़ॉन्ट आकार घटाएं" : "Decrease font size"}
+              >
+                A-
+              </button>
+              <button
+                onClick={() => setFontSizeOffset(0)}
+                className="hidden sm:inline-block text-[10px] font-bold text-slate-500 dark:text-slate-400 px-1.5 hover:text-sky-600 dark:hover:text-sky-400 cursor-pointer select-none transition-colors"
+                title={isHindi ? "फ़ॉन्ट स्केल रीसेट करें (100%)" : "Click to reset font scale to 100%"}
+              >
+                {fontSizeOffset === 0 ? '100%' : `${100 + Math.round(fontSizeOffset * 6.25)}%`}
+              </button>
+              <button
+                onClick={() => setFontSizeOffset(p => Math.min(4, p + 1))}
+                className="px-1.5 sm:px-2 py-0.5 sm:py-1 text-[11px] sm:text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white rounded hover:bg-white dark:hover:bg-slate-700 transition-all cursor-pointer"
+                title={isHindi ? "फ़ॉन्ट आकार बढ़ाएं" : "Increase font size"}
+              >
+                A+
+              </button>
+            </div>
+
+            {/* Compact Theme Switcher */}
+            <button
+              onClick={() => setIsDarkMode(!isDarkMode)}
+              aria-label="Toggle light/dark theme"
+              className="relative p-1.5 sm:p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 shadow-xs hover:bg-white dark:hover:bg-slate-700 text-slate-700 dark:text-amber-400 transition-all duration-300 overflow-hidden group cursor-pointer shrink-0"
+              title={isDarkMode ? (isHindi ? "लाइट थीम पर स्विच करें" : "Switch to Light Theme") : (isHindi ? "डार्क थीम पर स्विच करें" : "Switch to Dark Theme")}
+            >
+              <div className="relative w-4 h-4 flex items-center justify-center">
+                {/* Sun Icon */}
+                <Sun
+                  className={`w-4 h-4 text-amber-500 absolute transition-all duration-500 transform ${
+                    isDarkMode ? 'rotate-90 scale-0 opacity-0' : 'rotate-0 scale-100 opacity-100 group-hover:rotate-45'
+                  }`}
+                />
+                {/* Moon Icon */}
+                <Moon
+                  className={`w-4 h-4 text-sky-400 dark:text-amber-300 absolute transition-all duration-500 transform ${
+                    isDarkMode ? 'rotate-0 scale-100 opacity-100 group-hover:-rotate-12' : '-rotate-90 scale-0 opacity-0'
+                  }`}
+                />
+              </div>
+            </button>
+
+            {/* Mobile Menu Hamburger Toggle */}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              aria-label={isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+              className="md:hidden p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-all cursor-pointer shrink-0"
+            >
+              {isMobileMenuOpen ? (
+                <X className="w-5 h-5 text-slate-900 dark:text-white" />
+              ) : (
+                <Menu className="w-5 h-5 text-slate-900 dark:text-white" />
+              )}
+            </button>
+
+          </div>
+
+        </div>
+
+        {/* MOBILE NAVIGATION DRAWER */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden border-t border-slate-200/80 dark:border-white/10 bg-white/95 dark:bg-black/95 backdrop-blur-2xl px-4 py-4 space-y-3 shadow-2xl animate-in slide-in-from-top-2 duration-200">
+            
+            {/* 1. EMERGENCY HELPLINE */}
+            <a
+              href="tel:112"
+              className="flex items-center justify-between p-2.5 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 text-red-700 dark:text-red-300 transition-colors"
+            >
+              <div className="flex items-center gap-2">
+                <PhoneCall className="w-4 h-4 text-red-600 dark:text-red-400 shrink-0" />
+                <span className="text-xs font-bold">
+                  {isHindi ? 'राष्ट्रीय हेल्पलाइन: 112 / 1078' : 'Emergency Helpline: 112 / 1078'}
+                </span>
+              </div>
+              <span className="text-[10px] font-bold bg-red-600 text-white px-2 py-0.5 rounded-full">24x7</span>
+            </a>
+
+            {/* 2. NAVIGATION PAGES & MODULES */}
+            <div className="space-y-1 pt-1 border-t border-slate-100 dark:border-neutral-800">
+              <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 px-2 py-1">
+                {isHindi ? 'नेविगेशन एवं निगरानी पेज' : 'Navigation & Live Watch'}
+              </div>
+
+              {[
+                { 
+                  path: '/', 
+                  label: isHindi ? 'होम' : 'Home', 
+                  desc: isHindi ? 'राष्ट्रीय चक्रवात पोर्टल मुख्य पृष्ठ' : 'National Cyclone Portal Main Page',
+                  isHome: true 
+                },
+                { 
+                  path: '/city-tracker', 
+                  label: isHindi ? 'शहर व तटीय क्षेत्र निगरानी (110+)' : 'City & Area Watch (110+)', 
+                  desc: isHindi ? 'ज़िला और बंदरगाह स्तर का रीयल-टाइम डेटा' : 'District & Port-level Real-Time Tracker',
+                  badge: 'LIVE'
+                },
+                { 
+                  path: '/threat-map', 
+                  label: isHindi ? 'तटीय खतरा मानचित्र' : 'Threat Map', 
+                  desc: isHindi ? 'जीआईएस डॉपलर रडार और मौसम उपग्रह' : 'GIS Radar, Wind Radii & Track Cone'
+                },
+                { 
+                  path: '/bulletins', 
+                  label: isHindi ? 'सरकारी मौसम बुलेटिन' : 'Official Weather Bulletins', 
+                  desc: isHindi ? 'आईएमडी के आधिकारिक परामर्श एवं चेतावनी' : 'IMD advisories and official updates'
+                },
+                { 
+                  path: '/safety-guide', 
+                  label: isHindi ? 'सुरक्षा और निकासी गाइड' : 'Safety & Evacuation Guide', 
+                  desc: isHindi ? 'चक्रवात से पहले, दौरान और बाद के दिशा-निर्देश' : 'Actionable protocols for citizen safety'
+                }
+              ].map((item) => (
+                <button
+                  key={item.path}
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    if (item.isHome) {
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    } else {
+                      navigate(item.path);
+                    }
+                  }}
+                  className="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-neutral-900 transition-colors text-left group cursor-pointer"
+                >
+                  <div className="min-w-0 pr-2">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-semibold text-slate-800 dark:text-slate-200 group-hover:text-sky-600 dark:group-hover:text-sky-400 truncate">
+                        {item.label}
+                      </span>
+                      {item.badge && (
+                        <span className="text-[9px] font-extrabold px-1.5 py-0.5 rounded bg-red-100 dark:bg-red-900/60 text-red-600 dark:text-red-300">
+                          {item.badge}
+                        </span>
+                      )}
+                    </div>
+                    <div className="text-[10px] text-slate-400 dark:text-slate-500 truncate mt-0.5">
+                      {item.desc}
+                    </div>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-slate-400 dark:text-slate-600 group-hover:text-slate-600 dark:group-hover:text-slate-400 shrink-0" />
+                </button>
+              ))}
+            </div>
+
+            {/* 4. MOBILE LANGUAGE SWITCHER */}
+            <div className="pt-2 border-t border-slate-100 dark:border-neutral-800 flex items-center justify-between">
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                {isHindi ? 'वेबसाइट भाषा / Language:' : 'Portal Language / भाषा:'}
+              </span>
+              <button
+                onClick={() => {
+                  setIsMobileMenuOpen(false);
+                  handleLanguageToggle(!isHindi);
+                }}
+                className="px-3 py-1 rounded-lg text-xs font-bold text-sky-700 dark:text-sky-300 bg-slate-100 dark:bg-neutral-800 border border-slate-200 dark:border-neutral-700 cursor-pointer"
+              >
+                {isHindi ? 'English में देखें' : 'हिन्दी में देखें'}
+              </button>
+            </div>
+
+          </div>
+        )}
+        </div>
+
+        {/* MOVING NATIONAL ADVISORY TICKER (RIGHT TO LEFT) - STICKY TOGETHER WITH HEADER */}
+        <div className="bg-amber-500/15 dark:bg-amber-950/40 backdrop-blur-xl border-b border-amber-200/80 dark:border-amber-900/60 py-2 sm:py-2.5 text-xs text-amber-950 dark:text-amber-200 transition-colors duration-500 overflow-hidden shadow-xs">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-3">
+            {/* Pinned Authority Tag */}
+            <div className="flex items-center gap-2 shrink-0 bg-amber-500/20 dark:bg-amber-500/25 px-2.5 py-1 rounded-md z-10 select-none border border-amber-300/50 dark:border-amber-700/50">
+              <span className="relative flex h-2 w-2">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-500 opacity-75"></span>
+                <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-600 dark:bg-amber-400"></span>
+              </span>
+              <span className="font-bold text-amber-950 dark:text-amber-200 tracking-wider text-[11px] uppercase whitespace-nowrap">
+                {isHindi ? 'राष्ट्रीय चेतावनी' : 'NATIONAL ADVISORY'}
+              </span>
+            </div>
+
+            {/* Continuous Right-to-Left Scrolling Marquee */}
+            <div className="relative flex-1 overflow-hidden flex items-center group cursor-default">
+              <div className="animate-ticker-rtl flex items-center gap-12 font-medium">
+                <span className="inline-flex items-center gap-3 whitespace-nowrap">
+                  <span>{isHindi 
+                    ? 'बंगाल की खाड़ी (13.5°N, 88.5°E) में चक्रवाती परिसंचरण इन्वेस्ट 92B सक्रिय। 48 घंटों में चक्रवात बनने की संभावना: 68%।' 
+                    : 'Incipient cyclonic circulation Invest 92B in Bay of Bengal (13.5°N, 88.5°E). 48h cyclogenesis potential: 68%.'}</span>
+                  <span className="text-amber-500/60 dark:text-amber-400/60">•</span>
+                  <span>{isHindi 
+                    ? 'आपदा प्रबंधन बल (NDRF/SDRF) तटीय क्षेत्रों में अलर्ट पर।' 
+                    : 'Disaster response authorities on vigil across coastal corridors.'}</span>
+                  <span className="text-amber-500/60 dark:text-amber-400/60">•</span>
+                  <span>{isHindi 
+                    ? 'मछुआरों को गहरे समुद्र में न जाने की आधिकारिक सलाह।' 
+                    : 'Fishermen advised not to venture into deep sea.'}</span>
+                </span>
+
+                {/* Seamless loop duplication */}
+                <span className="inline-flex items-center gap-3 whitespace-nowrap">
+                  <span>{isHindi 
+                    ? 'बंगाल की खाड़ी (13.5°N, 88.5°E) में चक्रवाती परिसंचरण इन्वेस्ट 92B सक्रिय। 48 घंटों में चक्रवात बनने की संभावना: 68%।' 
+                    : 'Incipient cyclonic circulation Invest 92B in Bay of Bengal (13.5°N, 88.5°E). 48h cyclogenesis potential: 68%.'}</span>
+                  <span className="text-amber-500/60 dark:text-amber-400/60">•</span>
+                  <span>{isHindi 
+                    ? 'आपदा प्रबंधन बल (NDRF/SDRF) तटीय क्षेत्रों में अलर्ट पर।' 
+                    : 'Disaster response authorities on vigil across coastal corridors.'}</span>
+                  <span className="text-amber-500/60 dark:text-amber-400/60">•</span>
+                  <span>{isHindi 
+                    ? 'मछुआरों को गहरे समुद्र में न जाने की आधिकारिक सलाह।' 
+                    : 'Fishermen advised not to venture into deep sea.'}</span>
+                </span>
+              </div>
+            </div>
+
+            {/* Pinned Observation Timestamp */}
+            <span className="text-xs text-amber-800 dark:text-amber-400 shrink-0 hidden md:inline font-medium pl-2.5 border-l border-amber-300/40 dark:border-amber-800/40 z-10 whitespace-nowrap">
+              {isHindi ? `अवलोकन: ${istTime}` : `Observation: ${istTime}`}
+>>>>>>> 1a84afc6e5d4411510be97d324177520d1d45523
             </span>
           </div>
 

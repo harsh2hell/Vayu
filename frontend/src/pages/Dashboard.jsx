@@ -612,184 +612,243 @@ const Dashboard = () => {
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
       
-      {/* VAYU Enterprise Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1">
-            <h1 className="text-xl sm:text-2xl font-heading font-black text-slate-900 tracking-tight">
-              Welcome to VAYU AI
-            </h1>
-            <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-mono font-bold tracking-wider bg-slate-900 text-white shadow-xs">
-              ENTERPRISE PRO
-            </span>
+      {/* VAYU Enterprise Executive Command Header */}
+      <div className="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 shadow-xs relative overflow-hidden">
+        {/* Subtle decorative gradient background glow */}
+        <div className="absolute -right-16 -top-16 w-64 h-64 bg-sky-100/50 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute -left-16 -bottom-16 w-64 h-64 bg-blue-100/40 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
+          <div className="space-y-2">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/70">
+                <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                <span>MoES • IMD Operational Ingestion Active</span>
+              </span>
+              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider bg-slate-900 text-white shadow-xs">
+                ENTERPRISE PRO
+              </span>
+            </div>
+
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-heading font-extrabold text-slate-900 tracking-tight">
+                Meteorological Command Overview
+              </h1>
+              <p className="text-xs sm:text-sm text-slate-500 font-normal max-w-2xl mt-1 leading-relaxed">
+                Real-time AI/ML tropical cyclone trajectory forecasting, sub-kilometer eye fixes, multi-spectral INSAT-3DR ingestion, and automated coastal early warning intelligence.
+              </p>
+            </div>
           </div>
-          <p className="text-xs text-slate-500 font-normal">
-            Real-time AI/ML tropical cyclone trajectory forecasting, sub-kilometer eye fixes, multi-spectral satellite ingestion, and automated early warning intelligence.
-          </p>
-        </div>
 
-        {/* Action Button */}
-        <div className="flex items-center gap-2 self-start sm:self-auto">
-          <button
-            onClick={() => navigate('/dashboard/prediction')}
-            className="btn-primary text-xs py-1.5 px-3.5 shadow-xs"
-          >
-            <Compass className="w-3.5 h-3.5" />
-            <span>Launch Trajectory Studio</span>
-          </button>
+          {/* Action Buttons Group */}
+          <div className="flex flex-wrap items-center gap-2.5 self-start lg:self-auto shrink-0">
+            <button
+              onClick={() => navigate('/dashboard/prediction')}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold shadow-sm hover:shadow transition-all cursor-pointer"
+            >
+              <Compass className="w-4 h-4 text-sky-400" />
+              <span>Launch Trajectory Studio</span>
+            </button>
 
-          <button
-            onClick={handleSyncFeed}
-            disabled={isProcessing}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-amber-300/80 bg-amber-50/60 text-amber-900 hover:bg-amber-100 transition-colors text-xs font-semibold shadow-2xs"
-          >
-            <Sparkles className="w-3.5 h-3.5 text-amber-600" />
-            <span>{isProcessing ? 'Syncing Feeds...' : 'Sync Satellite Feeds+'}</span>
-          </button>
+            <button
+              onClick={handleSyncFeed}
+              disabled={isProcessing}
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-amber-300/80 bg-amber-50/70 text-amber-900 hover:bg-amber-100 transition-colors text-xs font-semibold shadow-2xs cursor-pointer"
+            >
+              <Sparkles className={`w-3.5 h-3.5 text-amber-600 ${isProcessing ? 'animate-spin' : ''}`} />
+              <span>{isProcessing ? 'Syncing Feeds...' : 'Sync Satellite Feeds+'}</span>
+            </button>
+
+            <button
+              onClick={() => downloadOfficialBulletinPdf(aiPrediction.name, { ...aiPrediction, timestamp: new Date().toISOString() })}
+              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 transition-colors text-xs font-semibold shadow-2xs cursor-pointer"
+              title="Download Official IMD Bulletin PDF"
+            >
+              <Download className="w-3.5 h-3.5 text-slate-500" />
+              <span className="hidden sm:inline">Bulletin PDF</span>
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* 4 Metric Cards Grid */}
+      {/* 4 Premium Metric KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
-        {/* Card 1: Active Cyclones */}
-        <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-4 shadow-2xs hover:border-slate-300 transition-all">
+        {/* Card 1: Active Systems */}
+        <div className="bg-white border border-slate-200/80 rounded-2xl p-4 space-y-3.5 shadow-2xs hover:border-slate-300 hover:shadow-xs transition-all">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded border border-slate-200 flex items-center justify-center text-slate-600">
-                <Wind className="w-3.5 h-3.5 text-sky-600" />
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-600 shadow-2xs">
+                <Wind className="w-4 h-4" />
               </div>
-              <span className="text-xs font-medium text-slate-700">Active Systems</span>
+              <div>
+                <span className="text-xs font-bold text-slate-800 block leading-tight">Active Systems</span>
+                <span className="text-[10px] text-slate-400 font-medium">North Indian Ocean</span>
+              </div>
             </div>
-            <span className="text-[11px] font-mono text-slate-400 font-semibold">// DATA_01</span>
+            <span className="text-[10px] font-mono text-slate-400 font-bold bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">DATA_01</span>
           </div>
 
-          <div className="space-y-0.5">
-            <p className="text-3xl font-heading font-bold text-slate-900 tracking-tight">
-              1 / 2 Active
+          <div className="space-y-1">
+            <div className="flex items-baseline gap-2">
+              <p className="text-3xl font-heading font-black text-slate-900 tracking-tight">
+                1 / 2 Active
+              </p>
+            </div>
+            <p className="text-[11px] text-slate-500 flex items-center gap-1.5">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>{aiPrediction.basin} Basin Monitored</span>
             </p>
           </div>
 
-          <div className="flex items-center justify-between text-xs text-slate-400 font-mono pt-1">
-            <span>{aiPrediction.basin}</span>
-            <div className="w-16 h-px bg-slate-200"></div>
+          <div className="flex items-center justify-between text-[11px] text-slate-400 font-mono pt-2 border-t border-slate-100">
+            <span className="text-slate-600 font-medium">{aiPrediction.category.split('/')[0]}</span>
+            <span className="text-emerald-600 font-semibold">Live Track</span>
           </div>
         </div>
 
         {/* Card 2: AI Detection Precision */}
-        <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-4 shadow-2xs hover:border-slate-300 transition-all">
+        <div className="bg-white border border-slate-200/80 rounded-2xl p-4 space-y-3.5 shadow-2xs hover:border-slate-300 hover:shadow-xs transition-all">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded border border-slate-200 flex items-center justify-center text-emerald-600">
-                <Target className="w-3.5 h-3.5" />
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 shadow-2xs">
+                <Target className="w-4 h-4" />
               </div>
-              <span className="text-xs font-medium text-slate-700">Detection Precision</span>
+              <div>
+                <span className="text-xs font-bold text-slate-800 block leading-tight">Detection Precision</span>
+                <span className="text-[10px] text-slate-400 font-medium">Eye Center Localization</span>
+              </div>
             </div>
-            <span className="text-[11px] font-mono text-slate-400 font-semibold">// DATA_02</span>
+            <span className="text-[10px] font-mono text-slate-400 font-bold bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">DATA_02</span>
           </div>
 
-          <div className="space-y-0.5">
-            <p className="text-3xl font-heading font-bold text-slate-900 tracking-tight">
-              94.8%
+          <div className="space-y-1">
+            <div className="flex items-baseline gap-2">
+              <p className="text-3xl font-heading font-black text-slate-900 tracking-tight">
+                94.8%
+              </p>
+              <span className="text-[11px] font-semibold text-emerald-600 font-mono">+1.4%</span>
+            </div>
+            <p className="text-[11px] text-slate-500">
+              Sub-km eye fix via Vision Transformer
             </p>
           </div>
 
-          <div className="flex items-center justify-between text-xs text-slate-400 font-mono pt-1">
-            <span>CNN Vision v2.1</span>
-            <svg className="w-16 h-4 text-emerald-500" viewBox="0 0 64 16" fill="none">
-              <path d="M0 12 L16 12 L28 6 L44 8 L64 2" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+          <div className="flex items-center justify-between text-[11px] text-slate-400 font-mono pt-2 border-t border-slate-100">
+            <span className="text-slate-600 font-medium">CNN Vision v2.1</span>
+            <span className="text-emerald-600 font-semibold">&lt; 18km Error</span>
           </div>
         </div>
 
         {/* Card 3: Satellite Ingest Streams */}
-        <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-4 shadow-2xs hover:border-slate-300 transition-all">
+        <div className="bg-white border border-slate-200/80 rounded-2xl p-4 space-y-3.5 shadow-2xs hover:border-slate-300 hover:shadow-xs transition-all">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded border border-slate-200 flex items-center justify-center text-slate-600">
-                <Satellite className="w-3.5 h-3.5 text-sky-600" />
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-violet-50 border border-violet-100 flex items-center justify-center text-violet-600 shadow-2xs">
+                <Satellite className="w-4 h-4" />
               </div>
-              <span className="text-xs font-medium text-slate-700">Multi-Spectral Feeds</span>
+              <div>
+                <span className="text-xs font-bold text-slate-800 block leading-tight">Multi-Spectral Feeds</span>
+                <span className="text-[10px] text-slate-400 font-medium">Satellite Ingestion</span>
+              </div>
             </div>
-            <span className="text-[11px] font-mono text-slate-400 font-semibold">// DATA_03</span>
+            <span className="text-[10px] font-mono text-slate-400 font-bold bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">DATA_03</span>
           </div>
 
-          <div className="space-y-0.5">
-            <p className="text-3xl font-heading font-bold text-slate-900 tracking-tight">
-              4 / 4 Live
+          <div className="space-y-1">
+            <div className="flex items-baseline gap-2">
+              <p className="text-3xl font-heading font-black text-slate-900 tracking-tight">
+                4 / 4 Live
+              </p>
+              <span className="text-[11px] font-semibold text-emerald-600 font-mono">100%</span>
+            </div>
+            <p className="text-[11px] text-slate-500">
+              INSAT-3DR (IR1/WV) + NOAA AVHRR
             </p>
           </div>
 
-          <div className="flex items-center justify-between text-xs text-slate-400 font-mono pt-1">
-            <span>INSAT-3DR & NOAA</span>
-            <svg className="w-16 h-4 text-slate-300" viewBox="0 0 64 16" fill="none">
-              <path d="M0 14 L32 14 L48 4 L64 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-            </svg>
+          <div className="flex items-center justify-between text-[11px] text-slate-400 font-mono pt-2 border-t border-slate-100">
+            <span className="text-slate-600 font-medium">Latency 140ms</span>
+            <span className="text-violet-600 font-semibold">Synced</span>
           </div>
         </div>
 
         {/* Card 4: 24h Track Lead Error */}
-        <div className="bg-white border border-slate-200 rounded-xl p-4 space-y-4 shadow-2xs hover:border-slate-300 transition-all">
+        <div className="bg-white border border-slate-200/80 rounded-2xl p-4 space-y-3.5 shadow-2xs hover:border-slate-300 hover:shadow-xs transition-all">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-6 h-6 rounded border border-slate-200 flex items-center justify-center text-slate-600">
-                <Compass className="w-3.5 h-3.5 text-amber-600" />
+            <div className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 shadow-2xs">
+                <Compass className="w-4 h-4" />
               </div>
-              <span className="text-xs font-medium text-slate-700">24h Track Error</span>
+              <div>
+                <span className="text-xs font-bold text-slate-800 block leading-tight">24h Track Error</span>
+                <span className="text-[10px] text-slate-400 font-medium">Trajectory Engine</span>
+              </div>
             </div>
-            <span className="text-[11px] font-mono text-slate-400 font-semibold">// DATA_04</span>
+            <span className="text-[10px] font-mono text-slate-400 font-bold bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">DATA_04</span>
           </div>
 
-          <div className="space-y-0.5">
-            <p className="text-3xl font-heading font-bold text-slate-900 tracking-tight">
-              ±38 km
+          <div className="space-y-1">
+            <div className="flex items-baseline gap-2">
+              <p className="text-3xl font-heading font-black text-slate-900 tracking-tight">
+                ±38 km
+              </p>
+              <span className="text-[11px] font-semibold text-emerald-600 font-mono">Optimal</span>
+            </div>
+            <p className="text-[11px] text-slate-500">
+              BiLSTM Recurrent Ensemble Model
             </p>
           </div>
 
-          <div className="flex items-center justify-between text-xs text-slate-400 font-mono pt-1">
-            <span>BiLSTM Neural Net</span>
-            <div className="w-16 h-px bg-slate-200"></div>
+          <div className="flex items-center justify-between text-[11px] text-slate-400 font-mono pt-2 border-t border-slate-100">
+            <span className="text-slate-600 font-medium">Target &lt;45km</span>
+            <span className="text-amber-600 font-semibold">91% Confidence</span>
           </div>
         </div>
 
       </div>
 
       {/* FULLY POWERED GIS MAP HUD SECTION */}
-      <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-4 shadow-2xs">
+      <div className="bg-white border border-slate-200/80 rounded-2xl p-5 space-y-4 shadow-xs">
         
         {/* Map Header & Preset System Switcher */}
-        <div className="flex flex-col gap-3 border-b border-slate-100 pb-3">
+        <div className="flex flex-col gap-3.5 border-b border-slate-100 pb-4">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3">
             <div>
-              <div className="flex items-center gap-2">
-                <span className="text-[11px] font-mono font-bold text-slate-800 uppercase tracking-wider">
-                  // REALTIME_GEOSPATIAL_TRACK_HUD
+              <div className="flex items-center gap-2.5">
+                <span className="text-xs font-mono font-bold text-slate-800 uppercase tracking-wider">
+                  REALTIME GEOSPATIAL RADAR HUD
                 </span>
-                <span className="badge badge-green text-[10px]">
-                  {systemCategoryFilter === 'UPCOMING_FORMING' ? '⚡ LIVE GENESIS RADAR' : '📚 HISTORICAL BENCHMARK'}
+                <span className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                  systemCategoryFilter === 'UPCOMING_FORMING'
+                    ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
+                    : 'bg-sky-50 text-sky-700 border border-sky-200'
+                }`}>
+                  <span className={`w-1.5 h-1.5 rounded-full ${systemCategoryFilter === 'UPCOMING_FORMING' ? 'bg-emerald-500 animate-pulse' : 'bg-sky-500'}`} />
+                  {systemCategoryFilter === 'UPCOMING_FORMING' ? 'LIVE GENESIS RADAR' : 'HISTORICAL BENCHMARK'}
                 </span>
               </div>
               <p className="text-xs text-slate-500 font-normal mt-0.5">
                 {systemCategoryFilter === 'UPCOMING_FORMING'
-                  ? 'Real-time tropical cyclogenesis scanner detecting upcoming low pressure formations, convective vortices, and 48h genesis potential.'
-                  : 'Replaying recorded IMD best-track archives to benchmark BiLSTM track and intensity prediction accuracy.'}
+                  ? 'Real-time tropical cyclogenesis scanner detecting developing low-pressure systems, convective vortices, and 48h formation potential.'
+                  : 'Evaluating recorded IMD best-track archives to benchmark BiLSTM track and intensity prediction accuracy.'}
               </p>
             </div>
 
             {/* Category Mode Switcher: Forming Lows vs Historical Benchmarks */}
-            <div className="flex items-center gap-1.5 p-1 bg-slate-100 rounded-xl border border-slate-200 text-xs font-semibold">
+            <div className="flex items-center gap-1 p-1 bg-slate-100 rounded-xl border border-slate-200/80 text-xs font-semibold">
               <button
                 onClick={() => {
                   setSystemCategoryFilter('UPCOMING_FORMING');
                   handlePresetSelect('invest-92b-forming');
                 }}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
                   systemCategoryFilter === 'UPCOMING_FORMING'
-                    ? 'bg-slate-900 text-white shadow-2xs'
+                    ? 'bg-slate-900 text-white shadow-xs'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                 <span>Live Forming Scanner</span>
               </button>
               <button
@@ -797,9 +856,9 @@ const Dashboard = () => {
                   setSystemCategoryFilter('HISTORICAL_BENCHMARK');
                   handlePresetSelect('cyclone-dana-2024');
                 }}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer ${
                   systemCategoryFilter === 'HISTORICAL_BENCHMARK'
-                    ? 'bg-slate-900 text-white shadow-2xs'
+                    ? 'bg-slate-900 text-white shadow-xs'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -809,23 +868,23 @@ const Dashboard = () => {
           </div>
 
           {/* Preset Buttons filtered by category */}
-          <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
+          <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1">
             <div className="flex flex-wrap items-center gap-2">
               <span className="text-[11px] font-mono text-slate-400 font-medium">
-                {systemCategoryFilter === 'UPCOMING_FORMING' ? 'Forming Systems:' : 'Case Studies:'}
+                {systemCategoryFilter === 'UPCOMING_FORMING' ? 'Active Systems:' : 'Case Studies:'}
               </span>
               {PRESET_SYSTEMS.filter(s => s.type === systemCategoryFilter).map((sys) => (
                 <button
                   key={sys.id}
                   onClick={() => handlePresetSelect(sys.id)}
-                  className={`px-3 py-1 rounded text-xs font-medium transition-all border flex items-center gap-1.5 ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border flex items-center gap-1.5 cursor-pointer ${
                     selectedPreset === sys.id
-                      ? 'bg-slate-900 text-white border-slate-900 font-bold shadow-2xs'
-                      : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+                      ? 'bg-slate-900 text-white border-slate-900 font-semibold shadow-xs'
+                      : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
                   }`}
                 >
                   {sys.type === 'UPCOMING_FORMING' && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse"></span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                   )}
                   <span>{sys.name}</span>
                 </button>
@@ -835,10 +894,10 @@ const Dashboard = () => {
             {/* Click to Simulate Coords Picker Button */}
             <button
               onClick={() => setIsClickPickerActive(!isClickPickerActive)}
-              className={`px-3 py-1 rounded text-xs font-medium transition-all border flex items-center gap-1.5 ${
+              className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all border flex items-center gap-1.5 cursor-pointer ${
                 isClickPickerActive
-                  ? 'bg-rose-500 text-white border-rose-600 animate-pulse font-bold'
-                  : 'bg-slate-100 text-slate-700 border-slate-200 hover:bg-slate-200'
+                  ? 'bg-rose-600 text-white border-rose-600 animate-pulse font-bold shadow-xs'
+                  : 'bg-slate-50 text-slate-700 border-slate-200 hover:bg-slate-100'
               }`}
               title="Click anywhere on the map to pick custom coordinates"
             >
@@ -850,13 +909,13 @@ const Dashboard = () => {
 
         {/* Dynamic Context Banner: Genesis Watch vs Historical Benchmark */}
         {aiPrediction.system_type === 'UPCOMING_FORMING_SYSTEM' ? (
-          <div className="bg-sky-50 border border-sky-200 rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+          <div className="bg-gradient-to-r from-sky-50 via-blue-50/40 to-sky-50/60 border border-sky-200/80 rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
             <div className="flex items-start sm:items-center gap-2.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-sky-500 animate-ping mt-0.5 sm:mt-0 shrink-0" />
+              <span className="w-2.5 h-2.5 rounded-full bg-sky-500 animate-pulse mt-0.5 sm:mt-0 shrink-0" />
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
                   <span className="font-bold text-sky-950 uppercase tracking-wide">
-                    ⚡ UPCOMING CYCLOGENESIS PATTERN: {aiPrediction.name}
+                    UPCOMING CYCLOGENESIS PATTERN: {aiPrediction.name}
                   </span>
                   <span className="badge badge-sky text-[10px] font-mono">GENESIS WATCH</span>
                   <span className="badge badge-orange text-[10px] font-mono">
@@ -864,32 +923,34 @@ const Dashboard = () => {
                   </span>
                 </div>
                 <p className="text-sky-700 text-[11px] mt-0.5">
-                  Deep Learning morphological pattern classification detects <strong>{aiPrediction.vit_pattern}</strong> in {aiPrediction.basin}. 
-                  Projected 72h trajectory indicates systematic deepening into a Depression and potential Cyclonic Storm.
+                  Deep Learning morphological classification detects <strong>{aiPrediction.vit_pattern}</strong> in {aiPrediction.basin}. 
+                  Projected trajectory indicates systematic deepening with potential coastal strike sector.
                 </p>
               </div>
             </div>
-            <div className="shrink-0 font-mono text-[11px] font-bold text-sky-900 bg-sky-100 px-2.5 py-1 rounded border border-sky-300">
+            <div className="shrink-0 font-mono text-[11px] font-bold text-sky-900 bg-white/80 px-2.5 py-1 rounded-lg border border-sky-200 shadow-2xs">
               Incipient Fix: {aiPrediction.current_lat}°N, {aiPrediction.current_lon}°E
             </div>
           </div>
         ) : (
-          <div className="bg-amber-50 border border-amber-200 rounded-xl p-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs">
+          <div className="bg-amber-50/70 border border-amber-200/80 rounded-xl p-3.5 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs">
             <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-amber-500" />
-              <span className="font-bold text-amber-950">
-                📚 HISTORICAL BENCHMARK: {aiPrediction.name}
-              </span>
-              <span className="text-amber-800 text-[11px]">
-                Evaluating BiLSTM neural model on recorded landfall dynamics.
-              </span>
+              <span className="w-2 h-2 rounded-full bg-amber-500 shrink-0" />
+              <div>
+                <span className="font-bold text-amber-950 block">
+                  HISTORICAL BENCHMARK: {aiPrediction.name}
+                </span>
+                <span className="text-amber-800 text-[11px]">
+                  Evaluating BiLSTM neural model on recorded landfall dynamics and intensity forecasts.
+                </span>
+              </div>
             </div>
             <button
               onClick={() => {
                 setSystemCategoryFilter('UPCOMING_FORMING');
                 handlePresetSelect('invest-92b-forming');
               }}
-              className="px-2.5 py-1 rounded bg-amber-200 text-amber-950 font-semibold text-[11px] hover:bg-amber-300 transition-colors shrink-0"
+              className="px-3 py-1.5 rounded-lg bg-amber-200/80 text-amber-950 font-semibold text-[11px] hover:bg-amber-300 transition-colors shrink-0 cursor-pointer"
             >
               Switch to Live Forming Scanner ➔
             </button>
@@ -897,18 +958,18 @@ const Dashboard = () => {
         )}
 
         {/* Map Toolbar: Tile Layer & Layer Toggles */}
-        <div className="flex flex-wrap items-center justify-between gap-3 text-xs">
+        <div className="flex flex-wrap items-center justify-between gap-3 text-xs pt-1">
           
           {/* Base Layer Switcher */}
-          <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-xs font-medium">
+          <div className="flex flex-wrap items-center gap-1 bg-slate-100 p-1 rounded-xl border border-slate-200/80 text-xs font-medium">
             <span className="text-[11px] text-slate-500 font-mono px-2">Map:</span>
             {MAP_LAYERS.map((layer) => (
               <button
                 key={layer.id}
                 onClick={() => setActiveTileLayer(layer)}
-                className={`px-2.5 py-1 rounded text-[11px] transition-all ${
+                className={`px-2.5 py-1 rounded-lg text-[11px] transition-all cursor-pointer ${
                   activeTileLayer.id === layer.id
-                    ? 'bg-white text-slate-900 font-semibold shadow-2xs'
+                    ? 'bg-white text-slate-900 font-semibold shadow-xs'
                     : 'text-slate-600 hover:text-slate-900'
                 }`}
               >
@@ -921,43 +982,43 @@ const Dashboard = () => {
           <div className="flex flex-wrap items-center gap-1.5 font-mono text-[11px]">
             <button
               onClick={() => setShowCone(!showCone)}
-              className={`px-2 py-0.5 rounded border transition-all ${
-                showCone ? 'bg-amber-100 text-amber-900 border-amber-300 font-bold' : 'bg-slate-50 text-slate-500 border-slate-200'
+              className={`px-2.5 py-1 rounded-lg border transition-all cursor-pointer ${
+                showCone ? 'bg-amber-100 text-amber-900 border-amber-300 font-bold' : 'bg-white text-slate-500 border-slate-200'
               }`}
             >
               70% Cone
             </button>
             <button
               onClick={() => setShowOuterCone(!showOuterCone)}
-              className={`px-2 py-0.5 rounded border transition-all ${
-                showOuterCone ? 'bg-amber-50 text-amber-800 border-amber-200 font-bold' : 'bg-slate-50 text-slate-500 border-slate-200'
+              className={`px-2.5 py-1 rounded-lg border transition-all cursor-pointer ${
+                showOuterCone ? 'bg-amber-50 text-amber-800 border-amber-200 font-bold' : 'bg-white text-slate-500 border-slate-200'
               }`}
             >
               90% Cone
             </button>
             <button
               onClick={() => setShowWindRadii(!showWindRadii)}
-              className={`px-2 py-0.5 rounded border transition-all ${
-                showWindRadii ? 'bg-sky-100 text-sky-900 border-sky-300 font-bold' : 'bg-slate-50 text-slate-500 border-slate-200'
+              className={`px-2.5 py-1 rounded-lg border transition-all cursor-pointer ${
+                showWindRadii ? 'bg-sky-100 text-sky-900 border-sky-300 font-bold' : 'bg-white text-slate-500 border-slate-200'
               }`}
             >
               Wind Radii
             </button>
             <button
               onClick={() => setShowPorts(!showPorts)}
-              className={`px-2 py-0.5 rounded border transition-all ${
-                showPorts ? 'bg-red-100 text-red-900 border-red-300 font-bold' : 'bg-slate-50 text-slate-500 border-slate-200'
+              className={`px-2.5 py-1 rounded-lg border transition-all cursor-pointer ${
+                showPorts ? 'bg-red-100 text-red-900 border-red-300 font-bold' : 'bg-white text-slate-500 border-slate-200'
               }`}
             >
               Coastal Ports
             </button>
             <button
               onClick={() => setShowDopplerRadar(!showDopplerRadar)}
-              className={`px-2 py-0.5 rounded border transition-all flex items-center gap-1 ${
-                showDopplerRadar ? 'bg-emerald-100 text-emerald-900 border-emerald-300 font-bold' : 'bg-slate-50 text-slate-500 border-slate-200'
+              className={`px-2.5 py-1 rounded-lg border transition-all flex items-center gap-1.5 cursor-pointer ${
+                showDopplerRadar ? 'bg-emerald-100 text-emerald-900 border-emerald-300 font-bold' : 'bg-white text-slate-500 border-slate-200'
               }`}
             >
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
               <span>Live Doppler Radar</span>
             </button>
           </div>
@@ -965,25 +1026,25 @@ const Dashboard = () => {
         </div>
 
         {/* Map Container */}
-        <div className="h-[340px] sm:h-96 w-full rounded-xl overflow-hidden border border-slate-200 relative shadow-inner">
+        <div className="h-[380px] sm:h-[440px] w-full rounded-2xl overflow-hidden border border-slate-200/90 relative shadow-inner">
           
           {/* Active Waypoint HUD Overlay */}
-          <div className="absolute top-2 left-2 sm:top-3 sm:left-3 z-[400] bg-white/95 backdrop-blur-md p-2.5 sm:px-3.5 sm:py-2 rounded-lg shadow-md border border-slate-200 text-[11px] sm:text-xs font-mono space-y-0.5 max-w-[calc(100%-16px)] sm:max-w-xs">
+          <div className="absolute top-2.5 left-2.5 sm:top-3.5 sm:left-3.5 z-[400] bg-white/95 backdrop-blur-md p-3 sm:px-4 sm:py-3 rounded-xl shadow-md border border-slate-200/90 text-[11px] sm:text-xs font-mono space-y-1 max-w-[calc(100%-20px)] sm:max-w-xs">
             <div className="flex items-center gap-2">
-              <span className={`w-2.5 h-2.5 rounded-full ${aiPrediction.system_type === 'UPCOMING_FORMING_SYSTEM' ? 'bg-sky-500 animate-ping' : 'bg-red-500 animate-pulse'}`} />
-              <span className="font-bold text-slate-900">{aiPrediction.name}</span>
+              <span className={`w-2.5 h-2.5 rounded-full ${aiPrediction.system_type === 'UPCOMING_FORMING_SYSTEM' ? 'bg-sky-500 animate-pulse' : 'bg-red-500'}`} />
+              <span className="font-bold text-slate-900 truncate">{aiPrediction.name}</span>
             </div>
-            <div className="text-slate-500 text-[11px]">
+            <div className="text-slate-600 text-[11px]">
               Fix: <strong>{activeWaypoint.lat}°N, {activeWaypoint.lon}°E</strong> • Wind: <strong className="text-sky-600">{activeWaypoint.speed} km/h</strong> • Press: <strong className="text-slate-800">{activeWaypoint.pressure} hPa</strong>
             </div>
-            <div className="text-[10px] text-slate-600 font-sans font-medium pt-0.5 border-t border-slate-100 flex items-center justify-between gap-2">
+            <div className="text-[10px] text-slate-600 font-sans font-medium pt-1 border-t border-slate-100 flex items-center justify-between gap-2">
               <span className="text-sky-800 font-semibold">{aiPrediction.category}</span>
               <span className="text-amber-800 font-bold">Risk: {aiPrediction.cyclogenesis_risk}</span>
             </div>
             {liveOceanData && (
-              <div className="text-[10px] text-emerald-700 font-sans font-medium flex items-center gap-1.5 pt-0.5 border-t border-slate-100">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
-                <span>Live Marine: Wind {liveOceanData.surface_wind_kmh} km/h • Press {liveOceanData.surface_pressure_hpa} hPa</span>
+              <div className="text-[10px] text-emerald-700 font-sans font-medium flex items-center gap-1.5 pt-1 border-t border-slate-100">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                <span>Marine Buoy: Wind {liveOceanData.surface_wind_kmh} km/h • Press {liveOceanData.surface_pressure_hpa} hPa</span>
               </div>
             )}
           </div>
@@ -1157,24 +1218,24 @@ const Dashboard = () => {
           </MapContainer>
 
           {/* Time-lapse Playback Strip Overlay */}
-          <div className="absolute bottom-2 left-2 right-2 sm:bottom-3 sm:left-3 sm:right-3 z-[400] bg-white/95 backdrop-blur-md p-2 sm:px-4 sm:py-2 rounded-xl shadow-lg border border-slate-200 flex flex-wrap items-center justify-between gap-2 sm:gap-3">
+          <div className="absolute bottom-2.5 left-2.5 right-2.5 sm:bottom-3.5 sm:left-3.5 sm:right-3.5 z-[400] bg-white/95 backdrop-blur-md p-2.5 sm:px-4 sm:py-2.5 rounded-xl shadow-lg border border-slate-200/90 flex flex-wrap items-center justify-between gap-2.5">
             
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setIsPlaying(!isPlaying)}
-                className="p-1.5 rounded-lg bg-slate-900 text-white hover:bg-slate-800 transition-colors shadow-xs"
+                className="p-1.5 rounded-lg bg-slate-900 text-white hover:bg-slate-800 transition-colors shadow-xs cursor-pointer"
                 title={isPlaying ? 'Pause' : 'Play 72h Timeline'}
               >
                 {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
               </button>
               <button
                 onClick={() => { setTimeStepIndex(0); setIsPlaying(false); }}
-                className="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 text-slate-600 transition-colors"
-                title="Reset"
+                className="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 text-slate-600 transition-colors cursor-pointer"
+                title="Reset Timeline"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
               </button>
-              <span className="text-xs font-mono font-semibold text-slate-800">
+              <span className="text-xs font-mono font-bold text-slate-800">
                 {activeWaypoint.time} Step ({activeWaypoint.stage})
               </span>
             </div>
@@ -1185,10 +1246,10 @@ const Dashboard = () => {
                 <button
                   key={idx}
                   onClick={() => { setTimeStepIndex(idx); setIsPlaying(false); }}
-                  className={`px-2 py-0.5 rounded transition-all border ${
+                  className={`px-2.5 py-1 rounded-lg transition-all border cursor-pointer ${
                     timeStepIndex === idx
                       ? 'bg-sky-600 text-white border-sky-600 font-bold shadow-2xs'
-                      : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+                      : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
                   }`}
                 >
                   {step.time}
@@ -1203,25 +1264,25 @@ const Dashboard = () => {
       </div>
 
       {/* 72H Trajectory & Intensity Trend Analysis */}
-      <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-5 shadow-2xs">
+      <div className="bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 space-y-5 shadow-xs">
         
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
           <div>
-            <span className="text-[11px] font-mono font-bold text-slate-800 uppercase tracking-wider block">
-              // 72H_INTENSITY_AND_PRESSURE_TREND_ANALYSIS
+            <span className="text-xs font-mono font-bold text-slate-800 uppercase tracking-wider block">
+              72H INTENSITY AND CENTRAL PRESSURE FORECAST
             </span>
             <p className="text-xs text-slate-500 font-normal mt-0.5">
-              Interactive timeline monitoring sustained wind speeds (km/h) and central atmospheric pressure (hPa).
+              Deep learning multi-step trajectory monitoring sustained wind speeds (km/h) and central barometric pressure (hPa).
             </p>
           </div>
 
           <div className="flex items-center gap-4 text-xs font-sans text-slate-600">
-            <span className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-blue-500" />
+            <span className="flex items-center gap-1.5 font-medium">
+              <span className="w-2.5 h-2.5 rounded-full bg-sky-500" />
               <span>Sustained Wind (km/h)</span>
             </span>
-            <span className="flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-rose-500" />
+            <span className="flex items-center gap-1.5 font-medium">
+              <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
               <span>Central Pressure (hPa)</span>
             </span>
           </div>
@@ -1248,7 +1309,7 @@ const Dashboard = () => {
                 tickLine={false}
               />
               <YAxis 
-                domain={[60, 130]}
+                domain={[40, 120]}
                 tick={{ fill: '#94A3B8', fontSize: 11, fontFamily: 'var(--font-mono)' }}
                 axisLine={false}
                 tickLine={false}
@@ -1258,9 +1319,9 @@ const Dashboard = () => {
                   if (active && payload && payload.length) {
                     const data = payload[0].payload;
                     return (
-                      <div className="bg-slate-900 text-white p-2.5 rounded-lg shadow-xl text-xs font-mono space-y-1">
+                      <div className="bg-slate-900 text-white p-3 rounded-xl shadow-xl text-xs font-mono space-y-1">
                         <p className="font-bold text-sky-400">{label} ({data.stage})</p>
-                        <p>Coords: {data.lat}°N, {data.lon}°E</p>
+                        <p className="text-slate-300">Coords: {data.lat}°N, {data.lon}°E</p>
                         <p className="text-white font-semibold">Sustained Wind: {data.speed} km/h</p>
                         <p className="text-rose-300">Central Pressure: {data.pressure} hPa</p>
                       </div>
@@ -1283,53 +1344,53 @@ const Dashboard = () => {
 
       </div>
 
-      {/* Bottom 2-Column Grid */}
+      {/* Bottom 2-Column Grid: Coastal Strike Districts & AI Pipeline Orchestration */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
         {/* Coastal Strike Districts */}
-        <div className="lg:col-span-7 bg-white border border-slate-200 rounded-xl p-5 space-y-4 shadow-2xs">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+        <div className="lg:col-span-7 bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 space-y-4 shadow-xs">
+          <div className="flex items-center justify-between border-b border-slate-100 pb-4">
             <div>
-              <span className="text-[11px] font-mono font-bold text-slate-800 uppercase tracking-wider block">
-                // COASTAL_EARLY_WARNING_AND_STRIKE_DISTRICTS
+              <span className="text-xs font-mono font-bold text-slate-800 uppercase tracking-wider block">
+                COASTAL EARLY WARNING &amp; IMPACT SECTORS
               </span>
-              <p className="text-xs text-slate-500 font-normal">Ranked coastal sectors in the 72h landfall corridor.</p>
+              <p className="text-xs text-slate-500 font-normal mt-0.5">Ranked coastal sectors in the 72h landfall corridor.</p>
             </div>
-            <span className="badge badge-red">CAP v1.2</span>
+            <span className="badge badge-red font-mono font-bold">CAP v1.2 PROTOCOL</span>
           </div>
 
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs font-sans">
               <thead>
                 <tr className="border-b border-slate-100 text-slate-400 font-mono text-[11px]">
-                  <th className="pb-2 font-medium">District & State</th>
-                  <th className="pb-2 font-medium">Strike Prob.</th>
-                  <th className="pb-2 font-medium">Est. Surge</th>
-                  <th className="pb-2 font-medium">24h Rain</th>
-                  <th className="pb-2 font-medium text-right">Warning</th>
+                  <th className="pb-3 font-medium">District &amp; State</th>
+                  <th className="pb-3 font-medium">Strike Prob.</th>
+                  <th className="pb-3 font-medium">Est. Surge</th>
+                  <th className="pb-3 font-medium">24h Rain</th>
+                  <th className="pb-3 font-medium text-right">Warning Status</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {aiPrediction.strike_districts.map((d, dIdx) => (
                   <tr key={dIdx} className="hover:bg-slate-50/80 transition-colors">
-                    <td className="py-2.5 font-semibold text-slate-800">
+                    <td className="py-3 font-semibold text-slate-800">
                       {d.district}
                       <span className="block text-[10px] text-slate-400 font-normal">{d.state}</span>
                     </td>
-                    <td className="py-2.5">
+                    <td className="py-3">
                       <div className="flex items-center gap-2 font-mono text-[11px]">
-                        <div className="w-12 bg-slate-100 rounded-full h-1.5 overflow-hidden">
+                        <div className="w-14 bg-slate-100 rounded-full h-1.5 overflow-hidden">
                           <div 
-                            className="bg-red-500 h-full rounded-full" 
+                            className="bg-rose-500 h-full rounded-full" 
                             style={{ width: `${d.strike_prob_pct}%` }} 
                           />
                         </div>
                         <span className="font-bold text-slate-800">{d.strike_prob_pct}%</span>
                       </div>
                     </td>
-                    <td className="py-2.5 font-mono text-slate-600">{d.surge_height_m}</td>
-                    <td className="py-2.5 font-mono text-slate-600">{d.rainfall_24h_mm} mm</td>
-                    <td className="py-2.5 text-right">
+                    <td className="py-3 font-mono text-slate-600">{d.surge_height_m}</td>
+                    <td className="py-3 font-mono text-slate-600">{d.rainfall_24h_mm} mm</td>
+                    <td className="py-3 text-right">
                       <span className={`badge ${
                         d.threat_level === 'RED' ? 'badge-red' :
                         d.threat_level === 'ORANGE' ? 'badge-orange' : 'badge-amber'
@@ -1345,57 +1406,59 @@ const Dashboard = () => {
         </div>
 
         {/* AI Model Pipeline Verification */}
-        <div className="lg:col-span-5 bg-white border border-slate-200 rounded-xl p-5 space-y-4 shadow-2xs">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-3">
-            <div>
-              <span className="text-[11px] font-mono font-bold text-slate-800 uppercase tracking-wider block">
-                // AI_PIPELINE_ORCHESTRATION
-              </span>
-              <p className="text-xs text-slate-500 font-normal">Active neural pipelines and bulletin dispatches.</p>
+        <div className="lg:col-span-5 bg-white border border-slate-200/80 rounded-2xl p-5 sm:p-6 space-y-4 shadow-xs flex flex-col justify-between">
+          <div>
+            <div className="flex items-center justify-between border-b border-slate-100 pb-4 mb-4">
+              <div>
+                <span className="text-xs font-mono font-bold text-slate-800 uppercase tracking-wider block">
+                  AI PIPELINE ORCHESTRATION
+                </span>
+                <p className="text-xs text-slate-500 font-normal mt-0.5">Active neural pipelines and bulletin dispatches.</p>
+              </div>
+              <span className="badge badge-green font-semibold">Operational</span>
             </div>
-            <span className="badge badge-green">Operational</span>
+
+            <div className="space-y-2.5 text-xs">
+              <div className="p-3 rounded-xl bg-slate-50/80 border border-slate-200/60 flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-emerald-600" />
+                  <span className="font-semibold text-slate-800">INSAT-3DR Telemetry Stream</span>
+                </div>
+                <span className="font-mono text-[10px] text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">4K Thermal IR</span>
+              </div>
+
+              <div className="p-3 rounded-xl bg-slate-50/80 border border-slate-200/60 flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-emerald-600" />
+                  <span className="font-semibold text-slate-800">CNN Eye Center Localization</span>
+                </div>
+                <span className="font-mono text-[10px] text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">&lt; 18km Error</span>
+              </div>
+
+              <div className="p-3 rounded-xl bg-slate-50/80 border border-slate-200/60 flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-emerald-600" />
+                  <span className="font-semibold text-slate-800">ResNet-50 Dvorak Classifier</span>
+                </div>
+                <span className="font-mono text-[10px] text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">T3.5 (85 km/h)</span>
+              </div>
+
+              <div className="p-3 rounded-xl bg-slate-50/80 border border-slate-200/60 flex items-center justify-between">
+                <div className="flex items-center gap-2.5">
+                  <CheckCircle className="w-4 h-4 text-emerald-600" />
+                  <span className="font-semibold text-slate-800">BiLSTM 72h Recurrent Engine</span>
+                </div>
+                <span className="font-mono text-[10px] text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">6 Interval Fixes</span>
+              </div>
+            </div>
           </div>
 
-          <div className="space-y-2 text-xs">
-            <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
-                <span className="font-semibold text-slate-800">INSAT-3DR Telemetry Stream</span>
-              </div>
-              <span className="font-mono text-[10px] text-slate-500">4K Thermal IR</span>
-            </div>
-
-            <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
-                <span className="font-semibold text-slate-800">CNN Eye Center Localization</span>
-              </div>
-              <span className="font-mono text-[10px] text-slate-500">&lt; 18km Error</span>
-            </div>
-
-            <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
-                <span className="font-semibold text-slate-800">ResNet-50 Dvorak Classifier</span>
-              </div>
-              <span className="font-mono text-[10px] text-slate-500">T3.5 (85 km/h)</span>
-            </div>
-
-            <div className="p-2.5 rounded-lg bg-slate-50 border border-slate-100 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
-                <span className="font-semibold text-slate-800">BiLSTM 72h Recurrent Engine</span>
-              </div>
-              <span className="font-mono text-[10px] text-slate-500">6 Interval Fixes</span>
-            </div>
-          </div>
-
-          <div className="pt-2 border-t border-slate-100">
+          <div className="pt-3 border-t border-slate-100">
             <button
               onClick={() => downloadOfficialBulletinPdf(aiPrediction.name, { ...aiPrediction, timestamp: new Date().toISOString() })}
-              className="w-full inline-flex items-center justify-center gap-2 py-2 px-3 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-medium transition-colors"
+              className="w-full inline-flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl border border-slate-200 bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold shadow-xs hover:shadow transition-all cursor-pointer"
             >
-              <FileText className="w-3.5 h-3.5 text-slate-500" />
+              <FileText className="w-4 h-4 text-sky-400" />
               <span>Download Official VAYU / IMD Advisory Bulletin (PDF)</span>
             </button>
           </div>
