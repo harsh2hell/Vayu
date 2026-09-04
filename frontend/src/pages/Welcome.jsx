@@ -483,7 +483,8 @@ const getDirectionName = (dir, isHindi) => {
 const Welcome = () => {
   const navigate = useNavigate();
   const [activeId, setActiveId] = useState('invest92b');
-  const [activeNav, setActiveNav] = useState('/city-tracker');
+  const [activeNav, setActiveNav] = useState(null);
+  const [isScrolled, setIsScrolled] = useState(false);
   const [isHindi, setIsHindi] = useState(() => {
     return localStorage.getItem('vayu_is_hindi') === 'true';
   });
@@ -513,9 +514,11 @@ const Welcome = () => {
     localStorage.setItem('vayu_is_hindi', isHindi ? 'true' : 'false');
   }, [isHindi]);
 
-  // Sync active nav item with scroll position
+  // Sync active nav item and header elevation with scroll position
   useEffect(() => {
     const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+
       const sectionIds = ['safety-protocol', 'bulletins', 'threat-matrix', 'geospatial-map'];
       const scrollY = window.scrollY + 140;
       for (const id of sectionIds) {
@@ -525,9 +528,8 @@ const Welcome = () => {
           return;
         }
       }
-      if (window.scrollY < 200) {
-        setActiveNav('/city-tracker');
-      }
+      // When at top of page, no navigation item is selected by default
+      setActiveNav(null);
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
@@ -760,7 +762,11 @@ const Welcome = () => {
     >
       
       {/* TOP APEX BAR (MINIMAL, ELEGANT, EXECUTIVE - ALWAYS AT TOP) */}
-      <header className="sticky top-0 z-[1000] w-full bg-white/80 dark:bg-black/90 backdrop-blur-xl border-b border-slate-200/80 dark:border-neutral-800/80 transition-colors duration-500">
+      <header className={`sticky top-0 z-[1000] w-full transition-all duration-300 ${
+        isScrolled 
+          ? 'bg-white/85 dark:bg-black/90 backdrop-blur-2xl border-b border-slate-200/60 dark:border-white/10 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.7)]'
+          : 'bg-white/80 dark:bg-black/85 backdrop-blur-xl border-b border-slate-200/80 dark:border-neutral-800/80'
+      }`}>
         {/* 2px National Tricolor Stripe */}
         <div className="h-0.5 bg-gradient-to-r from-[#FF9933] via-slate-300 dark:via-slate-700 to-[#138808]" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3 sm:gap-4 flex-nowrap">
@@ -775,8 +781,12 @@ const Welcome = () => {
             />
           </div>
 
-          {/* Clean Navigation Menu with identical blue hover & selection */}
-          <nav className="hidden md:flex items-center gap-1 sm:gap-1.5 shrink-0 flex-nowrap">
+          {/* Ultra-Glossy & Shiny Apple 3D Glass Pill Track */}
+          <nav className={`hidden md:flex items-center gap-1.5 p-1 rounded-full backdrop-blur-xl transition-all duration-300 shrink-0 flex-nowrap ${
+            isScrolled
+              ? 'bg-slate-100/90 dark:bg-neutral-900/60 border border-slate-200/80 dark:border-white/10 shadow-xs'
+              : 'bg-slate-100/80 dark:bg-neutral-950/40 border border-slate-200/60 dark:border-white/10'
+          }`}>
             {[
               { key: '/city-tracker', path: '/city-tracker', label: isHindi ? 'शहर व तटीय क्षेत्र (110+)' : 'City & Area Watch', isRoute: true },
               { key: 'geospatial-map', id: 'geospatial-map', label: isHindi ? 'जीआईएस रडार' : 'GIS Radar' },
@@ -784,7 +794,7 @@ const Welcome = () => {
               { key: 'bulletins', id: 'bulletins', label: isHindi ? 'सरकारी बुलेटिन' : 'Bulletins' },
               { key: 'safety-protocol', id: 'safety-protocol', label: isHindi ? 'सुरक्षा गाइड' : 'Safety Guide' }
             ].map((link) => {
-              const isSelected = activeNav === link.key || activeNav === link.id;
+              const isSelected = Boolean(activeNav && (activeNav === link.key || activeNav === link.id));
               return (
                 <button
                   key={link.key}
@@ -796,20 +806,33 @@ const Welcome = () => {
                       scrollToSection(link.id);
                     }
                   }}
-                  className={`group px-3 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 cursor-pointer whitespace-nowrap shrink-0 flex items-center gap-1.5 border ${
+                  className={`group relative overflow-hidden px-3.5 py-1.5 rounded-full text-xs transition-all duration-200 cursor-pointer whitespace-nowrap shrink-0 flex items-center gap-1.5 transform-gpu ${
                     isSelected
-                      ? 'bg-sky-50 dark:bg-sky-950/50 text-sky-700 dark:text-sky-300 border-sky-200/80 dark:border-sky-800/80 hover:bg-sky-100 dark:hover:bg-sky-900/60 shadow-2xs font-bold'
-                      : 'border-transparent text-slate-600 dark:text-slate-300 hover:border-sky-200/80 dark:hover:border-sky-800/80 hover:bg-sky-50 dark:hover:bg-sky-950/50 hover:text-sky-700 dark:hover:text-sky-300'
+                      ? 'bg-gradient-to-b from-white/95 via-white/85 to-white/70 dark:from-white/30 dark:via-white/15 dark:to-white/5 text-slate-950 dark:text-white border border-white/80 dark:border-white/40 shadow-[0_4px_16px_rgba(0,0,0,0.12),0_1px_3px_rgba(0,0,0,0.08),inset_0_2px_1px_rgba(255,255,255,1),inset_0_-1.5px_2px_rgba(255,255,255,0.4)] dark:shadow-[0_0_20px_rgba(255,255,255,0.15),0_6px_24px_rgba(0,0,0,0.8),inset_0_2px_1px_rgba(255,255,255,0.7),inset_0_-1.5px_2px_rgba(255,255,255,0.2)] backdrop-blur-2xl font-bold -translate-y-0.5 scale-[1.02]'
+                      : 'border border-transparent bg-transparent text-slate-700 dark:text-white hover:text-slate-950 dark:hover:text-white hover:bg-white/60 dark:hover:bg-white/10 hover:border-slate-200/60 dark:hover:border-white/15 hover:shadow-2xs font-medium'
                   }`}
                 >
+                  {/* Glossy Upper Dome Reflection & Bottom Rim - Active on Selected */}
+                  {isSelected && (
+                    <>
+                      <span className="absolute inset-x-1 top-0 h-[48%] rounded-t-full bg-gradient-to-b from-white/80 via-white/30 to-transparent dark:from-white/50 dark:via-white/15 pointer-events-none" />
+                      <span className="absolute inset-x-2.5 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-white/90 dark:via-white/70 to-transparent pointer-events-none" />
+                    </>
+                  )}
+
+                  {/* Luminous Jewel Status Dot */}
                   <span 
-                    className={`w-1.5 h-1.5 rounded-full bg-sky-500 transition-all duration-200 ${
-                      isSelected 
-                        ? 'opacity-100 animate-pulse scale-100' 
-                        : 'opacity-0 group-hover:opacity-100 scale-75 group-hover:scale-100'
+                    className={`relative flex items-center justify-center transition-all duration-200 ${
+                      isSelected ? 'opacity-100 scale-100' : 'opacity-0 group-hover:opacity-75 scale-75 group-hover:scale-100'
                     }`} 
-                  />
-                  <span>{link.label}</span>
+                  >
+                    <span className="absolute w-2 h-2 rounded-full bg-cyan-400 dark:bg-cyan-300 animate-ping opacity-65" />
+                    <span className="relative w-1.5 h-1.5 rounded-full bg-slate-900 dark:bg-white shadow-[0_0_8px_rgba(255,255,255,1),0_0_12px_rgba(34,211,238,0.9)] ring-1 ring-cyan-400/90" />
+                  </span>
+
+                  <span className="relative z-10">
+                    {link.label}
+                  </span>
                 </button>
               );
             })}
