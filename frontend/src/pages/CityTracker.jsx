@@ -71,9 +71,11 @@ const CityTracker = () => {
     <div className="min-h-screen bg-[#fafbfc] dark:bg-[#0b1120] text-slate-900 dark:text-slate-100 font-sans antialiased flex flex-col transition-colors duration-500">
       
       {/* =========================================================================
-           TOP APEX NAVIGATION BAR
+           TOP APEX NAVIGATION BAR (ALWAYS AT TOP)
            ========================================================================= */}
-      <header className="bg-white/80 dark:bg-[#0b1120]/80 backdrop-blur-xl border-b border-slate-200/80 dark:border-slate-800/80 sticky top-0 z-50 transition-colors duration-500">
+      <header className="sticky top-0 z-[1000] w-full bg-white/80 dark:bg-[#0b1120]/80 backdrop-blur-xl border-b border-slate-200/80 dark:border-slate-800/80 transition-colors duration-500">
+        {/* 2px National Tricolor Stripe */}
+        <div className="h-0.5 bg-gradient-to-r from-[#FF9933] via-slate-300 dark:via-slate-700 to-[#138808]" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
           
           <div className="flex items-center gap-3">

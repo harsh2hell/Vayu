@@ -39,11 +39,10 @@ const Login = () => {
   return (
     <div className="min-h-screen bg-[#fafbfc] dark:bg-[#0b1120] text-slate-800 dark:text-slate-100 flex flex-col font-sans transition-colors duration-500">
       
-      {/* 2px National Tricolor Stripe */}
-      <div className="h-0.5 bg-gradient-to-r from-[#FF9933] via-slate-300 dark:via-slate-700 to-[#138808]" />
-
-      {/* Top Apex Govt Bar */}
-      <header className="border-b border-slate-200/80 dark:border-slate-800/80 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl sticky top-0 z-50">
+      {/* Top Apex Govt Bar (ALWAYS AT TOP) */}
+      <header className="sticky top-0 z-[1000] w-full border-b border-slate-200/80 dark:border-slate-800/80 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl transition-colors duration-500">
+        {/* 2px National Tricolor Stripe */}
+        <div className="h-0.5 bg-gradient-to-r from-[#FF9933] via-slate-300 dark:via-slate-700 to-[#138808]" />
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between text-xs">
           <div className="flex items-center gap-2.5">
             <span className="font-medium text-slate-600 dark:text-slate-300">
