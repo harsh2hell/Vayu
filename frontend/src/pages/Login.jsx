@@ -73,7 +73,12 @@ const Login = () => {
               <img 
                 src="/vayu.png" 
                 alt="VAYU" 
-                className="h-12 w-auto object-contain filter drop-shadow-xs transition-transform duration-300 hover:scale-105" 
+                className="dark:hidden h-12 w-auto object-contain filter drop-shadow-xs transition-transform duration-300 hover:scale-105" 
+              />
+              <img 
+                src="/vayu-white.png?v=2" 
+                alt="VAYU" 
+                className="hidden dark:block h-12 w-auto object-contain filter drop-shadow-xs transition-transform duration-300 hover:scale-105" 
               />
             </div>
 

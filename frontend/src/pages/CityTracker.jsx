@@ -7,23 +7,35 @@ import {
 import { COASTAL_CITIES_DATA } from '../data/coastalCitiesData';
 
 const STATE_OPTIONS = [
-  { id: 'ALL', name: 'All States & UTs' },
-  { id: 'Odisha', name: 'Odisha' },
-  { id: 'West Bengal', name: 'West Bengal' },
-  { id: 'Andhra Pradesh', name: 'Andhra Pradesh' },
-  { id: 'Tamil Nadu', name: 'Tamil Nadu' },
-  { id: 'Gujarat', name: 'Gujarat' },
-  { id: 'Maharashtra', name: 'Maharashtra' },
-  { id: 'Goa', name: 'Goa' },
-  { id: 'Kerala', name: 'Kerala' },
-  { id: 'Karnataka', name: 'Karnataka' },
-  { id: 'Puducherry', name: 'Puducherry' },
-  { id: 'Andaman & Nicobar Islands', name: 'Andaman & Nicobar' },
-  { id: 'Lakshadweep', name: 'Lakshadweep' }
+  { id: 'ALL', name: 'All States & UTs', nameHindi: 'सभी राज्य व केंद्र शासित प्रदेश' },
+  { id: 'Odisha', name: 'Odisha', nameHindi: 'ओडिशा' },
+  { id: 'West Bengal', name: 'West Bengal', nameHindi: 'पश्चिम बंगाल' },
+  { id: 'Andhra Pradesh', name: 'Andhra Pradesh', nameHindi: 'आंध्र प्रदेश' },
+  { id: 'Tamil Nadu', name: 'Tamil Nadu', nameHindi: 'तमिलनाडु' },
+  { id: 'Gujarat', name: 'Gujarat', nameHindi: 'गुजरात' },
+  { id: 'Maharashtra', name: 'Maharashtra', nameHindi: 'महाराष्ट्र' },
+  { id: 'Goa', name: 'Goa', nameHindi: 'गोवा' },
+  { id: 'Kerala', name: 'Kerala', nameHindi: 'केरल' },
+  { id: 'Karnataka', name: 'Karnataka', nameHindi: 'कर्नाटक' },
+  { id: 'Puducherry', name: 'Puducherry', nameHindi: 'पुडुचेरी' },
+  { id: 'Andaman & Nicobar Islands', name: 'Andaman & Nicobar', nameHindi: 'अंडमान व निकोबार' },
+  { id: 'Lakshadweep', name: 'Lakshadweep', nameHindi: 'लक्षद्वीप' }
 ];
 
 const CityTracker = () => {
   const navigate = useNavigate();
+  const [isHindi, setIsHindi] = useState(() => {
+    return localStorage.getItem('vayu_is_hindi') === 'true';
+  });
+
+  const toggleHindi = () => {
+    setIsHindi(prev => {
+      const next = !prev;
+      localStorage.setItem('vayu_is_hindi', String(next));
+      return next;
+    });
+  };
+
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedState, setSelectedState] = useState('ALL');
   const [activeCategoryFilter, setActiveCategoryFilter] = useState('ALL'); // ALL, HOTSPOT, TRENDING, RED, ORANGE, PORTS
@@ -82,36 +94,45 @@ const CityTracker = () => {
             <button
               onClick={() => navigate('/')}
               className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-slate-950 hover:text-white dark:hover:bg-white dark:hover:text-slate-950 transition-all text-xs font-semibold cursor-pointer shadow-2xs"
-              title="Return to National Cyclone Portal"
+              title={isHindi ? "राष्ट्रीय चक्रवात पोर्टल पर वापस जाएं" : "Return to National Cyclone Portal"}
             >
               <ArrowLeft className="w-3.5 h-3.5" />
-              <span>Back to National Portal</span>
+              <span>{isHindi ? 'राष्ट्रीय पोर्टल पर वापस जाएं' : 'Back to National Portal'}</span>
             </button>
 
             <div className="h-5 w-px bg-slate-200 dark:bg-slate-800 hidden sm:block" />
 
             <div className="hidden sm:flex items-center gap-2">
               <span className="text-xs font-bold text-slate-900 dark:text-white">
-                City & Coastal Watch
+                {isHindi ? 'शहर व तटीय निगरानी' : 'City & Coastal Watch'}
               </span>
               <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300">
-                110+ Locations
+                {isHindi ? '110+ स्थान' : '110+ Locations'}
               </span>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <div className="hidden md:flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-              <span>Open Public Intelligence • Zero Login Required</span>
+              <span>{isHindi ? 'सार्वजनिक मौसम सूचना • शून्य लॉगिन' : 'Open Public Intelligence • Zero Login Required'}</span>
             </div>
+
+            {/* Language Switcher */}
+            <button
+              onClick={toggleHindi}
+              className="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-700 transition-all cursor-pointer shadow-2xs"
+              title={isHindi ? "Switch to English" : "हिन्दी में बदलें"}
+            >
+              {isHindi ? 'English' : 'हिन्दी'}
+            </button>
 
             <a
               href="tel:112"
               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 hover:bg-red-100 dark:hover:bg-red-900/60 transition-all shadow-2xs"
             >
               <PhoneCall className="w-3.5 h-3.5 text-red-600 dark:text-red-400" />
-              <span>Helpline: 112</span>
+              <span>{isHindi ? 'हेल्पलाइन: 112' : 'Helpline: 112'}</span>
             </a>
           </div>
 
@@ -129,10 +150,12 @@ const CityTracker = () => {
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <h2 className="text-xl sm:text-2xl font-heading font-black text-slate-950 dark:text-white">
-                National Coastal Directory (110+ Monitored Places)
+                {isHindi ? 'राष्ट्रीय तटीय निर्देशिका (110+ निगरानी किए गए स्थान)' : 'National Coastal Directory (110+ Monitored Places)'}
               </h2>
               <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-0.5">
-                Select your state or search below to inspect any city, port, island, or historical cyclone landfall hub.
+                {isHindi 
+                  ? 'किसी भी शहर, बंदरगाह, द्वीप या ऐतिहासिक चक्रवात लैंडफॉल केंद्र का निरीक्षण करने के लिए नीचे अपना राज्य चुनें या खोजें।'
+                  : 'Select your state or search below to inspect any city, port, island, or historical cyclone landfall hub.'}
               </p>
             </div>
 
@@ -143,7 +166,7 @@ const CityTracker = () => {
                 type="text"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search city, port, beach (e.g. Balasore, Digha, Mundra, Puri)..."
+                placeholder={isHindi ? "शहर, बंदरगाह, समुद्र तट खोजें (उदा. बालेश्वर, दीघा, पुरी)..." : "Search city, port, beach (e.g. Balasore, Digha, Mundra, Puri)..."}
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-sky-500 shadow-2xs"
               />
               {searchQuery && (
@@ -151,7 +174,7 @@ const CityTracker = () => {
                   onClick={() => setSearchQuery('')}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
                 >
-                  Clear
+                  {isHindi ? 'हटाएं' : 'Clear'}
                 </button>
               )}
             </div>
@@ -161,7 +184,7 @@ const CityTracker = () => {
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
             <span className="font-semibold text-slate-500 dark:text-slate-400 mr-1 shrink-0 flex items-center gap-1">
               <Filter className="w-3.5 h-3.5" />
-              <span>State:</span>
+              <span>{isHindi ? 'राज्य:' : 'State:'}</span>
             </span>
             {STATE_OPTIONS.map((st) => (
               <button
@@ -173,7 +196,7 @@ const CityTracker = () => {
                     : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                 }`}
               >
-                {st.name}
+                {isHindi ? (st.nameHindi || st.name) : st.name}
               </button>
             ))}
           </div>
@@ -181,14 +204,16 @@ const CityTracker = () => {
           {/* Special Category & Severity Filter Pills */}
           <div className="flex flex-wrap items-center justify-between gap-3 text-xs pt-2 border-t border-slate-100 dark:border-slate-800">
             <div className="flex items-center gap-1.5 flex-wrap">
-              <span className="font-semibold text-slate-500 dark:text-slate-400 mr-1">Filter by:</span>
+              <span className="font-semibold text-slate-500 dark:text-slate-400 mr-1">
+                {isHindi ? 'फ़िल्टर करें:' : 'Filter by:'}
+              </span>
               {[
-                { id: 'ALL', label: 'All Places' },
-                { id: 'HOTSPOT', label: '🔥 Landfall Hotspots' },
-                { id: 'TRENDING', label: '⚡ Trending Threat' },
-                { id: 'RED', label: '🔴 Red Alert' },
-                { id: 'ORANGE', label: '🟠 Orange Alert' },
-                { id: 'PORTS', label: '⚓ Commercial & Fishing Ports' }
+                { id: 'ALL', label: isHindi ? 'सभी स्थान' : 'All Places' },
+                { id: 'HOTSPOT', label: isHindi ? '🔥 लैंडफॉल हॉटस्पॉट' : '🔥 Landfall Hotspots' },
+                { id: 'TRENDING', label: isHindi ? '⚡ सक्रिय खतरा' : '⚡ Trending Threat' },
+                { id: 'RED', label: isHindi ? '🔴 रेड अलर्ट' : '🔴 Red Alert' },
+                { id: 'ORANGE', label: isHindi ? '🟠 ऑरेंज अलर्ट' : '🟠 Orange Alert' },
+                { id: 'PORTS', label: isHindi ? '⚓ वाणिज्यिक एवं मत्स्य बंदरगाह' : '⚓ Commercial & Fishing Ports' }
               ].map((f) => (
                 <button
                   key={f.id}
@@ -205,7 +230,9 @@ const CityTracker = () => {
             </div>
 
             <span className="text-slate-500 dark:text-slate-400 font-medium">
-              Showing <strong className="text-slate-900 dark:text-white">{filteredCities.length}</strong> locations
+              {isHindi ? `दिखाए जा रहे हैं ` : `Showing `}
+              <strong className="text-slate-900 dark:text-white">{filteredCities.length}</strong>
+              {isHindi ? ` स्थान` : ` locations`}
             </span>
           </div>
 
@@ -217,11 +244,8 @@ const CityTracker = () => {
             {filteredCities.map((item) => {
               const isRed = item.level === 'red';
               const isOrange = item.level === 'orange';
-              const isSelected = item.id === selectedCityId;
 
-              const borderTheme = isSelected
-                ? 'border-sky-500 dark:border-sky-400 ring-2 ring-sky-500/20 shadow-md'
-                : isRed
+              const borderTheme = isRed
                 ? 'border-red-200 dark:border-red-900/60 hover:border-red-300 dark:hover:border-red-700'
                 : isOrange
                 ? 'border-orange-200 dark:border-orange-900/60 hover:border-orange-300 dark:hover:border-orange-700'
@@ -240,7 +264,7 @@ const CityTracker = () => {
                   key={item.id}
                   onClick={() => navigate(`/state/${item.stateSlug}`)}
                   className={`bg-white dark:bg-slate-900/90 border rounded-2xl p-5 shadow-xs transition-all hover:shadow-md cursor-pointer flex flex-col justify-between gap-3 group ${borderTheme}`}
-                  title={`Click to open full weather & cyclone intelligence for ${item.state}`}
+                  title={isHindi ? `${item.state} के लिए संपूर्ण मौसम और चक्रवात जानकारी खोलें` : `Click to open full weather & cyclone intelligence for ${item.state}`}
                 >
                   
                   {/* Card Header: Location Name & Badges */}
@@ -267,29 +291,29 @@ const CityTracker = () => {
                   {/* Micro Weather Bar */}
                   <div className="grid grid-cols-3 gap-2 bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800 text-xs">
                     <div>
-                      <span className="text-[10px] text-slate-400 block font-medium">Wind</span>
+                      <span className="text-[10px] text-slate-400 block font-medium">{isHindi ? 'हवा' : 'Wind'}</span>
                       <strong className="text-slate-900 dark:text-white font-bold">{item.wind}</strong>
                     </div>
                     <div>
-                      <span className="text-[10px] text-slate-400 block font-medium">Vortex Fix</span>
+                      <span className="text-[10px] text-slate-400 block font-medium">{isHindi ? 'भंवर दूरी' : 'Vortex Fix'}</span>
                       <strong className="text-slate-900 dark:text-white font-bold truncate block">{item.distToEye}</strong>
                     </div>
                     <div>
-                      <span className="text-[10px] text-slate-400 block font-medium">Surge</span>
+                      <span className="text-[10px] text-slate-400 block font-medium">{isHindi ? 'लहर' : 'Surge'}</span>
                       <strong className="text-cyan-600 dark:text-cyan-400 font-bold">{item.surge}</strong>
                     </div>
                   </div>
 
                   {/* Historical Landmark Cyclone Tag */}
                   <div className="text-[11px] text-slate-600 dark:text-slate-300">
-                    <span className="font-semibold text-slate-500 dark:text-slate-400">Cyclone Record: </span>
+                    <span className="font-semibold text-slate-500 dark:text-slate-400">{isHindi ? 'चक्रवात रिकॉर्ड: ' : 'Cyclone Record: '}</span>
                     <span>{item.historicalEvent}</span>
                   </div>
 
                   {/* Action Bar */}
                   <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
                     <span className="text-sky-600 dark:text-sky-400 font-bold text-[11px] flex items-center gap-1">
-                      <span>Click to Inspect</span>
+                      <span>{isHindi ? 'जांचने के लिए क्लिक करें' : 'Click to Inspect'}</span>
                       <ArrowUpRight className="w-3 h-3" />
                     </span>
                     <button
@@ -299,7 +323,7 @@ const CityTracker = () => {
                       }}
                       className="text-slate-500 hover:text-slate-900 dark:hover:text-white font-semibold text-[11px] transition-colors"
                     >
-                      {item.state} Page →
+                      {item.state} {isHindi ? 'पृष्ठ →' : 'Page →'}
                     </button>
                   </div>
 
@@ -313,10 +337,12 @@ const CityTracker = () => {
               <Search className="w-6 h-6" />
             </div>
             <h3 className="text-base font-bold text-slate-900 dark:text-white">
-              No matching locations found
+              {isHindi ? 'कोई मेल खाता स्थान नहीं मिला' : 'No matching locations found'}
             </h3>
             <p className="text-xs text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
-              No coastal city or port matched your filter "{searchQuery}". Try selecting another state or clear your search input.
+              {isHindi 
+                ? `आपके फ़िल्टर "${searchQuery}" से कोई तटीय शहर या बंदरगाह मेल नहीं खाता। दूसरा राज्य चुनकर देखें या खोज साफ़ करें।`
+                : `No coastal city or port matched your filter "${searchQuery}". Try selecting another state or clear your search input.`}
             </p>
             <button
               onClick={() => {
@@ -326,7 +352,7 @@ const CityTracker = () => {
               }}
               className="px-4 py-2 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-950 text-xs font-semibold hover:bg-slate-800 transition-all cursor-pointer shadow-xs"
             >
-              Reset All Filters
+              {isHindi ? 'सभी फ़िल्टर रीसेट करें' : 'Reset All Filters'}
             </button>
           </div>
         )}
@@ -340,9 +366,13 @@ const CityTracker = () => {
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
           <div>
             <strong className="text-slate-900 dark:text-white font-bold block">
-              National Coastal Cyclone & Weather Intelligence Directory
+              {isHindi ? 'राष्ट्रीय तटीय चक्रवात एवं मौसम विज्ञान निर्देशिका' : 'National Coastal Cyclone & Weather Intelligence Directory'}
             </strong>
-            <span>Government of India • Ministry of Earth Sciences (MoES) & India Meteorological Department (IMD)</span>
+            <span>
+              {isHindi 
+                ? 'भारत सरकार • पृथ्वी विज्ञान मंत्रालय (MoES) एवं भारत मौसम विज्ञान विभाग (IMD)' 
+                : 'Government of India • Ministry of Earth Sciences (MoES) & India Meteorological Department (IMD)'}
+            </span>
           </div>
           
           <div className="flex items-center gap-4">
@@ -350,14 +380,14 @@ const CityTracker = () => {
               onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
               className="hover:text-slate-950 dark:hover:text-white font-semibold cursor-pointer"
             >
-              Back to Top ↑
+              {isHindi ? 'शीर्ष पर वापस जाएं ↑' : 'Back to Top ↑'}
             </button>
             <span>•</span>
             <button
               onClick={() => navigate('/')}
               className="hover:text-slate-950 dark:hover:text-white font-semibold cursor-pointer"
             >
-              National Portal
+              {isHindi ? 'राष्ट्रीय पोर्टल' : 'National Portal'}
             </button>
           </div>
         </div>
