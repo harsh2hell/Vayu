@@ -100,7 +100,7 @@ function App() {
       <Route path="/login" element={<Login />} />
 
       {/* Dashboard route handling:
-          - On production www.autonex.studio: redirects to dashboard.autonex.studio
+          - On production www.autonex.studio: redirects to dept.autonex.studio
           - On local dev / preview: loads DashboardLayout with ProtectedRoute
       */}
       {isProd ? (

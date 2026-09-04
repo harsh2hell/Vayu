@@ -79,7 +79,7 @@ export const AuthGateFallback = () => {
             Authentication Required
           </h1>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            Access to <code className="text-sky-600 font-mono">dashboard.autonex.studio</code> requires meteorological officer credentials via Clerk Pro.
+            Access to <code className="text-sky-600 font-mono">dept.autonex.studio</code> requires meteorological officer credentials via Clerk Pro.
           </p>
         </div>
 

@@ -86,15 +86,15 @@ The application uses **one single Vercel deployment** to serve both the public w
 | `www.autonex.studio` | Public Cyclone Atlas & Warnings (`Welcome.jsx`, `CityTracker.jsx`, `StateWeather.jsx`) | Public | Vercel |
 | `autonex.studio` (Apex) | Redirects to `www.autonex.studio` | Public | Vercel |
 | `auth.autonex.studio` | Clerk Pro Custom SSO Domain (Sign In, Passkeys, Session Cookies) | Auth Gateway | Clerk Pro |
-| `dashboard.autonex.studio`| Restricted MoES AI Command Platform (`Dashboard.jsx`, `TrackMap.jsx`, etc.) | Protected (Clerk) | Vercel (Same Project) |
+| `dept.autonex.studio`| Restricted MoES AI Command Platform (`Dashboard.jsx`, `TrackMap.jsx`, etc.) | Protected (Clerk) | Vercel (Same Project) |
 
 ### How Subdomain Routing Operates in Code:
 - **`frontend/src/utils/domain.js`**:
   - Detects `window.location.hostname`.
   - Helper functions: `isDashboardSubdomain()`, `getWebsiteUrl()`, `getDashboardUrl()`, `getAuthUrl()`.
 - **`frontend/src/App.jsx`**:
-  - When accessed on **`dashboard.autonex.studio`**: The root `/` immediately maps to `<DashboardLayout><Dashboard /></DashboardLayout>`. Subroutes (`/track`, `/satellite`, `/alerts`, etc.) load the dashboard subpages wrapped in `<ProtectedRoute>`.
-  - When accessed on **`www.autonex.studio`**: The root `/` maps to `<Welcome />`. Accessing `/dashboard` triggers an automatic redirect to `https://dashboard.autonex.studio`.
+  - When accessed on **`dept.autonex.studio`**: The root `/` immediately maps to `<DashboardLayout><Dashboard /></DashboardLayout>`. Subroutes (`/track`, `/satellite`, `/alerts`, etc.) load the dashboard subpages wrapped in `<ProtectedRoute>`.
+  - When accessed on **`www.autonex.studio`**: The root `/` maps to `<Welcome />`. Accessing `/dashboard` triggers an automatic redirect to `https://dept.autonex.studio`.
   - When running locally on **`localhost`**: Both `/` and `/dashboard/*` routes work seamlessly side-by-side.
 
 ---
@@ -116,7 +116,7 @@ The application uses **one single Vercel deployment** to serve both the public w
 
 3. **Login & Gateway Flow**:
    - Updated `frontend/src/pages/Welcome.jsx`: The topbar **"Officer Login"** button now opens the **Login Page** (`/login`).
-   - Updated `frontend/src/pages/Login.jsx`: Officers can verify via the official Department Gateway or click **Sign In via Clerk Pro (`auth.autonex.studio`)**. Once authenticated, officers are redirected to `https://dashboard.autonex.studio`.
+   - Updated `frontend/src/pages/Login.jsx`: Officers can verify via the official Department Gateway or click **Sign In via Clerk Pro (`auth.autonex.studio`)**. Once authenticated, officers are redirected to `https://dept.autonex.studio`.
 
 4. **Domain Connection (In Progress by User)**:
    - `www.autonex.studio` is already connected to the Vercel project and working.
@@ -125,17 +125,17 @@ The application uses **one single Vercel deployment** to serve both the public w
 
 ## 5. What Needs to Be Done Next (Action Items for User / AI Agent)
 
-### A. Vercel Project Setup (Dashboard Subdomain)
+### A. Vercel Project Setup (Department Subdomain)
 - [ ] In Vercel Dashboard -> Go to the **current project** (where `www.autonex.studio` is connected).
 - [ ] Navigate to **Settings** -> **Domains**.
 - [ ] Click **Add Domain** and enter:
   ```
-  dashboard.autonex.studio
+  dept.autonex.studio
   ```
   *(Important: Do NOT create a new project. Add it to the existing project).*
 - [ ] In your DNS manager (GoDaddy, Cloudflare, etc.), add the CNAME record:
   - **Type**: `CNAME`
-  - **Name**: `dashboard`
+  - **Name**: `dept`
   - **Value**: `cname.vercel-dns.com`
 
 ### B. Clerk Pro Custom Domain Setup (`auth.autonex.studio`)
@@ -145,12 +145,12 @@ The application uses **one single Vercel deployment** to serve both the public w
   - Copy the CNAME records provided by Clerk (e.g. `auth` pointing to `frontend-api.clerk.services`).
   - Add these CNAME and verification records to your DNS manager.
 - [ ] In Clerk Dashboard -> **Configure** -> **Paths & Redirects**:
-  - **Sign-in Redirect URL**: `https://dashboard.autonex.studio`
+  - **Sign-in Redirect URL**: `https://dept.autonex.studio`
   - **Sign-out Redirect URL**: `https://www.autonex.studio`
-  - **Cookie Domain**: `.autonex.studio` *(Critical: This shares the session across `auth`, `dashboard`, and `www`)*.
+  - **Cookie Domain**: `.autonex.studio` *(Critical: This shares the session across `auth`, `dept`, and `www`)*.
   - **Allowed Origins**:
     - `https://www.autonex.studio`
-    - `https://dashboard.autonex.studio`
+    - `https://dept.autonex.studio`
     - `http://localhost:5173`
 
 ### C. Set Environment Variables
