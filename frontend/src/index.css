@@ -261,3 +261,104 @@ html.dark,
   animation-play-state: paused;
 }
 
+/* =========================================================================
+   ANIMATED BLINKING VORTEX POINT FOR TIMELAPSE RADAR (CLASSY & SMOOTH)
+   ========================================================================= */
+@keyframes classyVortexBlink {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+    box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.4), 0 0 12px rgba(239, 68, 68, 0.85);
+  }
+  38% {
+    transform: scale(1.1);
+    opacity: 1;
+    box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.45), 0 0 22px rgba(239, 68, 68, 0.95), 0 0 36px rgba(239, 68, 68, 0.4);
+  }
+  72% {
+    transform: scale(0.92);
+    opacity: 0.32;
+    box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.2), 0 0 6px rgba(239, 68, 68, 0.25);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+    box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.4), 0 0 12px rgba(239, 68, 68, 0.85);
+  }
+}
+
+@keyframes classyRadarWave {
+  0% {
+    transform: scale(0.7);
+    opacity: 0.6;
+  }
+  100% {
+    transform: scale(3.2);
+    opacity: 0;
+  }
+}
+
+.vortex-blinking-wrapper {
+  background: transparent !important;
+  border: none !important;
+}
+
+.vortex-marker-pin {
+  position: relative;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.vortex-marker-pin .vortex-core-dot {
+  position: relative;
+  width: 20px;
+  height: 20px;
+  border-radius: 9999px;
+  background-color: #ef4444;
+  border: 3px solid #ffffff;
+  box-shadow: 0 0 0 3px rgba(15, 23, 42, 0.4), 0 0 12px rgba(239, 68, 68, 0.9);
+  z-index: 2;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* When time lapse is playing - SMOOTH, CLASSY RHYTHMIC BEACON BLINK & CALM SONAR WAVES */
+.vortex-marker-pin.is-timelapse-playing .vortex-core-dot {
+  animation: classyVortexBlink 1.2s cubic-bezier(0.4, 0, 0.2, 1) infinite !important;
+}
+
+.vortex-marker-pin.is-timelapse-playing .vortex-ping-outer {
+  position: absolute;
+  inset: -6px;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.55) 0%, rgba(239, 68, 68, 0) 72%);
+  animation: classyRadarWave 1.8s cubic-bezier(0.2, 0.8, 0.25, 1) infinite;
+  z-index: 1;
+}
+
+.vortex-marker-pin.is-timelapse-playing .vortex-ping-inner {
+  position: absolute;
+  inset: -2px;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(220, 38, 38, 0.45) 0%, rgba(220, 38, 38, 0) 70%);
+  animation: classyRadarWave 1.8s cubic-bezier(0.2, 0.8, 0.25, 1) infinite;
+  animation-delay: 0.6s;
+  z-index: 1;
+}
+
+/* Steady state when time lapse is paused (solid red point with white border as in screenshot) */
+.vortex-marker-pin:not(.is-timelapse-playing) .vortex-core-dot {
+  animation: none;
+  opacity: 1;
+  transform: scale(1);
+}
+
+.vortex-marker-pin:not(.is-timelapse-playing) .vortex-ping-outer,
+.vortex-marker-pin:not(.is-timelapse-playing) .vortex-ping-inner {
+  display: none;
+}
+

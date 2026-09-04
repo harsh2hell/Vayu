@@ -3,6 +3,9 @@ import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-
 import Welcome from './pages/Welcome';
 import StateWeather from './pages/StateWeather';
 import CityTracker from './pages/CityTracker';
+import ThreatMap from './pages/ThreatMap';
+import Bulletins from './pages/Bulletins';
+import SafetyGuide from './pages/SafetyGuide';
 import Login from './pages/Login';
 import DashboardLayout from './components/DashboardLayout';
 import Dashboard from './pages/Dashboard';
@@ -91,6 +94,19 @@ function App() {
       {/* 100+ Coastal Cities & High-Risk Danger Hotspots Directory */}
       <Route path="/city-tracker" element={<CityTracker />} />
       <Route path="/cities" element={<CityTracker />} />
+
+      {/* Unified Threat Map (GIS Doppler Radar & Coastal Threat Matrix) */}
+      <Route path="/threat-map" element={<ThreatMap />} />
+      <Route path="/radar" element={<ThreatMap />} />
+      <Route path="/gis-radar" element={<ThreatMap />} />
+      <Route path="/threat-matrix" element={<ThreatMap />} />
+
+      {/* Official IMD Meteorological Bulletins & Sea Warnings */}
+      <Route path="/bulletins" element={<Bulletins />} />
+
+      {/* Disaster Safety Protocol (NDMA Citizen Guidelines) */}
+      <Route path="/safety-guide" element={<SafetyGuide />} />
+      <Route path="/safety" element={<SafetyGuide />} />
 
       {/* State-Specific Weather & Cyclone Early Warning Directory */}
       <Route path="/state/:stateSlug" element={<StateWeather />} />

@@ -1,10 +1,11 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { 
   ArrowLeft, ArrowUpRight, Search, MapPin, 
   PhoneCall, Filter
 } from 'lucide-react';
 import { COASTAL_CITIES_DATA } from '../data/coastalCitiesData';
+import PublicNavbar from '../components/PublicNavbar';
 
 const STATE_OPTIONS = [
   { id: 'ALL', name: 'All States & UTs', nameHindi: 'सभी राज्य व केंद्र शासित प्रदेश' },
@@ -28,13 +29,38 @@ const CityTracker = () => {
     return localStorage.getItem('vayu_is_hindi') === 'true';
   });
 
-  const toggleHindi = () => {
-    setIsHindi(prev => {
-      const next = !prev;
-      localStorage.setItem('vayu_is_hindi', String(next));
-      return next;
-    });
+  const handleSetHindi = (val) => {
+    setIsHindi(val);
+    localStorage.setItem('vayu_is_hindi', String(val));
   };
+
+  // Dark mode state
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    return document.documentElement.classList.contains('dark') || localStorage.getItem('theme') === 'dark';
+  });
+
+  useEffect(() => {
+    if (isDarkMode) {
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      localStorage.setItem('theme', 'light');
+    }
+  }, [isDarkMode]);
+
+  // Font size offset
+  const [fontSizeOffset, setFontSizeOffset] = useState(0);
+
+  // Scroll state
+  const [isScrolled, setIsScrolled] = useState(false);
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 20);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedState, setSelectedState] = useState('ALL');
@@ -83,62 +109,16 @@ const CityTracker = () => {
   return (
     <div className="min-h-screen bg-[#fafbfc] dark:bg-black text-slate-900 dark:text-slate-100 font-sans antialiased flex flex-col transition-colors duration-500">
       
-      {/* =========================================================================
-           TOP APEX NAVIGATION BAR (ALWAYS AT TOP)
-           ========================================================================= */}
-      <header className="sticky top-0 z-[1000] w-full bg-white/80 dark:bg-black/90 backdrop-blur-xl border-b border-slate-200/80 dark:border-neutral-800/80 transition-colors duration-500">
-        {/* 2px National Tricolor Stripe */}
-        <div className="h-0.5 bg-gradient-to-r from-[#FF9933] via-slate-300 dark:via-slate-700 to-[#138808]" />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
-          
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => navigate('/')}
-              className="inline-flex items-center gap-2 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-slate-950 hover:text-white dark:hover:bg-white dark:hover:text-slate-950 transition-all text-xs font-semibold cursor-pointer shadow-2xs"
-              title={isHindi ? "राष्ट्रीय चक्रवात पोर्टल पर वापस जाएं" : "Return to National Cyclone Portal"}
-            >
-              <ArrowLeft className="w-3.5 h-3.5" />
-              <span>{isHindi ? 'राष्ट्रीय पोर्टल पर वापस जाएं' : 'Back to National Portal'}</span>
-            </button>
-
-            <div className="h-5 w-px bg-slate-200 dark:bg-slate-800 hidden sm:block" />
-
-            <div className="hidden sm:flex items-center gap-2">
-              <span className="text-xs font-bold text-slate-900 dark:text-white">
-                {isHindi ? 'शहर व तटीय निगरानी' : 'City & Coastal Watch'}
-              </span>
-              <span className="text-[10px] px-2 py-0.5 rounded-full font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300">
-                {isHindi ? '110+ स्थान' : '110+ Locations'}
-              </span>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2 sm:gap-3">
-            <div className="hidden md:flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-              <span>{isHindi ? 'सार्वजनिक मौसम सूचना • शून्य लॉगिन' : 'Open Public Intelligence • Zero Login Required'}</span>
-            </div>
-
-            {/* Language Switcher */}
-            <button
-              onClick={toggleHindi}
-              className="px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-700 transition-all cursor-pointer shadow-2xs"
-              title={isHindi ? "Switch to English" : "हिन्दी में बदलें"}
-            >
-              {isHindi ? 'English' : 'हिन्दी'}
-            </button>
-
-            <a
-              href="tel:112"
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 hover:bg-red-100 dark:hover:bg-red-900/60 transition-all shadow-2xs"
-            >
-              <PhoneCall className="w-3.5 h-3.5 text-red-600 dark:text-red-400" />
-              <span>{isHindi ? 'हेल्पलाइन: 112' : 'Helpline: 112'}</span>
-            </a>
-          </div>
-
-        </div>
-      </header>
+      {/* Top Navbar */}
+      <PublicNavbar
+        isHindi={isHindi}
+        setIsHindi={handleSetHindi}
+        isDarkMode={isDarkMode}
+        setIsDarkMode={setIsDarkMode}
+        fontSizeOffset={fontSizeOffset}
+        setFontSizeOffset={setFontSizeOffset}
+        isScrolled={isScrolled}
+      />
 
       {/* =========================================================================
            SEARCH & BROWSE 100+ COASTAL CITIES & DANGER DIRECTORY
