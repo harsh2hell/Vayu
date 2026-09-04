@@ -22,21 +22,7 @@ export const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY 
  */
 export const ProtectedRoute = ({ children }) => {
   if (!CLERK_PUBLISHABLE_KEY) {
-    return (
-      <div className="relative">
-        <div className="bg-amber-500/10 border-b border-amber-300 dark:border-amber-900/60 px-4 py-2 text-xs text-amber-800 dark:text-amber-200 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-            <span className="font-semibold">Local Demo Officer Session</span>
-            <span className="hidden sm:inline text-amber-600 dark:text-amber-400">
-              — Add <code className="bg-amber-100 dark:bg-amber-950 px-1.5 py-0.5 rounded font-mono">VITE_CLERK_PUBLISHABLE_KEY</code> in Vercel/.env for Clerk Pro
-            </span>
-          </div>
-          <span className="text-[10px] font-mono opacity-80">auth.autonex.studio</span>
-        </div>
-        {children}
-      </div>
-    );
+    return <>{children}</>;
   }
 
   return (

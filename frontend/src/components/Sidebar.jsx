@@ -1,14 +1,32 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { User, LogOut, MoreVertical, Shield } from 'lucide-react';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { 
+  User, LogOut, MoreVertical, Shield,
+  Activity, Map, Satellite, Crosshair, Layers,
+  Compass, Bell, Database, Gauge, Sparkles
+} from 'lucide-react';
 import { OfficerAccountDisplay, SafeSignOutButton } from './auth/ClerkAuth';
 import { getWebsiteUrl, isProductionDomain } from '../utils/domain';
 
 const Sidebar = () => {
   const navigate = useNavigate();
+  const location = useLocation();
   const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
   const menuRef = useRef(null);
+
+  const NAV_ITEMS = [
+    { path: '/dashboard', label: 'Command Overview', icon: Activity, exact: true },
+    { path: '/dashboard/track', label: '4D Track Visualizer', icon: Map },
+    { path: '/dashboard/satellite', label: 'Satellite (INSAT)', icon: Satellite },
+    { path: '/dashboard/detection', label: 'AI Detection', icon: Crosshair },
+    { path: '/dashboard/classification', label: 'Classification', icon: Layers },
+    { path: '/dashboard/prediction', label: 'Trajectory Studio', icon: Compass },
+    { path: '/dashboard/alerts', label: 'Coastal Warnings', icon: Bell, badge: 'Live' },
+    { path: '/dashboard/analytics', label: 'Storm Archives', icon: Database },
+    { path: '/dashboard/performance', label: 'Model Benchmarks', icon: Gauge },
+    { path: '/dashboard/training', label: 'Model Training', icon: Sparkles },
+  ];
 
   const handleLogoutSuccess = () => {
     setIsLogoutDialogOpen(false);
@@ -32,11 +50,11 @@ const Sidebar = () => {
 
   return (
     <>
-      {/* Left Column: Pure White Background, VAYU Logo at top, Account at bottom */}
+      {/* Left Column: Pure White Background, VAYU Logo at top, Operations Nav, Account at bottom */}
       <aside className="bg-white text-slate-700 flex flex-col justify-between fixed top-0 left-0 h-screen z-40 border-r border-slate-200 w-56 select-none shadow-xs">
         
         {/* Top Left: Authentic VAYU Logo on White Background with Continuous Sheen */}
-        <div className="h-16 px-5 flex items-center border-b border-slate-100">
+        <div className="h-16 px-5 flex items-center border-b border-slate-100 shrink-0">
           <div 
             className="relative overflow-hidden group rounded-xl p-1 -m-1 flex items-center cursor-pointer"
             onClick={() => navigate('/dashboard')}
@@ -53,8 +71,44 @@ const Sidebar = () => {
           </div>
         </div>
 
-        {/* Empty Middle Space */}
-        <div className="flex-1" />
+        {/* Navigation Links List */}
+        <nav className="flex-1 px-3 py-3 space-y-1 overflow-y-auto">
+          <div className="text-[10px] font-mono uppercase tracking-wider text-slate-400 font-bold px-3 mb-2">
+            Operations Desk
+          </div>
+          {NAV_ITEMS.map((item) => {
+            const Icon = item.icon;
+            const isActive = item.exact 
+              ? location.pathname === item.path 
+              : location.pathname.startsWith(item.path);
+            return (
+              <button
+                key={item.path}
+                type="button"
+                onClick={() => navigate(item.path)}
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold transition-all cursor-pointer group ${
+                  isActive
+                    ? 'bg-slate-900 text-white shadow-xs'
+                    : 'text-slate-600 hover:text-slate-950 hover:bg-slate-100/80'
+                }`}
+              >
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <Icon className={`w-4 h-4 shrink-0 transition-colors ${
+                    isActive ? 'text-sky-400' : 'text-slate-400 group-hover:text-slate-600'
+                  }`} />
+                  <span className="truncate">{item.label}</span>
+                </div>
+                {item.badge && (
+                  <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded-full ${
+                    isActive ? 'bg-red-500 text-white' : 'bg-red-100 text-red-600'
+                  }`}>
+                    {item.badge}
+                  </span>
+                )}
+              </button>
+            );
+          })}
+        </nav>
 
         {/* Bottom Left Account Trigger */}
         <div className="p-3 border-t border-slate-100 relative" ref={menuRef}>
