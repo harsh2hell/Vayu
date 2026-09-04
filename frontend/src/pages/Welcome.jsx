@@ -499,15 +499,29 @@ const Welcome = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Sync dark mode class with root html element
+  // Sync dark mode class and colorScheme with root html element
   useEffect(() => {
     const root = document.documentElement;
     if (isDarkMode) {
       root.classList.add('dark');
+      root.style.colorScheme = 'dark';
     } else {
       root.classList.remove('dark');
+      root.style.colorScheme = 'light';
     }
   }, [isDarkMode]);
+
+  // Dynamically scale root document font-size so all rem-based typography scales with A- / A+
+  useEffect(() => {
+    const root = document.documentElement;
+    // Base 16px is 100%. Each step scales by 6.25% (1px per step: -2 is 87.5%, 0 is 100%, +1 is 106.25%, +2 is 112.5%, etc.)
+    const scalePercent = 100 + fontSizeOffset * 6.25;
+    root.style.fontSize = `${scalePercent}%`;
+
+    return () => {
+      root.style.fontSize = '';
+    };
+  }, [fontSizeOffset]);
 
   // Live IST Clock
   useEffect(() => {
@@ -559,12 +573,11 @@ const Welcome = () => {
 
   return (
     <div 
-      className="min-h-screen bg-[#fafbfc] dark:bg-[#0b1120] text-slate-900 dark:text-slate-100 font-sans antialiased selection:bg-sky-500 selection:text-white flex flex-col transition-colors duration-500"
-      style={{ fontSize: `${16 + fontSizeOffset}px` }}
+      className="min-h-screen bg-[#fafbfc] dark:bg-black text-slate-900 dark:text-slate-100 font-sans antialiased selection:bg-sky-500 selection:text-white flex flex-col transition-colors duration-500"
     >
       
       {/* TOP APEX BAR (MINIMAL, ELEGANT, EXECUTIVE - ALWAYS AT TOP) */}
-      <header className="sticky top-0 z-[1000] w-full bg-white/80 dark:bg-[#0b1120]/80 backdrop-blur-xl border-b border-slate-200/80 dark:border-slate-800/80 transition-colors duration-500">
+      <header className="sticky top-0 z-[1000] w-full bg-white/80 dark:bg-black/90 backdrop-blur-xl border-b border-slate-200/80 dark:border-neutral-800/80 transition-colors duration-500">
         {/* 2px National Tricolor Stripe */}
         <div className="h-0.5 bg-gradient-to-r from-[#FF9933] via-slate-300 dark:via-slate-700 to-[#138808]" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3 sm:gap-4 flex-nowrap">
@@ -645,9 +658,13 @@ const Welcome = () => {
               >
                 A-
               </button>
-              <span className="text-[11px] font-medium text-slate-400 dark:text-slate-500 px-1 select-none">
-                {fontSizeOffset === 0 ? '100%' : `${100 + fontSizeOffset * 10}%`}
-              </span>
+              <button
+                onClick={() => setFontSizeOffset(0)}
+                className="text-[11px] font-bold text-slate-500 dark:text-slate-400 px-1.5 hover:text-sky-600 dark:hover:text-sky-400 cursor-pointer select-none transition-colors"
+                title="Click to reset font scale to 100%"
+              >
+                {fontSizeOffset === 0 ? '100%' : `${100 + Math.round(fontSizeOffset * 6.25)}%`}
+              </button>
               <button
                 onClick={() => setFontSizeOffset(p => Math.min(4, p + 1))}
                 className="px-2 py-1 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white rounded-md hover:bg-white dark:hover:bg-slate-700 transition-all cursor-pointer"
@@ -1418,7 +1435,7 @@ const Welcome = () => {
       {/* =========================================================================
            IMPROVED DISTRICT-WISE COASTAL THREAT MATRIX
            ========================================================================= */}
-      <section id="threat-matrix" className="py-12 px-4 sm:px-6 lg:px-8 bg-white dark:bg-[#0b1120] border-b border-slate-200 dark:border-slate-800 transition-colors">
+      <section id="threat-matrix" className="py-12 px-4 sm:px-6 lg:px-8 bg-white dark:bg-black border-b border-slate-200 dark:border-slate-800 transition-colors">
         <div className="max-w-7xl mx-auto space-y-6">
           
           {/* Header & Public Notice */}
@@ -1694,7 +1711,7 @@ const Welcome = () => {
       {/* =========================================================================
            OFFICIAL BULLETINS & MARITIME WARNINGS
            ========================================================================= */}
-      <section id="bulletins" className="py-12 px-4 sm:px-6 lg:px-8 bg-[#fafbfc] dark:bg-[#0b1120] border-b border-slate-200 dark:border-slate-800 transition-colors">
+      <section id="bulletins" className="py-12 px-4 sm:px-6 lg:px-8 bg-[#fafbfc] dark:bg-black border-b border-slate-200 dark:border-slate-800 transition-colors">
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             
@@ -1786,7 +1803,7 @@ const Welcome = () => {
       {/* =========================================================================
            DISASTER SAFETY PROTOCOL (NDMA CITIZEN GUIDELINES)
            ========================================================================= */}
-      <section id="safety-protocol" className="py-12 px-4 sm:px-6 lg:px-8 bg-white dark:bg-[#0b1120] border-b border-slate-200 dark:border-slate-800 transition-colors">
+      <section id="safety-protocol" className="py-12 px-4 sm:px-6 lg:px-8 bg-white dark:bg-black border-b border-slate-200 dark:border-slate-800 transition-colors">
         <div className="max-w-7xl mx-auto space-y-6">
           
           <div className="flex flex-wrap items-center justify-between gap-4">

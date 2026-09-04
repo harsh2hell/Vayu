@@ -56,7 +56,7 @@ export const AuthGateFallback = () => {
   const authUrl = getAuthUrl();
 
   return (
-    <div className="min-h-screen bg-[#fafbfc] dark:bg-[#0b1120] text-slate-800 dark:text-slate-100 flex flex-col items-center justify-center p-4">
+    <div className="min-h-screen bg-[#fafbfc] dark:bg-black text-slate-800 dark:text-slate-100 flex flex-col items-center justify-center p-4">
       {/* 2px National Tricolor Stripe */}
       <div className="fixed top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#FF9933] via-slate-300 dark:via-slate-700 to-[#138808]" />
 
