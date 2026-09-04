@@ -27,6 +27,7 @@ const CityTracker = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedState, setSelectedState] = useState('ALL');
   const [activeCategoryFilter, setActiveCategoryFilter] = useState('ALL'); // ALL, HOTSPOT, TRENDING, RED, ORANGE, PORTS
+  const [selectedCityId, setSelectedCityId] = useState(null);
 
   // Filter 100+ cities based on search, state, and category
   const filteredCities = useMemo(() => {
