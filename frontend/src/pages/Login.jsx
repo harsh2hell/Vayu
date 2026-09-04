@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { getDashboardUrl, getAuthUrl, isProductionDomain } from '../utils/domain';
+import { CLERK_PUBLISHABLE_KEY } from '../components/auth/ClerkAuth';
 import { 
   Shield, Lock, Mail, KeyRound, ArrowRight, ArrowLeft,
   Building2, Satellite, Compass, CheckCircle2, Sparkles
@@ -26,7 +28,11 @@ const Login = () => {
 
     setTimeout(() => {
       setLoading(false);
-      navigate('/dashboard');
+      if (isProductionDomain()) {
+        window.location.href = getDashboardUrl();
+      } else {
+        navigate('/dashboard');
+      }
     }, 600);
   };
 
@@ -117,6 +123,28 @@ const Login = () => {
               })}
             </div>
           </div>
+
+          {/* Clerk Pro SSO Option (if configured) */}
+          {CLERK_PUBLISHABLE_KEY && (
+            <div className="mb-5">
+              <a
+                href={getAuthUrl()}
+                className="w-full py-2.5 px-4 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer"
+              >
+                <Shield className="w-3.5 h-3.5 text-sky-200" />
+                <span>Single Sign-On (auth.autonex.studio)</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </a>
+              <div className="relative my-3">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-slate-200 dark:border-slate-800" />
+                </div>
+                <div className="relative flex justify-center text-[10px] uppercase text-slate-400 font-semibold bg-white dark:bg-slate-900 px-2">
+                  Or Department Officer Passkey
+                </div>
+              </div>
+            </div>
+          )}
 
           {/* Auth Form */}
           <form onSubmit={handleLogin} className="space-y-4">

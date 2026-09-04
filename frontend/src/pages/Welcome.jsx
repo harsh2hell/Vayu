@@ -607,16 +607,16 @@ const Welcome = () => {
           {/* RIGHT SIDE: HELPLINE, OFFICER LOGIN, LANGUAGE, FONT CONTROLLER, THEME TOGGLE */}
           <div className="flex items-center gap-2 sm:gap-2.5 shrink-0 flex-nowrap">
             
-            {/* Official Officer Gateway / Dashboard */}
-            <a 
-              href={getDashboardUrl()}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-slate-900 dark:bg-sky-600 hover:bg-slate-800 dark:hover:bg-sky-500 transition-all shadow-xs"
-              title="Official IMD / MoES Officer Gateway (dashboard.autonex.studio)"
+            {/* Official Officer Gateway / Login */}
+            <button
+              onClick={() => navigate('/login')}
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-slate-900 dark:bg-sky-600 hover:bg-slate-800 dark:hover:bg-sky-500 transition-all shadow-xs cursor-pointer"
+              title="Official IMD / MoES Officer Login Gateway"
             >
               <Shield className="w-3.5 h-3.5 text-amber-400 dark:text-sky-200" />
               <span className="hidden sm:inline">Officer Login</span>
               <span className="sm:hidden">Login</span>
-            </a>
+            </button>
 
             {/* National Emergency Hotline */}
             <a 
