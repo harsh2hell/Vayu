@@ -959,22 +959,21 @@ const Welcome = () => {
               : 'bg-slate-100/80 dark:bg-neutral-950/40 border border-slate-200/60 dark:border-white/10'
           }`}>
             {[
-              { key: '/city-tracker', path: '/city-tracker', label: isHindi ? 'शहर व तटीय क्षेत्र (110+)' : 'City & Area Watch', isRoute: true },
-              { key: 'geospatial-map', id: 'geospatial-map', label: isHindi ? 'जीआईएस रडार' : 'GIS Radar' },
-              { key: 'threat-matrix', id: 'threat-matrix', label: isHindi ? 'तटीय चेतावनी' : 'Threat Matrix' },
-              { key: 'bulletins', id: 'bulletins', label: isHindi ? 'सरकारी बुलेटिन' : 'Bulletins' },
-              { key: 'safety-protocol', id: 'safety-protocol', label: isHindi ? 'सुरक्षा गाइड' : 'Safety Guide' }
+              { path: '/', label: isHindi ? 'होम' : 'Home' },
+              { path: '/city-tracker', label: isHindi ? 'शहर व तटीय क्षेत्र (110+)' : 'City & Area Watch' },
+              { path: '/threat-map', label: isHindi ? 'तटीय खतरा मानचित्र' : 'Threat Map' },
+              { path: '/bulletins', label: isHindi ? 'सरकारी बुलेटिन' : 'Bulletins' },
+              { path: '/safety-guide', label: isHindi ? 'सुरक्षा गाइड' : 'Safety Guide' }
             ].map((link) => {
-              const isSelected = Boolean(activeNav && (activeNav === link.key || activeNav === link.id));
+              const isSelected = link.path === '/';
               return (
                 <button
-                  key={link.key}
+                  key={link.path}
                   onClick={() => {
-                    setActiveNav(link.key);
-                    if (link.isRoute) {
-                      navigate(link.path);
+                    if (link.path === '/') {
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
                     } else {
-                      scrollToSection(link.id);
+                      navigate(link.path);
                     }
                   }}
                   className={`group relative overflow-hidden px-3.5 py-1.5 rounded-full text-xs transition-all duration-200 cursor-pointer whitespace-nowrap shrink-0 flex items-center gap-1.5 transform-gpu ${
@@ -1011,16 +1010,7 @@ const Welcome = () => {
 
           {/* RIGHT SIDE: CONTROLS */}
           <div className="flex items-center gap-1.5 sm:gap-2 shrink-0 flex-nowrap">
-            
-            {/* Official Officer Gateway / Login (Desktop Only, in mobile menu on mobile) */}
-            <button
-              onClick={() => navigate('/login')}
-              className="hidden md:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-slate-900 dark:bg-sky-600 hover:bg-slate-800 dark:hover:bg-sky-500 transition-all shadow-xs cursor-pointer"
-              title={isHindi ? "आधिकारिक आईएमडी / एमओईएस अधिकारी लॉगिन पोर्टल" : "Official IMD / MoES Officer Login Gateway"}
-            >
-              <Shield className="w-3.5 h-3.5 text-amber-400 dark:text-sky-200" />
-              <span>{isHindi ? 'अधिकारी लॉगिन' : 'Officer Login'}</span>
-            </button>
+
 
             {/* National Emergency Hotline (Desktop Only) */}
             <a 
@@ -1110,31 +1100,7 @@ const Welcome = () => {
         {isMobileMenuOpen && (
           <div className="md:hidden border-t border-slate-200/80 dark:border-white/10 bg-white/95 dark:bg-black/95 backdrop-blur-2xl px-4 py-4 space-y-3 shadow-2xl animate-in slide-in-from-top-2 duration-200">
             
-            {/* 1. OFFICER LOGIN BUTTON (PROMINENT & HIGHLIGHTED) */}
-            <button
-              onClick={() => {
-                setIsMobileMenuOpen(false);
-                navigate('/login');
-              }}
-              className="w-full flex items-center justify-between p-3 rounded-xl text-white bg-gradient-to-r from-slate-900 via-sky-950 to-slate-900 dark:from-sky-700 dark:via-blue-600 dark:to-indigo-700 shadow-md border border-slate-700/50 dark:border-white/20 active:scale-[0.99] transition-all cursor-pointer"
-            >
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-amber-400/20 dark:bg-white/20 flex items-center justify-center shrink-0">
-                  <Shield className="w-4 h-4 text-amber-400 dark:text-white" />
-                </div>
-                <div className="text-left">
-                  <div className="text-xs font-bold tracking-tight">
-                    {isHindi ? 'अधिकारी लॉगिन पोर्टल' : 'Official Officer Login'}
-                  </div>
-                  <div className="text-[10px] text-slate-300 dark:text-sky-100 font-medium">
-                    {isHindi ? 'आईएमडी / एमओईएस प्राधिकृत' : 'IMD / MoES Operational Gateway'}
-                  </div>
-                </div>
-              </div>
-              <ChevronRight className="w-4 h-4 text-slate-400 dark:text-sky-200" />
-            </button>
-
-            {/* 2. EMERGENCY HELPLINE */}
+            {/* 1. EMERGENCY HELPLINE */}
             <a
               href="tel:112"
               className="flex items-center justify-between p-2.5 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 text-red-700 dark:text-red-300 transition-colors"
@@ -1148,7 +1114,7 @@ const Welcome = () => {
               <span className="text-[10px] font-bold bg-red-600 text-white px-2 py-0.5 rounded-full">24x7</span>
             </a>
 
-            {/* 3. NAVIGATION PAGES & MODULES */}
+            {/* 2. NAVIGATION PAGES & MODULES */}
             <div className="space-y-1 pt-1 border-t border-slate-100 dark:border-neutral-800">
               <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 px-2 py-1">
                 {isHindi ? 'नेविगेशन एवं निगरानी पेज' : 'Navigation & Live Watch'}
@@ -1156,54 +1122,41 @@ const Welcome = () => {
 
               {[
                 { 
-                  key: '/city-tracker', 
+                  path: '/', 
+                  label: isHindi ? 'होम' : 'Home', 
+                  desc: isHindi ? 'राष्ट्रीय चक्रवात पोर्टल मुख्य पृष्ठ' : 'National Cyclone Portal Main Page',
+                  isHome: true 
+                },
+                { 
                   path: '/city-tracker', 
                   label: isHindi ? 'शहर व तटीय क्षेत्र निगरानी (110+)' : 'City & Area Watch (110+)', 
                   desc: isHindi ? 'ज़िला और बंदरगाह स्तर का रीयल-टाइम डेटा' : 'District & Port-level Real-Time Tracker',
-                  badge: 'LIVE',
-                  isRoute: true 
+                  badge: 'LIVE'
                 },
                 { 
-                  key: 'geospatial-map', 
-                  id: 'geospatial-map', 
-                  label: isHindi ? 'जीआईएस डॉपलर रडार' : 'GIS Radar & Doppler Map', 
-                  desc: isHindi ? 'मौसम उपग्रह, हवा का दायरा और शंकु' : 'Satellite IR, Wind Radii & Track Cone'
+                  path: '/threat-map', 
+                  label: isHindi ? 'तटीय खतरा मानचित्र' : 'Threat Map', 
+                  desc: isHindi ? 'जीआईएस डॉपलर रडार और मौसम उपग्रह' : 'GIS Radar, Wind Radii & Track Cone'
                 },
                 { 
-                  key: 'threat-matrix', 
-                  id: 'threat-matrix', 
-                  label: isHindi ? 'तटीय खतरा मैट्रिक्स' : 'Coastal Threat Matrix', 
-                  desc: isHindi ? 'तटीय ज़िलों की जोखिम सूची व हवा की गति' : 'Port threat levels & preparedness status'
-                },
-                { 
-                  key: 'bulletins', 
-                  id: 'bulletins', 
+                  path: '/bulletins', 
                   label: isHindi ? 'सरकारी मौसम बुलेटिन' : 'Official Weather Bulletins', 
                   desc: isHindi ? 'आईएमडी के आधिकारिक परामर्श एवं चेतावनी' : 'IMD advisories and official updates'
                 },
                 { 
-                  key: 'safety-protocol', 
-                  id: 'safety-protocol', 
+                  path: '/safety-guide', 
                   label: isHindi ? 'सुरक्षा और निकासी गाइड' : 'Safety & Evacuation Guide', 
                   desc: isHindi ? 'चक्रवात से पहले, दौरान और बाद के दिशा-निर्देश' : 'Actionable protocols for citizen safety'
-                },
-                { 
-                  key: '/state/odisha', 
-                  path: '/state/odisha', 
-                  label: isHindi ? 'राज्य आपदा नियंत्रण केंद्र' : 'State Disaster Cells', 
-                  desc: isHindi ? 'ओडिशा, प. बंगाल, आंध्र प्रदेश, गुजरात' : 'Odisha, WB, AP, Gujarat Control Rooms',
-                  isRoute: true 
                 }
               ].map((item) => (
                 <button
-                  key={item.key}
+                  key={item.path}
                   onClick={() => {
                     setIsMobileMenuOpen(false);
-                    setActiveNav(item.key);
-                    if (item.isRoute) {
-                      navigate(item.path);
+                    if (item.isHome) {
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
                     } else {
-                      scrollToSection(item.id);
+                      navigate(item.path);
                     }
                   }}
                   className="w-full flex items-center justify-between p-2.5 rounded-xl hover:bg-slate-100 dark:hover:bg-neutral-900 transition-colors text-left group cursor-pointer"

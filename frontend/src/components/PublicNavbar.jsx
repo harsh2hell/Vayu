@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Shield, PhoneCall, Sun, Moon } from 'lucide-react';
+import { PhoneCall, Sun, Moon, Menu, X, ChevronRight } from 'lucide-react';
 
 const PublicNavbar = ({
   isHindi,
@@ -13,6 +13,7 @@ const PublicNavbar = ({
 }) => {
   const navigate = useNavigate();
   const location = useLocation();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const NAV_LINKS = [
     { 
@@ -70,7 +71,7 @@ const PublicNavbar = ({
           />
         </div>
 
-        {/* Ultra-Glossy 3D Glass Pill Track */}
+        {/* Ultra-Glossy 3D Glass Pill Track (Desktop) */}
         <nav className={`hidden md:flex items-center gap-1.5 p-1 rounded-full backdrop-blur-xl transition-all duration-300 shrink-0 flex-nowrap ${
           isScrolled
             ? 'bg-slate-100/90 dark:bg-neutral-900/60 border border-slate-200/80 dark:border-white/10 shadow-xs'
@@ -120,20 +121,9 @@ const PublicNavbar = ({
           })}
         </nav>
 
-        {/* RIGHT SIDE CONTROLS: OFFICER LOGIN, HELPLINE, LANGUAGE, FONT, THEME */}
+        {/* RIGHT SIDE CONTROLS: HELPLINE, LANGUAGE, FONT, THEME, MOBILE HAMBURGER */}
         <div className="flex items-center gap-2 sm:gap-2.5 shrink-0 flex-nowrap">
           
-          {/* Official Officer Gateway */}
-          <button
-            onClick={() => navigate('/login')}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-slate-900 dark:bg-sky-600 hover:bg-slate-800 dark:hover:bg-sky-500 transition-all shadow-xs cursor-pointer"
-            title={isHindi ? "आधिकारिक आईएमडी / एमओईएस अधिकारी लॉगिन पोर्टल" : "Official IMD / MoES Officer Login Gateway"}
-          >
-            <Shield className="w-3.5 h-3.5 text-amber-400 dark:text-sky-200" />
-            <span className="hidden sm:inline">{isHindi ? 'अधिकारी लॉगिन' : 'Officer Login'}</span>
-            <span className="sm:hidden">{isHindi ? 'लॉगिन' : 'Login'}</span>
-          </button>
-
           {/* National Emergency Hotline */}
           <a 
             href="tel:112" 
@@ -203,9 +193,74 @@ const PublicNavbar = ({
             </button>
           )}
 
+          {/* Mobile Menu Toggle */}
+          <button
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label={isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+            className="md:hidden p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-all cursor-pointer shrink-0"
+          >
+            {isMobileMenuOpen ? (
+              <X className="w-5 h-5 text-slate-900 dark:text-white" />
+            ) : (
+              <Menu className="w-5 h-5 text-slate-900 dark:text-white" />
+            )}
+          </button>
+
         </div>
 
       </div>
+
+      {/* MOBILE NAVIGATION DRAWER */}
+      {isMobileMenuOpen && (
+        <div className="md:hidden border-t border-slate-200/80 dark:border-white/10 bg-white/95 dark:bg-black/95 backdrop-blur-2xl px-4 py-4 space-y-3 shadow-2xl">
+          {/* Emergency Hotline in mobile */}
+          <a
+            href="tel:112"
+            className="flex items-center justify-between p-2.5 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 text-red-700 dark:text-red-300 transition-colors"
+          >
+            <div className="flex items-center gap-2">
+              <PhoneCall className="w-4 h-4 text-red-600 dark:text-red-400 shrink-0" />
+              <span className="text-xs font-bold">
+                {isHindi ? 'राष्ट्रीय हेल्पलाइन: 112 / 1078' : 'Emergency Helpline: 112 / 1078'}
+              </span>
+            </div>
+            <span className="text-[10px] font-bold bg-red-600 text-white px-2 py-0.5 rounded-full">24x7</span>
+          </a>
+
+          {/* Nav links */}
+          <div className="space-y-1 pt-1 border-t border-slate-100 dark:border-neutral-800">
+            {NAV_LINKS.map((link) => {
+              const isSelected = link.match.includes(location.pathname);
+              return (
+                <button
+                  key={link.path}
+                  onClick={() => {
+                    setIsMobileMenuOpen(false);
+                    if (link.path === '/' && location.pathname === '/') {
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    } else {
+                      navigate(link.path);
+                    }
+                  }}
+                  className={`w-full flex items-center justify-between p-2.5 rounded-xl transition-colors text-left group cursor-pointer ${
+                    isSelected 
+                      ? 'bg-slate-100 dark:bg-neutral-800 font-bold text-sky-600 dark:text-sky-400' 
+                      : 'hover:bg-slate-50 dark:hover:bg-neutral-900 text-slate-800 dark:text-slate-200 font-medium'
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    {isSelected && (
+                      <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+                    )}
+                    <span className="text-xs">{link.label}</span>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-slate-400 group-hover:text-slate-600 shrink-0" />
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
     </header>
   );
 };
