@@ -34,7 +34,14 @@
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-    overflow-x: hidden;
+    overflow-x: clip;
+    transition: background-color 0.3s ease, color 0.3s ease;
+  }
+
+  html.dark body,
+  .dark body {
+    background-color: #000000;
+    color: #f4f4f5;
   }
   
   h1, h2, h3, h4, h5, h6 {
@@ -46,6 +53,22 @@
   code, pre, kbd, samp {
     font-family: var(--font-mono);
   }
+}
+
+/* Proper Obsidian Black Theme — Zero Navy/Dark Blue Cast */
+html.dark,
+.dark,
+:where(.dark, .dark *) {
+  --color-slate-950: #000000;
+  --color-slate-900: #09090b;
+  --color-slate-800: #121215;
+  --color-slate-700: #1e1e24;
+  --color-slate-600: #2d2d35;
+  --color-brand-navy: #000000;
+  --color-surface-bg: #000000;
+  --color-surface-card: #09090b;
+  --color-surface-border: #1e1e24;
+  --color-surface-muted: #121215;
 }
 
 /* Modern Enterprise Cards */
