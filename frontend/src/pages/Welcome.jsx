@@ -1332,8 +1332,33 @@ const Welcome = () => {
 
             </div>
 
-            {/* Right Column: Kept clean as requested */}
-            <div className="lg:col-span-4 hidden lg:block" />
+            {/* Right Column: Hon'ble Prime Minister Narendra Modi Transparent Cutout */}
+            <div className="lg:col-span-4 flex flex-col items-center justify-end relative self-stretch pt-6 lg:pt-0">
+              
+              {/* Soft Ambient Radial Backdrop */}
+              <div className="absolute inset-0 bg-gradient-to-t from-sky-500/10 via-amber-500/5 to-transparent dark:from-sky-500/15 dark:via-blue-500/5 dark:to-transparent rounded-3xl blur-2xl pointer-events-none -z-10" />
+
+              {/* Modi Cutout Container */}
+              <div className="relative w-full flex flex-col items-center justify-end h-full">
+                <img
+                  src="/narendra-modi.png"
+                  alt={isHindi ? "माननीय प्रधानमंत्री नरेन्द्र मोदी" : "Hon'ble Prime Minister Narendra Modi"}
+                  className="max-h-[460px] sm:max-h-[500px] lg:max-h-[540px] w-auto object-contain filter drop-shadow-[0_16px_28px_rgba(0,0,0,0.12)] dark:drop-shadow-[0_20px_36px_rgba(0,0,0,0.7)] transition-transform duration-500 hover:scale-[1.02]"
+                  loading="eager"
+                />
+
+                {/* Dignified Caption Pill */}
+                <div className="mt-3 bg-white/90 dark:bg-black/80 backdrop-blur-md border border-slate-200/80 dark:border-white/10 px-4 py-1.5 rounded-full shadow-md text-center max-w-[280px]">
+                  <div className="text-xs font-bold text-slate-900 dark:text-white tracking-wide">
+                    {isHindi ? 'श्री नरेन्द्र मोदी' : 'Shri Narendra Modi'}
+                  </div>
+                  <div className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+                    {isHindi ? 'माननीय प्रधानमंत्री, भारत' : 'Hon’ble Prime Minister of India'}
+                  </div>
+                </div>
+              </div>
+
+            </div>
 
           </div>
 
