@@ -17,6 +17,7 @@ import {
 import {
   DATA_PROVENANCE,
   CURRENT_VORTEX_IDENTIFICATION,
+  STOCK_CYCLONES,
   CYCLONE_PATTERN_CLASSES,
   CYCLONE_LIFECYCLE_STAGES,
   MULTI_SOURCE_FEEDS,
@@ -66,10 +67,19 @@ const AICycloneIntelligence = () => {
     }
   }, [tabParam]);
 
-  // Module 1: AI Vortex Identification States
-  const [imageLayer, setImageLayer] = useState('gradcam'); // 'raw' | 'gradcam' | 'bbox'
+  // Module 1: AI Vortex Identification States & Stock Cyclone Datasets
+  const [selectedStockCycloneId, setSelectedStockCycloneId] = useState('invest_92b');
+  const activeStockCyclone = useMemo(() => {
+    return STOCK_CYCLONES.find(c => c.id === selectedStockCycloneId) || STOCK_CYCLONES[0];
+  }, [selectedStockCycloneId]);
+
+  const [imageLayer, setImageLayer] = useState('bbox'); // 'raw' | 'gradcam' | 'bbox' | 'radar'
   const [isRefreshingVortex, setIsRefreshingVortex] = useState(false);
-  const [vortexData, setVortexData] = useState(CURRENT_VORTEX_IDENTIFICATION);
+  const [vortexData, setVortexData] = useState(activeStockCyclone);
+
+  useEffect(() => {
+    setVortexData(activeStockCyclone);
+  }, [activeStockCyclone]);
 
   // Module 2: Pattern Classification States
   const [selectedPatternId, setSelectedPatternId] = useState('cdo_pattern');
@@ -314,18 +324,48 @@ const AICycloneIntelligence = () => {
               
               {/* Left Column: Satellite Frame & AI Layer Overlay (7 Cols) */}
               <div className="lg:col-span-7 bg-white dark:bg-slate-900/90 rounded-3xl border border-slate-200 dark:border-slate-800 p-4 sm:p-5 shadow-xs flex flex-col justify-between space-y-4">
-                <div className="flex items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800/80 pb-3">
+                {/* Stock Cyclone Dataset Selector Bar */}
+                <div className="flex items-center justify-between gap-2 flex-wrap pb-2 border-b border-slate-100 dark:border-slate-800/80">
+                  <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 dark:text-slate-200">
+                    <Database className="w-3.5 h-3.5 text-sky-500" />
+                    <span>{isHindi ? 'स्टॉक चक्रवात डेटा:' : 'Stock Cyclone Data:'}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar py-0.5 max-w-full">
+                    {STOCK_CYCLONES.map((sc) => {
+                      const isSelected = selectedStockCycloneId === sc.id;
+                      return (
+                        <button
+                          key={sc.id}
+                          type="button"
+                          onClick={() => setSelectedStockCycloneId(sc.id)}
+                          className={`px-2.5 py-1 rounded-xl text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap border flex items-center gap-1.5 ${
+                            isSelected
+                              ? 'bg-sky-500 text-white border-sky-400 shadow-xs ring-1 ring-sky-300 dark:ring-sky-600'
+                              : 'bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700'
+                          }`}
+                        >
+                          <span className={`w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-white animate-ping' : 'bg-sky-400'}`} />
+                          <span>{isHindi ? sc.nameHindi.split(' ')[0] : sc.name.split(' ')[0]} {sc.code}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Feed Info & Layer Switching Row */}
+                <div className="flex items-center justify-between gap-2 flex-wrap">
                   <div className="flex items-center gap-2">
-                    <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse" />
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
                     <span className="text-xs font-bold text-slate-900 dark:text-white">
-                      INSAT-3DR Thermal IR-1 (10.8 µm)
+                      {isHindi ? activeStockCyclone.satelliteChannelHindi : activeStockCyclone.satelliteChannel}
                     </span>
-                    <span className="text-[10px] text-slate-400 font-mono">{liveClock.utcStr}</span>
+                    <span className="text-[10px] text-slate-400 font-mono hidden sm:inline">{liveClock.utcStr}</span>
                   </div>
 
                   {/* Layer Switching Buttons */}
                   <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl text-[11px] font-semibold">
                     <button
+                      type="button"
                       onClick={() => setImageLayer('raw')}
                       className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
                         imageLayer === 'raw'
@@ -333,9 +373,10 @@ const AICycloneIntelligence = () => {
                           : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
                       }`}
                     >
-                      Raw IR
+                      {isHindi ? 'उपग्रह चित्र' : 'Satellite Frame'}
                     </button>
                     <button
+                      type="button"
                       onClick={() => setImageLayer('gradcam')}
                       className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
                         imageLayer === 'gradcam'
@@ -343,9 +384,10 @@ const AICycloneIntelligence = () => {
                           : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
                       }`}
                     >
-                      Grad-CAM Heatmap
+                      Grad-CAM
                     </button>
                     <button
+                      type="button"
                       onClick={() => setImageLayer('bbox')}
                       className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
                         imageLayer === 'bbox'
@@ -353,82 +395,137 @@ const AICycloneIntelligence = () => {
                           : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
                       }`}
                     >
-                      Eye Box & Center
+                      {isHindi ? 'कोर बॉक्स' : 'Eye Box & Center'}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setImageLayer('radar')}
+                      className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
+                        imageLayer === 'radar'
+                          ? 'bg-white dark:bg-slate-900 text-slate-950 dark:text-white shadow-2xs font-bold'
+                          : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                      }`}
+                    >
+                      Radar dBZ
                     </button>
                   </div>
                 </div>
 
-                {/* Satellite Frame Canvas Representation */}
-                <div className="relative aspect-4/3 rounded-2xl overflow-hidden bg-slate-950 flex items-center justify-center border border-slate-800 group select-none">
-                  {/* Background multi-spectral infrared clouds */}
-                  <div 
-                    className="absolute inset-0 bg-cover bg-center transition-all duration-500"
-                    style={{
-                      backgroundImage: `radial-gradient(circle at 50% 50%, rgba(220,38,38,0.4) 0%, rgba(37,99,235,0.4) 35%, rgba(15,23,42,0.9) 70%), radial-gradient(ellipse at 52% 48%, rgba(255,255,255,0.2) 0%, transparent 60%)`
-                    }}
+                {/* Satellite Frame Canvas Representation with Authentic Stock Cyclone Imagery */}
+                <div className="relative aspect-4/3 rounded-2xl overflow-hidden bg-slate-950 flex items-center justify-center border border-slate-800 group select-none shadow-2xl">
+                  {/* Stock Satellite Image Feed */}
+                  <img
+                    src={imageLayer === 'raw' ? (activeStockCyclone.visImage || activeStockCyclone.image) : activeStockCyclone.image}
+                    alt={activeStockCyclone.name}
+                    className="absolute inset-0 w-full h-full object-cover object-center transition-all duration-700 select-none pointer-events-none"
                   />
+
+                  {/* Atmospheric and Scanline Visual Overlays */}
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950/85 via-transparent to-slate-950/40 pointer-events-none" />
+                  <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,transparent_40%,rgba(2,6,23,0.7)_100%)] pointer-events-none" />
+
+                  {/* Top Overlay Badge with Stock Cyclone Telemetry */}
+                  <div className="absolute top-3 left-3 z-20 flex items-center gap-2">
+                    <span className="px-2.5 py-1 rounded-lg text-[10px] font-black bg-black/80 backdrop-blur-md text-cyan-300 border border-cyan-400/40 font-mono shadow-xs flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+                      {activeStockCyclone.name} ({activeStockCyclone.basin})
+                    </span>
+                    <span className="px-2 py-1 rounded-lg text-[10px] font-bold bg-black/80 backdrop-blur-md text-amber-300 border border-amber-400/40 hidden sm:inline-block">
+                      {isHindi ? activeStockCyclone.categoryHindi : activeStockCyclone.category}
+                    </span>
+                  </div>
 
                   {/* Grad-CAM Attention Layer */}
                   {imageLayer === 'gradcam' && (
                     <div 
                       className="absolute inset-0 transition-opacity duration-300 pointer-events-none"
                       style={{
-                        background: `radial-gradient(circle at 50% 50%, rgba(239,68,68,0.7) 0%, rgba(245,158,11,0.5) 25%, rgba(59,130,246,0.3) 50%, transparent 75%)`,
+                        background: `radial-gradient(circle at 50% 50%, rgba(239,68,68,0.75) 0%, rgba(245,158,11,0.55) 25%, rgba(59,130,246,0.35) 50%, transparent 75%)`,
                         mixBlendMode: 'screen'
                       }}
                     />
                   )}
 
+                  {/* Doppler Radar dBZ Overlay Layer */}
+                  {imageLayer === 'radar' && (
+                    <div className="absolute inset-0 transition-opacity duration-300 pointer-events-none flex items-center justify-center">
+                      <div 
+                        className="absolute inset-0"
+                        style={{
+                          background: `conic-gradient(from 45deg at 50% 50%, rgba(220,38,38,0.55) 0deg, rgba(234,88,12,0.45) 60deg, rgba(234,179,8,0.35) 120deg, rgba(34,197,94,0.25) 180deg, transparent 270deg, rgba(220,38,38,0.55) 360deg)`,
+                          mixBlendMode: 'color-dodge'
+                        }}
+                      />
+                      {/* Doppler Radar Range Rings */}
+                      <div className="w-[30%] h-[30%] border border-emerald-400/40 rounded-full absolute" />
+                      <div className="w-[60%] h-[60%] border border-emerald-400/30 rounded-full absolute" />
+                      <div className="w-[90%] h-[90%] border border-emerald-400/20 rounded-full absolute" />
+                      <div className="absolute top-2 right-2 bg-black/75 px-2 py-0.5 rounded text-[9px] font-mono text-emerald-400 border border-emerald-500/30">
+                        MAX 55 dBZ
+                      </div>
+                    </div>
+                  )}
+
                   {/* Bounding Box & Eye Fixation Layer */}
-                  {(imageLayer === 'bbox' || imageLayer === 'gradcam') && (
+                  {(imageLayer === 'bbox' || imageLayer === 'gradcam' || imageLayer === 'radar') && (
                     <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
                       {/* Bounding Box representing predicted cyclone core */}
-                      <div className="w-[60%] h-[60%] border-2 border-dashed border-sky-400 rounded-2xl relative animate-pulse shadow-[0_0_24px_rgba(56,189,248,0.4)]">
+                      <div 
+                        className="border-2 border-dashed border-sky-400 rounded-2xl relative animate-pulse shadow-[0_0_24px_rgba(56,189,248,0.4)] transition-all duration-500"
+                        style={{
+                          width: activeStockCyclone.boxWidth || '60%',
+                          height: activeStockCyclone.boxHeight || '60%'
+                        }}
+                      >
                         {/* Label Badge */}
-                        <div className="absolute -top-3 left-3 bg-sky-500 text-white text-[10px] font-black px-2 py-0.5 rounded shadow">
-                          TROPICAL CYCLONE VORTEX CORE (96.4%)
+                        <div className="absolute -top-3 left-3 bg-sky-500 text-white text-[10px] font-black px-2 py-0.5 rounded shadow flex items-center gap-1.5 whitespace-nowrap">
+                          <span>TROPICAL CYCLONE VORTEX CORE ({activeStockCyclone.confidence}%)</span>
                         </div>
                         {/* Eyewall radius circle */}
                         <div className="absolute inset-4 border border-rose-500/80 rounded-full flex items-center justify-center">
                           <div className="w-4 h-4 rounded-full bg-rose-500/40 animate-ping" />
-                          <div className="w-2 h-2 rounded-full bg-rose-500" />
+                          <div className="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-[0_0_10px_rgba(244,63,94,0.9)]" />
                         </div>
                         {/* Crosshairs */}
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="w-full h-px bg-cyan-400/40" />
-                          <div className="h-full w-px bg-cyan-400/40 absolute" />
+                          <div className="w-full h-px bg-cyan-400/50" />
+                          <div className="h-full w-px bg-cyan-400/50 absolute" />
                         </div>
                       </div>
                     </div>
                   )}
 
                   {/* Bottom HUD Data Overlay on Frame */}
-                  <div className="absolute bottom-3 inset-x-3 bg-black/75 backdrop-blur-md rounded-xl p-2.5 border border-white/10 flex items-center justify-between text-white text-xs">
+                  <div className="absolute bottom-3 inset-x-3 bg-black/85 backdrop-blur-md rounded-xl p-2.5 border border-white/10 flex items-center justify-between text-white text-xs flex-wrap gap-2 z-20">
                     <div className="flex items-center gap-2">
-                      <Target className="w-4 h-4 text-sky-400" />
+                      <Target className="w-4 h-4 text-sky-400 shrink-0" />
                       <span className="font-mono font-bold text-sky-300">
-                        FIX: {vortexData.vortexFixFormatted}
+                        FIX: {activeStockCyclone.vortexFixFormatted}
                       </span>
                       <span className="text-slate-400 text-[10px]">
-                        (Radius: ±{vortexData.fixationErrorRadiusKm} km)
+                        (Radius: ±{activeStockCyclone.fixationErrorRadiusKm} km)
                       </span>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-emerald-400 font-bold">
-                        LATENCY: {vortexData.inferenceLatencyMs} ms
+                    <div className="flex items-center gap-3">
+                      <span className="text-amber-400 font-mono text-[11px] font-bold hidden sm:inline">
+                        💨 {activeStockCyclone.dvorakPreliminary.estimatedWindKmh} km/h • 📉 {activeStockCyclone.dvorakPreliminary.centralPressureHpa} hPa
+                      </span>
+                      <span className="text-emerald-400 font-bold font-mono text-[11px]">
+                        LATENCY: {activeStockCyclone.inferenceLatencyMs} ms
                       </span>
                     </div>
                   </div>
                 </div>
 
                 {/* Layer Description */}
-                <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center justify-between">
+                <div className="text-xs text-slate-500 dark:text-slate-400 flex items-center justify-between flex-wrap gap-2">
                   <span>
-                    {imageLayer === 'raw' && 'Raw 10.8µm thermal infrared channel tracking brightness temperature.'}
-                    {imageLayer === 'gradcam' && 'Grad-CAM Attention: High activation indicates deep convective spiral banding.'}
-                    {imageLayer === 'bbox' && 'ResNet-50 bounding regressor predicting vortex coordinates with Smooth-L1 loss.'}
+                    {imageLayer === 'raw' && (isHindi ? 'उच्च-रिज़ॉल्यूशन दृश्य व थर्मल उपग्रह फ्रेम।' : 'High-resolution multispectral meteorological satellite frame.')}
+                    {imageLayer === 'gradcam' && (isHindi ? 'Grad-CAM अटेंशन: गहरे संवहनी बादलों पर मॉडल का ध्यान।' : 'Grad-CAM Attention: Deep convective spiral banding activation.')}
+                    {imageLayer === 'bbox' && (isHindi ? 'ResNet-50 बाउंडिंग रिग्रेसर द्वारा अनुमानित केंद्र निर्देशांक।' : 'ResNet-50 bounding regressor predicting circulation center with Smooth-L1 loss.')}
+                    {imageLayer === 'radar' && (isHindi ? 'डॉप्लर रडार परावर्तन (dBZ) सर्पिल संवहनी रिंग।' : 'Doppler radar reflectivity (dBZ) composite spiral rainband rings.')}
                   </span>
-                  <span className="font-mono text-[10px] text-slate-400">FP16 TensorRT</span>
+                  <span className="font-mono text-[10px] text-slate-400">FP16 TensorRT • ISRO MOSDAC</span>
                 </div>
               </div>
 

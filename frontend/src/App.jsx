@@ -9,6 +9,10 @@ import SafetyGuide from './pages/SafetyGuide';
 import SafetyUpdates from './pages/SafetyUpdates';
 import CityForecast from './pages/CityForecast';
 import AICycloneIntelligence from './pages/AICycloneIntelligence';
+import RainfallIntelligence from './pages/RainfallIntelligence';
+import AtmosphericPatterns from './pages/AtmosphericPatterns';
+import CycloneIntelligencePage from './pages/CycloneIntelligencePage';
+import ClimateOceanAnomalies from './pages/ClimateOceanAnomalies';
 import Login from './pages/Login';
 import DashboardLayout from './components/DashboardLayout';
 import Dashboard from './pages/Dashboard';
@@ -99,6 +103,12 @@ function App() {
       {/* SIH AI/ML Cyclone Intelligence Hub (Identification, Pattern Classification, Multi-Source Fusion, Track Prediction & Benchmarks) */}
       <Route path="/ai-cyclone" element={<AICycloneIntelligence />} />
       <Route path="/ai-intelligence" element={<AICycloneIntelligence />} />
+
+      {/* ── Service Dashboard Pages (from Homepage Service Cards) ── */}
+      <Route path="/rainfall-intelligence" element={<RainfallIntelligence />} />
+      <Route path="/atmospheric-patterns" element={<AtmosphericPatterns />} />
+      <Route path="/cyclone-intelligence" element={<CycloneIntelligencePage />} />
+      <Route path="/climate-ocean-anomalies" element={<ClimateOceanAnomalies />} />
       <Route path="/cyclone-ai" element={<AICycloneIntelligence />} />
 
       {/* 100+ Coastal Cities & High-Risk Danger Hotspots Directory */}

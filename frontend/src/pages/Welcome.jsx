@@ -72,9 +72,9 @@ const SERVICES_DATA = [
     tagClass: 'text-sky-700 dark:text-sky-300 bg-sky-500/10 dark:bg-sky-500/20 border-sky-300/60 dark:border-sky-500/30 backdrop-blur-md',
     topBar: 'bg-sky-500',
     icon: CloudRain,
-    route: '/city-tracker',
-    routeLabel: 'View Coastal Rainfall Tracker',
-    routeLabelHindi: 'तटीय वर्षा ट्रैकर देखें',
+    route: '/rainfall-intelligence',
+    routeLabel: 'Open Rainfall Intelligence Dashboard',
+    routeLabelHindi: 'वर्षा इंटेलिजेंस डैशबोर्ड खोलें',
     badge: 'Live Radar & AWS Gauges',
     badgeHindi: 'लाइव रडार और मौसम स्टेशन',
     summary: 'Comprehensive rainfall monitoring network integrating satellite precipitation estimates, Doppler weather radar accumulations, and 850+ coastal automatic weather stations (AWS).',
@@ -100,9 +100,9 @@ const SERVICES_DATA = [
     tagClass: 'text-amber-700 dark:text-amber-300 bg-amber-500/10 dark:bg-amber-500/20 border-amber-300/60 dark:border-amber-500/30 backdrop-blur-md',
     topBar: 'bg-amber-500',
     icon: Wind,
-    route: '/safety-updates',
-    routeLabel: 'View Atmospheric & Monsoon Bulletins',
-    routeLabelHindi: 'वायुमंडलीय एवं मानसूनी बुलेटिन देखें',
+    route: '/atmospheric-patterns',
+    routeLabel: 'Open Atmospheric & Monsoon Dashboard',
+    routeLabelHindi: 'वायुमंडलीय एवं मानसूनी डैशबोर्ड खोलें',
     badge: 'Synoptic & Atmospheric Watch',
     badgeHindi: 'सिनॉप्टिक एवं वायुमंडलीय निगरानी',
     summary: 'Real-time synoptic intelligence tracking seasonal monsoon circulation, atmospheric pressure patterns, upper-air wind shear, moisture advection, and ambient environmental conditions.',
@@ -128,9 +128,9 @@ const SERVICES_DATA = [
     tagClass: 'text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 dark:bg-emerald-500/20 border-emerald-300/60 dark:border-emerald-500/30 backdrop-blur-md',
     topBar: 'bg-emerald-500',
     icon: 'cyclone',
-    route: '/ai-cyclone',
-    routeLabel: 'Launch AI Cyclone Intelligence Studio',
-    routeLabelHindi: 'एआई चक्रवात इंटेलिजेंस स्टूडियो खोलें',
+    route: '/cyclone-intelligence',
+    routeLabel: 'Open Cyclone Intelligence Dashboard',
+    routeLabelHindi: 'चक्रवात इंटेलिजेंस डैशबोर्ड खोलें',
     badge: 'Critical Warning Active',
     badgeHindi: 'गंभीर चेतावनी सक्रिय',
     summary: 'End-to-end tropical cyclogenesis intelligence, multi-spectral satellite imagery, machine-learning track consensus, storm surge hydrodynamics, and district impact matrices.',
@@ -156,9 +156,9 @@ const SERVICES_DATA = [
     tagClass: 'text-rose-700 dark:text-rose-300 bg-rose-500/10 dark:bg-rose-500/20 border-rose-300/60 dark:border-rose-500/30 backdrop-blur-md',
     topBar: 'bg-rose-500',
     icon: SunMedium,
-    route: '/safety-updates',
-    routeLabel: 'View Climate & Ocean Outlook',
-    routeLabelHindi: 'जलवायु एवं महासागरीय आउटलुक देखें',
+    route: '/climate-ocean-anomalies',
+    routeLabel: 'Open Climate & Ocean Anomalies Dashboard',
+    routeLabelHindi: 'जलवायु एवं महासागरीय विसंगति डैशबोर्ड खोलें',
     badge: 'Oceanic Teleconnections',
     badgeHindi: 'महासागरीय टेलीकनेक्शन',
     summary: 'Comprehensive diagnostics on planetary and oceanic climate drivers including El Niño-Southern Oscillation (ENSO), Indian Ocean Dipole (IOD), Sea Surface Temperature (SST) anomalies, and upper ocean heat content influencing tropical cyclogenesis.',
@@ -1820,7 +1820,7 @@ const Welcome = () => {
                 return (
                   <IOSGlassCard
                     key={srv.id}
-                    onClick={() => setActiveServiceModal(srv)}
+                    onClick={() => navigate(srv.route)}
                     wrapperClassName="h-full"
                     className={`p-4 sm:p-4.5 rounded-2xl sm:rounded-3xl cursor-pointer group flex flex-col justify-between h-full ${srv.borderHover}`}
                   >
