@@ -68,13 +68,15 @@ const LoadingScreen = () => {
           
           {/* Platform Identity */}
           <div className="flex items-start gap-4 border-b border-slate-100 pb-6">
-            <div className="w-14 h-14 rounded-2xl bg-[#003087] flex items-center justify-center text-white shadow-md shadow-blue-900/20 flex-shrink-0">
-              <Wind className="w-8 h-8" />
+            <div className="w-14 h-14 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center justify-center p-1.5 flex-shrink-0">
+              <img src="/vayu-icon.png" alt="VAYU Logo" className="w-full h-full object-contain" />
             </div>
             <div className="space-y-1 flex-1">
-              <div className="flex items-center gap-2">
-                <h1 className="text-2xl font-extrabold text-[#003087] tracking-tight">Cyclone<span className="text-amber-600">AI</span></h1>
-                <span className="text-[10px] font-bold bg-blue-50 text-[#003087] border border-blue-200 px-2 py-0.5 rounded">
+              <div className="flex items-center gap-2.5">
+                <h1 className="text-2xl font-heading font-black text-slate-950 tracking-tight flex items-center gap-2">
+                  <span>VAYU</span>
+                </h1>
+                <span className="text-[10px] font-bold bg-blue-50 text-[#003087] border border-blue-200 px-2 py-0.5 rounded-full">
                   v2.1 Enterprise
                 </span>
               </div>
@@ -153,7 +155,7 @@ const LoadingScreen = () => {
       {/* Official Institutional Footer */}
       <footer className="bg-white border-t border-slate-200 py-3 px-6 text-center text-xs text-slate-500">
         <p className="max-w-4xl mx-auto text-[11px] text-slate-400">
-          © 2026 CycloneAI — Smart India Hackathon Prototype | Ministry of Earth Sciences, Government of India | IMD RSMC Gateway
+          © 2026 VAYU — Smart India Hackathon Prototype | Ministry of Earth Sciences, Government of India | IMD RSMC Gateway
         </p>
       </footer>
 

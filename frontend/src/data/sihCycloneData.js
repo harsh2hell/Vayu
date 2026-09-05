@@ -890,8 +890,8 @@ export const HISTORICAL_BENCHMARKS = [
 
 // 7. Benchmark Comparison Data (Error across lead times)
 export const MODEL_ACCURACY_BENCHMARKS = [
-  { lead: '+12h', CycloneAI: 18.2, IMD_Official: 24.5, ECMWF_IFS: 22.0, NCEP_GFS: 28.4 },
-  { lead: '+24h', CycloneAI: 32.4, IMD_Official: 48.0, ECMWF_IFS: 41.5, NCEP_GFS: 54.0 },
-  { lead: '+48h', CycloneAI: 68.5, IMD_Official: 86.2, ECMWF_IFS: 76.0, NCEP_GFS: 94.2 },
-  { lead: '+72h', CycloneAI: 112.0, IMD_Official: 138.4, ECMWF_IFS: 124.0, NCEP_GFS: 149.0 }
+  { lead: '+12h', VAYU: 18.2, IMD_Official: 24.5, ECMWF_IFS: 22.0, NCEP_GFS: 28.4 },
+  { lead: '+24h', VAYU: 32.4, IMD_Official: 48.0, ECMWF_IFS: 41.5, NCEP_GFS: 54.0 },
+  { lead: '+48h', VAYU: 68.5, IMD_Official: 86.2, ECMWF_IFS: 76.0, NCEP_GFS: 94.2 },
+  { lead: '+72h', VAYU: 112.0, IMD_Official: 138.4, ECMWF_IFS: 124.0, NCEP_GFS: 149.0 }
 ];

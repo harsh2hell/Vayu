@@ -8,7 +8,7 @@ DB_PATH = os.path.join(os.path.dirname(__file__), "cyclone_intel.db")
 
 class DatabaseManager:
     """
-    Enterprise SQLite / Embedded Persistence Layer for CycloneAI (SIH 2026).
+    Enterprise SQLite / Embedded Persistence Layer for VAYU (SIH 2026).
     Handles thread-safe transactions, schema migrations, and high-performance querying
     for satellite feeds, ocean buoys, deep learning inference logs, and CAP alerts.
     """
@@ -500,7 +500,7 @@ class DatabaseManager:
                 alert_data.get("cap_urgency", "Immediate"),
                 alert_data.get("cap_severity", "Extreme"),
                 alert_data.get("cap_certainty", "Observed"),
-                alert_data.get("issued_by", "CycloneAI Early Warning Gateway (SIH 2026)")
+                alert_data.get("issued_by", "VAYU Early Warning Gateway (SIH 2026)")
             ))
             conn.commit()
             return cursor.lastrowid

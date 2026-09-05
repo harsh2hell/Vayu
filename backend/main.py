@@ -39,7 +39,7 @@ seed_database()
 telemetry_worker.start()
 
 app = FastAPI(
-    title="CycloneAI Enterprise Intelligence Gateway",
+    title="VAYU Enterprise Intelligence Gateway",
     description="Operational AI/ML Multi-Source Satellite & Spatiotemporal Cyclone Prediction Platform (SIH 2026 — Team Chakravat Crew)",
     version="4.0.0",
     docs_url="/docs",
@@ -121,7 +121,7 @@ def health_check():
     """Health check endpoint to verify backend operational status, active models, and background workers."""
     return {
         "status": "ONLINE",
-        "service": "CycloneAI Enterprise Deep Learning Gateway",
+        "service": "VAYU Enterprise Deep Learning Gateway",
         "team": "Chakravat Crew",
         "problem_statement": "SIH26070",
         "version": "4.0.0",

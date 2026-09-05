@@ -122,7 +122,7 @@ class DisasterAlertCreate(BaseModel):
     cap_urgency: str = "Immediate"
     cap_severity: str = "Extreme"
     cap_certainty: str = "Observed"
-    issued_by: str = "CycloneAI Early Warning Gateway (SIH 2026)"
+    issued_by: str = "VAYU Early Warning Gateway (SIH 2026)"
     active: bool = True
 
 # -------------------------------------------------------------

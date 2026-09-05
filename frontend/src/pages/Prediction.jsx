@@ -21,10 +21,10 @@ const FEATURE_IMPORTANCE = [
 ];
 
 const MODEL_BENCHMARK_DATA = [
-  { lead: '+12h', CycloneAI: 18.2, IMD_Official: 24.5, ECMWF_IFS: 22.0, NCEP_GFS: 28.4 },
-  { lead: '+24h', CycloneAI: 32.4, IMD_Official: 48.0, ECMWF_IFS: 41.5, NCEP_GFS: 54.0 },
-  { lead: '+48h', CycloneAI: 68.5, IMD_Official: 86.2, ECMWF_IFS: 76.0, NCEP_GFS: 94.2 },
-  { lead: '+72h', CycloneAI: 112.0, IMD_Official: 138.4, ECMWF_IFS: 124.0, NCEP_GFS: 149.0 },
+  { lead: '+12h', VAYU: 18.2, IMD_Official: 24.5, ECMWF_IFS: 22.0, NCEP_GFS: 28.4 },
+  { lead: '+24h', VAYU: 32.4, IMD_Official: 48.0, ECMWF_IFS: 41.5, NCEP_GFS: 54.0 },
+  { lead: '+48h', VAYU: 68.5, IMD_Official: 86.2, ECMWF_IFS: 76.0, NCEP_GFS: 94.2 },
+  { lead: '+72h', VAYU: 112.0, IMD_Official: 138.4, ECMWF_IFS: 124.0, NCEP_GFS: 149.0 },
 ];
 
 const IMD_CATEGORIES = [
@@ -251,7 +251,7 @@ const Prediction = () => {
                     <Legend wrapperStyle={{ fontSize: 11, paddingTop: 10 }} />
                     <ReferenceLine x="+24h" stroke="#DC2626" strokeDasharray="4 4" strokeWidth={2} />
                     
-                    <Line type="monotone" dataKey="speed" stroke="#003087" strokeWidth={3.5} dot={{ r: 4 }} name="CycloneAI (BiLSTM Ensemble Mean)" />
+                    <Line type="monotone" dataKey="speed" stroke="#003087" strokeWidth={3.5} dot={{ r: 4 }} name="VAYU AI (BiLSTM Ensemble Mean)" />
                     <Line type="monotone" dataKey="controlMember" stroke="#059669" strokeWidth={2} strokeDasharray="4 4" dot={{ r: 3 }} name="Control Ensemble Member" />
                     <Line type="monotone" dataKey="highShearScenario" stroke="#F59E0B" strokeWidth={2} strokeDasharray="4 4" dot={{ r: 3 }} name="High-Shear Scenario" />
                     <Line type="monotone" dataKey="gfsBaseline" stroke="#7C3AED" strokeWidth={2} strokeDasharray="2 2" dot={{ r: 3 }} name="NCEP GFS NWP Baseline" />
@@ -306,7 +306,7 @@ const Prediction = () => {
             <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
               <div>
                 <h3 className="font-bold text-sm text-slate-900">Track Error (MAE in km) Benchmark vs Operational NWP</h3>
-                <p className="text-xs text-slate-500">Comparing CycloneAI BiLSTM against IMD Official, ECMWF IFS, and NCEP GFS models</p>
+                <p className="text-xs text-slate-500">Comparing VAYU BiLSTM against IMD Official, ECMWF IFS, and NCEP GFS models</p>
               </div>
               <span className="badge badge-green">32% Error Reduction at 24h</span>
             </div>
@@ -319,7 +319,7 @@ const Prediction = () => {
                   <YAxis tick={{ fontSize: 12, fill: '#64748B' }} axisLine={false} tickLine={false} unit=" km" width={65} />
                   <Tooltip contentStyle={{ borderRadius: 12, border: '1px solid #E2E8F0', fontSize: 12 }} />
                   <Legend wrapperStyle={{ fontSize: 11, paddingTop: 6 }} />
-                  <Bar dataKey="CycloneAI" fill="#003087" radius={[4, 4, 0, 0]} name="CycloneAI (BiLSTM)" />
+                  <Bar dataKey="VAYU" fill="#003087" radius={[4, 4, 0, 0]} name="VAYU (BiLSTM)" />
                   <Bar dataKey="IMD_Official" fill="#94A3B8" radius={[4, 4, 0, 0]} name="IMD Official Benchmark" />
                   <Bar dataKey="ECMWF_IFS" fill="#60A5FA" radius={[4, 4, 0, 0]} name="ECMWF (IFS Global)" />
                   <Bar dataKey="NCEP_GFS" fill="#CBD5E1" radius={[4, 4, 0, 0]} name="NCEP GFS" />

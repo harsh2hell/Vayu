@@ -236,10 +236,10 @@ def seed_database():
             "cap_urgency": "Immediate",
             "cap_severity": "Extreme",
             "cap_certainty": "Observed",
-            "issued_by": "CycloneAI Early Warning Gateway (SIH 2026)"
+            "issued_by": "VAYU Early Warning Gateway (SIH 2026)"
         })
 
-    print("✅ [CycloneAI DB] Database initialized with satellite sources, marine buoys, AI model registries, and benchmarks.")
+    print("✅ [VAYU DB] Database initialized with satellite sources, marine buoys, AI model registries, and benchmarks.")
 
 if __name__ == "__main__":
     seed_database()

@@ -208,16 +208,15 @@ const Landing = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-8 py-3.5 flex items-center justify-between">
           
           {/* Logo & Platform Name */}
-          <div className="flex items-center gap-3.5 cursor-pointer" onClick={() => navigate('/')}>
-            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-cyan-500 via-sky-600 to-blue-700 flex items-center justify-center text-white shadow-lg shadow-cyan-500/20 border border-cyan-300/30">
-              <Wind className="w-5 h-5 text-slate-950 animate-spin-slow" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-heading font-black text-xl text-white tracking-tight">VAYU <span className="text-cyan-400">AI</span></span>
-                <span className="text-[10px] bg-cyan-950/80 text-cyan-300 border border-cyan-500/40 px-2 py-0.5 rounded font-mono font-bold uppercase">v2.1</span>
-              </div>
-              <p className="text-[11px] text-slate-400 font-medium tracking-tight">National Tropical Cyclone Intelligence & Prediction Platform</p>
+          <div className="flex items-center gap-3 cursor-pointer select-none group" onClick={() => navigate('/')}>
+            <img 
+              src="/vayu-icon.png" 
+              alt="VAYU Logo" 
+              className="h-10 sm:h-11 w-auto object-contain transition-transform duration-300 group-hover:scale-105 filter drop-shadow-sm" 
+            />
+            <div className="flex items-center gap-2">
+              <span className="font-heading font-black text-xl sm:text-2xl text-white tracking-tight">VAYU</span>
+              <span className="text-[10px] bg-cyan-950/80 text-cyan-300 border border-cyan-500/40 px-2 py-0.5 rounded font-mono font-bold uppercase">v2.1</span>
             </div>
           </div>
 
@@ -624,10 +623,8 @@ const Landing = () => {
           
           <div className="space-y-2">
             <div className="flex items-center gap-2.5">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-cyan-500 to-sky-600 flex items-center justify-center text-slate-950 font-bold text-sm">
-                V
-              </div>
-              <span className="font-heading font-bold text-white text-base">VAYU Meteorological AI</span>
+              <img src="/vayu-icon.png" alt="VAYU Logo" className="w-7 h-7 object-contain" />
+              <span className="font-heading font-bold text-white text-base">VAYU</span>
               <span className="text-[10px] bg-emerald-950/80 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded font-mono">
                 System Active
               </span>

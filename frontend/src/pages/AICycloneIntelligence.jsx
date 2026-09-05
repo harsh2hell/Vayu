@@ -1500,7 +1500,7 @@ const AICycloneIntelligence = () => {
                         fontSize: '11px'
                       }}
                     />
-                    <Bar dataKey="CycloneAI" fill="#0284c7" radius={[4, 4, 0, 0]} name="CycloneAI (Our Model)" />
+                    <Bar dataKey="VAYU" fill="#0284c7" radius={[4, 4, 0, 0]} name="VAYU AI (Our Model)" />
                     <Bar dataKey="IMD_Official" fill="#94a3b8" radius={[4, 4, 0, 0]} name="IMD Official Consensus" />
                     <Bar dataKey="ECMWF_IFS" fill="#64748b" radius={[4, 4, 0, 0]} name="ECMWF IFS Model" />
                   </BarChart>

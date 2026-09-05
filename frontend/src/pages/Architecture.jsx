@@ -74,7 +74,7 @@ const Architecture = () => (
 
         {/* Final Output */}
         <div className="w-full border-2 border-emerald-500 rounded-2xl p-5 bg-emerald-50 text-center">
-          <p className="font-bold text-emerald-800 text-base">CycloneAI Dashboard Platform</p>
+          <p className="font-bold text-emerald-800 text-base">VAYU Dashboard Platform</p>
           <p className="text-xs text-emerald-600 mt-1">Web-based command center for meteorologists, disaster managers & emergency responders</p>
         </div>
       </div>
