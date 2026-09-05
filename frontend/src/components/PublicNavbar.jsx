@@ -78,14 +78,9 @@ const PublicNavbar = ({
       match: ['/threat-map', '/radar', '/gis-radar', '/threat-matrix']
     },
     { 
-      path: '/bulletins', 
-      label: isHindi ? 'सरकारी बुलेटिन' : 'Bulletins',
-      match: ['/bulletins']
-    },
-    { 
-      path: '/safety-guide', 
-      label: isHindi ? 'सुरक्षा गाइड' : 'Safety Guide',
-      match: ['/safety-guide', '/safety']
+      path: '/safety-updates', 
+      label: isHindi ? 'सुरक्षा व अपडेट' : 'Safety & Updates',
+      match: ['/safety-updates', '/bulletins', '/safety-guide', '/safety', '/updates']
     }
   ];
 
@@ -174,7 +169,7 @@ const PublicNavbar = ({
           {/* Official Officer Gateway */}
           <button
             onClick={() => navigate('/login')}
-            className="header-ctrl-btn hidden xl:inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-slate-900 dark:bg-sky-600 hover:bg-slate-800 dark:hover:bg-sky-500 transition-all shadow-xs cursor-pointer shrink-0"
+            className="header-ctrl-btn hidden xl:inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-slate-900 dark:bg-sky-600 hover:bg-slate-800 dark:hover:bg-sky-500 transition-all shadow-xs cursor-pointer shrink-0"
             title={isHindi ? "आधिकारिक आईएमडी / एमओईएस अधिकारी लॉगिन पोर्टल" : "Official IMD / MoES Officer Login Gateway"}
           >
             <Shield className="w-3.5 h-3.5 text-amber-400 dark:text-sky-200 shrink-0" />
@@ -185,7 +180,7 @@ const PublicNavbar = ({
           {/* National Emergency Hotline */}
           <a 
             href="tel:112" 
-            className="header-ctrl-btn hidden sm:inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold text-red-700 dark:text-red-300 bg-red-50/90 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 hover:bg-red-100 dark:hover:bg-red-900/60 transition-all shadow-2xs shrink-0"
+            className="header-ctrl-btn hidden sm:inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold text-red-700 dark:text-red-300 bg-red-50/90 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 hover:bg-red-100 dark:hover:bg-red-900/60 transition-all shadow-2xs shrink-0"
             title={isHindi ? "राष्ट्रीय आपातकालीन हेल्पलाइन" : "National Emergency Helpline"}
           >
             <PhoneCall className="w-3.5 h-3.5 text-red-600 dark:text-red-400 shrink-0" />
@@ -196,18 +191,18 @@ const PublicNavbar = ({
           {/* Language Switcher */}
           <button
             onClick={() => setIsHindi(!isHindi)}
-            className="header-ctrl-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-700 transition-all cursor-pointer shrink-0"
+            className="header-ctrl-btn px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-700 transition-all cursor-pointer shrink-0"
             title={isHindi ? "Switch to English" : "हिन्दी में बदलें"}
           >
             {isHindi ? 'English' : 'हिन्दी'}
           </button>
 
           {/* Font Size Scaling Controls */}
-          <div className="header-font-box flex items-center rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 p-0.5 shrink-0">
+          <div className="header-font-box flex items-center rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 p-0.5 shrink-0">
             <button
               onClick={() => handleFontChange(Math.max(-3, currentOffset - 1))}
               disabled={currentOffset <= -3}
-              className="header-font-btn px-1.5 sm:px-2 py-0.5 sm:py-1 text-[11px] sm:text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white rounded hover:bg-white dark:hover:bg-slate-700 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+              className="header-font-btn px-1.5 sm:px-2 py-0.5 sm:py-1 text-[11px] sm:text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white rounded-lg hover:bg-white dark:hover:bg-slate-700 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
               title={isHindi ? "फ़ॉन्ट आकार घटाएं" : "Decrease font size"}
             >
               A-
@@ -222,7 +217,7 @@ const PublicNavbar = ({
             <button
               onClick={() => handleFontChange(Math.min(4, currentOffset + 1))}
               disabled={currentOffset >= 4}
-              className="header-font-btn px-1.5 sm:px-2 py-0.5 sm:py-1 text-[11px] sm:text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white rounded hover:bg-white dark:hover:bg-slate-700 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+              className="header-font-btn px-1.5 sm:px-2 py-0.5 sm:py-1 text-[11px] sm:text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white rounded-lg hover:bg-white dark:hover:bg-slate-700 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
               title={isHindi ? "फ़ॉन्ट आकार बढ़ाएं" : "Increase font size"}
             >
               A+
@@ -234,7 +229,7 @@ const PublicNavbar = ({
             <button
               onClick={() => setIsDarkMode(!isDarkMode)}
               aria-label="Toggle light/dark theme"
-              className="header-theme-btn relative p-1.5 sm:p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 shadow-xs hover:bg-white dark:hover:bg-slate-700 text-slate-700 dark:text-amber-400 transition-all duration-300 overflow-hidden group cursor-pointer shrink-0"
+              className="header-theme-btn relative p-1.5 sm:p-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 shadow-xs hover:bg-white dark:hover:bg-slate-700 text-slate-700 dark:text-amber-400 transition-all duration-300 overflow-hidden group cursor-pointer shrink-0"
               title={isDarkMode ? (isHindi ? "लाइट थीम पर स्विच करें" : "Switch to Light Theme") : (isHindi ? "डार्क थीम पर स्विच करें" : "Switch to Dark Theme")}
             >
               <div className="relative w-4 h-4 flex items-center justify-center">
@@ -256,7 +251,7 @@ const PublicNavbar = ({
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label={isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
-            className="md:hidden p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-all cursor-pointer shrink-0"
+            className="md:hidden p-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-all cursor-pointer shrink-0"
           >
             {isMobileMenuOpen ? (
               <X className="w-5 h-5 text-slate-900 dark:text-white" />
@@ -279,10 +274,10 @@ const PublicNavbar = ({
               setIsMobileMenuOpen(false);
               navigate('/login');
             }}
-            className="w-full flex items-center justify-between p-3 rounded-xl text-white bg-gradient-to-r from-slate-900 via-sky-950 to-slate-900 dark:from-sky-700 dark:via-blue-600 dark:to-indigo-700 shadow-md border border-slate-700/50 dark:border-white/20 active:scale-[0.99] transition-all cursor-pointer"
+            className="w-full flex items-center justify-between p-3 rounded-2xl text-white bg-gradient-to-r from-slate-900 via-sky-950 to-slate-900 dark:from-sky-700 dark:via-blue-600 dark:to-indigo-700 shadow-md border border-slate-700/50 dark:border-white/20 active:scale-[0.99] transition-all cursor-pointer"
           >
             <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-lg bg-amber-400/20 dark:bg-white/20 flex items-center justify-center shrink-0">
+              <div className="w-8 h-8 rounded-xl bg-amber-400/20 dark:bg-white/20 flex items-center justify-center shrink-0">
                 <Shield className="w-4 h-4 text-amber-400 dark:text-white" />
               </div>
               <div className="text-left">
@@ -300,7 +295,7 @@ const PublicNavbar = ({
           {/* Emergency Helpline */}
           <a
             href="tel:112"
-            className="flex items-center justify-between p-2.5 rounded-xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 text-red-700 dark:text-red-300 transition-colors"
+            className="flex items-center justify-between p-2.5 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 text-red-700 dark:text-red-300 transition-colors"
           >
             <div className="flex items-center gap-2">
               <PhoneCall className="w-4 h-4 text-red-600 dark:text-red-400 shrink-0" />
@@ -308,7 +303,7 @@ const PublicNavbar = ({
                 {isHindi ? 'राष्ट्रीय हेल्पलाइन: 112 / 1078' : 'Emergency Helpline: 112 / 1078'}
               </span>
             </div>
-            <span className="text-[10px] font-bold bg-red-600 text-white px-2 py-0.5 rounded-full">24x7</span>
+            <span className="text-[10px] font-bold bg-red-600 text-white px-2.5 py-0.5 rounded-full">24x7</span>
           </a>
 
           {/* Navigation Pages */}
@@ -330,7 +325,7 @@ const PublicNavbar = ({
                       navigate(link.path);
                     }
                   }}
-                  className={`w-full flex items-center justify-between p-2.5 rounded-xl transition-colors text-left cursor-pointer ${
+                  className={`w-full flex items-center justify-between p-2.5 rounded-2xl transition-colors text-left cursor-pointer ${
                     isSelected
                       ? 'bg-sky-50 dark:bg-sky-950/50 text-sky-700 dark:text-sky-300 font-bold border border-sky-200/60 dark:border-sky-800/60'
                       : 'hover:bg-slate-100 dark:hover:bg-neutral-900 text-slate-800 dark:text-slate-200 font-medium'
@@ -358,7 +353,7 @@ const PublicNavbar = ({
                 setIsMobileMenuOpen(false);
                 setIsHindi(!isHindi);
               }}
-              className="px-3 py-1 rounded-lg text-xs font-bold text-sky-700 dark:text-sky-300 bg-slate-100 dark:bg-neutral-800 border border-slate-200 dark:border-neutral-700 cursor-pointer"
+              className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-sky-700 dark:text-sky-300 bg-slate-100 dark:bg-neutral-800 border border-slate-200 dark:border-neutral-700 cursor-pointer"
             >
               {isHindi ? 'English में देखें' : 'हिन्दी में देखें'}
             </button>

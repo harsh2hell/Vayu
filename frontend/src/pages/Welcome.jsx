@@ -9,7 +9,8 @@ import {
   Activity, Info, Layers, RefreshCw, Sun, Moon, Sparkles,
   ArrowUpRight, BarChart2, ShieldAlert, Play, Pause, Sliders, Crosshair, CloudRain, Maximize2,
   Search, Waves, Bell, Navigation2, Menu, X, ShieldCheck, Target, TrendingUp, Gauge,
-  Umbrella, SunMedium, ArrowRightCircle
+  Umbrella, SunMedium, ArrowRightCircle,
+  CloudFog, Cloud, CloudLightning, Thermometer, Droplets, CloudSun, ChevronLeft
 } from 'lucide-react';
 import LanguageWelcomeAnimation from '../components/LanguageWelcomeAnimation';
 import {
@@ -57,7 +58,16 @@ const SERVICES_DATA = [
     id: 'rainfall',
     title: 'RAINFALL INFORMATION',
     titleHindi: 'वर्षा की जानकारी',
-    bgColor: 'bg-[#1D82B8]',
+    tag: 'Live Doppler Radar',
+    tagHindi: 'लाइव डॉपलर रडार',
+    teaser: 'Precipitation estimates & 850+ coastal rain gauges',
+    teaserHindi: 'डॉपलर वर्षा एवं 850+ तटीय स्वचालित स्टेशन',
+    accent: 'sky',
+    gradient: 'from-sky-500/15 via-blue-500/5 to-transparent',
+    borderHover: 'hover:border-sky-500/60 dark:hover:border-sky-500/60',
+    iconBg: 'bg-sky-50 dark:bg-sky-950/70 border-sky-200 dark:border-sky-800/80 text-sky-600 dark:text-sky-400 group-hover:bg-sky-500 group-hover:text-white dark:group-hover:bg-sky-500 dark:group-hover:text-white',
+    tagClass: 'text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-950/80 border-sky-200 dark:border-sky-800/70',
+    topBar: 'bg-sky-500',
     icon: CloudRain,
     route: '/city-tracker',
     routeLabel: 'View Coastal Rainfall Tracker',
@@ -76,9 +86,18 @@ const SERVICES_DATA = [
     id: 'monsoon',
     title: 'MONSOON INFORMATION',
     titleHindi: 'मानसून की जानकारी',
-    bgColor: 'bg-[#B8860B]',
+    tag: 'Synoptic Circulation',
+    tagHindi: 'सिनॉप्टिक परिसंचरण',
+    teaser: 'Seasonal monsoon trough, NLM & LPA pulse tracking',
+    teaserHindi: 'मौसमी ट्रफ रेखा, एनएलएम एवं मानसूनी स्पंद',
+    accent: 'amber',
+    gradient: 'from-amber-500/15 via-yellow-500/5 to-transparent',
+    borderHover: 'hover:border-amber-500/60 dark:hover:border-amber-500/60',
+    iconBg: 'bg-amber-50 dark:bg-amber-950/70 border-amber-200 dark:border-amber-800/80 text-amber-600 dark:text-amber-400 group-hover:bg-amber-500 group-hover:text-white dark:group-hover:bg-amber-500 dark:group-hover:text-white',
+    tagClass: 'text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/80 border-amber-200 dark:border-amber-800/70',
+    topBar: 'bg-amber-500',
     icon: Umbrella,
-    route: '/bulletins',
+    route: '/safety-updates',
     routeLabel: 'Official Monsoon Bulletins',
     routeLabelHindi: 'आधिकारिक मानसून बुलेटिन',
     badge: 'Seasonal Circulation',
@@ -95,7 +114,16 @@ const SERVICES_DATA = [
     id: 'cyclone',
     title: 'CYCLONE INFORMATION',
     titleHindi: 'चक्रवात की जानकारी',
-    bgColor: 'bg-[#057A2A]',
+    tag: 'Vortex Intelligence',
+    tagHindi: 'चक्रवात खुफिया',
+    teaser: 'Multi-spectral satellite tracks & storm surge hydrodynamics',
+    teaserHindi: 'उपग्रह तूफान ट्रैक, ज्वार एवं लैंडफॉल मैट्रिक्स',
+    accent: 'emerald',
+    gradient: 'from-emerald-500/15 via-teal-500/5 to-transparent',
+    borderHover: 'hover:border-emerald-500/60 dark:hover:border-emerald-500/60',
+    iconBg: 'bg-emerald-50 dark:bg-emerald-950/70 border-emerald-200 dark:border-emerald-800/80 text-emerald-600 dark:text-emerald-400 group-hover:bg-emerald-500 group-hover:text-white dark:group-hover:bg-emerald-500 dark:group-hover:text-white',
+    tagClass: 'text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/80 border-emerald-200 dark:border-emerald-800/70',
+    topBar: 'bg-emerald-500',
     icon: 'cyclone',
     route: '/threat-map',
     routeLabel: 'Inspect GIS Cyclone Radar',
@@ -114,9 +142,18 @@ const SERVICES_DATA = [
     id: 'climate',
     title: 'CLIMATE SERVICES',
     titleHindi: 'जलवायु सेवाएं',
-    bgColor: 'bg-[#881337]',
+    tag: 'Decadal Anomalies',
+    tagHindi: 'दशकीय विसंगतियां',
+    teaser: 'ENSO diagnostic reports, IOD index & sea surface anomalies',
+    teaserHindi: 'ईएनएसओ नैदानिक, आईओडी एवं महासागरीय ऊष्मा',
+    accent: 'rose',
+    gradient: 'from-rose-500/15 via-purple-500/5 to-transparent',
+    borderHover: 'hover:border-rose-500/60 dark:hover:border-rose-500/60',
+    iconBg: 'bg-rose-50 dark:bg-rose-950/70 border-rose-200 dark:border-rose-800/80 text-rose-600 dark:text-rose-400 group-hover:bg-rose-500 group-hover:text-white dark:group-hover:bg-rose-500 dark:group-hover:text-white',
+    tagClass: 'text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/80 border-rose-200 dark:border-rose-800/70',
+    topBar: 'bg-rose-500',
     icon: SunMedium,
-    route: '/bulletins',
+    route: '/safety-updates',
     routeLabel: 'Climate Outlook Bulletins',
     routeLabelHindi: 'जलवायु दृष्टिकोण बुलेटिन',
     badge: 'Extended Forecasts',
@@ -130,6 +167,228 @@ const SERVICES_DATA = [
     ]
   }
 ];
+
+const MAJOR_CITIES_WEATHER = [
+  {
+    id: 'mumbai',
+    name: 'Mumbai',
+    nameHindi: 'मुंबई',
+    condition: 'Smoke Fog',
+    conditionHindi: 'धुंध और कोहरा',
+    icon: 'fog',
+    temp: '29.0',
+    windDir: 'No Direction',
+    windDirHindi: 'शांत दिशा',
+    windSpeed: '16.7 km/h',
+    windSpeedHindi: '16.7 किमी/घंटा',
+    humidity: '79 %',
+    pressure: '1008 hPa',
+    forecast: [
+      { day: 'Tomorrow', dayHindi: 'कल', high: '31°C', low: '25°C', cond: 'Haze' },
+      { day: 'Day 2', dayHindi: 'परसों', high: '32°C', low: '26°C', cond: 'Partly Cloudy' },
+      { day: 'Day 3', dayHindi: '3 दिन बाद', high: '30°C', low: '24°C', cond: 'Light Rain' },
+    ]
+  },
+  {
+    id: 'bengaluru',
+    name: 'Bengaluru',
+    nameHindi: 'बेंगलुरु',
+    condition: 'Cloudy Sky',
+    conditionHindi: 'बादल छाए रहेंगे',
+    icon: 'cloudy',
+    temp: '29.8',
+    windDir: 'Westerly',
+    windDirHindi: 'पश्चिमी',
+    windSpeed: '5.6 km/h',
+    windSpeedHindi: '5.6 किमी/घंटा',
+    humidity: '47 %',
+    pressure: '1012 hPa',
+    forecast: [
+      { day: 'Tomorrow', dayHindi: 'कल', high: '30°C', low: '20°C', cond: 'Scattered Clouds' },
+      { day: 'Day 2', dayHindi: 'परसों', high: '29°C', low: '19°C', cond: 'Thundershowers' },
+      { day: 'Day 3', dayHindi: '3 दिन बाद', high: '28°C', low: '19°C', cond: 'Rain' },
+    ]
+  },
+  {
+    id: 'chennai',
+    name: 'Chennai',
+    nameHindi: 'चेन्नई',
+    condition: 'Mainly Clear Sky',
+    conditionHindi: 'साफ आसमान',
+    icon: 'sun',
+    temp: '32.4',
+    windDir: 'Southeasterly',
+    windDirHindi: 'दक्षिण-पूर्वी',
+    windSpeed: '11.1 km/h',
+    windSpeedHindi: '11.1 किमी/घंटा',
+    humidity: '75 %',
+    pressure: '1006 hPa',
+    forecast: [
+      { day: 'Tomorrow', dayHindi: 'कल', high: '33°C', low: '27°C', cond: 'Sunny' },
+      { day: 'Day 2', dayHindi: 'परसों', high: '34°C', low: '27°C', cond: 'Hot & Humid' },
+      { day: 'Day 3', dayHindi: '3 दिन बाद', high: '31°C', low: '26°C', cond: 'Coastal Showers' },
+    ]
+  },
+  {
+    id: 'hyderabad',
+    name: 'Hyderabad',
+    nameHindi: 'हैदराबाद',
+    condition: 'Haze',
+    conditionHindi: 'हल्की धुंध',
+    icon: 'haze',
+    temp: '32.0',
+    windDir: 'Calm',
+    windDirHindi: 'शांत',
+    windSpeed: '0 km/h',
+    windSpeedHindi: '0 किमी/घंटा',
+    humidity: '67 %',
+    pressure: '1010 hPa',
+    forecast: [
+      { day: 'Tomorrow', dayHindi: 'कल', high: '33°C', low: '23°C', cond: 'Clear Sky' },
+      { day: 'Day 2', dayHindi: 'परसों', high: '34°C', low: '24°C', cond: 'Warm' },
+      { day: 'Day 3', dayHindi: '3 दिन बाद', high: '32°C', low: '22°C', cond: 'Passing Showers' },
+    ]
+  },
+  {
+    id: 'kolkata',
+    name: 'Kolkata',
+    nameHindi: 'कोलकाता',
+    condition: 'Thunderstorm with Rain',
+    conditionHindi: 'तूफान व बारिश',
+    icon: 'thunderstorm',
+    temp: '30.2',
+    windDir: 'Calm',
+    windDirHindi: 'शांत',
+    windSpeed: '0 km/h',
+    windSpeedHindi: '0 किमी/घंटा',
+    humidity: '84 %',
+    pressure: '1004 hPa',
+    forecast: [
+      { day: 'Tomorrow', dayHindi: 'कल', high: '31°C', low: '26°C', cond: 'Heavy Rain' },
+      { day: 'Day 2', dayHindi: 'परसों', high: '29°C', low: '25°C', cond: 'Squally Winds' },
+      { day: 'Day 3', dayHindi: '3 दिन बाद', high: '30°C', low: '25°C', cond: 'Overcast' },
+    ]
+  },
+  {
+    id: 'delhi',
+    name: 'New Delhi',
+    nameHindi: 'नई दिल्ली',
+    condition: 'Dust Haze',
+    conditionHindi: 'धूल भरी धुंध',
+    icon: 'haze',
+    temp: '31.5',
+    windDir: 'Northwesterly',
+    windDirHindi: 'उत्तर-पश्चिमी',
+    windSpeed: '8.2 km/h',
+    windSpeedHindi: '8.2 किमी/घंटा',
+    humidity: '52 %',
+    pressure: '1009 hPa',
+    forecast: [
+      { day: 'Tomorrow', dayHindi: 'कल', high: '33°C', low: '21°C', cond: 'Mainly Clear' },
+      { day: 'Day 2', dayHindi: 'परसों', high: '34°C', low: '22°C', cond: 'Sunny' },
+      { day: 'Day 3', dayHindi: '3 दिन बाद', high: '32°C', low: '20°C', cond: 'Dry Breeze' },
+    ]
+  },
+  {
+    id: 'bhubaneswar',
+    name: 'Bhubaneswar',
+    nameHindi: 'भुवनेश्वर',
+    condition: 'Squall Showers',
+    conditionHindi: 'तीव्र बौछारें',
+    icon: 'rain',
+    temp: '31.2',
+    windDir: 'Easterly',
+    windDirHindi: 'पूर्वी',
+    windSpeed: '18.5 km/h',
+    windSpeedHindi: '18.5 किमी/घंटा',
+    humidity: '88 %',
+    pressure: '1003 hPa',
+    forecast: [
+      { day: 'Tomorrow', dayHindi: 'कल', high: '29°C', low: '24°C', cond: 'Heavy Downpour' },
+      { day: 'Day 2', dayHindi: 'परसों', high: '28°C', low: '23°C', cond: 'Gale Winds' },
+      { day: 'Day 3', dayHindi: '3 दिन बाद', high: '30°C', low: '24°C', cond: 'Showers' },
+    ]
+  },
+  {
+    id: 'visakhapatnam',
+    name: 'Visakhapatnam',
+    nameHindi: 'विशाखापट्टनम',
+    condition: 'Gusty Winds & Rain',
+    conditionHindi: 'तेज हवाएं व बारिश',
+    icon: 'thunderstorm',
+    temp: '30.8',
+    windDir: 'Northeasterly',
+    windDirHindi: 'उत्तर-पूर्वी',
+    windSpeed: '24.1 km/h',
+    windSpeedHindi: '24.1 किमी/घंटा',
+    humidity: '86 %',
+    pressure: '1002 hPa',
+    forecast: [
+      { day: 'Tomorrow', dayHindi: 'कल', high: '30°C', low: '26°C', cond: 'Coastal Squall' },
+      { day: 'Day 2', dayHindi: 'परसों', high: '29°C', low: '25°C', cond: 'High Waves & Rain' },
+      { day: 'Day 3', dayHindi: '3 दिन बाद', high: '31°C', low: '26°C', cond: 'Overcast' },
+    ]
+  },
+  {
+    id: 'ahmedabad',
+    name: 'Ahmedabad',
+    nameHindi: 'अहमदाबाद',
+    condition: 'Sunny & Dry',
+    conditionHindi: 'धूप व शुष्क',
+    icon: 'sun',
+    temp: '33.6',
+    windDir: 'Southwesterly',
+    windDirHindi: 'दक्षिण-पश्चिमी',
+    windSpeed: '12.0 km/h',
+    windSpeedHindi: '12.0 किमी/घंटा',
+    humidity: '55 %',
+    pressure: '1007 hPa',
+    forecast: [
+      { day: 'Tomorrow', dayHindi: 'कल', high: '35°C', low: '24°C', cond: 'Sunny' },
+      { day: 'Day 2', dayHindi: 'परसों', high: '36°C', low: '25°C', cond: 'Hot' },
+      { day: 'Day 3', dayHindi: '3 दिन बाद', high: '34°C', low: '24°C', cond: 'Clear' },
+    ]
+  },
+  {
+    id: 'kochi',
+    name: 'Kochi',
+    nameHindi: 'कोच्चि',
+    condition: 'Coastal Showers',
+    conditionHindi: 'तटीय वर्षा',
+    icon: 'rain',
+    temp: '28.4',
+    windDir: 'Southwesterly',
+    windDirHindi: 'दक्षिण-पश्चिमी',
+    windSpeed: '14.8 km/h',
+    windSpeedHindi: '14.8 किमी/घंटा',
+    humidity: '89 %',
+    pressure: '1009 hPa',
+    forecast: [
+      { day: 'Tomorrow', dayHindi: 'कल', high: '29°C', low: '24°C', cond: 'Intermittent Rain' },
+      { day: 'Day 2', dayHindi: 'परसों', high: '28°C', low: '24°C', cond: 'Monsoon Clouds' },
+      { day: 'Day 3', dayHindi: '3 दिन बाद', high: '30°C', low: '25°C', cond: 'Humid' },
+    ]
+  }
+];
+
+const renderWeatherIcon = (type, className = "w-5 h-5") => {
+  switch (type) {
+    case 'fog':
+      return <CloudFog className={className} />;
+    case 'cloudy':
+      return <Cloud className={className} />;
+    case 'sun':
+      return <Sun className={className} />;
+    case 'haze':
+      return <CloudSun className={className} />;
+    case 'thunderstorm':
+      return <CloudLightning className={className} />;
+    case 'rain':
+      return <CloudRain className={className} />;
+    default:
+      return <CloudSun className={className} />;
+  }
+};
 
 const INITIAL_SYSTEMS = {
   invest92b: {
@@ -581,6 +840,54 @@ const Welcome = () => {
   });
   const [activeServiceModal, setActiveServiceModal] = useState(null);
 
+  // Auto-rotating Major Cities Weather Carousel state (rotates every 3-4 seconds)
+  const [cityCarouselIndex, setCityCarouselIndex] = useState(0);
+  const [isCityCarouselPaused, setIsCityCarouselPaused] = useState(false);
+  const [activeCityForecastModal, setActiveCityForecastModal] = useState(null);
+  const [isCarouselAnimated, setIsCarouselAnimated] = useState(true);
+
+  // Extended array with duplicates of the first 5 elements for seamless infinite looping
+  const extendedCities = useMemo(() => {
+    return [...MAJOR_CITIES_WEATHER, ...MAJOR_CITIES_WEATHER.slice(0, 5)];
+  }, []);
+
+  // Auto-rotate every 3.5 seconds
+  useEffect(() => {
+    if (isCityCarouselPaused) return;
+    const timer = setInterval(() => {
+      setIsCarouselAnimated(true);
+      setCityCarouselIndex(prev => prev + 1);
+    }, 3500);
+    return () => clearInterval(timer);
+  }, [isCityCarouselPaused]);
+
+  // Seamlessly reset index to 0 without animation once sliding into duplicate items
+  const handleCarouselTransitionEnd = () => {
+    if (cityCarouselIndex >= MAJOR_CITIES_WEATHER.length) {
+      setIsCarouselAnimated(false);
+      setCityCarouselIndex(0);
+    }
+  };
+
+  const handlePrevCity = () => {
+    if (cityCarouselIndex === 0) {
+      setIsCarouselAnimated(false);
+      setCityCarouselIndex(MAJOR_CITIES_WEATHER.length);
+      setTimeout(() => {
+        setIsCarouselAnimated(true);
+        setCityCarouselIndex(MAJOR_CITIES_WEATHER.length - 1);
+      }, 30);
+    } else {
+      setIsCarouselAnimated(true);
+      setCityCarouselIndex(prev => prev - 1);
+    }
+  };
+
+  const handleNextCity = () => {
+    setIsCarouselAnimated(true);
+    setCityCarouselIndex(prev => prev + 1);
+  };
+
   // Opening & Language Transition Animation state
   const [animState, setAnimState] = useState(() => {
     const hasSeenIntro = sessionStorage.getItem('vayu_intro_animated');
@@ -952,7 +1259,7 @@ const Welcome = () => {
       <div className="bg-amber-500/10 dark:bg-amber-950/30 border-b border-amber-200/80 dark:border-amber-900/50 py-2.5 text-xs text-amber-950 dark:text-amber-200 transition-colors duration-500 overflow-hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-3">
           {/* Pinned Authority Tag */}
-          <div className="flex items-center gap-2 shrink-0 bg-amber-500/20 dark:bg-amber-500/25 px-2.5 py-1 rounded-md z-10 select-none border border-amber-300/50 dark:border-amber-700/50">
+          <div className="flex items-center gap-2 shrink-0 bg-amber-500/20 dark:bg-amber-500/25 px-3 py-1 rounded-full z-10 select-none border border-amber-300/50 dark:border-amber-700/50">
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-500 opacity-75"></span>
               <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-600 dark:bg-amber-400"></span>
@@ -1016,7 +1323,7 @@ const Welcome = () => {
           <div className="flex flex-wrap items-center justify-between gap-2.5 border-b border-slate-200 dark:border-slate-800 pb-2.5 sm:pb-3">
             <div className="flex items-center gap-2.5 flex-wrap">
               {/* Active Detection Live Badge */}
-              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-50 dark:bg-red-950/50 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-900/60 text-xs font-bold shadow-2xs">
+              <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-50 dark:bg-red-950/50 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-900/60 text-xs font-bold shadow-2xs">
                 <span className="relative flex h-2 w-2">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75"></span>
                   <span className="relative inline-flex rounded-full h-2 w-2 bg-red-600 dark:bg-red-400"></span>
@@ -1025,7 +1332,7 @@ const Welcome = () => {
               </div>
 
               {/* Detected Area Name */}
-              <div className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-100/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 text-xs text-slate-800 dark:text-slate-200">
+              <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 text-xs text-slate-800 dark:text-slate-200">
                 <span className="font-bold text-slate-950 dark:text-white">
                   {isHindi ? current.basinHindi || current.basin : current.basin}
                 </span>
@@ -1038,7 +1345,7 @@ const Welcome = () => {
 
             <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 font-medium">
               <span>{isHindi ? 'भंवर निर्देशांक:' : 'Vortex Fix:'}</span>
-              <span className="font-bold text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-200/60 dark:border-slate-700">
+              <span className="font-bold text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700">
                 {current.lat}°N, {current.lon}°E
               </span>
             </div>
@@ -1046,7 +1353,7 @@ const Welcome = () => {
 
           {/* Hero Intel Presentation (Full Width) */}
           <div className="space-y-1.5 sm:space-y-2">
-            <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-lg text-xs font-semibold border bg-sky-50 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300 border-sky-200 dark:border-sky-800">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-semibold border bg-sky-50 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300 border-sky-200 dark:border-sky-800">
               <span>{isHindi ? (current.basinHindi || current.basin) : current.basin}</span>
             </div>
 
@@ -1062,7 +1369,7 @@ const Welcome = () => {
           </div>
 
           {/* Live AI Telemetry Feed Status & Diagnostics */}
-          <div className="bg-slate-100/80 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 rounded-xl px-3.5 py-2 sm:py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
+          <div className="bg-slate-100/80 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl px-3.5 py-2 sm:py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
             <div className="flex items-center gap-2">
               <span className="font-semibold text-slate-800 dark:text-slate-200">
                 {isHindi ? 'लाइव एआई मॉडल डेटा:' : 'Live AI Model Feed:'}
@@ -1088,7 +1395,7 @@ const Welcome = () => {
               <button
                 onClick={fetchLiveBackendData}
                 disabled={isSyncing}
-                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white transition-all cursor-pointer disabled:opacity-50"
+                className="inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white transition-all cursor-pointer disabled:opacity-50"
                 title={isHindi ? "एआई मॉडल निष्कर्ष और महासागरीय टेलीमेट्री रीफ्रेश करें" : "Refresh AI Model Inference & Ocean Telemetry"}
               >
                 <RefreshCw className={`w-3 h-3 ${isSyncing ? 'animate-spin' : ''}`} />
@@ -1099,7 +1406,7 @@ const Welcome = () => {
 
           {/* 4 Clean Metric Blocks */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-            <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 p-3 sm:p-3.5 rounded-xl sm:rounded-2xl shadow-xs transition-colors">
+            <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 p-3.5 sm:p-4 rounded-2xl sm:rounded-3xl shadow-xs transition-colors">
               <span className="text-xs text-slate-500 dark:text-slate-400 block mb-0.5 font-medium">
                 {isHindi ? 'सतत पवन गति' : 'Sustained Wind'}
               </span>
@@ -1111,7 +1418,7 @@ const Welcome = () => {
               </span>
             </div>
 
-            <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 p-3 sm:p-3.5 rounded-xl sm:rounded-2xl shadow-xs transition-colors">
+            <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 p-3.5 sm:p-4 rounded-2xl sm:rounded-3xl shadow-xs transition-colors">
               <span className="text-xs text-slate-500 dark:text-slate-400 block mb-0.5 font-medium">
                 {isHindi ? 'केंद्रीय दबाव' : 'Central Pressure'}
               </span>
@@ -1123,7 +1430,7 @@ const Welcome = () => {
               </span>
             </div>
 
-            <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 p-3 sm:p-3.5 rounded-xl sm:rounded-2xl shadow-xs transition-colors">
+            <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 p-3.5 sm:p-4 rounded-2xl sm:rounded-3xl shadow-xs transition-colors">
               <span className="text-xs text-slate-500 dark:text-slate-400 block mb-0.5 font-medium">
                 {isHindi ? '48 घंटे में चक्रवात संभावना' : '48h Formation'}
               </span>
@@ -1135,7 +1442,7 @@ const Welcome = () => {
               </span>
             </div>
 
-            <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 p-3 sm:p-3.5 rounded-xl sm:rounded-2xl shadow-xs transition-colors">
+            <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 p-3.5 sm:p-4 rounded-2xl sm:rounded-3xl shadow-xs transition-colors">
               <span className="text-xs text-slate-500 dark:text-slate-400 block mb-0.5 font-medium">
                 {isHindi ? 'गति एवं दिशा' : 'Movement'}
               </span>
@@ -1149,7 +1456,7 @@ const Welcome = () => {
           </div>
 
           {/* Coastal Corridor Strip */}
-          <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-xl sm:rounded-2xl px-4 py-2.5 sm:py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs shadow-xs">
+          <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-3xl px-4 py-2.5 sm:py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs shadow-xs">
             <div>
               <span className="text-slate-500 dark:text-slate-400 font-medium block">
                 {isHindi ? 'अनुमानित तटीय प्रभाव क्षेत्र:' : 'Projected Coastal Corridor:'}
@@ -1176,6 +1483,122 @@ const Welcome = () => {
           </div>
 
           {/* =========================================================================
+               CURRENT WEATHER ACROSS MAJOR CITIES (AUTO-ROTATING CAROUSEL)
+               ========================================================================= */}
+          <div
+            className="rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 p-3.5 sm:p-4.5 shadow-xs relative overflow-hidden group/carousel"
+            onMouseEnter={() => setIsCityCarouselPaused(true)}
+            onMouseLeave={() => setIsCityCarouselPaused(false)}
+          >
+            {/* Header / Title */}
+            <div className="flex items-center justify-between mb-3 px-1 border-b border-slate-200 dark:border-slate-800/80 pb-2.5">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-sky-500 animate-pulse" />
+                <h2 className="font-heading font-black text-xs sm:text-sm tracking-wider uppercase text-slate-950 dark:text-white">
+                  {isHindi ? 'प्रमुख शहरों का वर्तमान मौसम (CURRENT WEATHER ACROSS MAJOR CITIES)' : 'CURRENT WEATHER ACROSS MAJOR CITIES'}
+                </h2>
+              </div>
+              <div className="flex items-center gap-1.5 shrink-0">
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium hidden md:inline mr-1">
+                  {isCityCarouselPaused 
+                    ? (isHindi ? 'रोका गया (Paused)' : 'Paused on hover') 
+                    : (isHindi ? 'स्वचालित घूर्णन (3.5s)' : 'Auto-rotating (3.5s)')}
+                </span>
+                <button
+                  onClick={handlePrevCity}
+                  aria-label="Previous City"
+                  className="p-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors cursor-pointer"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={handleNextCity}
+                  aria-label="Next City"
+                  className="p-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors cursor-pointer"
+                >
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+
+            {/* Sliding Track Viewport */}
+            <div className="city-carousel-container">
+              <div
+                className={`city-carousel-track ${isCarouselAnimated ? 'is-animated' : ''}`}
+                style={{
+                  transform: `translateX(calc(-1 * ${cityCarouselIndex} * (100% / var(--items-per-screen))))`
+                }}
+                onTransitionEnd={handleCarouselTransitionEnd}
+              >
+                {extendedCities.map((city, idx) => (
+                  <div key={`${city.id}-${idx}`} className="city-carousel-item">
+                    <div className="bg-slate-50 dark:bg-[#0c0c0e] hover:bg-white dark:hover:bg-[#151518] border border-slate-200/90 dark:border-slate-800 hover:border-sky-500/50 dark:hover:border-sky-500/50 rounded-2xl p-3 text-slate-900 dark:text-white flex flex-col justify-between h-full min-h-[178px] transition-all duration-200 shadow-xs hover:shadow-sm group">
+                      {/* City Name */}
+                      <h3 className="text-center font-heading font-extrabold text-sm sm:text-base tracking-wide text-slate-900 dark:text-white mb-2">
+                        {isHindi ? city.nameHindi : city.name}
+                      </h3>
+
+                      {/* 2x2 Weather Metrics Grid */}
+                      <div className="grid grid-cols-2 gap-x-2 gap-y-2.5 my-auto text-center items-center py-1">
+                        {/* Condition */}
+                        <div className="flex flex-col items-center justify-center">
+                          <div className="text-sky-600 dark:text-sky-400 group-hover:scale-110 transition-transform">
+                            {renderWeatherIcon(city.icon, "w-6 h-6")}
+                          </div>
+                          <span className="text-[11px] text-slate-600 dark:text-slate-300 font-medium line-clamp-1 mt-1 leading-tight">
+                            {isHindi ? city.conditionHindi : city.condition}
+                          </span>
+                        </div>
+
+                        {/* Temperature */}
+                        <div className="flex flex-col items-center justify-center">
+                          <div className="text-sky-600 dark:text-sky-400 group-hover:scale-110 transition-transform">
+                            <Thermometer className="w-6 h-6" />
+                          </div>
+                          <span className="text-[11px] text-slate-900 dark:text-white font-bold mt-1 leading-tight">
+                            {city.temp} ° C
+                          </span>
+                        </div>
+
+                        {/* Wind */}
+                        <div className="flex flex-col items-center justify-center">
+                          <div className="text-sky-600 dark:text-sky-400 group-hover:scale-110 transition-transform">
+                            <Wind className="w-6 h-6" />
+                          </div>
+                          <span className="text-[11px] text-slate-600 dark:text-slate-300 font-medium line-clamp-1 mt-1 leading-tight">
+                            {isHindi ? city.windDirHindi : city.windDir}
+                          </span>
+                          <span className="text-[10px] text-slate-400 dark:text-slate-500 leading-none mt-0.5">
+                            {isHindi ? city.windSpeedHindi : city.windSpeed}
+                          </span>
+                        </div>
+
+                        {/* Humidity */}
+                        <div className="flex flex-col items-center justify-center">
+                          <div className="text-sky-600 dark:text-sky-400 group-hover:scale-110 transition-transform">
+                            <Droplets className="w-6 h-6" />
+                          </div>
+                          <span className="text-[11px] text-slate-900 dark:text-white font-bold mt-1 leading-tight">
+                            {city.humidity}
+                          </span>
+                        </div>
+                      </div>
+
+                      {/* Forecast CTA */}
+                      <button
+                        onClick={() => setActiveCityForecastModal(city)}
+                        className="text-center text-xs font-black uppercase tracking-wider text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 hover:underline pt-2.5 pb-0.5 mt-1 cursor-pointer transition-colors block w-full"
+                      >
+                        {isHindi ? 'पूर्वानुमान (FORECAST)' : 'FORECAST'}
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* =========================================================================
                OUR SERVICES SECTION (RAINFALL, MONSOON, CYCLONE, CLIMATE SERVICES)
                ========================================================================= */}
           <div className="pt-2 sm:pt-2.5">
@@ -1188,31 +1611,50 @@ const Welcome = () => {
               </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-3.5">
               {SERVICES_DATA.map((srv) => {
                 const IconComponent = srv.icon === 'cyclone' ? CycloneSwirlIcon : srv.icon;
                 return (
                   <div
                     key={srv.id}
                     onClick={() => setActiveServiceModal(srv)}
-                    className={`${srv.bgColor} rounded-lg sm:rounded-xl p-3 sm:p-3.5 text-white shadow-xs hover:shadow-lg hover:brightness-105 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer group flex items-center gap-3 relative overflow-hidden`}
+                    className={`relative overflow-hidden rounded-2xl sm:rounded-3xl p-4 sm:p-4.5 bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 ${srv.borderHover} shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group flex flex-col justify-between`}
                   >
-                    {/* Subtle top gloss reflection */}
-                    <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/15 to-transparent pointer-events-none" />
+                    {/* Ambient subtle glow background */}
+                    <div className={`absolute -right-8 -top-8 w-36 h-36 rounded-full bg-gradient-to-br ${srv.gradient} blur-2xl pointer-events-none group-hover:scale-125 transition-transform duration-500`} />
+                    
+                    {/* Top colored accent line on hover */}
+                    <div className={`absolute top-0 inset-x-0 h-0.5 ${srv.topBar} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
 
-                    {/* Service Icon */}
-                    <div className="shrink-0 p-2 rounded-lg bg-black/15 group-hover:bg-black/25 transition-colors flex items-center justify-center">
-                      <IconComponent className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
-                    </div>
+                    <div>
+                      {/* Card Header: Icon Badge + Pill Tag */}
+                      <div className="flex items-center justify-between gap-2 mb-3">
+                        <div className={`p-2.5 rounded-2xl border ${srv.iconBg} transition-all duration-300 shadow-xs flex items-center justify-center`}>
+                          <IconComponent className="w-5 h-5 sm:w-6 sm:h-6 group-hover:scale-110 transition-transform duration-300" />
+                        </div>
+                        <span className={`text-[9.5px] sm:text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${srv.tagClass} shrink-0`}>
+                          {isHindi ? srv.tagHindi : srv.tag}
+                        </span>
+                      </div>
 
-                    {/* Service Title & Read More */}
-                    <div className="min-w-0 flex-1">
-                      <h3 className="font-heading font-black text-xs sm:text-[13px] uppercase tracking-wide leading-tight text-white drop-shadow-xs">
+                      {/* Service Title */}
+                      <h3 className="font-heading font-black text-xs sm:text-[13px] uppercase tracking-wide leading-tight text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
                         {isHindi ? srv.titleHindi : srv.title}
                       </h3>
-                      <div className="text-[11px] font-semibold text-white/90 flex items-center gap-1 mt-1 group-hover:text-white transition-colors">
-                        <span>{isHindi ? 'अधिक पढ़ें' : 'Read More'}</span>
-                        <ArrowRightCircle className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+
+                      {/* Teaser Description */}
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed mt-1.5 line-clamp-2">
+                        {isHindi ? srv.teaserHindi : srv.teaser}
+                      </p>
+                    </div>
+
+                    {/* Card Bottom: Read More Action with animated arrow */}
+                    <div className="pt-3 mt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-slate-600 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
+                      <span className="text-[11px] font-bold">
+                        {isHindi ? 'विवरण देखें' : 'Explore Service'}
+                      </span>
+                      <div className="p-1 rounded-lg bg-slate-100 dark:bg-slate-800 group-hover:bg-slate-900 group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-slate-950 transition-colors">
+                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                       </div>
                     </div>
                   </div>
@@ -1225,7 +1667,7 @@ const Welcome = () => {
           <div className="flex flex-wrap items-center gap-3 pt-0.5 pb-1">
             <button
               onClick={() => navigate('/threat-map')}
-              className="px-5 py-2.5 rounded-xl bg-slate-950 hover:bg-slate-800 text-white dark:bg-white dark:text-slate-950 dark:hover:bg-slate-100 font-semibold text-xs transition-all shadow-xs flex items-center gap-2 cursor-pointer"
+              className="px-5 py-2.5 rounded-2xl bg-slate-950 hover:bg-slate-800 text-white dark:bg-white dark:text-slate-950 dark:hover:bg-slate-100 font-semibold text-xs transition-all shadow-xs flex items-center gap-2 cursor-pointer"
             >
               <Eye className="w-4 h-4" />
               <span>{isHindi ? 'जीआईएस रडार मैप देखें' : 'Inspect GIS Radar Map'}</span>
@@ -1233,7 +1675,7 @@ const Welcome = () => {
 
             <button
               onClick={() => navigate('/threat-map')}
-              className="px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 font-semibold text-xs transition-all shadow-xs flex items-center gap-2 cursor-pointer"
+              className="px-5 py-2.5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 font-semibold text-xs transition-all shadow-xs flex items-center gap-2 cursor-pointer"
             >
               <ShieldAlert className="w-4 h-4 text-red-600 dark:text-red-400" />
               <span>{isHindi ? 'तटीय जिला आपदा मैट्रिक्स' : 'View District Threat Matrix'}</span>
@@ -1250,31 +1692,31 @@ const Welcome = () => {
           onClick={() => setActiveServiceModal(null)}
         >
           <div 
-            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden animate-in zoom-in-95 duration-200"
+            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className={`${activeServiceModal.bgColor} p-4 sm:p-5 text-white relative`}>
+            <div className="bg-slate-950 dark:bg-black p-4 sm:p-5 text-white relative border-b border-slate-200 dark:border-slate-800">
               <button
                 onClick={() => setActiveServiceModal(null)}
-                className="absolute top-3.5 right-3.5 p-1 rounded-lg bg-black/20 hover:bg-black/35 text-white transition-all cursor-pointer"
+                className="absolute top-3.5 right-3.5 p-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer"
                 title={isHindi ? "बंद करें" : "Close"}
               >
                 <X className="w-4 h-4" />
               </button>
-              <div className="flex items-center gap-3">
-                <div className="p-2.5 rounded-xl bg-black/20">
+              <div className="flex items-center gap-3 pr-8">
+                <div className={`p-2.5 rounded-2xl border ${activeServiceModal.iconBg}`}>
                   {activeServiceModal.icon === 'cyclone' ? (
-                    <CycloneSwirlIcon className="w-7 h-7 text-white" />
+                    <CycloneSwirlIcon className="w-7 h-7" />
                   ) : (
-                    <activeServiceModal.icon className="w-7 h-7 text-white" />
+                    <activeServiceModal.icon className="w-7 h-7" />
                   )}
                 </div>
                 <div>
-                  <span className="text-[10px] font-bold uppercase tracking-wider text-white/80 block">
+                  <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${activeServiceModal.tagClass} inline-block mb-1`}>
                     {isHindi ? activeServiceModal.badgeHindi : activeServiceModal.badge}
                   </span>
-                  <h3 className="text-base sm:text-lg font-heading font-black tracking-wide">
+                  <h3 className="text-base sm:text-lg font-heading font-black tracking-wide text-white">
                     {isHindi ? activeServiceModal.titleHindi : activeServiceModal.title}
                   </h3>
                 </div>
@@ -1290,7 +1732,7 @@ const Welcome = () => {
               {/* Stats Highlights */}
               <div className="grid grid-cols-3 gap-2.5 pt-1">
                 {activeServiceModal.stats.map((st, idx) => (
-                  <div key={idx} className="bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 rounded-xl p-2.5 text-center">
+                  <div key={idx} className="bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-2.5 text-center">
                     <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium block truncate">
                       {isHindi ? st.labelHindi : st.label}
                     </span>
@@ -1308,7 +1750,7 @@ const Welcome = () => {
               <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-200 dark:border-slate-800">
                 <button
                   onClick={() => setActiveServiceModal(null)}
-                  className="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                  className="px-4 py-2 rounded-2xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                 >
                   {isHindi ? 'बंद करें' : 'Close'}
                 </button>
@@ -1318,9 +1760,139 @@ const Welcome = () => {
                     setActiveServiceModal(null);
                     navigate(r);
                   }}
-                  className={`px-4 py-2 rounded-xl text-xs font-bold text-white ${activeServiceModal.bgColor} hover:brightness-110 transition-all shadow-xs flex items-center gap-1.5 cursor-pointer`}
+                  className="px-4.5 py-2.5 rounded-2xl text-xs font-bold text-white bg-slate-950 hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-100 transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
                 >
                   <span>{isHindi ? activeServiceModal.routeLabelHindi : activeServiceModal.routeLabel}</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* =========================================================================
+           ACTIVE CITY FORECAST MODAL (3-DAY OUTLOOK)
+           ========================================================================= */}
+      {activeCityForecastModal && (
+        <div 
+          className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200"
+          onClick={() => setActiveCityForecastModal(null)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl max-w-md w-full overflow-hidden text-slate-900 dark:text-white"
+          >
+            {/* Modal Header */}
+            <div className="bg-slate-950 dark:bg-black text-white p-4 sm:p-5 relative border-b border-slate-200 dark:border-slate-800">
+              <button
+                onClick={() => setActiveCityForecastModal(null)}
+                aria-label="Close Forecast Modal"
+                className="absolute top-3.5 right-3.5 p-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors cursor-pointer"
+              >
+                <X className="w-4 h-4" />
+              </button>
+              <div className="flex items-center justify-between pr-7">
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-sky-400 block">
+                    {isHindi ? 'मौसम पूर्वानुमान एवं प्रेक्षण' : 'METEOROLOGICAL OBSERVATION & FORECAST'}
+                  </span>
+                  <h3 className="text-lg sm:text-xl font-heading font-black tracking-wide">
+                    {isHindi ? activeCityForecastModal.nameHindi : activeCityForecastModal.name}
+                  </h3>
+                </div>
+                <div className="text-right">
+                  <span className="text-2xl font-black font-heading text-white">
+                    {activeCityForecastModal.temp}°C
+                  </span>
+                  <span className="text-[11px] text-slate-400 block">
+                    {isHindi ? activeCityForecastModal.conditionHindi : activeCityForecastModal.condition}
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-4 sm:p-5 space-y-4">
+              {/* Current Key Metrics */}
+              <div className="grid grid-cols-3 gap-2 text-center text-xs">
+                <div className="bg-slate-50 dark:bg-slate-800/80 p-2.5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80">
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium block">
+                    {isHindi ? 'हवा की गति' : 'Wind'}
+                  </span>
+                  <strong className="text-xs font-bold block mt-0.5 text-slate-800 dark:text-slate-100">
+                    {isHindi ? activeCityForecastModal.windSpeedHindi : activeCityForecastModal.windSpeed}
+                  </strong>
+                  <span className="text-[9.5px] text-slate-500 dark:text-slate-400">
+                    {isHindi ? activeCityForecastModal.windDirHindi : activeCityForecastModal.windDir}
+                  </span>
+                </div>
+
+                <div className="bg-slate-50 dark:bg-slate-800/80 p-2.5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80">
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium block">
+                    {isHindi ? 'आर्द्रता' : 'Humidity'}
+                  </span>
+                  <strong className="text-xs font-bold block mt-0.5 text-slate-800 dark:text-slate-100">
+                    {activeCityForecastModal.humidity}
+                  </strong>
+                  <span className="text-[9.5px] text-slate-500 dark:text-slate-400">
+                    {isHindi ? 'सापेक्षिक' : 'Relative'}
+                  </span>
+                </div>
+
+                <div className="bg-slate-50 dark:bg-slate-800/80 p-2.5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80">
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium block">
+                    {isHindi ? 'दबाव' : 'Pressure'}
+                  </span>
+                  <strong className="text-xs font-bold block mt-0.5 text-slate-800 dark:text-slate-100">
+                    {activeCityForecastModal.pressure}
+                  </strong>
+                  <span className="text-[9.5px] text-emerald-600 dark:text-emerald-400 font-medium">
+                    {isHindi ? 'सामान्य' : 'Nominal'}
+                  </span>
+                </div>
+              </div>
+
+              {/* 3-Day Outlook */}
+              <div>
+                <h4 className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400 mb-2">
+                  {isHindi ? '3 दिवसीय पूर्वानुमान (3-Day Outlook)' : '3-Day Outlook'}
+                </h4>
+                <div className="grid grid-cols-3 gap-2">
+                  {activeCityForecastModal.forecast?.map((fc, idx) => (
+                    <div key={idx} className="p-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 text-center">
+                      <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 block">
+                        {isHindi ? fc.dayHindi : fc.day}
+                      </span>
+                      <span className="text-[10px] text-sky-600 dark:text-sky-400 font-semibold block mt-0.5">
+                        {fc.cond}
+                      </span>
+                      <div className="flex items-center justify-center gap-1.5 text-xs font-black mt-1">
+                        <span className="text-red-600 dark:text-red-400">{fc.high}</span>
+                        <span className="text-slate-400 text-[10px]">/</span>
+                        <span className="text-blue-600 dark:text-blue-400">{fc.low}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Modal Actions */}
+              <div className="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-800">
+                <button
+                  onClick={() => setActiveCityForecastModal(null)}
+                  className="px-4 py-2 rounded-2xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                >
+                  {isHindi ? 'बंद करें' : 'Close'}
+                </button>
+                <button
+                  onClick={() => {
+                    setActiveCityForecastModal(null);
+                    navigate('/city-tracker');
+                  }}
+                  className="px-4.5 py-2.5 rounded-2xl text-xs font-bold text-white bg-slate-950 hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-100 transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+                >
+                  <span>{isHindi ? 'विस्तृत शहर मौसम ट्रैकर' : 'Open Full City Weather Tracker'}</span>
                   <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               </div>

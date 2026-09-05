@@ -6,6 +6,7 @@ import CityTracker from './pages/CityTracker';
 import ThreatMap from './pages/ThreatMap';
 import Bulletins from './pages/Bulletins';
 import SafetyGuide from './pages/SafetyGuide';
+import SafetyUpdates from './pages/SafetyUpdates';
 import Login from './pages/Login';
 import DashboardLayout from './components/DashboardLayout';
 import Dashboard from './pages/Dashboard';
@@ -101,12 +102,12 @@ function App() {
       <Route path="/gis-radar" element={<ThreatMap />} />
       <Route path="/threat-matrix" element={<ThreatMap />} />
 
-      {/* Official IMD Meteorological Bulletins & Sea Warnings */}
-      <Route path="/bulletins" element={<Bulletins />} />
-
-      {/* Disaster Safety Protocol (NDMA Citizen Guidelines) */}
-      <Route path="/safety-guide" element={<SafetyGuide />} />
-      <Route path="/safety" element={<SafetyGuide />} />
+      {/* Unified Safety & Updates (IMD Bulletins & NDMA Safety Protocol) */}
+      <Route path="/safety-updates" element={<SafetyUpdates />} />
+      <Route path="/bulletins" element={<SafetyUpdates initialTab="bulletins" />} />
+      <Route path="/safety-guide" element={<SafetyUpdates initialTab="safety" />} />
+      <Route path="/safety" element={<SafetyUpdates initialTab="safety" />} />
+      <Route path="/updates" element={<SafetyUpdates initialTab="bulletins" />} />
 
       {/* State-Specific Weather & Cyclone Early Warning Directory */}
       <Route path="/state/:stateSlug" element={<StateWeather />} />
