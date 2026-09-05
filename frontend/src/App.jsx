@@ -8,6 +8,7 @@ import Bulletins from './pages/Bulletins';
 import SafetyGuide from './pages/SafetyGuide';
 import SafetyUpdates from './pages/SafetyUpdates';
 import CityForecast from './pages/CityForecast';
+import AICycloneIntelligence from './pages/AICycloneIntelligence';
 import Login from './pages/Login';
 import DashboardLayout from './components/DashboardLayout';
 import Dashboard from './pages/Dashboard';
@@ -67,6 +68,7 @@ function App() {
           <Route path="analytics" element={<Analytics />} />
           <Route path="performance" element={<Performance />} />
           <Route path="architecture" element={<Architecture />} />
+          <Route path="ai-cyclone" element={<AICycloneIntelligence />} />
 
           {/* Legacy /dashboard/* aliases so relative internal links keep working */}
           <Route path="dashboard" element={<Dashboard />} />
@@ -80,6 +82,7 @@ function App() {
           <Route path="dashboard/analytics" element={<Analytics />} />
           <Route path="dashboard/performance" element={<Performance />} />
           <Route path="dashboard/architecture" element={<Architecture />} />
+          <Route path="dashboard/ai-cyclone" element={<AICycloneIntelligence />} />
         </Route>
 
         <Route path="*" element={<Navigate to="/" replace />} />
@@ -92,6 +95,11 @@ function App() {
     <Routes>
       {/* Official MoES / IMD Public Cyclone Intelligence Portal */}
       <Route path="/" element={<Welcome />} />
+
+      {/* SIH AI/ML Cyclone Intelligence Hub (Identification, Pattern Classification, Multi-Source Fusion, Track Prediction & Benchmarks) */}
+      <Route path="/ai-cyclone" element={<AICycloneIntelligence />} />
+      <Route path="/ai-intelligence" element={<AICycloneIntelligence />} />
+      <Route path="/cyclone-ai" element={<AICycloneIntelligence />} />
 
       {/* 100+ Coastal Cities & High-Risk Danger Hotspots Directory */}
       <Route path="/city-tracker" element={<CityTracker />} />
@@ -148,6 +156,7 @@ function App() {
           <Route path="analytics" element={<Analytics />} />
           <Route path="performance" element={<Performance />} />
           <Route path="architecture" element={<Architecture />} />
+          <Route path="ai-cyclone" element={<AICycloneIntelligence />} />
         </Route>
       )}
 

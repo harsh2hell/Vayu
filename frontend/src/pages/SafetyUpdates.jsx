@@ -7,6 +7,7 @@ import {
   HeartPulse, Shield, Sparkles, Info, Layers
 } from 'lucide-react';
 import PublicNavbar from '../components/PublicNavbar';
+import IOSGlassCard from '../components/IOSGlassCard';
 
 const PORT_SIGNALS = [
   { signal: 'Signal No. 1', name: 'Warning', desc: 'Low pressure area or squally weather exists at sea.', descHindi: 'समुद्र में कम दबाव का क्षेत्र या झोंकेदार मौसम मौजूद है।' },
@@ -229,7 +230,7 @@ const SafetyUpdates = ({ initialTab }) => {
               <div className="lg:col-span-2 space-y-4">
                 
                 {/* Bulletin 14 Card */}
-                <div className="border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-900/90 p-5 sm:p-6 shadow-xs space-y-3.5 transition-all">
+                <IOSGlassCard className="rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-xs space-y-3.5">
                   <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
                     <div className="flex items-center gap-2">
                       <span className="font-extrabold text-slate-950 dark:text-white px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
@@ -266,10 +267,10 @@ const SafetyUpdates = ({ initialTab }) => {
                       <span>{isHindi ? 'आधिकारिक सलाह डाउनलोड करें (PDF)' : 'Download Official Advisory (PDF)'}</span>
                     </button>
                   </div>
-                </div>
+                </IOSGlassCard>
 
                 {/* Genesis Advisory 03 Card */}
-                <div className="border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-900/90 p-5 sm:p-6 shadow-xs space-y-3.5 transition-all">
+                <IOSGlassCard className="rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-xs space-y-3.5">
                   <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
                     <div className="flex items-center gap-2">
                       <span className="font-extrabold text-slate-950 dark:text-white px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
@@ -306,7 +307,7 @@ const SafetyUpdates = ({ initialTab }) => {
                       <span>{isHindi ? 'उत्पत्ति सलाह डाउनलोड करें (PDF)' : 'Download Genesis Advisory (PDF)'}</span>
                     </button>
                   </div>
-                </div>
+                </IOSGlassCard>
 
                 {/* Special Tropical Weather Outlook */}
                 <div className="border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-900/90 p-5 sm:p-6 shadow-xs space-y-3.5 transition-all">
@@ -684,7 +685,7 @@ const SafetyUpdates = ({ initialTab }) => {
             {/* Emergency Helplines Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {EMERGENCY_HELPLINES.map((hl, idx) => (
-                <div key={idx} className="border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-900/90 p-5 shadow-xs flex flex-col justify-between space-y-3">
+                <IOSGlassCard key={idx} wrapperClassName="h-full" className="rounded-2xl sm:rounded-3xl p-5 shadow-xs flex flex-col justify-between space-y-3 h-full">
                   <div>
                     <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">
                       {isHindi ? hl.nameHindi : hl.name}
@@ -700,7 +701,7 @@ const SafetyUpdates = ({ initialTab }) => {
                   <p className="text-[11px] text-slate-500 dark:text-slate-400 border-t border-slate-100 dark:border-slate-800 pt-2">
                     {isHindi ? hl.descHindi : hl.desc}
                   </p>
-                </div>
+                </IOSGlassCard>
               ))}
             </div>
 

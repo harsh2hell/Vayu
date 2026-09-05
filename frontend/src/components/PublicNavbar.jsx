@@ -173,6 +173,11 @@ const PublicNavbar = ({
       match: ['/']
     },
     { 
+      path: '/ai-cyclone', 
+      label: isHindi ? 'एआई चक्रवात' : 'AI Cyclone',
+      match: ['/ai-cyclone', '/ai-intelligence', '/cyclone-ai']
+    },
+    { 
       path: '/city-tracker', 
       label: isHindi ? 'शहर व तटीय क्षेत्र (110+)' : 'City & Area Watch',
       match: ['/city-tracker', '/cities']

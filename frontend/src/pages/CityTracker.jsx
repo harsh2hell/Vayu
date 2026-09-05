@@ -7,6 +7,7 @@ import {
 import LanguageWelcomeAnimation from '../components/LanguageWelcomeAnimation';
 import { COASTAL_CITIES_DATA } from '../data/coastalCitiesData';
 import PublicNavbar from '../components/PublicNavbar';
+import IOSGlassCard from '../components/IOSGlassCard';
 
 const STATE_OPTIONS = [
   { id: 'ALL', name: 'All States & UTs', nameHindi: 'सभी राज्य व केंद्र शासित प्रदेश' },
@@ -277,10 +278,11 @@ const CityTracker = () => {
                 : 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800';
 
               return (
-                <div
+                <IOSGlassCard
                   key={item.id}
                   onClick={() => navigate(`/state/${item.stateSlug}`)}
-                  className={`bg-white dark:bg-slate-900/90 border rounded-2xl p-5 shadow-xs transition-all hover:shadow-md cursor-pointer flex flex-col justify-between gap-3 group ${borderTheme}`}
+                  wrapperClassName="h-full"
+                  className={`rounded-2xl p-5 cursor-pointer flex flex-col justify-between gap-3 group h-full ${borderTheme}`}
                   title={isHindi ? `${item.state} के लिए संपूर्ण मौसम और चक्रवात जानकारी खोलें` : `Click to open full weather & cyclone intelligence for ${item.state}`}
                 >
                   
@@ -338,13 +340,13 @@ const CityTracker = () => {
                         e.stopPropagation();
                         navigate(`/state/${item.stateSlug}`);
                       }}
-                      className="text-slate-500 hover:text-slate-900 dark:hover:text-white font-semibold text-[11px] transition-colors"
+                      className="text-slate-500 hover:text-slate-900 dark:hover:text-white font-semibold text-[11px] transition-colors cursor-pointer"
                     >
                       {item.state} {isHindi ? 'पृष्ठ →' : 'Page →'}
                     </button>
                   </div>
 
-                </div>
+                </IOSGlassCard>
               );
             })}
           </div>

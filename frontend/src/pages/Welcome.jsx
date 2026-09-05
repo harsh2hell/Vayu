@@ -10,9 +10,11 @@ import {
   ArrowUpRight, BarChart2, ShieldAlert, Play, Pause, Sliders, Crosshair, CloudRain, Maximize2,
   Search, Waves, Bell, Navigation2, Menu, X, ShieldCheck, Target, TrendingUp, Gauge,
   Umbrella, SunMedium, ArrowRightCircle,
-  CloudFog, Cloud, CloudLightning, Thermometer, Droplets, CloudSun, ChevronLeft
+  CloudFog, Cloud, CloudLightning, Thermometer, Droplets, CloudSun, ChevronLeft,
+  BrainCircuit, Cpu
 } from 'lucide-react';
 import LanguageWelcomeAnimation from '../components/LanguageWelcomeAnimation';
+import IOSGlassCard from '../components/IOSGlassCard';
 import {
   MapContainer,
   TileLayer,
@@ -125,9 +127,9 @@ const SERVICES_DATA = [
     tagClass: 'text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 dark:bg-emerald-500/20 border-emerald-300/60 dark:border-emerald-500/30 backdrop-blur-md',
     topBar: 'bg-emerald-500',
     icon: 'cyclone',
-    route: '/threat-map',
-    routeLabel: 'Inspect GIS Cyclone Radar',
-    routeLabelHindi: 'जीआईएस चक्रवात रडार देखें',
+    route: '/ai-cyclone',
+    routeLabel: 'Launch AI Cyclone Intelligence Studio',
+    routeLabelHindi: 'एआई चक्रवात इंटेलिजेंस स्टूडियो खोलें',
     badge: 'Critical Warning Active',
     badgeHindi: 'गंभीर चेतावनी सक्रिय',
     summary: 'End-to-end tropical cyclogenesis intelligence, multi-spectral satellite imagery, machine-learning track consensus, storm surge hydrodynamics, and district impact matrices.',
@@ -1624,7 +1626,7 @@ const Welcome = () => {
 
           {/* 4 Clean Metric Blocks */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-            <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 p-3.5 sm:p-4 rounded-2xl sm:rounded-3xl shadow-xs transition-colors">
+            <IOSGlassCard className="p-3.5 sm:p-4 rounded-2xl sm:rounded-3xl">
               <span className="text-xs text-slate-500 dark:text-slate-400 block mb-0.5 font-medium">
                 {isHindi ? 'सतत पवन गति' : 'Sustained Wind'}
               </span>
@@ -1634,9 +1636,9 @@ const Welcome = () => {
               <span className="text-[0.7rem] text-slate-500 dark:text-slate-400 mt-0.5 block">
                 {isHindi ? `झोंके ${current.gusts} किमी/घंटा` : `Gusts ${current.gusts} km/h`}
               </span>
-            </div>
+            </IOSGlassCard>
 
-            <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 p-3.5 sm:p-4 rounded-2xl sm:rounded-3xl shadow-xs transition-colors">
+            <IOSGlassCard className="p-3.5 sm:p-4 rounded-2xl sm:rounded-3xl">
               <span className="text-xs text-slate-500 dark:text-slate-400 block mb-0.5 font-medium">
                 {isHindi ? 'केंद्रीय दबाव' : 'Central Pressure'}
               </span>
@@ -1646,9 +1648,9 @@ const Welcome = () => {
               <span className="text-[0.7rem] text-slate-500 dark:text-slate-400 mt-0.5 block">
                 {isHindi ? 'बैरोमीटर रीडिंग' : 'Barometric Fix'}
               </span>
-            </div>
+            </IOSGlassCard>
 
-            <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 p-3.5 sm:p-4 rounded-2xl sm:rounded-3xl shadow-xs transition-colors">
+            <IOSGlassCard className="p-3.5 sm:p-4 rounded-2xl sm:rounded-3xl">
               <span className="text-xs text-slate-500 dark:text-slate-400 block mb-0.5 font-medium">
                 {isHindi ? '48 घंटे में चक्रवात संभावना' : '48h Formation'}
               </span>
@@ -1658,9 +1660,9 @@ const Welcome = () => {
               <span className="text-[0.7rem] text-slate-500 dark:text-slate-400 mt-0.5 block">
                 {isHindi ? 'एआई वीआईटी मॉडल प्रायिकता' : 'ViT Probability'}
               </span>
-            </div>
+            </IOSGlassCard>
 
-            <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 p-3.5 sm:p-4 rounded-2xl sm:rounded-3xl shadow-xs transition-colors">
+            <IOSGlassCard className="p-3.5 sm:p-4 rounded-2xl sm:rounded-3xl">
               <span className="text-xs text-slate-500 dark:text-slate-400 block mb-0.5 font-medium">
                 {isHindi ? 'गति एवं दिशा' : 'Movement'}
               </span>
@@ -1670,7 +1672,7 @@ const Welcome = () => {
               <span className="text-[0.7rem] text-slate-500 dark:text-slate-400 mt-0.5 block">
                 {isHindi ? `गति ${current.speed} किमी/घंटा` : `Speed ${current.speed} km/h`}
               </span>
-            </div>
+            </IOSGlassCard>
           </div>
 
           {/* Coastal Corridor Strip */}
@@ -1814,20 +1816,18 @@ const Welcome = () => {
               {SERVICES_DATA.map((srv) => {
                 const IconComponent = srv.icon === 'cyclone' ? CycloneSwirlIcon : srv.icon;
                 return (
-                  <div
+                  <IOSGlassCard
                     key={srv.id}
                     onClick={() => setActiveServiceModal(srv)}
-                    className={`relative overflow-hidden rounded-2xl sm:rounded-3xl p-4 sm:p-4.5 bg-white/65 hover:bg-white/90 dark:bg-white/[0.03] dark:hover:bg-white/[0.07] backdrop-blur-2xl border border-white/80 dark:border-white/10 ${srv.borderHover} shadow-[0_8px_30px_rgb(0,0,0,0.04),inset_0_1px_1px_rgba(255,255,255,0.95),inset_0_-1px_1px_rgba(255,255,255,0.3)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.08),inset_0_-1px_1px_rgba(255,255,255,0.02)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_20px_40px_rgba(0,0,0,0.7)] hover:-translate-y-1.5 transition-all duration-300 cursor-pointer group flex flex-col justify-between`}
+                    wrapperClassName="h-full"
+                    className={`p-4 sm:p-4.5 rounded-2xl sm:rounded-3xl cursor-pointer group flex flex-col justify-between h-full ${srv.borderHover}`}
                   >
-                    {/* Glass specular top edge reflection */}
-                    <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white dark:via-white/20 to-transparent" />
-
                     {/* Ambient colored refraction aura */}
                     <div className={`absolute -right-10 -top-10 w-44 h-44 rounded-full bg-gradient-to-br ${srv.gradient} blur-2xl pointer-events-none group-hover:scale-125 transition-transform duration-500 opacity-90 group-hover:opacity-100`} />
                     <div className="pointer-events-none absolute -bottom-10 -left-10 w-32 h-32 rounded-full bg-slate-200/40 dark:bg-white/[0.02] blur-xl" />
 
                     {/* Top colored accent line on hover */}
-                    <div className={`absolute top-0 inset-x-0 h-0.5 ${srv.topBar} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
+                    <div className={`absolute top-0 inset-x-0 h-0.5 ${srv.topBar} opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10`} />
 
                     <div className="relative z-10">
                       {/* Card Header: Icon Badge + Pill Tag */}
@@ -1860,9 +1860,152 @@ const Welcome = () => {
                         <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                       </div>
                     </div>
-                  </div>
+                  </IOSGlassCard>
                 );
               })}
+            </div>
+          </div>
+
+          {/* =========================================================================
+               SIH AI CYCLONE INTELLIGENCE & PATTERN CLASSIFICATION SUITE PREVIEW
+               Problem Statement: "AI/ML system for identification, classification, and prediction of tropical cyclone patterns using multi-source satellite data"
+               ========================================================================= */}
+          <div className="relative overflow-hidden rounded-3xl p-5 sm:p-6 bg-gradient-to-br from-indigo-900/15 via-purple-900/10 to-sky-900/15 dark:from-indigo-950/40 dark:via-purple-950/30 dark:to-sky-950/40 backdrop-blur-2xl border border-indigo-400/30 dark:border-indigo-500/20 shadow-[0_16px_40px_rgba(79,70,229,0.08)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.8)]">
+            {/* Ambient Refraction Glows */}
+            <div className="pointer-events-none absolute -top-24 -left-20 w-80 h-80 bg-indigo-500/15 rounded-full blur-3xl" />
+            <div className="pointer-events-none absolute -bottom-24 -right-20 w-80 h-80 bg-cyan-500/15 rounded-full blur-3xl" />
+            {/* Top specular highlight */}
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/80 dark:via-white/30 to-transparent" />
+
+            <div className="relative z-10 space-y-4">
+              {/* Header Banner */}
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-indigo-200/50 dark:border-white/10 pb-4">
+                <div>
+                  <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-500/20 border border-purple-400/40 text-purple-700 dark:text-purple-300 text-[10px] font-bold tracking-wide">
+                      <Sparkles className="w-3 h-3 text-purple-500 animate-pulse" />
+                      {isHindi ? 'स्मार्ट इंडिया हैकाथॉन (SIH) एआई/एमएल सिस्टम' : 'SIH AI/ML INNOVATION SUITE'}
+                    </span>
+                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-emerald-500/20 border border-emerald-400/40 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold tracking-wide">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
+                      {isHindi ? 'मल्टी-सोर्स उपग्रह डेटा एकीकरण' : 'Multi-Source Satellite Fusion Active'}
+                    </span>
+                  </div>
+                  <h2 className="font-heading font-black text-base sm:text-lg lg:text-xl text-slate-900 dark:text-white tracking-tight">
+                    {isHindi 
+                      ? 'उष्णकटिबंधीय चक्रवात पैटर्न पहचान, वर्गीकरण एवं पूर्वानुमान'
+                      : 'Tropical Cyclone Pattern Identification, Classification & Prediction'}
+                  </h2>
+                  <p className="text-xs text-slate-600 dark:text-slate-300 max-w-3xl mt-1 leading-relaxed">
+                    {isHindi
+                      ? 'इन्सैट-3डीआर, ओशनसैट-3 और डॉप्लर रडार से वास्तविक समय उपग्रह डेटा संलयन द्वारा वोर्टेक्स केंद्र पहचान, 5 डोवोरक पैटर्न वर्गीकरण और 72 घंटे का न्यूरल ट्रैक व तीव्रता पूर्वानुमान।'
+                      : 'Real-time multi-source data fusion from INSAT-3DR, Oceansat-3, and IMD Doppler Radars powering automated vortex identification (±14.2 km fix), 5 morphological pattern classifications, and 72-hour neural spatiotemporal track & intensity predictions.'}
+                  </p>
+                </div>
+
+                {/* Primary Launch Studio Button */}
+                <div className="shrink-0 flex items-center gap-2.5">
+                  <button
+                    onClick={() => navigate('/ai-cyclone')}
+                    className="w-full sm:w-auto px-5 py-2.5 rounded-2xl bg-gradient-to-r from-indigo-600 via-sky-600 to-purple-600 hover:from-indigo-500 hover:to-purple-500 text-white font-bold text-xs shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 cursor-pointer"
+                  >
+                    <BrainCircuit className="w-4 h-4" />
+                    <span>{isHindi ? 'एआई चक्रवात स्टूडियो खोलें' : 'Launch AI Cyclone Studio'}</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* 4 Feature Pillars Grid */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                {/* Pillar 1 */}
+                <IOSGlassCard
+                  onClick={() => navigate('/ai-cyclone?tab=identification')}
+                  wrapperClassName="h-full"
+                  className="p-3.5 rounded-2xl cursor-pointer group shadow-2xs h-full flex flex-col justify-between"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="p-2 rounded-xl bg-sky-500/10 dark:bg-sky-500/20 text-sky-600 dark:text-sky-400">
+                      <Crosshair className="w-4 h-4" />
+                    </div>
+                    <span className="text-[10px] font-extrabold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md">
+                      96.4% Conf.
+                    </span>
+                  </div>
+                  <h3 className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
+                    {isHindi ? '1. वोर्टेक्स पहचान व विश्वास स्कोर' : '1. Vortex Identification'}
+                  </h3>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-normal">
+                    {isHindi ? 'केंद्र फिक्स 15.40°N 87.80°E (त्रुटि ±14.2 किमी) व Grad-CAM ध्यान हीटमैप' : 'Autonomous center fix at 15.40°N 87.80°E (±14.2 km error) with Grad-CAM heatmaps.'}
+                  </p>
+                </IOSGlassCard>
+
+                {/* Pillar 2 */}
+                <IOSGlassCard
+                  onClick={() => navigate('/ai-cyclone?tab=classification')}
+                  wrapperClassName="h-full"
+                  className="p-3.5 rounded-2xl cursor-pointer group shadow-2xs h-full flex flex-col justify-between"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="p-2 rounded-xl bg-purple-500/10 dark:bg-purple-500/20 text-purple-600 dark:text-purple-400">
+                      <Layers className="w-4 h-4" />
+                    </div>
+                    <span className="text-[10px] font-extrabold text-purple-600 dark:text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded-md">
+                      5 Classes
+                    </span>
+                  </div>
+                  <h3 className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                    {isHindi ? '2. संरचनात्मक पैटर्न वर्गीकरण' : '2. Pattern Classification'}
+                  </h3>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-normal">
+                    {isHindi ? 'डोवोरक आकारिकी (Curved Band 62%) एवं 6-चरणीय विकास चक्र' : 'Dvorak morphological models (Curved Band 62%) & 6-stage lifecycle analysis.'}
+                  </p>
+                </IOSGlassCard>
+
+                {/* Pillar 3 */}
+                <IOSGlassCard
+                  onClick={() => navigate('/ai-cyclone?tab=multisource')}
+                  wrapperClassName="h-full"
+                  className="p-3.5 rounded-2xl cursor-pointer group shadow-2xs h-full flex flex-col justify-between"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="p-2 rounded-xl bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400">
+                      <Satellite className="w-4 h-4" />
+                    </div>
+                    <span className="text-[10px] font-extrabold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md">
+                      6 Feeds
+                    </span>
+                  </div>
+                  <h3 className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                    {isHindi ? '3. बहु-स्रोत उपग्रह डेटा संलयन' : '3. Multi-Source Integration'}
+                  </h3>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-normal">
+                    {isHindi ? 'इन्सैट-3डीआर, ओशनसैट-3, जीपीएम राडार एवं आईएमडी डॉपलर नेटवर्क' : 'INSAT-3DR IR/WV, Oceansat-3 scatterometer, GPM Radar & IMD Coastal DWR.'}
+                  </p>
+                </IOSGlassCard>
+
+                {/* Pillar 4 */}
+                <IOSGlassCard
+                  onClick={() => navigate('/ai-cyclone?tab=prediction')}
+                  wrapperClassName="h-full"
+                  className="p-3.5 rounded-2xl cursor-pointer group shadow-2xs h-full flex flex-col justify-between"
+                >
+                  <div className="flex items-center justify-between mb-2">
+                    <div className="p-2 rounded-xl bg-rose-500/10 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400">
+                      <TrendingUp className="w-4 h-4" />
+                    </div>
+                    <span className="text-[10px] font-extrabold text-sky-600 dark:text-sky-400 bg-sky-500/10 px-2 py-0.5 rounded-md">
+                      72h Cone
+                    </span>
+                  </div>
+                  <h3 className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
+                    {isHindi ? '4. ट्रैक व तीव्रता न्यूरल पूर्वानुमान' : '4. 72h Track & Intensity'}
+                  </h3>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-normal">
+                    {isHindi ? 'अनिश्चितता शंकु, केंद्रीय दबाव गिरावट व संवेदनशीलता सिम्युलेटर' : 'Uncertainty bounds, pressure drops & interactive What-If sensitivity sliders.'}
+                  </p>
+                </IOSGlassCard>
+              </div>
             </div>
           </div>
 

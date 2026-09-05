@@ -1943,19 +1943,176 @@ export const CITY_FORECAST_DATA = {
   }
 };
 
-// Fallback generator for any custom city id
+const WIND_MAP = {
+  'N': { en: 'Northerly', hi: 'उत्तरी', deg: 0 },
+  'NNE': { en: 'North-Northeasterly', hi: 'उत्तर-उत्तर-पूर्वी', deg: 22 },
+  'NE': { en: 'Northeasterly', hi: 'उत्तर-पूर्वी', deg: 45 },
+  'ENE': { en: 'East-Northeasterly', hi: 'पूर्व-उत्तर-पूर्वी', deg: 67 },
+  'E': { en: 'Easterly', hi: 'पूर्वी', deg: 90 },
+  'ESE': { en: 'East-Southeasterly', hi: 'पूर्व-दक्षिण-पूर्वी', deg: 112 },
+  'SE': { en: 'Southeasterly', hi: 'दक्षिण-पूर्वी', deg: 135 },
+  'SSE': { en: 'South-Southeasterly', hi: 'दक्षिण-दक्षिण-पूर्वी', deg: 157 },
+  'S': { en: 'Southerly', hi: 'दक्षिणी', deg: 180 },
+  'SSW': { en: 'South-Southwesterly', hi: 'दक्षिण-दक्षिण-पश्चिमी', deg: 202 },
+  'SW': { en: 'Southwesterly', hi: 'दक्षिण-पश्चिमी', deg: 225 },
+  'WSW': { en: 'West-Southwesterly', hi: 'पश्चिम-दक्षिण-पश्चिमी', deg: 247 },
+  'W': { en: 'Westerly', hi: 'पश्चिमी', deg: 270 },
+  'WNW': { en: 'West-Northwesterly', hi: 'पश्चिम-उत्तर-पश्चिमी', deg: 292 },
+  'NW': { en: 'Northwesterly', hi: 'उत्तर-पश्चिमी', deg: 315 },
+  'NNW': { en: 'North-Northwesterly', hi: 'उत्तर-उत्तर-पश्चिमी', deg: 337 },
+};
+
+// Enriches every single day in forecast7Days with complete, distinct telemetry
+export const enrichCityData = (city) => {
+  if (!city) return null;
+
+  const enrichedDays = (city.forecast7Days || []).map((d, index) => {
+    // 1. Temperature metrics
+    const max = Number(d.tempMax ?? (city.tempMax ?? 31));
+    const min = Number(d.tempMin ?? (city.tempMin ?? 22));
+    const dayTemp = Number(d.temp ?? ((max * 0.65) + (min * 0.35)).toFixed(1));
+    const humidity = Number(d.humidity ?? (index === 0 ? city.humidity : 60));
+    const feelsLike = Number(d.feelsLike ?? (dayTemp + (humidity > 75 ? 4.2 : humidity > 55 ? 2.3 : 0.8)).toFixed(1));
+    const dewPoint = d.dewPoint ?? `${(min - Math.max(1, (100 - humidity) / 20)).toFixed(1)} °C`;
+
+    // 2. AQI metrics
+    const aqiNum = typeof d.aqi === 'number' ? d.aqi : (d.aqi?.value ?? city.aqi?.value ?? 68);
+    const aqiCat = aqiNum <= 50 ? 'Good' : aqiNum <= 100 ? 'Satisfactory' : aqiNum <= 150 ? 'Moderate' : aqiNum <= 250 ? 'Poor' : 'Severe';
+    const aqiCatHi = aqiNum <= 50 ? 'अच्छा (स्वस्थ)' : aqiNum <= 100 ? 'संतोषजनक' : aqiNum <= 150 ? 'मध्यम' : aqiNum <= 250 ? 'खराब' : 'गंभीर';
+    const aqiColor = aqiNum <= 50 ? 'emerald' : aqiNum <= 100 ? 'sky' : aqiNum <= 150 ? 'amber' : aqiNum <= 250 ? 'orange' : 'rose';
+    const pm25 = `${(aqiNum * 0.34 + 2.1).toFixed(1)} µg/m³`;
+    const pm10 = `${(aqiNum * 0.76 + 4.8).toFixed(1)} µg/m³`;
+    const aqiAdvisory = aqiNum <= 50
+      ? 'Air quality is pristine and healthy for all outdoor activities.'
+      : aqiNum <= 100
+      ? 'Acceptable air quality; satisfactory for general public with minor sensitivity.'
+      : aqiNum <= 150
+      ? 'Breathing discomfort possible for sensitive individuals, children, and seniors.'
+      : 'Unhealthy air: sensitive groups should restrict prolonged outdoor exposure.';
+    const aqiAdvisoryHi = aqiNum <= 50
+      ? 'वायु गुणवत्ता बहुत अच्छी और स्वास्थ्यप्रद है।'
+      : aqiNum <= 100
+      ? 'वायु गुणवत्ता स्वीकार्य है; सामान्य गतिविधियों के लिए उपयुक्त।'
+      : aqiNum <= 150
+      ? 'संवेदनशील व्यक्तियों और बच्चों को बाहर अधिक परिश्रम से बचना चाहिए।'
+      : 'अस्वस्थ वायु गुणवत्ता: बाहर जाने पर मास्क का उपयोग करें।';
+
+    const aqiObj = {
+      value: aqiNum,
+      category: aqiCat,
+      categoryHindi: aqiCatHi,
+      statusColor: aqiColor,
+      pm25,
+      pm10,
+      advisory: aqiAdvisory,
+      advisoryHindi: aqiAdvisoryHi
+    };
+
+    // 3. Precipitation metrics
+    const pChance = Number(d.precipChance ?? 25);
+    const pRate = pChance >= 80 ? `${(pChance * 0.16 + 2.0).toFixed(1)} mm/hr`
+                : pChance >= 50 ? `${(pChance * 0.08).toFixed(1)} mm/hr`
+                : pChance >= 25 ? `${(pChance * 0.03).toFixed(1)} mm/hr`
+                : '0.0 mm/hr';
+    const pType = pChance >= 80 ? 'Heavy Tropical Downpours'
+                : pChance >= 55 ? 'Scattered Convective Showers'
+                : pChance >= 30 ? 'Passing Light Rain'
+                : 'Dry Atmospheric Conditions';
+    const pTypeHi = pChance >= 80 ? 'तीव्र मानसूनी वर्षा'
+                  : pChance >= 55 ? 'छिटपुट बौछारें व वर्षा'
+                  : pChance >= 30 ? 'हल्की वर्षा'
+                  : 'शुष्क मौसम स्थिति';
+    const past24h = d.rainfall ?? (pChance >= 40 ? `${Math.round(pChance * 0.42)} mm` : '0.0 mm');
+    const exp24h = pChance >= 75 ? `${Math.round(pChance * 0.5)} - ${Math.round(pChance * 0.85)} mm`
+                 : pChance >= 40 ? `${Math.round(pChance * 0.2)} - ${Math.round(pChance * 0.4)} mm`
+                 : '0 - 2 mm';
+
+    const precipObj = {
+      chance: pChance,
+      rate: pRate,
+      type: pType,
+      typeHindi: pTypeHi,
+      past24h,
+      expected24h: exp24h
+    };
+
+    // 4. Wind metrics
+    const wCode = d.windDir || (index % 2 === 0 ? 'W' : 'SW');
+    const wDirInfo = WIND_MAP[wCode] || { en: d.windDir || 'Westerly', hi: 'पश्चिमी', deg: 270 };
+    const wSpeedNum = parseFloat(d.windSpeed) || (10 + (index * 2) % 15);
+    const windObj = {
+      speed: `${wSpeedNum} km/h`,
+      speedKmh: wSpeedNum,
+      direction: wDirInfo.en,
+      directionHindi: wDirInfo.hi,
+      bearing: wDirInfo.deg,
+      gusts: `${(wSpeedNum * 1.75 + 1.5).toFixed(1)} km/h`,
+      beaufortScale: wSpeedNum < 12 ? 'Force 2 - Light Breeze'
+                   : wSpeedNum < 20 ? 'Force 3 - Gentle Breeze'
+                   : wSpeedNum < 29 ? 'Force 4 - Moderate Breeze'
+                   : 'Force 5 - Fresh Breeze'
+    };
+
+    // 5. Secondary Atmospheric metrics
+    const pressure = d.pressure || `${1014 - Math.round(pChance * 0.08) - (index % 3)} hPa`;
+    const uvIndex = d.emoji === '☀️' ? (max > 33 ? 8 : 7) : d.emoji === '🌧️' || d.emoji === '⛈️' ? 3 : 5;
+    const uvCategory = uvIndex >= 8 ? 'Very High' : uvIndex >= 6 ? 'High' : 'Moderate';
+    const visibility = d.emoji === '🌫️' ? '3.2 km' : pChance > 75 ? '3.8 km' : '8.5 km';
+    const cloudCover = d.emoji === '☀️' ? '12 %' : d.emoji === '☁️' ? '82 %' : d.emoji === '🌧️' || d.emoji === '⛈️' ? '94 %' : '55 %';
+
+    // 6. Hourly breakdown
+    let hourly = d.hourly;
+    if (!hourly || hourly.length === 0) {
+      hourly = [
+        { time: '06:00', temp: min, emoji: d.emoji, cond: d.condition, rain: Math.max(0, pChance - 15), wind: `${Math.max(4, Math.round(wSpeedNum * 0.7))} km/h` },
+        { time: '09:00', temp: Math.round(min + (max - min) * 0.4), emoji: d.emoji, cond: d.condition, rain: pChance, wind: `${Math.round(wSpeedNum * 0.9)} km/h` },
+        { time: '12:00', temp: max, emoji: d.emoji, cond: d.condition, rain: Math.min(100, pChance + 10), wind: `${wSpeedNum} km/h` },
+        { time: '15:00', temp: Math.round(max - 1), emoji: d.emoji, cond: d.condition, rain: pChance, wind: `${Math.round(wSpeedNum * 1.1)} km/h` },
+        { time: '18:00', temp: Math.round(min + (max - min) * 0.5), emoji: d.emoji, cond: d.condition, rain: Math.max(0, pChance - 10), wind: `${wSpeedNum} km/h` },
+        { time: '21:00', temp: Math.round(min + (max - min) * 0.2), emoji: '☁️', cond: 'Cloudy Sky', rain: Math.max(0, pChance - 20), wind: `${Math.max(4, Math.round(wSpeedNum * 0.7))} km/h` }
+      ];
+    }
+
+    return {
+      ...d,
+      temp: dayTemp,
+      feelsLike,
+      dewPoint,
+      aqi: aqiObj,
+      precipitation: precipObj,
+      wind: windObj,
+      humidity,
+      pressure,
+      visibility,
+      uvIndex,
+      uvCategory,
+      cloudCover,
+      hourly
+    };
+  });
+
+  return {
+    ...city,
+    forecast7Days: enrichedDays
+  };
+};
+
+// Fallback generator for any custom city id with full enrichment
 export const getCityForecast = (cityId) => {
   const normalized = String(cityId || '').toLowerCase().trim();
-  if (CITY_FORECAST_DATA[normalized]) {
-    return CITY_FORECAST_DATA[normalized];
+  let foundCity = CITY_FORECAST_DATA[normalized];
+  
+  if (!foundCity) {
+    // Try matching by partial name
+    foundCity = Object.values(CITY_FORECAST_DATA).find(c => 
+      c.id.toLowerCase().includes(normalized) || 
+      c.name.toLowerCase().includes(normalized)
+    );
   }
-  // Try matching by partial name
-  const match = Object.values(CITY_FORECAST_DATA).find(c => 
-    c.id.toLowerCase().includes(normalized) || 
-    c.name.toLowerCase().includes(normalized)
-  );
-  if (match) return match;
+  
+  if (!foundCity) {
+    foundCity = CITY_FORECAST_DATA.kolkata;
+  }
 
-  // Default fallback: Kolkata
-  return CITY_FORECAST_DATA.kolkata;
+  return enrichCityData(foundCity);
 };
