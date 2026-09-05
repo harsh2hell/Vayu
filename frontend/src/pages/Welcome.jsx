@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getDashboardUrl } from '../utils/domain';
 import PublicNavbar, { getFontScalePercent, applyGlobalFontScale } from '../components/PublicNavbar';
@@ -63,10 +63,10 @@ const SERVICES_DATA = [
     teaser: 'Precipitation estimates & 850+ coastal rain gauges',
     teaserHindi: 'डॉपलर वर्षा एवं 850+ तटीय स्वचालित स्टेशन',
     accent: 'sky',
-    gradient: 'from-sky-500/15 via-blue-500/5 to-transparent',
-    borderHover: 'hover:border-sky-500/60 dark:hover:border-sky-500/60',
-    iconBg: 'bg-sky-50 dark:bg-sky-950/70 border-sky-200 dark:border-sky-800/80 text-sky-600 dark:text-sky-400 group-hover:bg-sky-500 group-hover:text-white dark:group-hover:bg-sky-500 dark:group-hover:text-white',
-    tagClass: 'text-sky-700 dark:text-sky-300 bg-sky-50 dark:bg-sky-950/80 border-sky-200 dark:border-sky-800/70',
+    gradient: 'from-sky-500/25 via-blue-500/10 to-transparent',
+    borderHover: 'hover:border-sky-400/70 dark:hover:border-sky-400/70',
+    iconBg: 'bg-sky-500/10 dark:bg-sky-500/20 border-sky-300/60 dark:border-sky-500/30 text-sky-600 dark:text-sky-400 group-hover:bg-sky-500 group-hover:text-white dark:group-hover:bg-sky-500 dark:group-hover:text-white backdrop-blur-md',
+    tagClass: 'text-sky-700 dark:text-sky-300 bg-sky-500/10 dark:bg-sky-500/20 border-sky-300/60 dark:border-sky-500/30 backdrop-blur-md',
     topBar: 'bg-sky-500',
     icon: CloudRain,
     route: '/city-tracker',
@@ -91,10 +91,10 @@ const SERVICES_DATA = [
     teaser: 'Seasonal circulation, pressure patterns & environmental conditions',
     teaserHindi: 'मौसमी परिसंचरण, दबाव पैटर्न एवं पर्यावरणीय स्थितियां',
     accent: 'amber',
-    gradient: 'from-amber-500/15 via-yellow-500/5 to-transparent',
-    borderHover: 'hover:border-amber-500/60 dark:hover:border-amber-500/60',
-    iconBg: 'bg-amber-50 dark:bg-amber-950/70 border-amber-200 dark:border-amber-800/80 text-amber-600 dark:text-amber-400 group-hover:bg-amber-500 group-hover:text-white dark:group-hover:bg-amber-500 dark:group-hover:text-white',
-    tagClass: 'text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/80 border-amber-200 dark:border-amber-800/70',
+    gradient: 'from-amber-500/25 via-yellow-500/10 to-transparent',
+    borderHover: 'hover:border-amber-400/70 dark:hover:border-amber-400/70',
+    iconBg: 'bg-amber-500/10 dark:bg-amber-500/20 border-amber-300/60 dark:border-amber-500/30 text-amber-600 dark:text-amber-400 group-hover:bg-amber-500 group-hover:text-white dark:group-hover:bg-amber-500 dark:group-hover:text-white backdrop-blur-md',
+    tagClass: 'text-amber-700 dark:text-amber-300 bg-amber-500/10 dark:bg-amber-500/20 border-amber-300/60 dark:border-amber-500/30 backdrop-blur-md',
     topBar: 'bg-amber-500',
     icon: Wind,
     route: '/safety-updates',
@@ -119,10 +119,10 @@ const SERVICES_DATA = [
     teaser: 'Multi-spectral satellite tracks & storm surge hydrodynamics',
     teaserHindi: 'उपग्रह तूफान ट्रैक, ज्वार एवं लैंडफॉल मैट्रिक्स',
     accent: 'emerald',
-    gradient: 'from-emerald-500/15 via-teal-500/5 to-transparent',
-    borderHover: 'hover:border-emerald-500/60 dark:hover:border-emerald-500/60',
-    iconBg: 'bg-emerald-50 dark:bg-emerald-950/70 border-emerald-200 dark:border-emerald-800/80 text-emerald-600 dark:text-emerald-400 group-hover:bg-emerald-500 group-hover:text-white dark:group-hover:bg-emerald-500 dark:group-hover:text-white',
-    tagClass: 'text-emerald-700 dark:text-emerald-300 bg-emerald-50 dark:bg-emerald-950/80 border-emerald-200 dark:border-emerald-800/70',
+    gradient: 'from-emerald-500/25 via-teal-500/10 to-transparent',
+    borderHover: 'hover:border-emerald-400/70 dark:hover:border-emerald-400/70',
+    iconBg: 'bg-emerald-500/10 dark:bg-emerald-500/20 border-emerald-300/60 dark:border-emerald-500/30 text-emerald-600 dark:text-emerald-400 group-hover:bg-emerald-500 group-hover:text-white dark:group-hover:bg-emerald-500 dark:group-hover:text-white backdrop-blur-md',
+    tagClass: 'text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 dark:bg-emerald-500/20 border-emerald-300/60 dark:border-emerald-500/30 backdrop-blur-md',
     topBar: 'bg-emerald-500',
     icon: 'cyclone',
     route: '/threat-map',
@@ -147,10 +147,10 @@ const SERVICES_DATA = [
     teaser: 'ENSO, IOD, sea surface temperature and other climate factors influencing cyclone formation',
     teaserHindi: 'ईएनएसओ, आईओडी, समुद्री सतह तापमान एवं चक्रवात निर्माण को प्रभावित करने वाले जलवायु कारक',
     accent: 'rose',
-    gradient: 'from-rose-500/15 via-purple-500/5 to-transparent',
-    borderHover: 'hover:border-rose-500/60 dark:hover:border-rose-500/60',
-    iconBg: 'bg-rose-50 dark:bg-rose-950/70 border-rose-200 dark:border-rose-800/80 text-rose-600 dark:text-rose-400 group-hover:bg-rose-500 group-hover:text-white dark:group-hover:bg-rose-500 dark:group-hover:text-white',
-    tagClass: 'text-rose-700 dark:text-rose-300 bg-rose-50 dark:bg-rose-950/80 border-rose-200 dark:border-rose-800/70',
+    gradient: 'from-rose-500/25 via-purple-500/10 to-transparent',
+    borderHover: 'hover:border-rose-400/70 dark:hover:border-rose-400/70',
+    iconBg: 'bg-rose-500/10 dark:bg-rose-500/20 border-rose-300/60 dark:border-rose-500/30 text-rose-600 dark:text-rose-400 group-hover:bg-rose-500 group-hover:text-white dark:group-hover:bg-rose-500 dark:group-hover:text-white backdrop-blur-md',
+    tagClass: 'text-rose-700 dark:text-rose-300 bg-rose-500/10 dark:bg-rose-500/20 border-rose-300/60 dark:border-rose-500/30 backdrop-blur-md',
     topBar: 'bg-rose-500',
     icon: SunMedium,
     route: '/safety-updates',
@@ -388,6 +388,152 @@ const renderWeatherIcon = (type, className = "w-5 h-5") => {
     default:
       return <CloudSun className={className} />;
   }
+};
+
+// Interactive 3D Glass Card with dynamic cursor tilt & depth layers
+const CityWeather3DCard = ({
+  city,
+  idx,
+  isHindi,
+  isActive,
+  positionOffset,
+  renderWeatherIcon,
+  onOpenForecast
+}) => {
+  const cardRef = useRef(null);
+  const [tilt, setTilt] = useState({ rx: 0, ry: 0, gx: 50, gy: 50, isHovered: false });
+
+  const handleMouseMove = (e) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    // 3D rotation angles (-12 to +12 deg)
+    const rx = ((y - centerY) / centerY) * -12;
+    const ry = ((x - centerX) / centerX) * 12;
+    const gx = (x / rect.width) * 100;
+    const gy = (y / rect.height) * 100;
+    setTilt({ rx, ry, gx, gy, isHovered: true });
+  };
+
+  const handleMouseLeave = () => {
+    setTilt(prev => ({ ...prev, rx: 0, ry: 0, gx: 50, gy: 50, isHovered: false }));
+  };
+
+  // 3D Transform Calculation
+  let dynamicTransform = '';
+  if (tilt.isHovered) {
+    // High-elevation interactive mouse tilt with cursor parallax
+    dynamicTransform = `perspective(900px) rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg) translateZ(28px) scale3d(1.05, 1.05, 1.05) translateY(-4px)`;
+  } else if (isActive) {
+    // Active / Center focus card (pops out in 3D like Chennai in screenshot)
+    dynamicTransform = `perspective(900px) rotateX(0deg) rotateY(0deg) translateZ(24px) scale3d(1.04, 1.04, 1.04) translateY(-4px)`;
+  } else {
+    // Adjacent cards form a 3D cylindrical coverflow curve
+    const arcAngle = positionOffset === -1 ? 5 : positionOffset === -2 ? 9 : positionOffset === 1 ? -5 : positionOffset === 2 ? -9 : 0;
+    const depthZ = Math.abs(positionOffset) === 1 ? -4 : Math.abs(positionOffset) >= 2 ? -12 : 0;
+    dynamicTransform = `perspective(900px) rotateY(${arcAngle}deg) translateZ(${depthZ}px) scale3d(0.97, 0.97, 0.97)`;
+  }
+
+  return (
+    <div className="glass-3d-card-wrapper h-full">
+      <div
+        ref={cardRef}
+        onMouseMove={handleMouseMove}
+        onMouseLeave={handleMouseLeave}
+        className={`glass-3d-card relative overflow-hidden rounded-2xl p-3 text-slate-900 dark:text-white flex flex-col justify-between h-full min-h-[178px] transition-all duration-300 backdrop-blur-xl border ${
+          isActive || tilt.isHovered
+            ? 'is-active-3d border-sky-400 dark:border-sky-400 bg-white/85 dark:bg-white/[0.08]'
+            : 'border-white/85 dark:border-white/10 bg-white/60 dark:bg-white/[0.04] hover:bg-white/80 dark:hover:bg-white/[0.07]'
+        }`}
+        style={{
+          transform: dynamicTransform,
+        }}
+      >
+        {/* Dynamic Specular Glare Layer that follows mouse cursor in 3D */}
+        <div
+          className="pointer-events-none absolute inset-0 rounded-2xl transition-opacity duration-300"
+          style={{
+            background: tilt.isHovered
+              ? `radial-gradient(circle at ${tilt.gx}% ${tilt.gy}%, rgba(255,255,255,0.45) 0%, rgba(255,255,255,0.08) 35%, transparent 65%)`
+              : isActive
+              ? `radial-gradient(circle at 50% 0%, rgba(56,189,248,0.2) 0%, transparent 65%)`
+              : 'none',
+            opacity: tilt.isHovered || isActive ? 1 : 0
+          }}
+        />
+
+        {/* Glass Specular Bevel Highlights */}
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white dark:via-white/30 to-transparent" />
+        <div className="pointer-events-none absolute -top-8 -right-8 w-24 h-24 bg-gradient-to-br from-sky-400/20 to-transparent rounded-full blur-xl" />
+
+        {/* 3D Floating Layer: City Name */}
+        <h3 className="glass-layer-title text-center font-heading font-extrabold text-sm sm:text-base tracking-wide text-slate-900 dark:text-white mb-2 relative z-10 transition-colors">
+          {isHindi ? city.nameHindi : city.name}
+        </h3>
+
+        {/* 3D Floating Layer: 2x2 Weather Metrics Grid */}
+        <div className="glass-layer-metrics grid grid-cols-2 gap-x-2 gap-y-2.5 my-auto text-center items-center py-1 relative z-10">
+          {/* Condition */}
+          <div className="flex flex-col items-center justify-center">
+            <div className="glass-layer-icon text-sky-600 dark:text-sky-400">
+              {renderWeatherIcon(city.icon, "w-6 h-6")}
+            </div>
+            <span className="text-[11px] text-slate-600 dark:text-slate-300 font-medium line-clamp-1 mt-1 leading-tight">
+              {isHindi ? city.conditionHindi : city.condition}
+            </span>
+          </div>
+
+          {/* Temperature */}
+          <div className="flex flex-col items-center justify-center">
+            <div className="glass-layer-icon text-sky-600 dark:text-sky-400">
+              <Thermometer className="w-6 h-6" />
+            </div>
+            <span className="text-[11px] text-slate-900 dark:text-white font-bold mt-1 leading-tight">
+              {city.temp} ° C
+            </span>
+          </div>
+
+          {/* Wind */}
+          <div className="flex flex-col items-center justify-center">
+            <div className="glass-layer-icon text-sky-600 dark:text-sky-400">
+              <Wind className="w-6 h-6" />
+            </div>
+            <span className="text-[11px] text-slate-600 dark:text-slate-300 font-medium line-clamp-1 mt-1 leading-tight">
+              {isHindi ? city.windDirHindi : city.windDir}
+            </span>
+            <span className="text-[10px] text-slate-400 dark:text-slate-500 leading-none mt-0.5">
+              {isHindi ? city.windSpeedHindi : city.windSpeed}
+            </span>
+          </div>
+
+          {/* Humidity */}
+          <div className="flex flex-col items-center justify-center">
+            <div className="glass-layer-icon text-sky-600 dark:text-sky-400">
+              <Droplets className="w-6 h-6" />
+            </div>
+            <span className="text-[11px] text-slate-900 dark:text-white font-bold mt-1 leading-tight">
+              {city.humidity}
+            </span>
+          </div>
+        </div>
+
+        {/* 3D Floating Layer: Forecast CTA */}
+        <button
+          onClick={() => onOpenForecast(city)}
+          className={`glass-layer-cta text-center text-xs font-black uppercase tracking-wider py-1.5 px-3 rounded-xl border backdrop-blur-xs transition-all duration-200 block w-full cursor-pointer mt-1.5 relative z-10 shadow-2xs hover:shadow-xs active:scale-[0.97] ${
+            isActive || tilt.isHovered
+              ? 'bg-amber-500/20 dark:bg-amber-400/20 text-amber-700 dark:text-amber-300 border-amber-500/35 dark:border-amber-400/35'
+              : 'bg-amber-500/10 hover:bg-amber-500/20 dark:bg-amber-400/10 dark:hover:bg-amber-400/20 text-amber-600 dark:text-amber-400 border-amber-500/25 dark:border-amber-400/25'
+          }`}
+        >
+          {isHindi ? 'पूर्वानुमान (FORECAST)' : 'FORECAST'}
+        </button>
+      </div>
+    </div>
+  );
 };
 
 const INITIAL_SYSTEMS = {
@@ -845,6 +991,29 @@ const Welcome = () => {
   const [isCityCarouselPaused, setIsCityCarouselPaused] = useState(false);
   const [activeCityForecastModal, setActiveCityForecastModal] = useState(null);
   const [isCarouselAnimated, setIsCarouselAnimated] = useState(true);
+  const [hoveredCardIdx, setHoveredCardIdx] = useState(null);
+  const [itemsPerScreen, setItemsPerScreen] = useState(5);
+  const [dragOffsetPx, setDragOffsetPx] = useState(0);
+
+  const isDraggingRef = useRef(false);
+  const dragStartXRef = useRef(0);
+  const dragDeltaXRef = useRef(0);
+  const lastWheelTimeRef = useRef(0);
+
+  // Responsive items-per-screen detection
+  useEffect(() => {
+    const calcItems = () => {
+      const w = window.innerWidth;
+      if (w >= 1280) setItemsPerScreen(5);
+      else if (w >= 1024) setItemsPerScreen(4);
+      else if (w >= 768) setItemsPerScreen(3);
+      else if (w >= 640) setItemsPerScreen(2);
+      else setItemsPerScreen(1);
+    };
+    calcItems();
+    window.addEventListener('resize', calcItems);
+    return () => window.removeEventListener('resize', calcItems);
+  }, []);
 
   // Extended array with duplicates of the first 5 elements for seamless infinite looping
   const extendedCities = useMemo(() => {
@@ -886,6 +1055,55 @@ const Welcome = () => {
   const handleNextCity = () => {
     setIsCarouselAnimated(true);
     setCityCarouselIndex(prev => prev + 1);
+  };
+
+  // Horizontal scroll wheel handler (two-finger swipe on trackpad or shift+scroll)
+  const handleCarouselWheel = (e) => {
+    const dx = e.deltaX;
+    const dy = e.shiftKey ? e.deltaY : 0;
+    const delta = Math.abs(dx) > Math.abs(dy) ? dx : dy;
+    if (Math.abs(delta) > 15) {
+      const now = Date.now();
+      if (now - lastWheelTimeRef.current > 380) {
+        lastWheelTimeRef.current = now;
+        if (delta > 0) {
+          handleNextCity();
+        } else {
+          handlePrevCity();
+        }
+      }
+    }
+  };
+
+  // Touch & Mouse Drag handlers for tactile 3D scrolling
+  const handleDragStart = (e) => {
+    isDraggingRef.current = true;
+    dragStartXRef.current = e.clientX || (e.touches && e.touches[0].clientX) || 0;
+    dragDeltaXRef.current = 0;
+    setIsCityCarouselPaused(true);
+  };
+
+  const handleDragMove = (e) => {
+    if (!isDraggingRef.current) return;
+    const currentX = e.clientX || (e.touches && e.touches[0].clientX) || 0;
+    const delta = currentX - dragStartXRef.current;
+    dragDeltaXRef.current = delta;
+    setDragOffsetPx(delta);
+  };
+
+  const handleDragEnd = () => {
+    if (!isDraggingRef.current) return;
+    isDraggingRef.current = false;
+    const delta = dragDeltaXRef.current;
+    setDragOffsetPx(0);
+    if (delta < -45) {
+      handleNextCity();
+    } else if (delta > 45) {
+      handlePrevCity();
+    }
+    setTimeout(() => {
+      setIsCityCarouselPaused(false);
+    }, 1200);
   };
 
   // Opening & Language Transition Animation state
@@ -1486,12 +1704,18 @@ const Welcome = () => {
                CURRENT WEATHER ACROSS MAJOR CITIES (AUTO-ROTATING CAROUSEL)
                ========================================================================= */}
           <div
-            className="rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 p-3.5 sm:p-4.5 shadow-xs relative overflow-hidden group/carousel"
+            className="rounded-2xl sm:rounded-3xl bg-white/70 dark:bg-slate-950/60 backdrop-blur-2xl border border-white/80 dark:border-white/10 p-3.5 sm:p-4.5 shadow-[0_8px_32px_0_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(255,255,255,0.95),inset_0_-1px_1px_rgba(255,255,255,0.4)] dark:shadow-[0_8px_32px_0_rgba(0,0,0,0.6),inset_0_1px_1px_rgba(255,255,255,0.08)] relative overflow-hidden group/carousel transition-all duration-300"
             onMouseEnter={() => setIsCityCarouselPaused(true)}
             onMouseLeave={() => setIsCityCarouselPaused(false)}
           >
+            {/* Ambient chromatic luminous glow orbs for glass refraction */}
+            <div className="pointer-events-none absolute -top-24 -left-20 w-64 h-64 bg-sky-400/15 dark:bg-sky-500/15 rounded-full blur-3xl" />
+            <div className="pointer-events-none absolute -bottom-24 -right-20 w-64 h-64 bg-cyan-400/15 dark:bg-cyan-500/15 rounded-full blur-3xl" />
+            {/* Specular glare top line */}
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white dark:via-white/25 to-transparent" />
+
             {/* Header / Title */}
-            <div className="flex items-center justify-between mb-3 px-1 border-b border-slate-200 dark:border-slate-800/80 pb-2.5">
+            <div className="flex items-center justify-between mb-3 px-1 border-b border-slate-200/70 dark:border-white/10 pb-2.5 relative z-10">
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-sky-500 animate-pulse" />
                 <h2 className="font-heading font-black text-xs sm:text-sm tracking-wider uppercase text-slate-950 dark:text-white">
@@ -1507,93 +1731,63 @@ const Welcome = () => {
                 <button
                   onClick={handlePrevCity}
                   aria-label="Previous City"
-                  className="p-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors cursor-pointer"
+                  className="p-1.5 rounded-xl border border-white/80 dark:border-white/15 bg-white/70 hover:bg-white dark:bg-white/10 dark:hover:bg-white/20 backdrop-blur-md text-slate-700 dark:text-slate-200 shadow-xs transition-all cursor-pointer"
                 >
                   <ChevronLeft className="w-3.5 h-3.5" />
                 </button>
                 <button
                   onClick={handleNextCity}
                   aria-label="Next City"
-                  className="p-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-colors cursor-pointer"
+                  className="p-1.5 rounded-xl border border-white/80 dark:border-white/15 bg-white/70 hover:bg-white dark:bg-white/10 dark:hover:bg-white/20 backdrop-blur-md text-slate-700 dark:text-slate-200 shadow-xs transition-all cursor-pointer"
                 >
                   <ChevronRight className="w-3.5 h-3.5" />
                 </button>
               </div>
             </div>
 
-            {/* Sliding Track Viewport */}
-            <div className="city-carousel-container">
+            {/* 3D Glass Sliding Track Viewport with Wheel & Drag Gestures */}
+            <div
+              className="city-carousel-container relative z-10 select-none cursor-grab active:cursor-grabbing"
+              onWheel={handleCarouselWheel}
+              onMouseDown={handleDragStart}
+              onMouseMove={handleDragMove}
+              onMouseUp={handleDragEnd}
+              onMouseLeave={handleDragEnd}
+              onTouchStart={handleDragStart}
+              onTouchMove={handleDragMove}
+              onTouchEnd={handleDragEnd}
+            >
               <div
-                className={`city-carousel-track ${isCarouselAnimated ? 'is-animated' : ''}`}
+                className={`city-carousel-track ${isCarouselAnimated && dragOffsetPx === 0 ? 'is-animated' : ''}`}
                 style={{
-                  transform: `translateX(calc(-1 * ${cityCarouselIndex} * (100% / var(--items-per-screen))))`
+                  transform: `translateX(calc(-1 * ${cityCarouselIndex} * (100% / var(--items-per-screen)) + ${dragOffsetPx}px))`
                 }}
                 onTransitionEnd={handleCarouselTransitionEnd}
               >
-                {extendedCities.map((city, idx) => (
-                  <div key={`${city.id}-${idx}`} className="city-carousel-item">
-                    <div className="bg-slate-50 dark:bg-[#0c0c0e] hover:bg-white dark:hover:bg-[#151518] border border-slate-200/90 dark:border-slate-800 hover:border-sky-500/50 dark:hover:border-sky-500/50 rounded-2xl p-3 text-slate-900 dark:text-white flex flex-col justify-between h-full min-h-[178px] transition-all duration-200 shadow-xs hover:shadow-sm group">
-                      {/* City Name */}
-                      <h3 className="text-center font-heading font-extrabold text-sm sm:text-base tracking-wide text-slate-900 dark:text-white mb-2">
-                        {isHindi ? city.nameHindi : city.name}
-                      </h3>
+                {extendedCities.map((city, idx) => {
+                  const centerIdx = cityCarouselIndex + Math.floor(itemsPerScreen / 2);
+                  const positionOffset = idx - centerIdx;
+                  const isActive = hoveredCardIdx !== null ? hoveredCardIdx === idx : idx === centerIdx;
 
-                      {/* 2x2 Weather Metrics Grid */}
-                      <div className="grid grid-cols-2 gap-x-2 gap-y-2.5 my-auto text-center items-center py-1">
-                        {/* Condition */}
-                        <div className="flex flex-col items-center justify-center">
-                          <div className="text-sky-600 dark:text-sky-400 group-hover:scale-110 transition-transform">
-                            {renderWeatherIcon(city.icon, "w-6 h-6")}
-                          </div>
-                          <span className="text-[11px] text-slate-600 dark:text-slate-300 font-medium line-clamp-1 mt-1 leading-tight">
-                            {isHindi ? city.conditionHindi : city.condition}
-                          </span>
-                        </div>
-
-                        {/* Temperature */}
-                        <div className="flex flex-col items-center justify-center">
-                          <div className="text-sky-600 dark:text-sky-400 group-hover:scale-110 transition-transform">
-                            <Thermometer className="w-6 h-6" />
-                          </div>
-                          <span className="text-[11px] text-slate-900 dark:text-white font-bold mt-1 leading-tight">
-                            {city.temp} ° C
-                          </span>
-                        </div>
-
-                        {/* Wind */}
-                        <div className="flex flex-col items-center justify-center">
-                          <div className="text-sky-600 dark:text-sky-400 group-hover:scale-110 transition-transform">
-                            <Wind className="w-6 h-6" />
-                          </div>
-                          <span className="text-[11px] text-slate-600 dark:text-slate-300 font-medium line-clamp-1 mt-1 leading-tight">
-                            {isHindi ? city.windDirHindi : city.windDir}
-                          </span>
-                          <span className="text-[10px] text-slate-400 dark:text-slate-500 leading-none mt-0.5">
-                            {isHindi ? city.windSpeedHindi : city.windSpeed}
-                          </span>
-                        </div>
-
-                        {/* Humidity */}
-                        <div className="flex flex-col items-center justify-center">
-                          <div className="text-sky-600 dark:text-sky-400 group-hover:scale-110 transition-transform">
-                            <Droplets className="w-6 h-6" />
-                          </div>
-                          <span className="text-[11px] text-slate-900 dark:text-white font-bold mt-1 leading-tight">
-                            {city.humidity}
-                          </span>
-                        </div>
-                      </div>
-
-                      {/* Forecast CTA */}
-                      <button
-                        onClick={() => setActiveCityForecastModal(city)}
-                        className="text-center text-xs font-black uppercase tracking-wider text-amber-600 dark:text-amber-400 hover:text-amber-700 dark:hover:text-amber-300 hover:underline pt-2.5 pb-0.5 mt-1 cursor-pointer transition-colors block w-full"
-                      >
-                        {isHindi ? 'पूर्वानुमान (FORECAST)' : 'FORECAST'}
-                      </button>
+                  return (
+                    <div
+                      key={`${city.id}-${idx}`}
+                      className="city-carousel-item"
+                      onMouseEnter={() => setHoveredCardIdx(idx)}
+                      onMouseLeave={() => setHoveredCardIdx(null)}
+                    >
+                      <CityWeather3DCard
+                        city={city}
+                        idx={idx}
+                        isHindi={isHindi}
+                        isActive={isActive}
+                        positionOffset={positionOffset}
+                        renderWeatherIcon={renderWeatherIcon}
+                        onOpenForecast={(city) => navigate(`/forecast/${city.id}`)}
+                      />
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           </div>
@@ -1601,32 +1795,41 @@ const Welcome = () => {
           {/* =========================================================================
                OUR SERVICES SECTION (RAINFALL, MONSOON, CYCLONE, CLIMATE SERVICES)
                ========================================================================= */}
-          <div className="pt-2 sm:pt-2.5">
-            <div className="border-b border-slate-300 dark:border-slate-800 pb-1 mb-2.5 flex items-center justify-between">
-              <h2 className="text-xs sm:text-sm font-black tracking-wider uppercase text-slate-950 dark:text-white font-heading">
-                {isHindi ? 'हमारी सेवाएं (OUR SERVICES)' : 'OUR SERVICES'}
+          <div className="pt-2 sm:pt-2.5 relative">
+            {/* Ambient luminous color orbs for glass refraction across services grid */}
+            <div className="pointer-events-none absolute -top-12 left-1/4 w-80 h-80 bg-sky-500/10 dark:bg-sky-500/15 rounded-full blur-3xl" />
+            <div className="pointer-events-none absolute -bottom-12 right-1/4 w-80 h-80 bg-rose-500/10 dark:bg-rose-500/15 rounded-full blur-3xl" />
+
+            <div className="border-b border-slate-200/80 dark:border-white/10 pb-1.5 mb-3 flex items-center justify-between relative z-10">
+              <h2 className="text-xs sm:text-sm font-black tracking-wider uppercase text-slate-950 dark:text-white font-heading flex items-center gap-2">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                <span>{isHindi ? 'हमारी सेवाएं (OUR SERVICES)' : 'OUR SERVICES'}</span>
               </h2>
               <span className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-medium hidden sm:inline">
                 {isHindi ? 'भारत मौसम विज्ञान विभाग (IMD) अधिकृत मौसम सेवाएं' : 'National Meteorological & Early Warning Portals'}
               </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-3.5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-3.5 relative z-10">
               {SERVICES_DATA.map((srv) => {
                 const IconComponent = srv.icon === 'cyclone' ? CycloneSwirlIcon : srv.icon;
                 return (
                   <div
                     key={srv.id}
                     onClick={() => setActiveServiceModal(srv)}
-                    className={`relative overflow-hidden rounded-2xl sm:rounded-3xl p-4 sm:p-4.5 bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 ${srv.borderHover} shadow-xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300 cursor-pointer group flex flex-col justify-between`}
+                    className={`relative overflow-hidden rounded-2xl sm:rounded-3xl p-4 sm:p-4.5 bg-white/65 hover:bg-white/90 dark:bg-white/[0.03] dark:hover:bg-white/[0.07] backdrop-blur-2xl border border-white/80 dark:border-white/10 ${srv.borderHover} shadow-[0_8px_30px_rgb(0,0,0,0.04),inset_0_1px_1px_rgba(255,255,255,0.95),inset_0_-1px_1px_rgba(255,255,255,0.3)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.5),inset_0_1px_1px_rgba(255,255,255,0.08),inset_0_-1px_1px_rgba(255,255,255,0.02)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.08)] dark:hover:shadow-[0_20px_40px_rgba(0,0,0,0.7)] hover:-translate-y-1.5 transition-all duration-300 cursor-pointer group flex flex-col justify-between`}
                   >
-                    {/* Ambient subtle glow background */}
-                    <div className={`absolute -right-8 -top-8 w-36 h-36 rounded-full bg-gradient-to-br ${srv.gradient} blur-2xl pointer-events-none group-hover:scale-125 transition-transform duration-500`} />
-                    
+                    {/* Glass specular top edge reflection */}
+                    <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white dark:via-white/20 to-transparent" />
+
+                    {/* Ambient colored refraction aura */}
+                    <div className={`absolute -right-10 -top-10 w-44 h-44 rounded-full bg-gradient-to-br ${srv.gradient} blur-2xl pointer-events-none group-hover:scale-125 transition-transform duration-500 opacity-90 group-hover:opacity-100`} />
+                    <div className="pointer-events-none absolute -bottom-10 -left-10 w-32 h-32 rounded-full bg-slate-200/40 dark:bg-white/[0.02] blur-xl" />
+
                     {/* Top colored accent line on hover */}
                     <div className={`absolute top-0 inset-x-0 h-0.5 ${srv.topBar} opacity-0 group-hover:opacity-100 transition-opacity duration-300`} />
 
-                    <div>
+                    <div className="relative z-10">
                       {/* Card Header: Icon Badge + Pill Tag */}
                       <div className="flex items-center justify-between gap-2 mb-3">
                         <div className={`p-2.5 rounded-2xl border ${srv.iconBg} transition-all duration-300 shadow-xs flex items-center justify-center`}>
@@ -1649,11 +1852,11 @@ const Welcome = () => {
                     </div>
 
                     {/* Card Bottom: Read More Action with animated arrow */}
-                    <div className="pt-3 mt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-slate-600 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors">
+                    <div className="pt-3 mt-3 border-t border-slate-200/60 dark:border-white/10 flex items-center justify-between text-slate-600 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors relative z-10">
                       <span className="text-[11px] font-bold">
                         {isHindi ? 'विवरण देखें' : 'Explore Service'}
                       </span>
-                      <div className="p-1 rounded-lg bg-slate-100 dark:bg-slate-800 group-hover:bg-slate-900 group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-slate-950 transition-colors">
+                      <div className="p-1 rounded-xl bg-white/80 dark:bg-white/10 group-hover:bg-slate-900 group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-slate-950 border border-white/80 dark:border-white/15 backdrop-blur-md shadow-2xs transition-all">
                         <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                       </div>
                     </div>
@@ -1692,7 +1895,7 @@ const Welcome = () => {
           onClick={() => setActiveServiceModal(null)}
         >
           <div 
-            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden animate-in zoom-in-95 duration-200"
+            className="bg-white/95 dark:bg-slate-950/95 backdrop-blur-2xl border border-white/80 dark:border-white/10 rounded-3xl shadow-[0_24px_64px_rgba(0,0,0,0.2)] dark:shadow-[0_24px_64px_rgba(0,0,0,0.8)] max-w-lg w-full overflow-hidden animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
@@ -1781,7 +1984,7 @@ const Welcome = () => {
         >
           <div
             onClick={(e) => e.stopPropagation()}
-            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl max-w-md w-full overflow-hidden text-slate-900 dark:text-white"
+            className="bg-white/95 dark:bg-slate-950/95 backdrop-blur-2xl border border-white/80 dark:border-white/10 rounded-3xl shadow-[0_24px_64px_rgba(0,0,0,0.2)] dark:shadow-[0_24px_64px_rgba(0,0,0,0.8)] max-w-md w-full overflow-hidden text-slate-900 dark:text-white"
           >
             {/* Modal Header */}
             <div className="bg-slate-950 dark:bg-black text-white p-4 sm:p-5 relative border-b border-slate-200 dark:border-slate-800">
@@ -1885,16 +2088,28 @@ const Welcome = () => {
                 >
                   {isHindi ? 'बंद करें' : 'Close'}
                 </button>
-                <button
-                  onClick={() => {
-                    setActiveCityForecastModal(null);
-                    navigate('/city-tracker');
-                  }}
-                  className="px-4.5 py-2.5 rounded-2xl text-xs font-bold text-white bg-slate-950 hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-100 transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
-                >
-                  <span>{isHindi ? 'विस्तृत शहर मौसम ट्रैकर' : 'Open Full City Weather Tracker'}</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => {
+                      setActiveCityForecastModal(null);
+                      navigate('/city-tracker');
+                    }}
+                    className="px-3.5 py-2 rounded-2xl text-xs font-semibold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer hidden sm:inline-flex"
+                  >
+                    {isHindi ? 'सभी शहर' : 'All Cities'}
+                  </button>
+                  <button
+                    onClick={() => {
+                      const cId = activeCityForecastModal.id;
+                      setActiveCityForecastModal(null);
+                      navigate(`/forecast/${cId}`);
+                    }}
+                    className="px-4.5 py-2.5 rounded-2xl text-xs font-bold text-white bg-sky-600 hover:bg-sky-500 dark:bg-sky-500 dark:text-white dark:hover:bg-sky-400 transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+                  >
+                    <span>{isHindi ? '7-दिवसीय विस्तृत पूर्वानुमान' : 'Open 7-Day City Forecast'}</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </div>
             </div>
           </div>
