@@ -1,3 +1,5 @@
+import { getDynamicLeadTimestamp } from '../utils/liveDateTime';
+
 // SIH Cyclone Intelligence Data Model
 // Problem Statement: "To develop an AI/ML based system for identification,
 // classification, and prediction of different tropical cyclone patterns using multi-source satellite data."
@@ -244,7 +246,7 @@ export const CYCLONE_LIFECYCLE_STAGES = [
     pressureRange: '> 1000 hPa',
     dvorak: 'T1.0',
     status: 'COMPLETED',
-    detectedAt: '03 Sep 06:00 UTC',
+    detectedAt: `${getDynamicLeadTimestamp(-48)}`,
     summary: 'Organized convective clustering over warm Bay of Bengal waters (SST > 30°C).'
   },
   {
@@ -258,7 +260,7 @@ export const CYCLONE_LIFECYCLE_STAGES = [
     pressureRange: '996 – 1000 hPa',
     dvorak: 'T1.5 – T2.0',
     status: 'COMPLETED',
-    detectedAt: '04 Sep 12:00 UTC',
+    detectedAt: `${getDynamicLeadTimestamp(-24)}`,
     summary: 'Closed surface isobar with curved convective banding initiating.'
   },
   {
@@ -272,7 +274,7 @@ export const CYCLONE_LIFECYCLE_STAGES = [
     pressureRange: '990 – 996 hPa',
     dvorak: 'T2.5 – T3.0',
     status: 'ACTIVE_STAGE', // Currently happening
-    detectedAt: '05 Sep 18:00 UTC (Current Fix)',
+    detectedAt: `${getDynamicLeadTimestamp(0)} (Current Fix)`,
     summary: 'Compact vortex with Central Dense Overcast (CDO) consolidating. High probability of upgrading to Cyclonic Storm.'
   },
   {
@@ -286,7 +288,7 @@ export const CYCLONE_LIFECYCLE_STAGES = [
     pressureRange: '984 – 990 hPa',
     dvorak: 'T3.5',
     status: 'PREDICTED (+12h)',
-    detectedAt: '06 Sep 06:00 UTC (Forecast)',
+    detectedAt: `${getDynamicLeadTimestamp(12)} (Forecast)`,
     summary: 'Named storm threshold reached. Widespread squalls and storm gale warnings active.'
   },
   {
@@ -300,7 +302,7 @@ export const CYCLONE_LIFECYCLE_STAGES = [
     pressureRange: '970 – 984 hPa',
     dvorak: 'T4.0 – T4.5',
     status: 'PREDICTED (+24h Landfall)',
-    detectedAt: '06 Sep 18:00 UTC (Projected Landfall)',
+    detectedAt: `${getDynamicLeadTimestamp(24)} (Projected Landfall)`,
     summary: 'Peak intensity window. Eyewall formation and extreme storm surge expected along target coast.'
   },
   {
@@ -314,7 +316,7 @@ export const CYCLONE_LIFECYCLE_STAGES = [
     pressureRange: '> 995 hPa',
     dvorak: 'T2.0',
     status: 'PREDICTED (+48h)',
-    detectedAt: '07 Sep 18:00 UTC (Forecast)',
+    detectedAt: `${getDynamicLeadTimestamp(48)} (Forecast)`,
     summary: 'Frictional dissipation over terrain. Heavy precipitation persists as system converts into inland depression.'
   }
 ];
@@ -430,7 +432,7 @@ export const TRAJECTORY_72H_FORECAST = [
   {
     lead: 'NOW',
     leadHours: 0,
-    timestamp: '05 Sep 18:00 UTC',
+    timestamp: getDynamicLeadTimestamp(0),
     lat: 15.40,
     lon: 87.80,
     latLonStr: '15.4°N, 87.8°E',
@@ -451,7 +453,7 @@ export const TRAJECTORY_72H_FORECAST = [
   {
     lead: '+6h',
     leadHours: 6,
-    timestamp: '06 Sep 00:00 UTC',
+    timestamp: getDynamicLeadTimestamp(6),
     lat: 16.10,
     lon: 87.10,
     latLonStr: '16.1°N, 87.1°E',
@@ -472,7 +474,7 @@ export const TRAJECTORY_72H_FORECAST = [
   {
     lead: '+12h',
     leadHours: 12,
-    timestamp: '06 Sep 06:00 UTC',
+    timestamp: getDynamicLeadTimestamp(12),
     lat: 16.90,
     lon: 86.50,
     latLonStr: '16.9°N, 86.5°E',
@@ -493,7 +495,7 @@ export const TRAJECTORY_72H_FORECAST = [
   {
     lead: '+24h',
     leadHours: 24,
-    timestamp: '06 Sep 18:00 UTC',
+    timestamp: getDynamicLeadTimestamp(24),
     lat: 18.20,
     lon: 85.60,
     latLonStr: '18.2°N, 85.6°E',
@@ -517,7 +519,7 @@ export const TRAJECTORY_72H_FORECAST = [
   {
     lead: '+48h',
     leadHours: 48,
-    timestamp: '07 Sep 18:00 UTC',
+    timestamp: getDynamicLeadTimestamp(48),
     lat: 20.10,
     lon: 84.20,
     latLonStr: '20.1°N, 84.2°E',
@@ -538,7 +540,7 @@ export const TRAJECTORY_72H_FORECAST = [
   {
     lead: '+72h',
     leadHours: 72,
-    timestamp: '08 Sep 18:00 UTC',
+    timestamp: getDynamicLeadTimestamp(72),
     lat: 22.00,
     lon: 83.00,
     latLonStr: '22.0°N, 83.0°E',

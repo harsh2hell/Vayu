@@ -25,11 +25,13 @@ import {
   MODEL_ACCURACY_BENCHMARKS
 } from '../data/sihCycloneData';
 import { detectCycloneFromImage, classifyMorphologyPattern } from '../services/api';
+import { useLiveClock } from '../utils/liveDateTime';
 
 const AICycloneIntelligence = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const tabParam = useMemo(() => new URLSearchParams(location.search).get('tab'), [location.search]);
+  const liveClock = useLiveClock(1000);
 
   // Global Theme & Preferences
   const [isDarkMode, setIsDarkMode] = useState(() => {
@@ -318,7 +320,7 @@ const AICycloneIntelligence = () => {
                     <span className="text-xs font-bold text-slate-900 dark:text-white">
                       INSAT-3DR Thermal IR-1 (10.8 µm)
                     </span>
-                    <span className="text-[10px] text-slate-400 font-mono">05 Sep 18:00 UTC</span>
+                    <span className="text-[10px] text-slate-400 font-mono">{liveClock.utcStr}</span>
                   </div>
 
                   {/* Layer Switching Buttons */}

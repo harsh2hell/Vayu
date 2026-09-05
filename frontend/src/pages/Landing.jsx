@@ -7,6 +7,7 @@ import {
   Compass, Radio, Users, Building2, Eye, RefreshCw, Gauge, Zap,
   Navigation, MapPin, Sliders, Globe, Shield, Terminal, ArrowUpRight
 } from 'lucide-react';
+import { getDynamicLeadTimestamp } from '../utils/liveDateTime';
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -31,7 +32,7 @@ const Landing = () => {
       speed: '14 km/h',
       heading: 'North-Northwest (330°)',
       landfall: 'Gopalpur-Kalingapatnam (Odisha/AP)',
-      eta: 'T+24 Hours (02 Sep 18:00 UTC)',
+      eta: `T+24 Hours (${getDynamicLeadTimestamp(24)})`,
       confidence: '96.4%',
       riskLevel: 'HIGH',
       trackSteps: [
@@ -56,7 +57,7 @@ const Landing = () => {
       speed: '18 km/h',
       heading: 'North-Northeast (025°)',
       landfall: 'Saurashtra Coast (Gujarat / Porbandar)',
-      eta: 'T+36 Hours (03 Sep 06:00 UTC)',
+      eta: `T+36 Hours (${getDynamicLeadTimestamp(36)})`,
       confidence: '94.8%',
       riskLevel: 'CRITICAL',
       trackSteps: [

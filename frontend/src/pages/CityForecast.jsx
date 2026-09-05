@@ -20,13 +20,24 @@ import {
   MapPin,
   Calendar,
   ChevronRight,
+  ChevronLeft,
   Radio,
   ExternalLink,
-  ChevronDown
+  ChevronDown,
+  Search,
+  X,
+  Check,
+  Anchor,
+  Sunrise,
+  Sunset,
+  Moon,
+  CloudMoon
 } from 'lucide-react';
 import PublicNavbar from '../components/PublicNavbar';
 import IOSGlassCard from '../components/IOSGlassCard';
-import { CITY_FORECAST_DATA, getCityForecast } from '../data/cityForecastData';
+import { CITY_FORECAST_DATA, getCityForecast, getCityAstronomy } from '../data/cityForecastData';
+import { COASTAL_CITIES_DATA } from '../data/coastalCitiesData';
+import { useLiveClock } from '../utils/liveDateTime';
 
 // Helper to render lucide icon based on condition string
 const renderWeatherIcon = (iconName, className = "w-6 h-6") => {
@@ -47,6 +58,279 @@ const renderWeatherIcon = (iconName, className = "w-6 h-6") => {
   }
 };
 
+// Helper to render weather icon inside the 48-hour hourly weather strip
+const renderHourlyWeatherIcon = (icon) => {
+  switch (icon) {
+    case 'sun':
+      return <Sun className="w-6 h-6 text-amber-500 dark:text-amber-400 drop-shadow-[0_0_6px_rgba(251,191,36,0.35)]" />;
+    case 'clear-night':
+      return <Moon className="w-6 h-6 text-sky-600 dark:text-sky-200 drop-shadow-[0_0_6px_rgba(186,230,253,0.35)]" />;
+    case 'cloud-sun':
+      return <CloudSun className="w-6 h-6 text-amber-500 dark:text-amber-300" />;
+    case 'cloud-night':
+      return <CloudMoon className="w-6 h-6 text-slate-500 dark:text-slate-300" />;
+    case 'rain':
+    case 'night-rain':
+      return <CloudRain className="w-6 h-6 text-sky-500 dark:text-sky-400 drop-shadow-[0_0_6px_rgba(56,189,248,0.35)]" />;
+    case 'thunderstorm':
+      return <CloudLightning className="w-6 h-6 text-indigo-600 dark:text-indigo-400 drop-shadow-[0_0_6px_rgba(129,140,248,0.45)]" />;
+    case 'fog':
+      return <CloudFog className="w-6 h-6 text-slate-400 dark:text-slate-300" />;
+    case 'sunrise':
+      return <Sunrise className="w-6 h-6 text-amber-500 dark:text-amber-400 drop-shadow-[0_0_8px_rgba(251,191,36,0.6)]" />;
+    case 'sunset':
+      return <Sunset className="w-6 h-6 text-orange-500 dark:text-orange-400 drop-shadow-[0_0_8px_rgba(251,146,60,0.6)]" />;
+    case 'cloud':
+    default:
+      return <Cloud className="w-6 h-6 text-slate-400 dark:text-slate-200" />;
+  }
+};
+
+// Generate dynamic, city-specific 48-hour forecast with tailored 2-hour interval cadence and true astronomical events
+const generate48HourForecast = (city, isHindi) => {
+  if (!city) return [];
+
+  const profile = getCityAstronomy(city);
+  const baseTemp = Number(city.temp) || 28;
+  const day1 = city.forecast7Days?.[0] || {};
+  const day2 = city.forecast7Days?.[1] || {};
+  const tMin1 = Number(day1.tempMin) || Math.round(baseTemp - 3.5);
+  const tMax1 = Number(day1.tempMax) || Math.round(baseTemp + 3.8);
+  const tMin2 = Number(day2.tempMin) || Math.round(baseTemp - 3.2);
+  const tMax2 = Number(day2.tempMax) || Math.round(baseTemp + 4.0);
+  const pChance1 = day1.precipChance !== undefined ? day1.precipChance : (city.precipitation?.chance || 40);
+  const pChance2 = day2.precipChance !== undefined ? day2.precipChance : (city.precipitation?.chance || 40);
+  const condition = (city.condition || '').toLowerCase();
+
+  const now = new Date();
+  const rawPoints = [];
+
+  const M_EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  const M_HI = ['जन', 'फर', 'मार्च', 'अप्रै', 'मई', 'जून', 'जुला', 'अग', 'सितं', 'अक्टू', 'नव', 'दिस'];
+
+  // Current real-time point ("Now" / "अभी")
+  const nowDayNum = String(now.getDate()).padStart(2, '0');
+  const nowDateStr = isHindi ? `${nowDayNum} ${M_HI[now.getMonth()]}` : `${nowDayNum} ${M_EN[now.getMonth()]}`;
+
+  let nowIcon = 'cloud';
+  let nowCondLabel = isHindi ? 'बादल' : 'Cloudy';
+  const isRainyCity = condition.includes('rain') || condition.includes('storm') || condition.includes('squall') || pChance1 >= 50;
+
+  const nowH = now.getHours();
+  const nowMinOfDay = nowH * 60 + now.getMinutes();
+  const isNowNight = nowMinOfDay < profile.sunriseMin || nowMinOfDay >= profile.sunsetMin;
+
+  if (isRainyCity && pChance1 >= 40) {
+    if (condition.includes('thunder') || pChance1 >= 75) {
+      nowIcon = 'thunderstorm';
+      nowCondLabel = isHindi ? 'तूफान व बारिश' : 'Thunderstorm';
+    } else {
+      nowIcon = isNowNight ? 'night-rain' : 'rain';
+      nowCondLabel = isHindi ? 'बारिश' : 'Rain';
+    }
+  } else if (isRainyCity && pChance1 >= 20) {
+    nowIcon = isNowNight ? 'night-rain' : 'rain';
+    nowCondLabel = isHindi ? 'बौछारें' : 'Showers';
+  } else if (condition.includes('fog') || condition.includes('haze') || condition.includes('dust')) {
+    nowIcon = 'fog';
+    nowCondLabel = isHindi ? 'धुंध' : 'Haze & Fog';
+  } else if (condition.includes('sun') || condition.includes('clear')) {
+    nowIcon = isNowNight ? 'clear-night' : 'sun';
+    nowCondLabel = isNowNight ? (isHindi ? 'साफ रात' : 'Clear Night') : (isHindi ? 'धूप' : 'Sunny');
+  } else {
+    nowIcon = isNowNight ? 'cloud-night' : 'cloud-sun';
+    nowCondLabel = isHindi ? 'आंशिक बादल' : 'Partly Cloudy';
+  }
+
+  rawPoints.push({
+    type: 'hour',
+    date: new Date(now),
+    offsetH: 0,
+    timeLabel: isHindi ? 'अभी' : 'Now',
+    temp: Math.round(baseTemp),
+    icon: nowIcon,
+    condLabel: nowCondLabel,
+    rainProb: pChance1 >= 20 ? pChance1 : 0,
+    isNow: true,
+    isMidnight: false,
+    isDay2: false,
+    dateLabel: nowDateStr
+  });
+
+  // Determine city-specific station cadence track ('even' vs 'odd')
+  let candidateH = nowH + 1;
+  if (profile.slotCadence === 'even' && candidateH % 2 !== 0) candidateH += 1;
+  if (profile.slotCadence === 'odd' && candidateH % 2 === 0) candidateH += 1;
+
+  let currentSlotDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), candidateH, 0, 0);
+  if (currentSlotDate.getTime() <= now.getTime()) {
+    currentSlotDate.setTime(currentSlotDate.getTime() + 2 * 3600000);
+  }
+
+  const endTime = now.getTime() + 48 * 3600000;
+
+  // Generate 2-hour interval timepoints following this city's station cadence
+  while (currentSlotDate.getTime() <= endTime) {
+    const d = new Date(currentSlotDate);
+    const offsetH = Math.round((d.getTime() - now.getTime()) / 3600000);
+    const isDay2 = offsetH >= 24;
+    const tMin = isDay2 ? tMin2 : tMin1;
+    const tMax = isDay2 ? tMax2 : tMax1;
+    const baseRain = isDay2 ? pChance2 : pChance1;
+    const h = d.getHours();
+
+    // Diurnal temperature curve tailored to the city's peak heat hour and coastal moderating spread
+    const cycle = Math.cos(((h - profile.peakHeatHour) / 12) * Math.PI);
+    const temp = Math.round(tMin + (tMax - tMin) * ((cycle + 1) / 2));
+
+    // Dynamic rain probability modulated by local rain window and nocturnal cooling
+    let rainProb = baseRain;
+    if (h >= profile.rainWindow[0] && h <= profile.rainWindow[1]) {
+      rainProb = Math.min(100, baseRain + profile.rainBoost);
+    } else if (h < Math.floor(profile.sunriseMin / 60) || h >= Math.floor(profile.sunsetMin / 60)) {
+      rainProb = Math.max(0, baseRain - Math.round(profile.nightCooling * 2.5));
+    }
+
+    const isNight = h < Math.floor(profile.sunriseMin / 60) || h >= Math.floor(profile.sunsetMin / 60);
+
+    let icon = 'cloud';
+    let condLabel = isHindi ? 'बादल' : 'Cloudy';
+
+    if (isRainyCity && rainProb >= 40) {
+      if (condition.includes('thunder') || rainProb >= 75) {
+        icon = 'thunderstorm';
+        condLabel = isHindi ? 'तूफान व बारिश' : 'Thunderstorm';
+      } else {
+        icon = isNight ? 'night-rain' : 'rain';
+        condLabel = isHindi ? 'बारिश' : 'Rain';
+      }
+    } else if (isRainyCity && rainProb >= 20) {
+      icon = isNight ? 'night-rain' : 'rain';
+      condLabel = isHindi ? 'बौछारें' : 'Showers';
+    } else if (condition.includes('fog') || condition.includes('haze') || condition.includes('dust')) {
+      icon = 'fog';
+      condLabel = isHindi ? 'धुंध' : 'Haze & Fog';
+    } else if (condition.includes('sun') || condition.includes('clear')) {
+      icon = isNight ? 'clear-night' : 'sun';
+      condLabel = isNight ? (isHindi ? 'साफ रात' : 'Clear Night') : (isHindi ? 'धूप' : 'Sunny');
+    } else {
+      icon = isNight ? 'cloud-night' : 'cloud-sun';
+      condLabel = isHindi ? 'आंशिक बादल' : 'Partly Cloudy';
+    }
+
+    const ampm = h >= 12 ? 'PM' : 'AM';
+    const displayHour = h % 12 === 0 ? 12 : h % 12;
+    const timeLabel = `${displayHour}${ampm}`;
+
+    const slotDayNum = String(d.getDate()).padStart(2, '0');
+    const slotDateStr = isHindi ? `${slotDayNum} ${M_HI[d.getMonth()]}` : `${slotDayNum} ${M_EN[d.getMonth()]}`;
+
+    rawPoints.push({
+      type: 'hour',
+      date: d,
+      offsetH,
+      timeLabel,
+      temp,
+      icon,
+      condLabel,
+      rainProb: rainProb >= 20 ? rainProb : 0,
+      isNow: false,
+      isMidnight: h === 0,
+      isDay2,
+      dateLabel: slotDateStr
+    });
+
+    currentSlotDate = new Date(currentSlotDate.getTime() + 2 * 3600000);
+  }
+
+  // Insert geographically accurate Sunrise and Sunset events for this specific city
+  for (let dayOffset = 0; dayOffset <= 2; dayOffset++) {
+    const sunriseD = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate() + dayOffset,
+      Math.floor(profile.sunriseMin / 60),
+      profile.sunriseMin % 60,
+      0
+    );
+    if (sunriseD.getTime() > now.getTime() && sunriseD.getTime() <= endTime) {
+      rawPoints.push({
+        type: 'event',
+        date: sunriseD,
+        timeLabel: isHindi ? profile.sunriseHi : profile.sunrise,
+        label: isHindi ? 'सूर्योदय' : 'Sunrise',
+        icon: 'sunrise',
+        rainProb: 0,
+        isDay2: sunriseD.getTime() >= now.getTime() + 24 * 3600000
+      });
+    }
+
+    const sunsetD = new Date(
+      now.getFullYear(),
+      now.getMonth(),
+      now.getDate() + dayOffset,
+      Math.floor(profile.sunsetMin / 60),
+      profile.sunsetMin % 60,
+      0
+    );
+    if (sunsetD.getTime() > now.getTime() && sunsetD.getTime() <= endTime) {
+      rawPoints.push({
+        type: 'event',
+        date: sunsetD,
+        timeLabel: isHindi ? profile.sunsetHi : profile.sunset,
+        label: isHindi ? 'सूर्यास्त' : 'Sunset',
+        icon: 'sunset',
+        rainProb: 0,
+        isDay2: sunsetD.getTime() >= now.getTime() + 24 * 3600000
+      });
+    }
+  }
+
+  // Sort strictly chronologically so events and hourly slots flow seamlessly
+  rawPoints.sort((a, b) => a.date.getTime() - b.date.getTime());
+
+  return rawPoints;
+};
+
+// Summary text generator for 48-hour forecast with city-specific astronomy and cadence
+const get48HourSummary = (city, isHindi) => {
+  if (!city) return '';
+  const profile = getCityAstronomy(city);
+  const cond = (city.condition || '').toLowerCase();
+  const precip = city.precipitation?.chance || 0;
+  const sRise = isHindi ? profile.sunriseHi : profile.sunrise;
+  const sSet = isHindi ? profile.sunsetHi : profile.sunset;
+
+  let weatherDesc = '';
+  if (precip >= 75 || cond.includes('thunder') || cond.includes('storm')) {
+    weatherDesc = isHindi
+      ? 'अगले 48 घंटों में गरज-चमक के साथ मानसूनी बौछारों की संभावना है। दोपहर के समय तीव्र बारिश और तटीय हवाएं सक्रिय रहेंगी।'
+      : 'Scattered thunderstorms and localized heavy downpours expected over the next 48 hours. Gusty coastal winds active during afternoon hours.';
+  } else if (precip >= 40 || cond.includes('rain') || cond.includes('shower')) {
+    weatherDesc = isHindi
+      ? 'अगले 48 घंटों में रुक-रुक कर बारिश होने का अनुमान है। कल दोपहर वर्षा की तीव्रता में वृद्धि हो सकती है।'
+      : 'Passing showers and coastal cloud cover expected over the next 48 hours, with peak precipitation chances developing tomorrow afternoon.';
+  } else if (cond.includes('haze') || cond.includes('fog') || cond.includes('dust')) {
+    weatherDesc = isHindi
+      ? 'सुबह के समय धुंध और हल्का कोहरा बना रहेगा। दिन चढ़ने के साथ दृश्यता में सुधार होगा। अगले 48 घंटे शुष्क मौसम रहेगा।'
+      : 'Moderate haze during early morning hours, improving with daytime solar heating. Dry conditions forecast across the next 48 hours.';
+  } else if (cond.includes('sun') || cond.includes('clear')) {
+    weatherDesc = isHindi
+      ? 'अगले 48 घंटों तक मुख्यतः साफ आसमान और तेज धूप खिली रहेगी। रात का तापमान सुखद बना रहेगा।'
+      : 'Mainly clear skies and bright sunshine expected throughout the next 48 hours. Warm afternoons with pleasant night breezes.';
+  } else {
+    weatherDesc = isHindi
+      ? 'मध्यम तापमान और आंशिक बादलों के साथ सामान्य मौसम रहने का अनुमान है। अगले 48 घंटों में मौसम स्थिर रहेगा।'
+      : 'Partly cloudy skies with stable temperatures forecast over the next 48 hours. Humidity levels remaining moderate.';
+  }
+
+  const astroNote = isHindi
+    ? `सूर्योदय ${sRise} • सूर्यास्त ${sSet}`
+    : `Sunrise ${sRise} • Sunset ${sSet}`;
+
+  return `${weatherDesc} (${astroNote})`;
+};
+
 const CityForecast = () => {
   const { cityId } = useParams();
   const navigate = useNavigate();
@@ -65,6 +349,8 @@ const CityForecast = () => {
   const [isDarkMode, setIsDarkMode] = useState(() => {
     return document.documentElement.classList.contains('dark');
   });
+
+  const liveClock = useLiveClock(1000);
 
   const [fontSizeOffset, setFontSizeOffset] = useState(() => {
     try {
@@ -112,10 +398,226 @@ const CityForecast = () => {
   // Selected day object
   const activeDay = cityData.forecast7Days[selectedDayIdx] || cityData.forecast7Days[0];
 
-  // List of all major cities for quick switcher
+  // Search Location Modal states
+  const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchCategory, setSearchCategory] = useState('ALL');
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const searchInputRef = React.useRef(null);
+  const searchModalRef = React.useRef(null);
+
+  // 48-Hour Hourly Weather Forecast Strip State & Ref
+  const hourlyScrollRef = React.useRef(null);
+  const hourly48Data = useMemo(() => generate48HourForecast(cityData, isHindi), [cityData, isHindi]);
+  const hourly48Summary = useMemo(() => get48HourSummary(cityData, isHindi), [cityData, isHindi]);
+  const cityAstronomy = useMemo(() => getCityAstronomy(cityData), [cityData]);
+
+  const handleScrollHourly = (dir) => {
+    if (hourlyScrollRef.current) {
+      hourlyScrollRef.current.scrollBy({
+        left: dir === 'left' ? -340 : 340,
+        behavior: 'smooth'
+      });
+    }
+  };
+
+  // List of all 10 major cities for quick switcher (kept exactly as they are)
   const allCities = useMemo(() => {
     return Object.values(CITY_FORECAST_DATA);
   }, []);
+
+  const isCustomLocationActive = useMemo(() => {
+    return !allCities.some(c => c.id.toLowerCase() === (cityData?.id || '').toLowerCase());
+  }, [allCities, cityData]);
+
+  // Comprehensive Search Index of 120+ Indian Cities, Coastal Ports & Maritime States
+  const allSearchableLocations = useMemo(() => {
+    const list = [];
+    const seenIds = new Set();
+
+    // 1. Major Quick-Switch Cities
+    Object.values(CITY_FORECAST_DATA).forEach((c) => {
+      const normalizedId = c.id.toLowerCase();
+      seenIds.add(normalizedId);
+      list.push({
+        id: c.id,
+        name: c.name,
+        nameHindi: c.nameHindi,
+        state: c.state,
+        stateHindi: c.stateHindi,
+        type: 'city',
+        typeLabel: 'Major City',
+        typeLabelHindi: 'प्रमुख शहर',
+        badgeColor: 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border-sky-200 dark:border-sky-800',
+        emoji: c.emoji || '🏙️',
+        temp: `${c.temp}°C`,
+        condition: c.condition,
+        conditionHindi: c.conditionHindi,
+        isHotspot: false,
+        alert: null
+      });
+    });
+
+    // 2. Coastal Cities, Ports & Landfall Hotspots from COASTAL_CITIES_DATA
+    COASTAL_CITIES_DATA.forEach((item) => {
+      const normalizedId = item.id.toLowerCase();
+      if (!seenIds.has(normalizedId)) {
+        seenIds.add(normalizedId);
+        const isPort = item.name.toLowerCase().includes('port') ||
+                       item.category?.toLowerCase().includes('port') ||
+                       item.category?.toLowerCase().includes('harbour');
+        list.push({
+          id: item.id,
+          name: item.name,
+          nameHindi: item.nameHindi || item.name,
+          state: item.state,
+          stateHindi: item.stateHindi || item.state,
+          type: isPort ? 'port' : 'coastal',
+          typeLabel: isPort ? 'Commercial Port' : (item.category || 'Coastal Watch Zone'),
+          typeLabelHindi: isPort ? 'बंदरगाह' : 'तटीय क्षेत्र',
+          badgeColor: item.level === 'red'
+            ? 'bg-red-50 dark:bg-red-950/60 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800'
+            : item.level === 'orange'
+            ? 'bg-orange-50 dark:bg-orange-950/60 text-orange-700 dark:text-orange-300 border-orange-200 dark:border-orange-800'
+            : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700',
+          emoji: item.level === 'red' ? '⛈️' : item.level === 'orange' ? '🌧️' : (isPort ? '⚓' : '🌊'),
+          temp: item.temp,
+          condition: item.condition,
+          conditionHindi: item.condition,
+          isHotspot: item.isDangerHotspot,
+          alert: item.alert
+        });
+      }
+    });
+
+    // 3. Maritime States & UTs
+    const MARITIME_STATES = [
+      { id: 'odisha', hubId: 'bhubaneswar', name: 'Odisha', nameHindi: 'ओडिशा', coast: 'Bay of Bengal Seaboard' },
+      { id: 'west-bengal', hubId: 'kolkata', name: 'West Bengal', nameHindi: 'पश्चिम बंगाल', coast: 'Bay of Bengal & Sundarbans' },
+      { id: 'andhra-pradesh', hubId: 'visakhapatnam', name: 'Andhra Pradesh', nameHindi: 'आंध्र प्रदेश', coast: 'Bay of Bengal Coast' },
+      { id: 'tamil-nadu', hubId: 'chennai', name: 'Tamil Nadu', nameHindi: 'तमिलनाडु', coast: 'Coromandel Coast' },
+      { id: 'kerala', hubId: 'kochi', name: 'Kerala', nameHindi: 'केरल', coast: 'Malabar Coast' },
+      { id: 'karnataka', hubId: 'bengaluru', name: 'Karnataka', nameHindi: 'कर्नाटक', coast: 'Canara Coast' },
+      { id: 'maharashtra', hubId: 'mumbai', name: 'Maharashtra', nameHindi: 'महाराष्ट्र', coast: 'Konkan Coast' },
+      { id: 'gujarat', hubId: 'ahmedabad', name: 'Gujarat', nameHindi: 'गुजरात', coast: 'Kathiawar & Kutch Seaboard' },
+      { id: 'goa', hubId: 'mumbai', name: 'Goa', nameHindi: 'गोवा', coast: 'Konkan Coast' },
+      { id: 'andaman-nicobar', hubId: 'kolkata', name: 'Andaman & Nicobar Islands', nameHindi: 'अंडमान और निकोबार द्वीप समूह', coast: 'Andaman Sea' },
+      { id: 'lakshadweep', hubId: 'kochi', name: 'Lakshadweep', nameHindi: 'लक्षद्वीप', coast: 'Arabian Sea' },
+      { id: 'puducherry', hubId: 'chennai', name: 'Puducherry', nameHindi: 'पुदुचेरी', coast: 'Coromandel Coast' },
+      { id: 'delhi', hubId: 'delhi', name: 'National Capital (Delhi NCR)', nameHindi: 'दिल्ली राष्ट्रीय राजधानी क्षेत्र', coast: 'Northern Meteorological Grid' }
+    ];
+
+    MARITIME_STATES.forEach(st => {
+      list.push({
+        id: st.hubId,
+        name: st.name,
+        nameHindi: st.nameHindi,
+        state: st.coast,
+        stateHindi: st.coast,
+        type: 'state',
+        typeLabel: 'Maritime State',
+        typeLabelHindi: 'तटीय राज्य',
+        badgeColor: 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800',
+        emoji: '🇮🇳',
+        temp: 'State Hub',
+        condition: st.coast,
+        conditionHindi: st.coast,
+        isHotspot: false,
+        alert: null
+      });
+    });
+
+    return list;
+  }, []);
+
+  // Filtered locations based on search query and category tab
+  const filteredSearchLocations = useMemo(() => {
+    const q = searchQuery.toLowerCase().trim();
+    let base = allSearchableLocations;
+
+    if (searchCategory === 'CITIES') {
+      base = base.filter(item => item.type === 'city' || item.type === 'coastal');
+    } else if (searchCategory === 'PORTS') {
+      base = base.filter(item => item.type === 'port');
+    } else if (searchCategory === 'STATES') {
+      base = base.filter(item => item.type === 'state');
+    }
+
+    if (!q) {
+      return base.slice(0, 24);
+    }
+
+    return base
+      .filter((item) => {
+        const nameMatch = item.name.toLowerCase().includes(q);
+        const nameHiMatch = (item.nameHindi || '').toLowerCase().includes(q);
+        const stateMatch = item.state.toLowerCase().includes(q);
+        const stateHiMatch = (item.stateHindi || '').toLowerCase().includes(q);
+        const typeMatch = item.typeLabel.toLowerCase().includes(q);
+        return nameMatch || nameHiMatch || stateMatch || stateHiMatch || typeMatch;
+      })
+      .sort((a, b) => {
+        const aStarts = a.name.toLowerCase().startsWith(q);
+        const bStarts = b.name.toLowerCase().startsWith(q);
+        if (aStarts && !bStarts) return -1;
+        if (!aStarts && bStarts) return 1;
+        return 0;
+      });
+  }, [allSearchableLocations, searchQuery, searchCategory]);
+
+  // Lock background scroll and auto-focus input when modal opens
+  useEffect(() => {
+    if (isSearchModalOpen) {
+      document.body.style.overflow = 'hidden';
+      const timer = setTimeout(() => {
+        searchInputRef.current?.focus();
+      }, 50);
+      return () => {
+        document.body.style.overflow = '';
+        clearTimeout(timer);
+      };
+    } else {
+      document.body.style.overflow = '';
+    }
+  }, [isSearchModalOpen]);
+
+  // Global Escape & Cmd/Ctrl+K key handler
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setIsSearchModalOpen((prev) => !prev);
+        setSearchQuery('');
+        setSelectedIndex(0);
+      } else if (e.key === 'Escape' && isSearchModalOpen) {
+        setIsSearchModalOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isSearchModalOpen]);
+
+  // Keyboard navigation inside search dropdown
+  const handleSearchKeyDown = (e) => {
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      setSelectedIndex((prev) => Math.min(prev + 1, filteredSearchLocations.length - 1));
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      setSelectedIndex((prev) => Math.max(prev - 1, 0));
+    } else if (e.key === 'Enter') {
+      e.preventDefault();
+      if (filteredSearchLocations[selectedIndex]) {
+        handleSelectLocation(filteredSearchLocations[selectedIndex]);
+      }
+    }
+  };
+
+  const handleSelectLocation = (location) => {
+    setIsSearchModalOpen(false);
+    setSearchQuery('');
+    navigate(`/forecast/${location.id}`);
+  };
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors duration-300">
@@ -168,8 +670,8 @@ const CityForecast = () => {
         {/* =========================================================================
              CITY QUICK SWITCHER PILLS (Switch between Mumbai, Chennai, Kolkata, etc.)
              ========================================================================= */}
-        <div className="bg-white/70 dark:bg-slate-900/60 backdrop-blur-xl border border-slate-200/80 dark:border-white/10 p-2.5 sm:p-3 rounded-2xl shadow-xs overflow-x-auto no-scrollbar">
-          <div className="flex items-center gap-1.5 sm:gap-2 min-w-max">
+        <div className="bg-white/70 dark:bg-slate-900/60 backdrop-blur-xl border border-slate-200/80 dark:border-white/10 p-2 sm:p-2.5 rounded-2xl shadow-xs overflow-x-auto no-scrollbar">
+          <div className="flex items-center gap-1.5 min-w-max">
             <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mr-1 flex items-center gap-1 shrink-0">
               <MapPin className="w-3 h-3 text-sky-500" />
               {isHindi ? 'प्रमुख शहर:' : 'Quick Switch:'}
@@ -180,17 +682,38 @@ const CityForecast = () => {
                 <button
                   key={c.id}
                   onClick={() => navigate(`/forecast/${c.id}`)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-1.5 shrink-0 ${
+                  className={`px-3 py-1 sm:py-1.5 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer flex items-center shrink-0 ${
                     isCurrent
                       ? 'bg-sky-500 text-white shadow-xs scale-[1.03]'
                       : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-950 dark:hover:text-white'
                   }`}
                 >
-                  <span className="text-sm leading-none">{c.emoji}</span>
                   <span>{isHindi ? c.nameHindi : c.name}</span>
                 </button>
               );
             })}
+
+            {/* Subtle Divider */}
+            <div className="h-4 w-px bg-slate-200 dark:bg-slate-700/80 mx-0.5 shrink-0" />
+
+            {/* Premium Pill-Shaped Search Location Button */}
+            <button
+              id="quick-switch-search-btn"
+              onClick={() => {
+                setIsSearchModalOpen(true);
+                setSearchQuery('');
+                setSelectedIndex(0);
+              }}
+              className={`px-3 py-1 sm:py-1.5 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-1.5 shrink-0 group ${
+                isCustomLocationActive
+                  ? 'bg-sky-500 text-white shadow-xs scale-[1.03]'
+                  : 'bg-sky-500/10 hover:bg-sky-500 text-sky-700 dark:text-sky-300 hover:text-white dark:hover:text-white border border-sky-300/60 dark:border-sky-500/40 hover:border-transparent hover:scale-[1.03] active:scale-[0.98] shadow-xs'
+              }`}
+              title={isHindi ? 'स्थान खोजें' : 'Search Location'}
+            >
+              <Search className={`w-3.5 h-3.5 transition-colors ${isCustomLocationActive ? 'text-white' : 'text-sky-600 dark:text-sky-400 group-hover:text-white'}`} />
+              <span>{isHindi ? 'स्थान खोजें' : 'Search Location'}</span>
+            </button>
           </div>
         </div>
 
@@ -257,15 +780,16 @@ const CityForecast = () => {
               <div className="flex items-center gap-1.5 text-xs text-slate-400 dark:text-slate-500 pt-1">
                 {selectedDayIdx === 0 ? (
                   <>
-                    <Clock className="w-3.5 h-3.5 text-sky-500" />
-                    <span>
-                      {isHindi ? 'वर्तमान अवलोकन (आज): ' : 'Live Observation Station ' + cityData.stationCode + ' • '}
-                      {isHindi ? cityData.updatedAtHindi : cityData.updatedAt}
+                    <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+                    <span className="font-semibold text-slate-700 dark:text-slate-300">
+                      {isHindi 
+                        ? `लाइव अवलोकन स्टेशन ${cityData.stationCode} • ${liveClock.timeStr} IST (${liveClock.dateStrHindi})` 
+                        : `Live Observation Station ${cityData.stationCode} • ${liveClock.timeStr} IST (${liveClock.dateStr})`}
                     </span>
                   </>
                 ) : (
                   <>
-                    <Calendar className="w-3.5 h-3.5 text-sky-500" />
+                    <Calendar className="w-3.5 h-3.5 text-sky-500 shrink-0" />
                     <span className="font-semibold text-sky-600 dark:text-sky-400">
                       {isHindi ? `${activeDay.dayHindi} का पूर्वानुमान (${activeDay.date})` : `${activeDay.day} Forecast (${activeDay.date})`}
                       {' • '}
@@ -592,6 +1116,132 @@ const CityForecast = () => {
         </section>
 
         {/* =========================================================================
+             PREMIUM APPLE WEATHER 48-HOUR HOURLY FORECAST INFO BOX (2-HR INTERVALS)
+             ========================================================================= */}
+        <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-white/90 via-white/80 to-sky-50/70 dark:from-[#0d1322]/95 dark:via-[#090e1a]/95 dark:to-[#050810]/95 backdrop-blur-2xl border border-white/90 dark:border-white/10 text-slate-900 dark:text-white p-4 sm:p-5 shadow-[0_8px_32px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(255,255,255,0.95)] dark:shadow-[0_16px_48px_rgba(0,0,0,0.6)]">
+          {/* Ambient Glow behind glass */}
+          <div className="pointer-events-none absolute -top-20 -right-20 w-72 h-72 bg-sky-400/10 dark:bg-sky-500/15 rounded-full blur-3xl" />
+          <div className="pointer-events-none absolute -bottom-20 -left-20 w-72 h-72 bg-cyan-400/10 dark:bg-cyan-500/10 rounded-full blur-3xl" />
+          {/* Top specular reflection line */}
+          <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/80 dark:via-white/30 to-transparent" />
+
+          {/* Card Header */}
+          <div className="relative z-10 flex items-center justify-between gap-3 pb-3 border-b border-slate-200/80 dark:border-white/10 flex-wrap">
+            <div className="flex items-center gap-2 flex-wrap">
+              <Clock className="w-4 h-4 text-sky-600 dark:text-sky-400 shrink-0" />
+              <h3 className="text-xs sm:text-sm font-heading font-extrabold uppercase tracking-wider text-slate-800 dark:text-slate-200">
+                {isHindi ? '48 घंटे का प्रति घंटा पूर्वानुमान (2 घंटे का अंतराल)' : '48-HOUR HOURLY FORECAST (2-HOUR INTERVALS)'}
+              </h3>
+              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-500/10 dark:bg-sky-500/20 text-sky-700 dark:text-sky-300 border border-sky-300/60 dark:border-sky-400/30">
+                {isHindi ? cityData.nameHindi : cityData.name}
+              </span>
+              {cityAstronomy && (
+                <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-500/10 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-300/60 dark:border-amber-400/30 inline-flex items-center gap-1.5 shadow-2xs">
+                  <span>🌅 {isHindi ? cityAstronomy.sunriseHi : cityAstronomy.sunrise}</span>
+                  <span className="opacity-40">•</span>
+                  <span>🌇 {isHindi ? cityAstronomy.sunsetHi : cityAstronomy.sunset}</span>
+                </span>
+              )}
+              {cityAstronomy && (
+                <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-100/90 dark:bg-white/5 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-white/10 hidden md:inline-flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                  <span>{isHindi ? cityAstronomy.stationCadenceHindi : cityAstronomy.stationCadence}</span>
+                </span>
+              )}
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 hidden sm:inline">
+                {isHindi ? 'दाईं ओर स्क्रॉल करें →' : 'Scroll right for full 48h →'}
+              </span>
+              <div className="flex items-center gap-1">
+                <button
+                  type="button"
+                  onClick={() => handleScrollHourly('left')}
+                  className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 active:scale-95 dark:bg-white/5 dark:hover:bg-white/15 text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-all cursor-pointer border border-slate-200/80 dark:border-white/10 shadow-xs"
+                  aria-label="Scroll left"
+                  title="Scroll left"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleScrollHourly('right')}
+                  className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 active:scale-95 dark:bg-white/5 dark:hover:bg-white/15 text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-all cursor-pointer border border-slate-200/80 dark:border-white/10 shadow-xs"
+                  aria-label="Scroll right"
+                  title="Scroll right"
+                >
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Dynamic Summary Subtitle */}
+          <div className="relative z-10 py-2.5 text-xs sm:text-sm text-slate-600 dark:text-slate-300/90 font-medium">
+            {hourly48Summary}
+          </div>
+
+          {/* 48-Hour Horizontal Scroll Strip with 2-hr gaps */}
+          <div className="relative z-10 mt-1">
+            <div
+              ref={hourlyScrollRef}
+              className="flex items-center gap-2 sm:gap-3 overflow-x-auto no-scrollbar scroll-smooth py-2 px-1"
+            >
+              {hourly48Data.map((item, idx) => (
+                <div
+                  key={`${item.timeLabel}-${idx}`}
+                  className={`min-w-[68px] sm:min-w-[76px] h-[116px] flex flex-col items-center justify-between py-2 px-1.5 rounded-2xl transition-all duration-150 shrink-0 ${
+                    item.isNow
+                      ? 'bg-sky-500/15 dark:bg-sky-500/20 border border-sky-400/50 dark:border-sky-400/40 shadow-xs ring-1 ring-sky-400/20'
+                      : item.type === 'event'
+                        ? 'bg-amber-500/10 dark:bg-amber-500/15 border border-amber-300/50 dark:border-amber-400/30'
+                        : 'hover:bg-slate-100/80 dark:hover:bg-white/10 border border-transparent hover:border-slate-200/70 dark:hover:border-white/10'
+                  }`}
+                >
+                  {/* Top Row: Time label */}
+                  <div className="text-center w-full">
+                    <span className={`text-xs block truncate ${item.isNow ? 'text-sky-700 dark:text-sky-300 font-bold' : 'text-slate-600 dark:text-slate-300 font-semibold'}`}>
+                      {item.timeLabel}
+                    </span>
+                    {item.isMidnight && (
+                      <span className="text-[9px] font-bold text-sky-600 dark:text-sky-400 uppercase tracking-wider block leading-tight">
+                        {item.dateLabel}
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Middle Row: Icon & Precipitation % */}
+                  <div className="flex flex-col items-center justify-center my-auto">
+                    {renderHourlyWeatherIcon(item.icon)}
+                    {item.rainProb > 0 ? (
+                      <span className="text-[10px] font-bold text-sky-600 dark:text-cyan-400 leading-none mt-1">
+                        {item.rainProb}%
+                      </span>
+                    ) : (
+                      <span className="h-2.5" />
+                    )}
+                  </div>
+
+                  {/* Bottom Row: Temperature or Event Label */}
+                  <div className="text-center w-full">
+                    {item.type === 'event' ? (
+                      <span className="text-xs font-bold text-amber-600 dark:text-amber-300 block truncate">
+                        {item.label}
+                      </span>
+                    ) : (
+                      <span className="text-sm sm:text-base font-bold text-slate-900 dark:text-white block">
+                        {item.temp}°
+                      </span>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* =========================================================================
              7-DAY WEATHER FORECAST CARDS WITH EMOJIS (☀️, 🌧️, ☁️, ⛈️)
              ========================================================================= */}
         <section className="space-y-3">
@@ -603,8 +1253,8 @@ const CityForecast = () => {
               </h2>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                 {isHindi
-                  ? 'प्रत्येक दिन पर क्लिक करके विस्तृत प्रति घंटा अवलोकन (Hourly Breakdown) देखें।'
-                  : 'Click any day card below to inspect detailed 24-hour intervals and hourly metrics.'}
+                  ? 'अगले 7 दिनों का विस्तृत मौसम एवं चक्रवात निगरानी पूर्वानुमान।'
+                  : 'Comprehensive 7-day meteorological and coastal risk outlook.'}
               </p>
             </div>
 
@@ -680,55 +1330,6 @@ const CityForecast = () => {
               );
             })}
           </div>
-
-          {/* =========================================================================
-               DETAILED HOURLY TIMELINE FOR SELECTED DAY
-               ========================================================================= */}
-          {activeDay.hourly && activeDay.hourly.length > 0 && (
-            <div className="mt-4 rounded-3xl bg-white/70 dark:bg-slate-900/60 backdrop-blur-2xl border border-white/85 dark:border-white/10 p-5 shadow-sm space-y-3">
-              <div className="flex items-center justify-between flex-wrap gap-2">
-                <div className="flex items-center gap-2">
-                  <Clock className="w-4 h-4 text-sky-500" />
-                  <h3 className="text-sm font-heading font-extrabold text-slate-900 dark:text-white uppercase tracking-wider">
-                    {isHindi
-                      ? `${activeDay.dayHindi} (${activeDay.date}) - प्रति घंटा विस्तृत मौसम पूर्वानुमान`
-                      : `${activeDay.day} (${activeDay.date}) - 24-Hour Detailed Interval Timeline`}
-                  </h3>
-                </div>
-                <span className="text-xs text-slate-400">
-                  {isHindi ? 'पूर्वानुमान स्थिति: ' : 'Condition: '}
-                  <strong className="text-slate-800 dark:text-slate-200">
-                    {isHindi ? activeDay.conditionHindi : activeDay.condition} {activeDay.emoji}
-                  </strong>
-                </span>
-              </div>
-
-              {/* Hourly Cards Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-                {activeDay.hourly.map((h, hIdx) => (
-                  <div
-                    key={hIdx}
-                    className="bg-white/60 dark:bg-white/[0.04] backdrop-blur-md rounded-2xl p-3 border border-white/80 dark:border-white/10 text-center shadow-2xs hover:shadow-xs transition-all"
-                  >
-                    <span className="text-[11px] font-bold text-slate-400 dark:text-slate-500 block mb-1">
-                      {h.time}
-                    </span>
-                    <span className="text-2xl block my-1">{h.emoji}</span>
-                    <span className="text-sm font-black text-slate-900 dark:text-white block">
-                      {h.temp}°C
-                    </span>
-                    <span className="text-[11px] text-slate-600 dark:text-slate-300 font-medium block truncate">
-                      {h.cond}
-                    </span>
-                    <div className="mt-2 pt-1 border-t border-slate-200/60 dark:border-slate-800/80 flex items-center justify-between text-[10px] text-slate-400 font-semibold">
-                      <span className="text-sky-600 dark:text-sky-400">🌧️ {h.rain}%</span>
-                      <span>💨 {h.wind}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
         </section>
 
         {/* =========================================================================
@@ -769,6 +1370,214 @@ const CityForecast = () => {
         </div>
 
       </main>
+
+      {/* =========================================================================
+           PREMIUM SEARCH LOCATION POPUP / MODAL
+           ========================================================================= */}
+      {isSearchModalOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-slate-950/60 backdrop-blur-md flex items-start justify-center p-3 sm:p-6 pt-16 sm:pt-24 animate-in fade-in duration-200"
+          onClick={(e) => {
+            if (e.target === e.currentTarget) {
+              setIsSearchModalOpen(false);
+            }
+          }}
+        >
+          {/* Modal Container */}
+          <div
+            ref={searchModalRef}
+            className="w-full max-w-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-3xl border border-white/80 dark:border-white/10 shadow-[0_25px_70px_rgba(0,0,0,0.3)] dark:shadow-[0_25px_70px_rgba(0,0,0,0.75)] overflow-hidden flex flex-col max-h-[82vh] animate-in zoom-in-95 duration-200"
+            onKeyDown={handleSearchKeyDown}
+          >
+            {/* Top Specular Line */}
+            <div className="h-0.5 w-full bg-gradient-to-r from-transparent via-sky-500/40 dark:via-sky-400/40 to-transparent" />
+
+            {/* Search Input Bar */}
+            <div className="p-3.5 sm:p-4 border-b border-slate-200/80 dark:border-white/10 flex items-center gap-3">
+              <div className="p-2 rounded-xl bg-sky-500/10 text-sky-600 dark:text-sky-400 shrink-0">
+                <Search className="w-5 h-5" />
+              </div>
+              <input
+                ref={searchInputRef}
+                type="text"
+                value={searchQuery}
+                onChange={(e) => {
+                  setSearchQuery(e.target.value);
+                  setSelectedIndex(0);
+                }}
+                placeholder={isHindi ? 'शहर या राज्य खोजें...' : 'Search city or state...'}
+                className="w-full bg-transparent text-sm sm:text-base font-semibold text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none"
+              />
+              {searchQuery && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSearchQuery('');
+                    setSelectedIndex(0);
+                    searchInputRef.current?.focus();
+                  }}
+                  className="p-1.5 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 transition-colors cursor-pointer"
+                  aria-label="Clear search"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+              <button
+                type="button"
+                onClick={() => setIsSearchModalOpen(false)}
+                className="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white text-xs font-bold transition-colors flex items-center gap-1 shrink-0 cursor-pointer"
+              >
+                <span>Esc</span>
+              </button>
+            </div>
+
+            {/* Quick Category Filters */}
+            <div className="px-3.5 sm:px-4 py-2 border-b border-slate-100 dark:border-white/5 flex items-center gap-1.5 overflow-x-auto no-scrollbar bg-slate-50/50 dark:bg-slate-900/50">
+              {[
+                { key: 'ALL', label: isHindi ? 'सभी' : 'All', count: allSearchableLocations.length },
+                { key: 'CITIES', label: isHindi ? 'प्रमुख शहर' : 'Major Cities', count: allSearchableLocations.filter(i => i.type === 'city' || i.type === 'coastal').length },
+                { key: 'PORTS', label: isHindi ? 'तटीय बंदरगाह' : 'Ports & Harbours', count: allSearchableLocations.filter(i => i.type === 'port').length },
+                { key: 'STATES', label: isHindi ? 'तटीय राज्य' : 'Maritime States', count: allSearchableLocations.filter(i => i.type === 'state').length },
+              ].map((tab) => {
+                const isActive = searchCategory === tab.key;
+                return (
+                  <button
+                    key={tab.key}
+                    onClick={() => {
+                      setSearchCategory(tab.key);
+                      setSelectedIndex(0);
+                    }}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all duration-150 shrink-0 flex items-center gap-1.5 cursor-pointer ${
+                      isActive
+                        ? 'bg-sky-500 text-white shadow-xs'
+                        : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/60 dark:border-slate-700/60'
+                    }`}
+                  >
+                    <span>{tab.label}</span>
+                    <span className={`text-[10px] px-1.5 py-0.2 rounded-full ${isActive ? 'bg-white/25 text-white' : 'bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400'}`}>
+                      {tab.count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Dynamic Suggestions List */}
+            <div className="flex-1 overflow-y-auto p-2 sm:p-3 space-y-1.5 max-h-[50vh]">
+              {filteredSearchLocations.length > 0 ? (
+                filteredSearchLocations.map((item, idx) => {
+                  const isSelected = idx === selectedIndex;
+                  const isCurrentActive = item.id.toLowerCase() === cityData.id.toLowerCase();
+                  return (
+                    <div
+                      key={`${item.id}-${idx}`}
+                      onClick={() => handleSelectLocation(item)}
+                      onMouseEnter={() => setSelectedIndex(idx)}
+                      className={`group p-2.5 sm:p-3 rounded-2xl transition-all duration-150 cursor-pointer flex items-center justify-between gap-3 border ${
+                        isSelected
+                          ? 'bg-sky-500/10 dark:bg-sky-500/20 border-sky-500/40 shadow-xs scale-[1.005]'
+                          : 'bg-white/50 dark:bg-slate-800/40 border-slate-200/50 dark:border-white/5 hover:bg-slate-100/70 dark:hover:bg-slate-800/70'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 shrink-0 group-hover:scale-105 transition-transform text-sky-600 dark:text-sky-400">
+                          {item.type === 'port' ? (
+                            <Anchor className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
+                          ) : item.type === 'state' ? (
+                            <Compass className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                          ) : (
+                            <MapPin className="w-4 h-4 text-sky-600 dark:text-sky-400" />
+                          )}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <span className="font-bold text-sm sm:text-base text-slate-900 dark:text-white truncate">
+                              {isHindi ? item.nameHindi : item.name}
+                            </span>
+                            {isHindi && item.nameHindi !== item.name && (
+                              <span className="text-xs text-slate-400 dark:text-slate-500 hidden sm:inline">
+                                ({item.name})
+                              </span>
+                            )}
+                            <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${item.badgeColor}`}>
+                              {isHindi ? item.typeLabelHindi : item.typeLabel}
+                            </span>
+                            {item.isHotspot && (
+                              <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-red-500/10 text-red-600 dark:text-red-400 border border-red-500/25">
+                                {isHindi ? 'खतरा क्षेत्र' : 'High Alert'}
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                            {isHindi ? item.stateHindi : item.state} {item.condition ? `• ${isHindi ? item.conditionHindi : item.condition}` : ''}
+                          </p>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 shrink-0">
+                        {item.temp && item.temp !== 'State Hub' && (
+                          <div className="text-right hidden sm:block">
+                            <span className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                              {item.temp}
+                            </span>
+                          </div>
+                        )}
+                        {isCurrentActive ? (
+                          <span className="flex items-center gap-1 text-[11px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 border border-emerald-500/25 px-2 py-1 rounded-lg">
+                            <Check className="w-3 h-3" />
+                            <span className="hidden sm:inline">{isHindi ? 'सक्रिय' : 'Active'}</span>
+                          </span>
+                        ) : (
+                          <div className={`p-1.5 rounded-lg transition-colors ${isSelected ? 'bg-sky-500 text-white' : 'text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-200'}`}>
+                            <ChevronRight className="w-4 h-4" />
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })
+              ) : (
+                <div className="py-12 text-center space-y-3">
+                  <div className="w-12 h-12 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-400 flex items-center justify-center mx-auto">
+                    <Search className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h5 className="text-sm font-bold text-slate-900 dark:text-white">
+                      {isHindi ? 'कोई स्थान नहीं मिला' : 'No locations found'}
+                    </h5>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                      {isHindi
+                        ? `"${searchQuery}" के लिए कोई परिणाम नहीं मिला। कृपया कोई अन्य भारतीय शहर या राज्य खोजें।`
+                        : `No matching results for "${searchQuery}". Try searching for Kolkata, Chennai, Odisha, or Paradip.`}
+                    </p>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Bottom Keyboard & Info Bar */}
+            <div className="p-3 sm:px-4 border-t border-slate-200/80 dark:border-white/10 bg-slate-50/70 dark:bg-slate-900/70 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+              <div className="flex items-center gap-3">
+                <span className="flex items-center gap-1">
+                  <kbd className="px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-[10px] font-semibold text-slate-700 dark:text-slate-300">↑↓</kbd>
+                  <span className="hidden sm:inline">{isHindi ? 'नेविगेट' : 'Navigate'}</span>
+                </span>
+                <span className="flex items-center gap-1">
+                  <kbd className="px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-[10px] font-semibold text-slate-700 dark:text-slate-300">↵</kbd>
+                  <span className="hidden sm:inline">{isHindi ? 'चुनें' : 'Select'}</span>
+                </span>
+                <span className="flex items-center gap-1">
+                  <kbd className="px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-[10px] font-semibold text-slate-700 dark:text-slate-300">esc</kbd>
+                  <span className="hidden sm:inline">{isHindi ? 'बंद करें' : 'Close'}</span>
+                </span>
+              </div>
+              <div className="text-[11px] font-medium text-slate-400 dark:text-slate-500">
+                {isHindi ? '120+ भारतीय शहर व बंदरगाह' : '120+ Indian Cities, Ports & States'}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

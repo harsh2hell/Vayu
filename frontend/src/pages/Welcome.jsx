@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import LanguageWelcomeAnimation from '../components/LanguageWelcomeAnimation';
 import IOSGlassCard from '../components/IOSGlassCard';
+import { useLiveClock } from '../utils/liveDateTime';
 import {
   MapContainer,
   TileLayer,
@@ -1156,6 +1157,7 @@ const Welcome = () => {
   const [matrixThreatFilter, setMatrixThreatFilter] = useState('All');
   const [matrixSearchQuery, setMatrixSearchQuery] = useState('');
   const [safetyTab, setSafetyTab] = useState('before');
+  const liveClock = useLiveClock(1000);
   const [istTime, setIstTime] = useState('');
   // GIS Radar Map States
   const [mapBaseLayer, setMapBaseLayer] = useState('satellite');
@@ -1524,8 +1526,8 @@ const Welcome = () => {
           </div>
 
           {/* Pinned Observation Timestamp */}
-          <span className="text-xs text-amber-800 dark:text-amber-400 shrink-0 hidden md:inline font-medium pl-2.5 border-l border-amber-300/40 dark:border-amber-800/40 z-10 whitespace-nowrap">
-            {isHindi ? `अवलोकन: ${istTime}` : `Observation: ${istTime}`}
+          <span className="text-xs text-amber-800 dark:text-amber-400 shrink-0 hidden md:inline font-mono font-medium pl-2.5 border-l border-amber-300/40 dark:border-amber-800/40 z-10 whitespace-nowrap">
+            {isHindi ? `अवलोकन: ${liveClock.observationStrHindi}` : `Observation: ${liveClock.observationStr}`}
           </span>
         </div>
       </div>

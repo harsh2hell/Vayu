@@ -6,6 +6,7 @@ import {
   ExternalLink, Building2, Radio, Compass, Navigation2,
   ChevronRight, ArrowUpRight, Sun, Moon, Info, Bell
 } from 'lucide-react';
+import { useLiveClock } from '../utils/liveDateTime';
 
 const STATE_DATA = {
   odisha: {
@@ -449,6 +450,7 @@ const StateWeather = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('ALL'); // ALL, RED, ORANGE, YELLOW
+  const liveClock = useLiveClock(1000);
 
   // Normalize slug or default to 'odisha'
   const currentSlug = useMemo(() => {
@@ -582,6 +584,8 @@ const StateWeather = () => {
               <span>{stateInfo.alertBadge}</span>
               <span className="text-slate-400 dark:text-slate-600">•</span>
               <span>{stateInfo.basin}</span>
+              <span className="text-slate-400 dark:text-slate-600 hidden sm:inline">•</span>
+              <span className="hidden sm:inline font-mono font-medium">{liveClock.fullLiveStr}</span>
             </div>
           </div>
 

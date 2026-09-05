@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Shield, PhoneCall, Sun, Moon, Menu, X, ChevronRight } from 'lucide-react';
+import { Shield, PhoneCall, Sun, Moon, Menu, X, ChevronRight, Clock } from 'lucide-react';
+import { useLiveClock } from '../utils/liveDateTime';
 
 export const FONT_SCALE_MAP = {
   '-3': 75,
@@ -120,6 +121,7 @@ const PublicNavbar = ({
   const navigate = useNavigate();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const liveClock = useLiveClock(1000);
 
   // Read initial offset from prop or localStorage
   const currentOffset = typeof fontSizeOffset === 'number' 
@@ -335,6 +337,20 @@ const PublicNavbar = ({
             <span className="2xl:hidden inline whitespace-nowrap">{isHindi ? 'लॉगिन' : 'Login'}</span>
           </button>
 
+          {/* Real-time Live Clock with Seconds & Pulsing Dot */}
+          <div
+            className="header-ctrl-btn hidden md:inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-mono font-bold text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 shrink-0 select-none shadow-2xs"
+            title={isHindi ? "लाइव भारतीय मानक समय (IST) व दिनांक" : "Live Real-Time Indian Standard Time (IST) & Date"}
+          >
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+            <span className="text-slate-500 dark:text-slate-400 font-sans font-semibold text-[11px] hidden xl:inline">
+              {isHindi ? liveClock.dateShortHindi : liveClock.dateShort}
+            </span>
+            <span className="text-slate-300 dark:text-slate-600 hidden xl:inline">•</span>
+            <span className="tracking-tight">{liveClock.timeStr}</span>
+            <span className="text-[10px] text-sky-600 dark:text-sky-400 font-sans font-bold">IST</span>
+          </div>
+
           {/* National Emergency Hotline */}
           <a 
             href="tel:112" 
@@ -425,6 +441,19 @@ const PublicNavbar = ({
       {/* Mobile Navigation Drawer */}
       {isMobileMenuOpen && (
         <div className="md:hidden border-t border-slate-200/80 dark:border-white/10 bg-white/95 dark:bg-black/95 backdrop-blur-2xl px-4 py-4 space-y-3 shadow-2xl animate-in slide-in-from-top-2 duration-200">
+          
+          {/* Mobile Live Clock Display */}
+          <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-xs font-semibold">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+              <span className="text-slate-700 dark:text-slate-300">
+                {isHindi ? liveClock.dateStrHindi : liveClock.dateStr}
+              </span>
+            </div>
+            <div className="font-mono font-bold text-sky-600 dark:text-sky-400">
+              {liveClock.timeStr} IST
+            </div>
+          </div>
           
           {/* Officer Login Button */}
           <button

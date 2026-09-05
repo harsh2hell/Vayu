@@ -227,11 +227,11 @@ const CityTracker = () => {
               </span>
               {[
                 { id: 'ALL', label: isHindi ? 'सभी स्थान' : 'All Places' },
-                { id: 'HOTSPOT', label: isHindi ? '🔥 लैंडफॉल हॉटस्पॉट' : '🔥 Landfall Hotspots' },
-                { id: 'TRENDING', label: isHindi ? '⚡ सक्रिय खतरा' : '⚡ Trending Threat' },
-                { id: 'RED', label: isHindi ? '🔴 रेड अलर्ट' : '🔴 Red Alert' },
-                { id: 'ORANGE', label: isHindi ? '🟠 ऑरेंज अलर्ट' : '🟠 Orange Alert' },
-                { id: 'PORTS', label: isHindi ? '⚓ वाणिज्यिक एवं मत्स्य बंदरगाह' : '⚓ Commercial & Fishing Ports' }
+                { id: 'HOTSPOT', label: isHindi ? 'लैंडफॉल हॉटस्पॉट' : 'Landfall Hotspots' },
+                { id: 'TRENDING', label: isHindi ? 'सक्रिय खतरा' : 'Trending Threat' },
+                { id: 'RED', label: isHindi ? 'रेड अलर्ट' : 'Red Alert' },
+                { id: 'ORANGE', label: isHindi ? 'ऑरेंज अलर्ट' : 'Orange Alert' },
+                { id: 'PORTS', label: isHindi ? 'वाणिज्यिक एवं मत्स्य बंदरगाह' : 'Commercial & Fishing Ports' }
               ].map((f) => (
                 <button
                   key={f.id}
