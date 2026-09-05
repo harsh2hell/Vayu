@@ -3,7 +3,7 @@ import {
   AlertTriangle, AlertOctagon, Info, Bell, CheckCircle, 
   Clock, ShieldAlert, FileText, Download, Printer, 
   Send, Radio, Building2, Users, Anchor, X, CheckCheck,
-  MapPin, Waves, Wind, Copy, Code
+  MapPin, Waves, Wind, Copy, Code, ChevronRight
 } from 'lucide-react';
 import { 
   MapContainer, TileLayer, Marker, Popup, Circle
