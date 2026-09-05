@@ -208,13 +208,118 @@ header {
   box-sizing: border-box !important;
 }
 
-header .header-inner-row,
-header .h-16,
-nav.h-16 {
-  height: 64px !important;
+/* Authentic Apple VisionOS Transparent Glass Glossy Header Bar */
+header.header-glass-bar {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.32) 0%, rgba(255, 255, 255, 0.14) 100%) !important;
+  backdrop-filter: blur(28px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(200%) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.45) !important;
+  box-shadow: inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.85), 0 8px 32px 0 rgba(0, 0, 0, 0.05) !important;
+}
+
+.dark header.header-glass-bar {
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.45) 0%, rgba(2, 6, 23, 0.22) 100%) !important;
+  backdrop-filter: blur(28px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(200%) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12) !important;
+  box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.22), 0 12px 36px 0 rgba(0, 0, 0, 0.5) !important;
+}
+
+header.header-glass-bar.is-scrolled {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.48) 0%, rgba(255, 255, 255, 0.26) 100%) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.6) !important;
+  box-shadow: inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.95), 0 10px 30px -5px rgba(0, 0, 0, 0.10) !important;
+}
+
+.dark header.header-glass-bar.is-scrolled {
+  background: linear-gradient(180deg, rgba(15, 23, 42, 0.65) 0%, rgba(2, 6, 23, 0.38) 100%) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.18) !important;
+  box-shadow: inset 0 1px 1px 0 rgba(255, 255, 255, 0.28), 0 16px 40px 0 rgba(0, 0, 0, 0.7) !important;
+}
+
+header .header-inner-row {
+  height: 70px !important;
+  min-height: 64px !important;
   padding-left: clamp(10px, 1.5vw, 24px) !important;
   padding-right: clamp(10px, 1.5vw, 24px) !important;
   gap: clamp(6px, 1vw, 16px) !important;
+}
+
+header .h-16,
+nav.h-16 {
+  height: 70px !important;
+}
+
+/* Smooth Apple-grade motion collapse for logo and login when scrolled */
+.header-collapsible-item {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
+  filter: blur(0px);
+  white-space: nowrap;
+  transition: max-width 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+              opacity 0.42s cubic-bezier(0.16, 1, 0.3, 1),
+              transform 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+              filter 0.4s ease,
+              margin 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+              padding 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+              border-width 0.55s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  will-change: max-width, opacity, transform, filter;
+}
+
+.header-collapsible-item.is-collapsed {
+  max-width: 0px !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  overflow: hidden !important;
+  margin-left: 0px !important;
+  margin-right: 0px !important;
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+}
+
+.header-collapsible-logo {
+  max-width: 220px;
+  overflow: hidden;
+}
+
+.header-collapsible-logo.is-collapsed,
+.header-collapsible-item.is-collapsed.header-collapsible-logo {
+  max-width: 0px !important;
+  opacity: 0 !important;
+  transform: translate3d(-28px, 0, 0) scale(0.85) !important;
+  filter: blur(5px) !important;
+  margin-left: 0px !important;
+  margin-right: 0px !important;
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+  pointer-events: none !important;
+  overflow: hidden !important;
+}
+
+.header-collapsible-login {
+  max-width: 170px;
+  overflow: hidden;
+}
+
+.header-collapsible-login.is-collapsed,
+.header-collapsible-item.is-collapsed.header-collapsible-login {
+  max-width: 0px !important;
+  opacity: 0 !important;
+  transform: translate3d(28px, 0, 0) scale(0.85) !important;
+  filter: blur(5px) !important;
+  margin-left: 0px !important;
+  margin-right: 0px !important;
+  padding-left: 0px !important;
+  padding-right: 0px !important;
+  border-width: 0px !important;
+  border-color: transparent !important;
+  gap: 0px !important;
+  pointer-events: none !important;
+  overflow: hidden !important;
+}
+
+header nav.nav-pill-track-3d {
+  transition: all 0.55s cubic-bezier(0.16, 1, 0.3, 1) !important;
 }
 
 /* Nav links track: stable pixel sizing */

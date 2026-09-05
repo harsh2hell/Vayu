@@ -161,10 +161,66 @@ const PublicNavbar = ({
     }
   };
 
+  const [isPastHero, setIsPastHero] = useState(false);
+  const isPastHeroRef = useRef(false);
+
   useEffect(() => {
     // Guarantee font scale is applied on mount
     applyGlobalFontScale(currentOffset);
-  }, []);
+
+    let rafId = null;
+
+    const checkScroll = () => {
+      const currentY = window.scrollY;
+      const heroH1 = document.querySelector('#three-globe-hero h1');
+      
+      let shouldCollapse = false;
+      let shouldExpand = false;
+
+      if (heroH1) {
+        const bottom = heroH1.getBoundingClientRect().bottom;
+        // Collapses when the hero heading has scrolled past the sticky header (~75px)
+        shouldCollapse = bottom <= 75;
+        // Expands back with a smooth 60px hysteresis deadband to prevent flickering
+        shouldExpand = bottom >= 135;
+      } else {
+        // Fallback for pages without three-globe-hero
+        shouldCollapse = currentY > 220;
+        shouldExpand = currentY < 160;
+      }
+
+      if (!isPastHeroRef.current && shouldCollapse) {
+        isPastHeroRef.current = true;
+        setIsPastHero(true);
+      } else if (isPastHeroRef.current && shouldExpand) {
+        isPastHeroRef.current = false;
+        setIsPastHero(false);
+      }
+    };
+
+    const onScroll = () => {
+      if (rafId !== null) return;
+      rafId = window.requestAnimationFrame(() => {
+        checkScroll();
+        rafId = null;
+      });
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+
+    // Initial check after paint
+    const t1 = setTimeout(checkScroll, 60);
+    const t2 = setTimeout(checkScroll, 350);
+
+    return () => {
+      if (rafId !== null) window.cancelAnimationFrame(rafId);
+      clearTimeout(t1);
+      clearTimeout(t2);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
+  }, [location.pathname]);
 
   const NAV_LINKS = [
     { 
@@ -195,23 +251,26 @@ const PublicNavbar = ({
   ];
 
   return (
-    <header className={`sticky top-0 z-[1000] w-full transition-all duration-300 ${
-      isScrolled 
-        ? 'bg-white/85 dark:bg-black/90 backdrop-blur-2xl border-b border-slate-200/60 dark:border-white/10 shadow-[0_4px_24px_-4px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.7)]'
-        : 'bg-white/80 dark:bg-black/85 backdrop-blur-xl border-b border-slate-200/80 dark:border-neutral-800/80'
+    <header className={`sticky top-0 z-[1000] w-full transition-all duration-300 header-glass-bar relative ${
+      isScrolled ? 'is-scrolled' : ''
     }`}>
-      {/* 2px National Tricolor Stripe */}
-      <div className="h-0.5 bg-gradient-to-r from-[#FF9933] via-slate-300 dark:via-slate-700 to-[#138808]" />
+      {/* Specular Glossy Light Sheen across top half of glass header */}
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-[48%] bg-gradient-to-b from-white/35 via-white/12 to-transparent dark:from-white/15 dark:via-white/4 dark:to-transparent select-none z-0" />
       
-      <div className="header-inner-row max-w-7xl mx-auto px-2.5 sm:px-4 lg:px-6 h-16 flex items-center justify-between gap-2 sm:gap-3 flex-nowrap">
+      {/* 2px National Tricolor Stripe */}
+      <div className="h-0.5 bg-gradient-to-r from-[#FF9933] via-slate-300 dark:via-slate-700 to-[#138808] relative z-10" />
+      
+      <div className="header-inner-row max-w-7xl mx-auto px-2.5 sm:px-4 lg:px-6 h-16 sm:h-[68px] md:h-[72px] flex items-center justify-between gap-2 sm:gap-3 flex-nowrap relative z-10">
         
-        {/* VAYU Brand Logo */}
-        <div className="flex items-center shrink-0">
+        {/* VAYU Brand Logo - Collapses smoothly when scrolled past hero section */}
+        <div className={`header-collapsible-item header-collapsible-logo flex items-center shrink-0 ${
+          isPastHero ? 'is-collapsed' : ''
+        }`}>
           <img 
             src={isDarkMode ? "/vayu-white.png?v=2" : "/vayu.png"} 
             alt="VAYU" 
-            className="h-11 sm:h-12 md:h-[50px] w-auto object-contain filter drop-shadow-xs transition-transform duration-300 hover:scale-105 cursor-pointer" 
-            style={{ maxHeight: '50px' }}
+            className="h-12 sm:h-14 md:h-16 lg:h-[62px] w-auto object-contain filter drop-shadow-xs transition-transform duration-300 hover:scale-105 cursor-pointer select-none shrink-0" 
+            style={{ maxHeight: '62px' }}
             onClick={() => {
               if (location.pathname === '/') {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -226,8 +285,10 @@ const PublicNavbar = ({
         {/* Ultra-Glossy 3D Glass Pill Track with Scroll & Hover Interaction */}
         <nav
           onWheel={handleNavWheel}
-          className={`nav-pill-track-3d hidden md:flex items-center gap-1.5 p-1 rounded-full backdrop-blur-2xl transition-all duration-400 shrink min-w-0 flex-nowrap relative select-none ${
-            isScrolled
+          className={`nav-pill-track-3d hidden md:flex items-center gap-1.5 p-1 rounded-full backdrop-blur-2xl transition-all duration-500 shrink min-w-0 flex-nowrap relative select-none ${
+            isPastHero ? 'mx-auto' : ''
+          } ${
+            isScrolled || isPastHero
               ? 'is-scrolled-3d'
               : 'bg-slate-200/55 dark:bg-neutral-950/45 border border-white/70 dark:border-white/10 shadow-[0_2px_12px_rgba(0,0,0,0.04),inset_0_1px_1px_rgba(255,255,255,0.8)]'
           }`}
@@ -245,7 +306,7 @@ const PublicNavbar = ({
                 key={link.path}
                 link={link}
                 isSelected={isSelected}
-                isScrolled={isScrolled}
+                isScrolled={isScrolled || isPastHero}
                 onClick={() => {
                   if (link.path === '/' && location.pathname === '/') {
                     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -261,15 +322,17 @@ const PublicNavbar = ({
         {/* RIGHT SIDE CONTROLS: OFFICER LOGIN, HELPLINE, LANGUAGE, FONT, THEME, MOBILE HAMBURGER */}
         <div className="header-controls-row flex items-center gap-1.5 sm:gap-2 shrink-0 flex-nowrap">
           
-          {/* Official Officer Gateway */}
+          {/* Official Officer Gateway - Collapses smoothly when scrolled past hero section */}
           <button
             onClick={() => navigate('/login')}
-            className="header-ctrl-btn hidden xl:inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-slate-900 dark:bg-sky-600 hover:bg-slate-800 dark:hover:bg-sky-500 transition-all shadow-xs cursor-pointer shrink-0"
+            className={`header-ctrl-btn header-collapsible-item header-collapsible-login hidden xl:inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-slate-900 dark:bg-sky-600 hover:bg-slate-800 dark:hover:bg-sky-500 transition-all shadow-xs cursor-pointer shrink-0 whitespace-nowrap ${
+              isPastHero ? 'is-collapsed' : ''
+            }`}
             title={isHindi ? "आधिकारिक आईएमडी / एमओईएस अधिकारी लॉगिन पोर्टल" : "Official IMD / MoES Officer Login Gateway"}
           >
             <Shield className="w-3.5 h-3.5 text-amber-400 dark:text-sky-200 shrink-0" />
-            <span className="hidden 2xl:inline">{isHindi ? 'अधिकारी लॉगिन' : 'Officer Login'}</span>
-            <span className="2xl:hidden inline">{isHindi ? 'लॉगिन' : 'Login'}</span>
+            <span className="hidden 2xl:inline whitespace-nowrap">{isHindi ? 'अधिकारी लॉगिन' : 'Officer Login'}</span>
+            <span className="2xl:hidden inline whitespace-nowrap">{isHindi ? 'लॉगिन' : 'Login'}</span>
           </button>
 
           {/* National Emergency Hotline */}
