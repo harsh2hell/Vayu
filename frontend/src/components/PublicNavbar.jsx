@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Shield, PhoneCall, Sun, Moon, Menu, X, ChevronRight } from 'lucide-react';
 
@@ -23,6 +23,89 @@ export const applyGlobalFontScale = (offset) => {
   try {
     localStorage.setItem('vayu_font_offset', String(offset));
   } catch (e) {}
+};
+
+// Interactive 3D Glass Option Button with Dynamic Mouse Parallax & Specular Light Reflection
+const Nav3DGlassButton = ({ link, isSelected, isScrolled, onClick }) => {
+  const [tilt, setTilt] = useState({ rx: 0, ry: 0, gx: 50, gy: 50, isHovered: false });
+  const btnRef = useRef(null);
+
+  const handleMouseMove = (e) => {
+    if (!btnRef.current) return;
+    const rect = btnRef.current.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    // Multi-axis 3D tilt
+    const rx = ((y - centerY) / centerY) * -12;
+    const ry = ((x - centerX) / centerX) * 12;
+    const gx = (x / rect.width) * 100;
+    const gy = (y / rect.height) * 100;
+    setTilt({ rx, ry, gx, gy, isHovered: true });
+  };
+
+  const handleMouseLeave = () => {
+    setTilt({ rx: 0, ry: 0, gx: 50, gy: 50, isHovered: false });
+  };
+
+  let transformStyle = '';
+  if (tilt.isHovered) {
+    transformStyle = `perspective(600px) rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg) translateZ(16px) scale3d(1.04, 1.04, 1.04) translateY(-1px)`;
+  } else if (isSelected) {
+    transformStyle = `perspective(600px) rotateX(0deg) rotateY(0deg) translateZ(${isScrolled ? '14px' : '10px'}) scale3d(1.02, 1.02, 1.02) translateY(-0.5px)`;
+  } else {
+    transformStyle = 'perspective(600px) rotateX(0deg) rotateY(0deg) translateZ(0px) scale3d(1, 1, 1)';
+  }
+
+  return (
+    <button
+      ref={btnRef}
+      onClick={onClick}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{ transform: transformStyle }}
+      className={`nav-3d-glass-btn group relative overflow-hidden px-3.5 lg:px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide transition-all duration-250 cursor-pointer whitespace-nowrap shrink-0 flex items-center gap-2 select-none ${
+        isSelected
+          ? 'is-selected-glass text-slate-950 dark:text-white font-bold'
+          : 'border border-transparent text-slate-600 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white font-medium'
+      }`}
+    >
+      {/* Specular Glare Layer that follows mouse cursor in 3D */}
+      <div
+        className="pointer-events-none absolute inset-0 rounded-full transition-opacity duration-300"
+        style={{
+          background: tilt.isHovered
+            ? `radial-gradient(circle at ${tilt.gx}% ${tilt.gy}%, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.12) 45%, transparent 70%)`
+            : isSelected
+            ? `radial-gradient(circle at 50% 0%, rgba(56,189,248,0.25) 0%, transparent 70%)`
+            : 'none',
+          opacity: tilt.isHovered || isSelected ? 1 : 0
+        }}
+      />
+
+      {/* Glass Upper Dome Reflection on Selected */}
+      {isSelected && (
+        <>
+          <span className="absolute inset-x-1 top-0 h-[48%] rounded-t-full bg-gradient-to-b from-white/90 via-white/35 to-transparent dark:from-white/60 dark:via-white/15 pointer-events-none" />
+          <span className="absolute inset-x-2.5 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-white dark:via-white/70 to-transparent pointer-events-none" />
+        </>
+      )}
+
+      {/* Luminous Jewel Status Dot (Cyan / Sky-Blue with pulsing aura) - Only on Selected Option */}
+      {isSelected && (
+        <span className="relative flex items-center justify-center transition-all duration-300 shrink-0">
+          <span className="absolute w-2.5 h-2.5 rounded-full bg-cyan-400 dark:bg-cyan-300 animate-ping opacity-60" />
+          <span className="relative w-2 h-2 rounded-full bg-slate-950 dark:bg-cyan-200 shadow-[0_0_8px_rgba(56,189,248,1),0_0_12px_rgba(34,211,238,0.9)] ring-1.5 ring-cyan-400/90" />
+        </span>
+      )}
+
+      {/* Nav Label with floating depth */}
+      <span className="relative z-10 transition-transform duration-200" style={{ transform: 'translateZ(8px)' }}>
+        {link.label}
+      </span>
+    </button>
+  );
 };
 
 const PublicNavbar = ({
@@ -54,6 +137,28 @@ const PublicNavbar = ({
       setFontSizeOffset(newOffset);
     }
     window.dispatchEvent(new CustomEvent('fontScaleChange', { detail: newOffset }));
+  };
+
+  const lastNavWheelTimeRef = useRef(0);
+
+  // Wheel scroll handler: scrolling over the navbar options advances smoothly between options
+  const handleNavWheel = (e) => {
+    const dx = e.deltaX;
+    const dy = e.shiftKey ? e.deltaY : (Math.abs(e.deltaY) > Math.abs(e.deltaX) ? e.deltaY : 0);
+    const delta = Math.abs(dx) > Math.abs(dy) ? dx : dy;
+    if (Math.abs(delta) > 15) {
+      const now = Date.now();
+      if (now - lastNavWheelTimeRef.current > 320) {
+        lastNavWheelTimeRef.current = now;
+        const currentIdx = NAV_LINKS.findIndex(l => l.match.includes(location.pathname));
+        const validCurrentIdx = currentIdx >= 0 ? currentIdx : 0;
+        if (delta > 0 && validCurrentIdx < NAV_LINKS.length - 1) {
+          navigate(NAV_LINKS[validCurrentIdx + 1].path);
+        } else if (delta < 0 && validCurrentIdx > 0) {
+          navigate(NAV_LINKS[validCurrentIdx - 1].path);
+        }
+      }
+    }
   };
 
   useEffect(() => {
@@ -113,17 +218,29 @@ const PublicNavbar = ({
           />
         </div>
 
-        {/* Ultra-Glossy 3D Glass Pill Track (Desktop) */}
-        <nav className={`nav-pill-track hidden md:flex items-center gap-1.5 p-1 rounded-full backdrop-blur-xl transition-all duration-300 shrink min-w-0 flex-nowrap ${
-          isScrolled
-            ? 'bg-slate-100/90 dark:bg-neutral-900/60 border border-slate-200/80 dark:border-white/10 shadow-xs'
-            : 'bg-slate-100/80 dark:bg-neutral-950/40 border border-slate-200/60 dark:border-white/10'
-        }`}>
+        {/* Ultra-Glossy 3D Glass Pill Track with Scroll & Hover Interaction */}
+        <nav
+          onWheel={handleNavWheel}
+          className={`nav-pill-track-3d hidden md:flex items-center gap-1.5 p-1 rounded-full backdrop-blur-2xl transition-all duration-400 shrink min-w-0 flex-nowrap relative select-none ${
+            isScrolled
+              ? 'is-scrolled-3d'
+              : 'bg-slate-200/55 dark:bg-neutral-950/45 border border-white/70 dark:border-white/10 shadow-[0_2px_12px_rgba(0,0,0,0.04),inset_0_1px_1px_rgba(255,255,255,0.8)]'
+          }`}
+          title={isHindi ? "पेज बदलने के लिए क्लिक या स्क्रॉल करें" : "Click or scroll through options"}
+        >
+          {/* Ambient chromatic luminous glow orbs inside track for glass refraction */}
+          <div className="pointer-events-none absolute -inset-1 bg-gradient-to-r from-sky-400/15 via-cyan-400/10 to-indigo-400/15 rounded-full blur-md opacity-60" />
+          {/* Specular top rim highlight */}
+          <div className="pointer-events-none absolute inset-x-3 top-0 h-[1px] bg-gradient-to-r from-transparent via-white/90 dark:via-white/30 to-transparent" />
+
           {NAV_LINKS.map((link) => {
             const isSelected = link.match.includes(location.pathname);
             return (
-              <button
+              <Nav3DGlassButton
                 key={link.path}
+                link={link}
+                isSelected={isSelected}
+                isScrolled={isScrolled}
                 onClick={() => {
                   if (link.path === '/' && location.pathname === '/') {
                     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -131,34 +248,7 @@ const PublicNavbar = ({
                     navigate(link.path);
                   }
                 }}
-                className={`nav-link-btn group relative overflow-hidden px-3 lg:px-3.5 py-1.5 rounded-full text-xs transition-all duration-200 cursor-pointer whitespace-nowrap shrink-0 flex items-center gap-1.5 transform-gpu ${
-                  isSelected
-                    ? 'bg-gradient-to-b from-white/95 via-white/85 to-white/70 dark:from-white/30 dark:via-white/15 dark:to-white/5 text-slate-950 dark:text-white border border-white/80 dark:border-white/40 shadow-[0_4px_16px_rgba(0,0,0,0.12),0_1px_3px_rgba(0,0,0,0.08),inset_0_2px_1px_rgba(255,255,255,1),inset_0_-1.5px_2px_rgba(255,255,255,0.4)] dark:shadow-[0_0_20px_rgba(255,255,255,0.15),0_6px_24px_rgba(0,0,0,0.8),inset_0_2px_1px_rgba(255,255,255,0.7),inset_0_-1.5px_2px_rgba(255,255,255,0.2)] backdrop-blur-2xl font-bold -translate-y-0.5 scale-[1.02]'
-                    : 'border border-transparent bg-transparent text-slate-700 dark:text-white hover:text-slate-950 dark:hover:text-white hover:bg-white/60 dark:hover:bg-white/10 hover:border-slate-200/60 dark:hover:border-white/15 hover:shadow-2xs font-medium'
-                }`}
-              >
-                {/* Glossy Upper Dome Reflection & Bottom Rim - Active on Selected */}
-                {isSelected && (
-                  <>
-                    <span className="absolute inset-x-1 top-0 h-[48%] rounded-t-full bg-gradient-to-b from-white/80 via-white/30 to-transparent dark:from-white/50 dark:via-white/15 pointer-events-none" />
-                    <span className="absolute inset-x-2.5 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-white/90 dark:via-white/70 to-transparent pointer-events-none" />
-                  </>
-                )}
-
-                {/* Luminous Jewel Status Dot */}
-                <span 
-                  className={`relative flex items-center justify-center transition-all duration-200 ${
-                    isSelected ? 'opacity-100 scale-100' : 'opacity-0 group-hover:opacity-75 scale-75 group-hover:scale-100'
-                  }`} 
-                >
-                  <span className="absolute w-2 h-2 rounded-full bg-cyan-400 dark:bg-cyan-300 animate-ping opacity-65" />
-                  <span className="relative w-1.5 h-1.5 rounded-full bg-slate-900 dark:bg-white shadow-[0_0_8px_rgba(255,255,255,1),0_0_12px_rgba(34,211,238,0.9)] ring-1 ring-cyan-400/90" />
-                </span>
-
-                <span className="relative z-10">
-                  {link.label}
-                </span>
-              </button>
+              />
             );
           })}
         </nav>

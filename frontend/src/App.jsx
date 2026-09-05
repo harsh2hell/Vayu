@@ -7,6 +7,7 @@ import ThreatMap from './pages/ThreatMap';
 import Bulletins from './pages/Bulletins';
 import SafetyGuide from './pages/SafetyGuide';
 import SafetyUpdates from './pages/SafetyUpdates';
+import CityForecast from './pages/CityForecast';
 import Login from './pages/Login';
 import DashboardLayout from './components/DashboardLayout';
 import Dashboard from './pages/Dashboard';
@@ -108,6 +109,11 @@ function App() {
       <Route path="/safety-guide" element={<SafetyUpdates initialTab="safety" />} />
       <Route path="/safety" element={<SafetyUpdates initialTab="safety" />} />
       <Route path="/updates" element={<SafetyUpdates initialTab="bulletins" />} />
+
+      {/* Dedicated City 7-Day Extended Weather Forecast (AQI, Temp, Precip, Wind & Weather Emojis) */}
+      <Route path="/forecast/:cityId" element={<CityForecast />} />
+      <Route path="/city-forecast/:cityId" element={<CityForecast />} />
+      <Route path="/forecast" element={<CityForecast />} />
 
       {/* State-Specific Weather & Cyclone Early Warning Directory */}
       <Route path="/state/:stateSlug" element={<StateWeather />} />

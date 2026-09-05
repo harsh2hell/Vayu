@@ -587,12 +587,19 @@ header .header-theme-btn {
 }
 
 /* =========================================================================
-   MAJOR CITIES WEATHER ROTATING CAROUSEL
+   MAJOR CITIES WEATHER 3D GLASS CAROUSEL
    ========================================================================= */
 .city-carousel-container {
-  overflow: hidden;
+  overflow-x: clip;
+  overflow-y: visible;
   position: relative;
   width: 100%;
+  perspective: 1200px;
+  perspective-origin: 50% 50%;
+  padding-top: 0.6rem;
+  padding-bottom: 0.85rem;
+  touch-action: pan-y pinch-zoom;
+  user-select: none;
 }
 
 .city-carousel-track {
@@ -600,6 +607,7 @@ header .header-theme-btn {
   display: flex;
   width: 100%;
   will-change: transform;
+  transform-style: preserve-3d;
 }
 
 .city-carousel-track.is-animated {
@@ -610,9 +618,77 @@ header .header-theme-btn {
   flex: 0 0 calc(100% / var(--items-per-screen));
   width: calc(100% / var(--items-per-screen));
   max-width: calc(100% / var(--items-per-screen));
-  padding-left: 0.375rem;
-  padding-right: 0.375rem;
+  padding-left: 0.4rem;
+  padding-right: 0.4rem;
   box-sizing: border-box;
+  transform-style: preserve-3d;
+  will-change: transform, opacity;
+}
+
+/* 3D Glass Card Container & Micro-Layers */
+.glass-3d-card-wrapper {
+  perspective: 1000px;
+  transform-style: preserve-3d;
+  height: 100%;
+}
+
+.glass-3d-card {
+  transform-style: preserve-3d;
+  will-change: transform, box-shadow, border-color;
+  transition: transform 0.45s cubic-bezier(0.2, 0.8, 0.25, 1),
+              box-shadow 0.45s cubic-bezier(0.2, 0.8, 0.25, 1),
+              border-color 0.3s ease,
+              background-color 0.3s ease;
+}
+
+/* Floating Internal 3D Depth Layers */
+.glass-layer-title {
+  transform: translateZ(12px);
+  transform-style: preserve-3d;
+}
+
+.glass-layer-icon {
+  transform: translateZ(20px);
+  transform-style: preserve-3d;
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.25, 1);
+}
+
+.glass-3d-card:hover .glass-layer-icon {
+  transform: translateZ(28px) scale(1.15);
+}
+
+.glass-layer-metrics {
+  transform: translateZ(12px);
+  transform-style: preserve-3d;
+}
+
+.glass-layer-cta {
+  transform: translateZ(16px);
+  transform-style: preserve-3d;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.glass-layer-cta:hover {
+  transform: translateZ(24px) scale(1.02);
+}
+
+/* Dynamic Active 3D Focus (Highlight like Chennai in screenshot) */
+.glass-3d-card.is-active-3d {
+  border-color: rgba(56, 189, 248, 0.95) !important;
+  background-color: rgba(255, 255, 255, 0.85) !important;
+  box-shadow: 0 20px 48px -6px rgba(2, 132, 199, 0.24),
+              0 6px 16px -2px rgba(0, 0, 0, 0.05),
+              inset 0 2px 4px 0 rgba(255, 255, 255, 1),
+              inset 0 -1.5px 3px 0 rgba(56, 189, 248, 0.25) !important;
+}
+
+.dark .glass-3d-card.is-active-3d {
+  border-color: rgba(56, 189, 248, 0.9) !important;
+  background-color: rgba(255, 255, 255, 0.07) !important;
+  box-shadow: 0 24px 56px -6px rgba(2, 132, 199, 0.38),
+              0 0 30px 2px rgba(56, 189, 248, 0.18),
+              inset 0 2px 4px 0 rgba(255, 255, 255, 0.3),
+              inset 0 -1.5px 3px 0 rgba(56, 189, 248, 0.45) !important;
 }
 
 @media (min-width: 640px) {
@@ -639,5 +715,85 @@ header .header-theme-btn {
   }
 }
 
+/* =========================================================================
+   NAVBAR 3D GLASS PILL TRACK & OPTIONS
+   ========================================================================= */
+.nav-pill-track-3d {
+  perspective: 1200px;
+  perspective-origin: 50% 50%;
+  transform-style: preserve-3d;
+  will-change: transform, box-shadow, background-color, border-color;
+  transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.25, 1),
+              box-shadow 0.4s cubic-bezier(0.2, 0.8, 0.25, 1),
+              background-color 0.3s ease,
+              border-color 0.3s ease;
+}
 
+/* Floating 3D Frosted Glass Capsule state while scrolling */
+.nav-pill-track-3d.is-scrolled-3d {
+  transform: perspective(1200px) translateZ(8px) translateY(-1px);
+  background: rgba(255, 255, 255, 0.82) !important;
+  backdrop-filter: blur(28px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(190%) !important;
+  border-color: rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 0 16px 36px -6px rgba(0, 0, 0, 0.12),
+              0 4px 12px -2px rgba(0, 0, 0, 0.05),
+              0 0 20px 1px rgba(56, 189, 248, 0.12),
+              inset 0 2px 3px 0 rgba(255, 255, 255, 1),
+              inset 0 -1.5px 2px 0 rgba(56, 189, 248, 0.25) !important;
+}
 
+.dark .nav-pill-track-3d.is-scrolled-3d {
+  background: rgba(10, 15, 29, 0.72) !important;
+  backdrop-filter: blur(28px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(190%) !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
+  box-shadow: 0 20px 48px -6px rgba(0, 0, 0, 0.8),
+              0 0 28px 2px rgba(56, 189, 248, 0.2),
+              inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.2),
+              inset 0 -1px 2px 0 rgba(56, 189, 248, 0.35) !important;
+}
+
+/* Individual 3D Glass Nav Option Button */
+.nav-3d-glass-btn {
+  transform-style: preserve-3d;
+  will-change: transform, box-shadow, background-color;
+  transition: transform 0.35s cubic-bezier(0.2, 0.8, 0.25, 1),
+              box-shadow 0.35s cubic-bezier(0.2, 0.8, 0.25, 1),
+              background-color 0.25s ease,
+              border-color 0.25s ease;
+}
+
+/* Selected Active 3D Glass Pill Option */
+.nav-3d-glass-btn.is-selected-glass {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.98) 0%, rgba(255, 255, 255, 0.88) 60%, rgba(240, 249, 255, 0.84) 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.95) !important;
+  box-shadow: 0 8px 24px -2px rgba(2, 132, 199, 0.22),
+              0 2px 6px 0 rgba(0, 0, 0, 0.06),
+              inset 0 2px 1.5px 0 rgba(255, 255, 255, 1),
+              inset 0 -1.5px 2px 0 rgba(56, 189, 248, 0.35) !important;
+}
+
+.dark .nav-3d-glass-btn.is-selected-glass {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.14) 60%, rgba(56, 189, 248, 0.1) 100%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.38) !important;
+  box-shadow: 0 0 24px 2px rgba(56, 189, 248, 0.28),
+              0 8px 28px rgba(0, 0, 0, 0.75),
+              inset 0 2px 1.5px 0 rgba(255, 255, 255, 0.7),
+              inset 0 -1.5px 2px 0 rgba(56, 189, 248, 0.45) !important;
+}
+
+/* Unselected Option Hover State */
+.nav-3d-glass-btn:not(.is-selected-glass):hover {
+  background: rgba(255, 255, 255, 0.65) !important;
+  border: 1px solid rgba(255, 255, 255, 0.8) !important;
+  box-shadow: 0 4px 16px rgba(2, 132, 199, 0.12),
+              inset 0 1px 1px rgba(255, 255, 255, 0.9) !important;
+}
+
+.dark .nav-3d-glass-btn:not(.is-selected-glass):hover {
+  background: rgba(255, 255, 255, 0.09) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.45),
+              inset 0 1px 1px rgba(255, 255, 255, 0.15) !important;
+}
