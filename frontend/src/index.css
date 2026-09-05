@@ -21,6 +21,18 @@
   --color-threat-amber: #F59E0B;
   --color-threat-green: #10B981;
   --color-threat-blue: #0284C7;
+
+  /* Fixed pixel container boundaries so layout width never collapses when font size scales */
+  --container-7xl: 1800px;
+  --container-6xl: 1152px;
+  --container-5xl: 1024px;
+  --container-4xl: 896px;
+  --container-3xl: 768px;
+  --container-2xl: 672px;
+  --container-xl: 576px;
+  --container-lg: 512px;
+  --container-md: 448px;
+  --container-sm: 384px;
 }
 
 @layer base {
@@ -75,6 +87,90 @@ html.dark,
   --color-surface-card: #09090b;
   --color-surface-border: #1e1e24;
   --color-surface-muted: #121215;
+}
+
+/* Lock container max-widths to stable pixels so layout width does not collapse when font-size is reduced */
+.max-w-7xl { max-width: 1800px !important; }
+.max-w-6xl { max-width: 1152px !important; }
+.max-w-5xl { max-width: 1024px !important; }
+.max-w-4xl { max-width: 896px !important; }
+.max-w-3xl { max-width: 768px !important; }
+.max-w-2xl { max-width: 672px !important; }
+.max-w-xl  { max-width: 576px !important; }
+.max-w-lg  { max-width: 512px !important; }
+.max-w-md  { max-width: 448px !important; }
+.max-w-sm  { max-width: 384px !important; }
+
+/* ==========================================================================
+   PUBLIC NAVBAR STABILITY & ACCESSIBILITY ISOLATION
+   Ensures the header utility and navigation controls never overflow or get
+   cut off at high font scale levels (125%, 140%, 155%) or on compact screens.
+   ========================================================================== */
+header {
+  width: 100% !important;
+  max-width: 100vw !important;
+  box-sizing: border-box !important;
+}
+
+header .header-inner-row,
+header .h-16,
+nav.h-16 {
+  height: 64px !important;
+  padding-left: clamp(10px, 1.5vw, 24px) !important;
+  padding-right: clamp(10px, 1.5vw, 24px) !important;
+  gap: clamp(6px, 1vw, 16px) !important;
+}
+
+/* Nav links track: stable pixel sizing */
+header nav.nav-pill-track {
+  padding: 3px !important;
+  gap: 3px !important;
+}
+
+header nav.nav-pill-track .nav-link-btn {
+  font-size: 12px !important;
+  line-height: 16px !important;
+  padding: 5px 9px !important;
+  gap: 5px !important;
+}
+
+@media (min-width: 1366px) {
+  header nav.nav-pill-track .nav-link-btn {
+    padding: 5px 11px !important;
+    font-size: 12.5px !important;
+  }
+}
+
+/* Controls container & buttons */
+header .header-controls-row {
+  gap: clamp(4px, 0.6vw, 8px) !important;
+}
+
+header .header-ctrl-btn {
+  font-size: 11.5px !important;
+  line-height: 15px !important;
+  padding: 5px 9px !important;
+  gap: 5px !important;
+}
+
+header .header-font-box {
+  padding: 2px !important;
+}
+
+header .header-font-btn {
+  font-size: 11px !important;
+  line-height: 14px !important;
+  padding: 2px 7px !important;
+}
+
+header .header-font-indicator {
+  font-size: 10.5px !important;
+  padding: 0 4px !important;
+  min-width: 36px !important;
+}
+
+header .header-theme-btn {
+  padding: 6px !important;
 }
 
 /* Modern Enterprise Cards */

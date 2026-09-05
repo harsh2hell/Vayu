@@ -1,6 +1,29 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Shield, PhoneCall, Sun, Moon, Menu, X, ChevronRight } from 'lucide-react';
+
+export const FONT_SCALE_MAP = {
+  '-3': 75,
+  '-2': 85,
+  '-1': 92,
+  '0': 100,
+  '1': 110,
+  '2': 125,
+  '3': 140,
+  '4': 155,
+};
+
+export const getFontScalePercent = (offset) => {
+  return FONT_SCALE_MAP[String(offset)] ?? 100;
+};
+
+export const applyGlobalFontScale = (offset) => {
+  const percent = getFontScalePercent(offset);
+  document.documentElement.style.fontSize = `${percent}%`;
+  try {
+    localStorage.setItem('vayu_font_offset', String(offset));
+  } catch (e) {}
+};
 
 const PublicNavbar = ({
   isHindi,
@@ -14,6 +37,29 @@ const PublicNavbar = ({
   const navigate = useNavigate();
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Read initial offset from prop or localStorage
+  const currentOffset = typeof fontSizeOffset === 'number' 
+    ? fontSizeOffset 
+    : (() => {
+        try {
+          const s = localStorage.getItem('vayu_font_offset');
+          return s !== null ? parseInt(s, 10) : 0;
+        } catch(e) { return 0; }
+      })();
+
+  const handleFontChange = (newOffset) => {
+    applyGlobalFontScale(newOffset);
+    if (typeof setFontSizeOffset === 'function') {
+      setFontSizeOffset(newOffset);
+    }
+    window.dispatchEvent(new CustomEvent('fontScaleChange', { detail: newOffset }));
+  };
+
+  useEffect(() => {
+    // Guarantee font scale is applied on mount
+    applyGlobalFontScale(currentOffset);
+  }, []);
 
   const NAV_LINKS = [
     { 
@@ -52,14 +98,15 @@ const PublicNavbar = ({
       {/* 2px National Tricolor Stripe */}
       <div className="h-0.5 bg-gradient-to-r from-[#FF9933] via-slate-300 dark:via-slate-700 to-[#138808]" />
       
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-3 sm:gap-4 flex-nowrap">
+      <div className="header-inner-row max-w-7xl mx-auto px-2.5 sm:px-4 lg:px-6 h-16 flex items-center justify-between gap-2 sm:gap-3 flex-nowrap">
         
         {/* VAYU Brand Logo */}
         <div className="flex items-center shrink-0">
           <img 
             src={isDarkMode ? "/vayu-white.png?v=2" : "/vayu.png"} 
             alt="VAYU" 
-            className="h-9 sm:h-10 w-auto object-contain filter drop-shadow-xs transition-transform duration-300 hover:scale-105 cursor-pointer" 
+            className="h-8 sm:h-9 w-auto object-contain filter drop-shadow-xs transition-transform duration-300 hover:scale-105 cursor-pointer" 
+            style={{ maxHeight: '36px' }}
             onClick={() => {
               if (location.pathname === '/') {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -72,7 +119,7 @@ const PublicNavbar = ({
         </div>
 
         {/* Ultra-Glossy 3D Glass Pill Track (Desktop) */}
-        <nav className={`hidden md:flex items-center gap-1.5 p-1 rounded-full backdrop-blur-xl transition-all duration-300 shrink-0 flex-nowrap ${
+        <nav className={`nav-pill-track hidden md:flex items-center gap-1.5 p-1 rounded-full backdrop-blur-xl transition-all duration-300 shrink min-w-0 flex-nowrap ${
           isScrolled
             ? 'bg-slate-100/90 dark:bg-neutral-900/60 border border-slate-200/80 dark:border-white/10 shadow-xs'
             : 'bg-slate-100/80 dark:bg-neutral-950/40 border border-slate-200/60 dark:border-white/10'
@@ -89,7 +136,7 @@ const PublicNavbar = ({
                     navigate(link.path);
                   }
                 }}
-                className={`group relative overflow-hidden px-3 lg:px-3.5 py-1.5 rounded-full text-xs transition-all duration-200 cursor-pointer whitespace-nowrap shrink-0 flex items-center gap-1.5 transform-gpu ${
+                className={`nav-link-btn group relative overflow-hidden px-3 lg:px-3.5 py-1.5 rounded-full text-xs transition-all duration-200 cursor-pointer whitespace-nowrap shrink-0 flex items-center gap-1.5 transform-gpu ${
                   isSelected
                     ? 'bg-gradient-to-b from-white/95 via-white/85 to-white/70 dark:from-white/30 dark:via-white/15 dark:to-white/5 text-slate-950 dark:text-white border border-white/80 dark:border-white/40 shadow-[0_4px_16px_rgba(0,0,0,0.12),0_1px_3px_rgba(0,0,0,0.08),inset_0_2px_1px_rgba(255,255,255,1),inset_0_-1.5px_2px_rgba(255,255,255,0.4)] dark:shadow-[0_0_20px_rgba(255,255,255,0.15),0_6px_24px_rgba(0,0,0,0.8),inset_0_2px_1px_rgba(255,255,255,0.7),inset_0_-1.5px_2px_rgba(255,255,255,0.2)] backdrop-blur-2xl font-bold -translate-y-0.5 scale-[1.02]'
                     : 'border border-transparent bg-transparent text-slate-700 dark:text-white hover:text-slate-950 dark:hover:text-white hover:bg-white/60 dark:hover:bg-white/10 hover:border-slate-200/60 dark:hover:border-white/15 hover:shadow-2xs font-medium'
@@ -122,71 +169,72 @@ const PublicNavbar = ({
         </nav>
 
         {/* RIGHT SIDE CONTROLS: OFFICER LOGIN, HELPLINE, LANGUAGE, FONT, THEME, MOBILE HAMBURGER */}
-        <div className="flex items-center gap-1.5 sm:gap-2.5 shrink-0 flex-nowrap">
+        <div className="header-controls-row flex items-center gap-1.5 sm:gap-2 shrink-0 flex-nowrap">
           
           {/* Official Officer Gateway */}
           <button
             onClick={() => navigate('/login')}
-            className="inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-slate-900 dark:bg-sky-600 hover:bg-slate-800 dark:hover:bg-sky-500 transition-all shadow-xs cursor-pointer"
+            className="header-ctrl-btn hidden xl:inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold text-white bg-slate-900 dark:bg-sky-600 hover:bg-slate-800 dark:hover:bg-sky-500 transition-all shadow-xs cursor-pointer shrink-0"
             title={isHindi ? "आधिकारिक आईएमडी / एमओईएस अधिकारी लॉगिन पोर्टल" : "Official IMD / MoES Officer Login Gateway"}
           >
-            <Shield className="w-3.5 h-3.5 text-amber-400 dark:text-sky-200" />
-            <span className="hidden sm:inline">{isHindi ? 'अधिकारी लॉगिन' : 'Officer Login'}</span>
-            <span className="sm:hidden">{isHindi ? 'लॉगिन' : 'Login'}</span>
+            <Shield className="w-3.5 h-3.5 text-amber-400 dark:text-sky-200 shrink-0" />
+            <span className="hidden 2xl:inline">{isHindi ? 'अधिकारी लॉगिन' : 'Officer Login'}</span>
+            <span className="2xl:hidden inline">{isHindi ? 'लॉगिन' : 'Login'}</span>
           </button>
 
           {/* National Emergency Hotline */}
           <a 
             href="tel:112" 
-            className="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold text-red-700 dark:text-red-300 bg-red-50/90 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 hover:bg-red-100 dark:hover:bg-red-900/60 transition-all shadow-2xs"
+            className="header-ctrl-btn hidden sm:inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold text-red-700 dark:text-red-300 bg-red-50/90 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 hover:bg-red-100 dark:hover:bg-red-900/60 transition-all shadow-2xs shrink-0"
             title={isHindi ? "राष्ट्रीय आपातकालीन हेल्पलाइन" : "National Emergency Helpline"}
           >
-            <PhoneCall className="w-3.5 h-3.5 text-red-600 dark:text-red-400" />
-            <span>112 / 1078</span>
+            <PhoneCall className="w-3.5 h-3.5 text-red-600 dark:text-red-400 shrink-0" />
+            <span>112</span>
+            <span className="hidden lg:inline"> / 1078</span>
           </a>
 
           {/* Language Switcher */}
           <button
             onClick={() => setIsHindi(!isHindi)}
-            className="px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-700 transition-all cursor-pointer"
+            className="header-ctrl-btn px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-700 transition-all cursor-pointer shrink-0"
             title={isHindi ? "Switch to English" : "हिन्दी में बदलें"}
           >
             {isHindi ? 'English' : 'हिन्दी'}
           </button>
 
           {/* Font Size Scaling Controls */}
-          {setFontSizeOffset && (
-            <div className="flex items-center rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 p-0.5">
-              <button
-                onClick={() => setFontSizeOffset(p => Math.max(-2, p - 1))}
-                className="px-1.5 sm:px-2 py-0.5 sm:py-1 text-[11px] sm:text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white rounded hover:bg-white dark:hover:bg-slate-700 transition-all cursor-pointer"
-                title={isHindi ? "फ़ॉन्ट आकार घटाएं" : "Decrease font size"}
-              >
-                A-
-              </button>
-              <button
-                onClick={() => setFontSizeOffset(0)}
-                className="text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-400 px-1 sm:px-1.5 hover:text-sky-600 dark:hover:text-sky-400 cursor-pointer select-none transition-colors hidden sm:inline-block"
-                title={isHindi ? "फ़ॉन्ट स्केल रीसेट करें (100%)" : "Click to reset font scale to 100%"}
-              >
-                {fontSizeOffset === 0 ? '100%' : `${100 + Math.round(fontSizeOffset * 6.25)}%`}
-              </button>
-              <button
-                onClick={() => setFontSizeOffset(p => Math.min(4, p + 1))}
-                className="px-1.5 sm:px-2 py-0.5 sm:py-1 text-[11px] sm:text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white rounded hover:bg-white dark:hover:bg-slate-700 transition-all cursor-pointer"
-                title={isHindi ? "फ़ॉन्ट आकार बढ़ाएं" : "Increase font size"}
-              >
-                A+
-              </button>
-            </div>
-          )}
+          <div className="header-font-box flex items-center rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 p-0.5 shrink-0">
+            <button
+              onClick={() => handleFontChange(Math.max(-3, currentOffset - 1))}
+              disabled={currentOffset <= -3}
+              className="header-font-btn px-1.5 sm:px-2 py-0.5 sm:py-1 text-[11px] sm:text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white rounded hover:bg-white dark:hover:bg-slate-700 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+              title={isHindi ? "फ़ॉन्ट आकार घटाएं" : "Decrease font size"}
+            >
+              A-
+            </button>
+            <button
+              onClick={() => handleFontChange(0)}
+              className="header-font-indicator text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-400 px-1 sm:px-1.5 hover:text-sky-600 dark:hover:text-sky-400 cursor-pointer select-none transition-colors hidden sm:inline-block min-w-[36px] text-center"
+              title={isHindi ? "फ़ॉन्ट स्केल रीसेट करें (100%)" : "Click to reset font scale to 100%"}
+            >
+              {`${getFontScalePercent(currentOffset)}%`}
+            </button>
+            <button
+              onClick={() => handleFontChange(Math.min(4, currentOffset + 1))}
+              disabled={currentOffset >= 4}
+              className="header-font-btn px-1.5 sm:px-2 py-0.5 sm:py-1 text-[11px] sm:text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white rounded hover:bg-white dark:hover:bg-slate-700 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+              title={isHindi ? "फ़ॉन्ट आकार बढ़ाएं" : "Increase font size"}
+            >
+              A+
+            </button>
+          </div>
 
           {/* Theme Switcher */}
           {setIsDarkMode && (
             <button
               onClick={() => setIsDarkMode(!isDarkMode)}
               aria-label="Toggle light/dark theme"
-              className="relative p-1.5 sm:p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 shadow-xs hover:bg-white dark:hover:bg-slate-700 text-slate-700 dark:text-amber-400 transition-all duration-300 overflow-hidden group cursor-pointer"
+              className="header-theme-btn relative p-1.5 sm:p-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 shadow-xs hover:bg-white dark:hover:bg-slate-700 text-slate-700 dark:text-amber-400 transition-all duration-300 overflow-hidden group cursor-pointer shrink-0"
               title={isDarkMode ? (isHindi ? "लाइट थीम पर स्विच करें" : "Switch to Light Theme") : (isHindi ? "डार्क थीम पर स्विच करें" : "Switch to Dark Theme")}
             >
               <div className="relative w-4 h-4 flex items-center justify-center">

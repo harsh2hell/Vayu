@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getDashboardUrl } from '../utils/domain';
-import PublicNavbar from '../components/PublicNavbar';
-import { 
+import PublicNavbar, { getFontScalePercent, applyGlobalFontScale } from '../components/PublicNavbar';
+import {
   Wind, Shield, AlertTriangle, ArrowRight, ExternalLink,
   Satellite, Compass, PhoneCall, FileText, CheckCircle2,
   XCircle, ChevronRight, Clock, MapPin, Eye, Radio,
@@ -11,16 +11,16 @@ import {
   Search, Waves, Bell, Navigation2, Menu, X, ShieldCheck, Target, TrendingUp, Gauge
 } from 'lucide-react';
 import LanguageWelcomeAnimation from '../components/LanguageWelcomeAnimation';
-import { 
-  MapContainer, 
-  TileLayer, 
-  CircleMarker, 
+import {
+  MapContainer,
+  TileLayer,
+  CircleMarker,
   Circle,
-  Polyline, 
-  Polygon, 
-  Popup, 
+  Polyline,
+  Polygon,
+  Popup,
   Marker,
-  useMap 
+  useMap
 } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 
@@ -28,11 +28,11 @@ import L from 'leaflet';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 
-L.Marker.prototype.options.icon = L.icon({ 
-  iconUrl: icon, 
-  shadowUrl: iconShadow, 
-  iconSize: [25, 41], 
-  iconAnchor: [12, 41] 
+L.Marker.prototype.options.icon = L.icon({
+  iconUrl: icon,
+  shadowUrl: iconShadow,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41]
 });
 
 const MapController = ({ center, zoom }) => {
@@ -203,226 +203,226 @@ const BASE_LAYERS = {
 };
 
 const DISTRICT_ROWS = [
-  { 
-    state: 'Odisha', 
+  {
+    state: 'Odisha',
     stateHindi: 'ओडिशा',
-    slug: 'odisha', 
-    district: 'Balasore', 
+    slug: 'odisha',
+    district: 'Balasore',
     districtHindi: 'बालेश्वर',
-    alert: 'Red Alert', 
+    alert: 'Red Alert',
     alertHindi: 'रेड अलर्ट',
     level: 'red',
-    wind: '110-120 km/h', 
+    wind: '110-120 km/h',
     windHindi: '110-120 किमी/घंटा',
     gusts: '140 km/h',
     gustsHindi: '140 किमी/घंटा',
     windPercent: 95,
-    surge: '2.0-3.0 m', 
+    surge: '2.0-3.0 m',
     surgeHindi: '2.0-3.0 मीटर',
     surgePercent: 90,
     rainfall: 'Torrential (>200 mm)',
     rainfallHindi: 'मूसलाधार (>200 मिमी)',
-    readiness: 'Shelters Activated (100%)', 
+    readiness: 'Shelters Activated (100%)',
     readinessHindi: '100% आश्रय स्थल सक्रिय',
     stations: ['Chandipur Coast', 'Soro Port'],
     stationsHindi: ['चांदीपुर तट', 'सोरो पोर्ट'],
     controlRoom: '06782-262261'
   },
-  { 
-    state: 'Odisha', 
+  {
+    state: 'Odisha',
     stateHindi: 'ओडिशा',
-    slug: 'odisha', 
-    district: 'Bhadrak', 
+    slug: 'odisha',
+    district: 'Bhadrak',
     districtHindi: 'भद्रक',
-    alert: 'Red Alert', 
+    alert: 'Red Alert',
     alertHindi: 'रेड अलर्ट',
     level: 'red',
-    wind: '110-120 km/h', 
+    wind: '110-120 km/h',
     windHindi: '110-120 किमी/घंटा',
     gusts: '135 km/h',
     gustsHindi: '135 किमी/घंटा',
     windPercent: 95,
-    surge: '2.0-3.0 m', 
+    surge: '2.0-3.0 m',
     surgeHindi: '2.0-3.0 मीटर',
     surgePercent: 90,
     rainfall: 'Torrential (220 mm)',
     rainfallHindi: 'मूसलाधार (220 मिमी)',
-    readiness: 'Shelters Activated', 
+    readiness: 'Shelters Activated',
     readinessHindi: 'आश्रय स्थल सक्रिय',
     stations: ['Dhamra Port', 'Basudevpur'],
     stationsHindi: ['धामरा बंदरगाह', 'बासुदेवपुर'],
     controlRoom: '06784-251201'
   },
-  { 
-    state: 'Odisha', 
+  {
+    state: 'Odisha',
     stateHindi: 'ओडिशा',
-    slug: 'odisha', 
-    district: 'Kendrapara', 
+    slug: 'odisha',
+    district: 'Kendrapara',
     districtHindi: 'केंद्रपड़ा',
-    alert: 'Red Alert', 
+    alert: 'Red Alert',
     alertHindi: 'रेड अलर्ट',
     level: 'red',
-    wind: '100-115 km/h', 
+    wind: '100-115 km/h',
     windHindi: '100-115 किमी/घंटा',
     gusts: '130 km/h',
     gustsHindi: '130 किमी/घंटा',
     windPercent: 88,
-    surge: '1.5-2.0 m', 
+    surge: '1.5-2.0 m',
     surgeHindi: '1.5-2.0 मीटर',
     surgePercent: 75,
     rainfall: 'Very Heavy (190 mm)',
     rainfallHindi: 'अत्यधिक भारी (190 मिमी)',
-    readiness: 'Evacuation in Progress', 
+    readiness: 'Evacuation in Progress',
     readinessHindi: 'सुरक्षित निकासी जारी',
     stations: ['Rajnagar Delta', 'Mahakalapada'],
     stationsHindi: ['राजनगर डेल्टा', 'महाकालपड़ा'],
     controlRoom: '06727-232145'
   },
-  { 
-    state: 'Odisha', 
+  {
+    state: 'Odisha',
     stateHindi: 'ओडिशा',
-    slug: 'odisha', 
-    district: 'Puri', 
+    slug: 'odisha',
+    district: 'Puri',
     districtHindi: 'पुरी',
-    alert: 'Orange Alert', 
+    alert: 'Orange Alert',
     alertHindi: 'ऑरेंज अलर्ट',
     level: 'orange',
-    wind: '80-95 km/h', 
+    wind: '80-95 km/h',
     windHindi: '80-95 किमी/घंटा',
     gusts: '115 km/h',
     gustsHindi: '115 किमी/घंटा',
     windPercent: 75,
-    surge: '1.0-1.5 m', 
+    surge: '1.0-1.5 m',
     surgeHindi: '1.0-1.5 मीटर',
     surgePercent: 55,
     rainfall: 'Heavy Rain (160 mm)',
     rainfallHindi: 'भारी वर्षा (160 मिमी)',
-    readiness: 'High Vigil • Beach Ban', 
+    readiness: 'High Vigil • Beach Ban',
     readinessHindi: 'उच्च सतर्कता • समुद्र तट प्रतिबंध',
     stations: ['Puri Seafront', 'Konark Marine'],
     stationsHindi: ['पुरी समुद्र तट', 'कोणार्क मरीन'],
     controlRoom: '06752-223230'
   },
-  { 
-    state: 'West Bengal', 
+  {
+    state: 'West Bengal',
     stateHindi: 'पश्चिम बंगाल',
-    slug: 'west-bengal', 
-    district: 'East Medinipur', 
+    slug: 'west-bengal',
+    district: 'East Medinipur',
     districtHindi: 'पूर्व मेदिनीपुर',
-    alert: 'Red Alert', 
+    alert: 'Red Alert',
     alertHindi: 'रेड अलर्ट',
     level: 'red',
-    wind: '90-110 km/h', 
+    wind: '90-110 km/h',
     windHindi: '90-110 किमी/घंटा',
     gusts: '125 km/h',
     gustsHindi: '125 किमी/घंटा',
     windPercent: 85,
-    surge: '1.5-2.0 m', 
+    surge: '1.5-2.0 m',
     surgeHindi: '1.5-2.0 मीटर',
     surgePercent: 75,
     rainfall: 'Torrential (200 mm)',
     rainfallHindi: 'मूसलाधार (200 मिमी)',
-    readiness: 'Coastal Warning Hoisted', 
+    readiness: 'Coastal Warning Hoisted',
     readinessHindi: 'तटीय चेतावनी जारी',
     stations: ['Digha Sea Beach', 'Haldia Port'],
     stationsHindi: ['दीघा समुद्र तट', 'हल्दिया बंदरगाह'],
     controlRoom: '03228-263124'
   },
-  { 
-    state: 'West Bengal', 
+  {
+    state: 'West Bengal',
     stateHindi: 'पश्चिम बंगाल',
-    slug: 'west-bengal', 
-    district: 'South 24 Parganas', 
+    slug: 'west-bengal',
+    district: 'South 24 Parganas',
     districtHindi: 'दक्षिण 24 परगना',
-    alert: 'Orange Alert', 
+    alert: 'Orange Alert',
     alertHindi: 'ऑरेंज अलर्ट',
     level: 'orange',
-    wind: '80-95 km/h', 
+    wind: '80-95 km/h',
     windHindi: '80-95 किमी/घंटा',
     gusts: '120 km/h',
     gustsHindi: '120 किमी/घंटा',
     windPercent: 75,
-    surge: '1.0-1.5 m', 
+    surge: '1.0-1.5 m',
     surgeHindi: '1.0-1.5 मीटर',
     surgePercent: 55,
     rainfall: 'Heavy Rain (180 mm)',
     rainfallHindi: 'भारी वर्षा (180 मिमी)',
-    readiness: 'Rough Sea Advisory Active', 
+    readiness: 'Rough Sea Advisory Active',
     readinessHindi: 'अशांत समुद्र चेतावनी सक्रिय',
     stations: ['Sagar Island', 'Kakdwip Trawler Base'],
     stationsHindi: ['सागर द्वीप', 'काकद्वीप ट्रॉलर बेस'],
     controlRoom: '033-24791010'
   },
-  { 
-    state: 'Andhra Pradesh', 
+  {
+    state: 'Andhra Pradesh',
     stateHindi: 'आंध्र प्रदेश',
-    slug: 'andhra-pradesh', 
-    district: 'Srikakulam', 
+    slug: 'andhra-pradesh',
+    district: 'Srikakulam',
     districtHindi: 'श्रीकाकुलम',
-    alert: 'Orange Alert', 
+    alert: 'Orange Alert',
     alertHindi: 'ऑरेंज अलर्ट',
     level: 'orange',
-    wind: '70-85 km/h', 
+    wind: '70-85 km/h',
     windHindi: '70-85 किमी/घंटा',
     gusts: '100 km/h',
     gustsHindi: '100 किमी/घंटा',
     windPercent: 65,
-    surge: '0.5-1.0 m', 
+    surge: '0.5-1.0 m',
     surgeHindi: '0.5-1.0 मीटर',
     surgePercent: 40,
     rainfall: 'Heavy Rain (140 mm)',
     rainfallHindi: 'भारी वर्षा (140 मिमी)',
-    readiness: 'Disaster Teams Ready', 
+    readiness: 'Disaster Teams Ready',
     readinessHindi: 'आपदा राहत दल तैनात',
     stations: ['Kalingapatnam Port', 'Tekkali Coast'],
     stationsHindi: ['कलिंगपट्टनम बंदरगाह', 'टेक्काली तट'],
     controlRoom: '08942-240557'
   },
-  { 
-    state: 'Andhra Pradesh', 
+  {
+    state: 'Andhra Pradesh',
     stateHindi: 'आंध्र प्रदेश',
-    slug: 'andhra-pradesh', 
-    district: 'Visakhapatnam', 
+    slug: 'andhra-pradesh',
+    district: 'Visakhapatnam',
     districtHindi: 'विशाखापट्टनम',
-    alert: 'Yellow Watch', 
+    alert: 'Yellow Watch',
     alertHindi: 'येलो वॉच',
     level: 'yellow',
-    wind: '50-65 km/h', 
+    wind: '50-65 km/h',
     windHindi: '50-65 किमी/घंटा',
     gusts: '85 km/h',
     gustsHindi: '85 किमी/घंटा',
     windPercent: 50,
-    surge: '0.5 m', 
+    surge: '0.5 m',
     surgeHindi: '0.5 मीटर',
     surgePercent: 25,
     rainfall: 'Moderate Rain (95 mm)',
     rainfallHindi: 'मध्यम वर्षा (95 मिमी)',
-    readiness: 'Port Signal Hoisted (No. 3)', 
+    readiness: 'Port Signal Hoisted (No. 3)',
     readinessHindi: 'बंदरगाह संकेत संख्या 3 जारी',
     stations: ['Gangavaram Port', 'Bheemunipatnam'],
     stationsHindi: ['गंगावरम बंदरगाह', 'भीमुनिपट्टनम'],
     controlRoom: '0891-2560121'
   },
-  { 
-    state: 'Gujarat', 
+  {
+    state: 'Gujarat',
     stateHindi: 'गुजरात',
-    slug: 'gujarat', 
-    district: 'Kutch Coast', 
+    slug: 'gujarat',
+    district: 'Kutch Coast',
     districtHindi: 'कच्छ तट',
-    alert: 'Yellow Watch', 
+    alert: 'Yellow Watch',
     alertHindi: 'येलो वॉच',
     level: 'yellow',
-    wind: '45-55 km/h', 
+    wind: '45-55 km/h',
     windHindi: '45-55 किमी/घंटा',
     gusts: '65 km/h',
     gustsHindi: '65 किमी/घंटा',
     windPercent: 40,
-    surge: '0.5 m', 
+    surge: '0.5 m',
     surgeHindi: '0.5 मीटर',
     surgePercent: 20,
     rainfall: 'Squall Showers (40 mm)',
     rainfallHindi: 'तेज़ बौछारें (40 मिमी)',
-    readiness: 'Deep Sea Advisory Active', 
+    readiness: 'Deep Sea Advisory Active',
     readinessHindi: 'गहरे समुद्र चेतावनी सक्रिय',
     stations: ['Jakhau Port', 'Mandvi Coast'],
     stationsHindi: ['जाखौ बंदरगाह', 'मांडवी तट'],
@@ -504,8 +504,8 @@ const Welcome = () => {
 
   const handleLanguageToggle = (nextVal) => {
     setAnimState(prev => {
-      const nextIsHindi = typeof nextVal === 'boolean' 
-        ? nextVal 
+      const nextIsHindi = typeof nextVal === 'boolean'
+        ? nextVal
         : (prev.isOpen ? prev.targetLang !== 'hi' : !isHindi);
       return {
         isOpen: true,
@@ -528,7 +528,14 @@ const Welcome = () => {
   const [isDarkMode, setIsDarkMode] = useState(() => {
     return document.documentElement.classList.contains('dark') || localStorage.getItem('theme') === 'dark';
   });
-  const [fontSizeOffset, setFontSizeOffset] = useState(0);
+  const [fontSizeOffset, setFontSizeOffset] = useState(() => {
+    try {
+      const saved = localStorage.getItem('vayu_font_offset');
+      return saved !== null ? parseInt(saved, 10) : 0;
+    } catch (e) {
+      return 0;
+    }
+  });
   const [stateFilter, setStateFilter] = useState('All');
   const [matrixThreatFilter, setMatrixThreatFilter] = useState('All');
   const [matrixSearchQuery, setMatrixSearchQuery] = useState('');
@@ -750,15 +757,19 @@ const Welcome = () => {
 
   // Dynamically scale root document font-size so all rem-based typography scales with A- / A+
   useEffect(() => {
-    const root = document.documentElement;
-    // Base 16px is 100%. Each step scales by 6.25% (1px per step: -2 is 87.5%, 0 is 100%, +1 is 106.25%, +2 is 112.5%, etc.)
-    const scalePercent = 100 + fontSizeOffset * 6.25;
-    root.style.fontSize = `${scalePercent}%`;
-
-    return () => {
-      root.style.fontSize = '';
-    };
+    applyGlobalFontScale(fontSizeOffset);
   }, [fontSizeOffset]);
+
+  // Listen to fontScaleChange custom events across tabs or components
+  useEffect(() => {
+    const handleFontScale = (e) => {
+      if (typeof e.detail === 'number') {
+        setFontSizeOffset(e.detail);
+      }
+    };
+    window.addEventListener('fontScaleChange', handleFontScale);
+    return () => window.removeEventListener('fontScaleChange', handleFontScale);
+  }, []);
 
   // Live IST Clock
   useEffect(() => {
@@ -825,7 +836,7 @@ const Welcome = () => {
   };
 
   return (
-    <div 
+    <div
       className="min-h-screen bg-[#fafbfc] dark:bg-black text-slate-900 dark:text-slate-100 font-sans antialiased selection:bg-sky-500 selection:text-white flex flex-col transition-colors duration-500 w-full max-w-full"
     >
       {/* Cinematic Opening & Language Translation Morph Animation */}
@@ -866,31 +877,31 @@ const Welcome = () => {
           <div className="relative flex-1 overflow-hidden flex items-center group cursor-default">
             <div className="animate-ticker-rtl flex items-center gap-12 font-medium">
               <span className="inline-flex items-center gap-3 whitespace-nowrap">
-                <span>{isHindi 
-                  ? 'बंगाल की खाड़ी (13.5°N, 88.5°E) में चक्रवाती परिसंचरण इन्वेस्ट 92B सक्रिय। 48 घंटों में चक्रवात बनने की संभावना: 68%।' 
+                <span>{isHindi
+                  ? 'बंगाल की खाड़ी (13.5°N, 88.5°E) में चक्रवाती परिसंचरण इन्वेस्ट 92B सक्रिय। 48 घंटों में चक्रवात बनने की संभावना: 68%।'
                   : 'Incipient cyclonic circulation Invest 92B in Bay of Bengal (13.5°N, 88.5°E). 48h cyclogenesis potential: 68%.'}</span>
                 <span className="text-amber-500/60 dark:text-amber-400/60">•</span>
-                <span>{isHindi 
-                  ? 'आपदा प्रबंधन बल (NDRF/SDRF) तटीय क्षेत्रों में अलर्ट पर।' 
+                <span>{isHindi
+                  ? 'आपदा प्रबंधन बल (NDRF/SDRF) तटीय क्षेत्रों में अलर्ट पर।'
                   : 'Disaster response authorities on vigil across coastal corridors.'}</span>
                 <span className="text-amber-500/60 dark:text-amber-400/60">•</span>
-                <span>{isHindi 
-                  ? 'मछुआरों को गहरे समुद्र में न जाने की आधिकारिक सलाह।' 
+                <span>{isHindi
+                  ? 'मछुआरों को गहरे समुद्र में न जाने की आधिकारिक सलाह।'
                   : 'Fishermen advised not to venture into deep sea.'}</span>
               </span>
 
               {/* Seamless loop duplication */}
               <span className="inline-flex items-center gap-3 whitespace-nowrap">
-                <span>{isHindi 
-                  ? 'बंगाल की खाड़ी (13.5°N, 88.5°E) में चक्रवाती परिसंचरण इन्वेस्ट 92B सक्रिय। 48 घंटों में चक्रवात बनने की संभावना: 68%।' 
+                <span>{isHindi
+                  ? 'बंगाल की खाड़ी (13.5°N, 88.5°E) में चक्रवाती परिसंचरण इन्वेस्ट 92B सक्रिय। 48 घंटों में चक्रवात बनने की संभावना: 68%।'
                   : 'Incipient cyclonic circulation Invest 92B in Bay of Bengal (13.5°N, 88.5°E). 48h cyclogenesis potential: 68%.'}</span>
                 <span className="text-amber-500/60 dark:text-amber-400/60">•</span>
-                <span>{isHindi 
-                  ? 'आपदा प्रबंधन बल (NDRF/SDRF) तटीय क्षेत्रों में अलर्ट पर।' 
+                <span>{isHindi
+                  ? 'आपदा प्रबंधन बल (NDRF/SDRF) तटीय क्षेत्रों में अलर्ट पर।'
                   : 'Disaster response authorities on vigil across coastal corridors.'}</span>
                 <span className="text-amber-500/60 dark:text-amber-400/60">•</span>
-                <span>{isHindi 
-                  ? 'मछुआरों को गहरे समुद्र में न जाने की आधिकारिक सलाह।' 
+                <span>{isHindi
+                  ? 'मछुआरों को गहरे समुद्र में न जाने की आधिकारिक सलाह।'
                   : 'Fishermen advised not to venture into deep sea.'}</span>
               </span>
             </div>
@@ -904,13 +915,16 @@ const Welcome = () => {
       </div>
 
       {/* =========================================================================
-           HERO SECTION: EXECUTIVE CYCLONE INTEL (RIGHT PART KEPT CLEAN)
+           HERO SECTION: EXECUTIVE CYCLONE INTEL (FIT FOR PC & LAPTOP SCREENS)
            ========================================================================= */}
-      <section id="three-globe-hero" className="py-8 sm:py-12 px-4 sm:px-6 lg:px-8 overflow-hidden relative">
-        <div className="max-w-7xl mx-auto">
-          
+      <section
+        id="three-globe-hero"
+        className="flex-1 flex flex-col justify-center py-3 sm:py-4 lg:py-5 px-4 sm:px-6 lg:px-8 relative w-full overflow-hidden"
+      >
+        <div className="max-w-7xl mx-auto w-full my-auto space-y-3 sm:space-y-3.5 lg:space-y-4">
+
           {/* Active Detected Area Status Indicator */}
-          <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-4 mb-6">
+          <div className="flex flex-wrap items-center justify-between gap-2.5 border-b border-slate-200 dark:border-slate-800 pb-2.5 sm:pb-3">
             <div className="flex items-center gap-2.5 flex-wrap">
               {/* Active Detection Live Badge */}
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-red-50 dark:bg-red-950/50 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-900/60 text-xs font-bold shadow-2xs">
@@ -942,314 +956,157 @@ const Welcome = () => {
           </div>
 
           {/* Hero Intel Presentation (Full Width) */}
-          <div className="space-y-6">
-            
-            <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg text-xs font-semibold border mb-3 bg-sky-50 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300 border-sky-200 dark:border-sky-800">
-                <span>{isHindi ? (current.basinHindi || current.basin) : current.basin}</span>
-              </div>
-              
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-heading font-black tracking-tight text-slate-950 dark:text-white leading-tight">
-                {isHindi ? current.hindiName : current.name}
-              </h1>
-              
-              <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 font-normal mt-2 leading-relaxed">
-                {isHindi 
-                  ? 'बहु-स्रोत उपग्रह डेटा और संख्यात्मक मौसम मॉडल का उपयोग करके पहचान, वर्गीकरण और 72 घंटे के प्रक्षेपवक्र पूर्वानुमान के लिए वास्तविक समय मौसम विज्ञान निगरानी।'
-                  : 'Real-time meteorological intelligence for identification, classification, and 72-hour trajectory prediction using multi-source satellite data and numerical weather models.'}
-              </p>
+          <div className="space-y-1.5 sm:space-y-2">
+            <div className="inline-flex items-center gap-2 px-2.5 py-0.5 rounded-lg text-xs font-semibold border bg-sky-50 dark:bg-sky-950/60 text-sky-800 dark:text-sky-300 border-sky-200 dark:border-sky-800">
+              <span>{isHindi ? (current.basinHindi || current.basin) : current.basin}</span>
             </div>
 
-            {/* Live AI Telemetry Feed Status & Diagnostics */}
-            <div className="bg-slate-100/80 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-3.5 flex flex-wrap items-center justify-between gap-2.5 text-xs">
-              <div className="flex items-center gap-2">
-                <span className="font-semibold text-slate-800 dark:text-slate-200">
-                  {isHindi ? 'लाइव एआई मॉडल डेटा:' : 'Live AI Model Feed:'}
-                </span>
-                <span className="text-slate-600 dark:text-slate-400">
-                  {current.vitPattern 
-                    ? (isHindi ? `वीआईटी आकारिकी (${current.vitPattern})` : `ViT Morphology (${current.vitPattern})`) 
-                    : (isHindi ? 'चक्रवातविज़न सीएनएन v2.1' : 'CycloneVision CNN v2.1')}
-                </span>
-                {current.sst && (
-                  <span className="hidden sm:inline text-slate-500 dark:text-slate-400">
-                    • {isHindi ? 'समुद्री तापमान' : 'SST'} {current.sst}°C • {isHindi ? 'पवन अपरूपण' : 'Shear'} {current.shear} kts
-                  </span>
-                )}
-              </div>
+            <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-[2.65rem] font-heading font-black tracking-tight text-slate-950 dark:text-white leading-tight">
+              {isHindi ? current.hindiName : current.name}
+            </h1>
 
-              <div className="flex items-center gap-2">
-                <span className="text-[11px] text-slate-500 dark:text-slate-400">
-                  {lastSyncTime 
-                    ? (isHindi ? `सिंक किया गया: ${lastSyncTime}` : `Synced: ${lastSyncTime}`) 
-                    : (isHindi ? 'बैकएंड कनेक्ट हो रहा है...' : 'Connecting backend...')}
-                </span>
-                <button
-                  onClick={fetchLiveBackendData}
-                  disabled={isSyncing}
-                  className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white transition-all cursor-pointer disabled:opacity-50"
-                  title={isHindi ? "एआई मॉडल निष्कर्ष और महासागरीय टेलीमेट्री रीफ्रेश करें" : "Refresh AI Model Inference & Ocean Telemetry"}
-                >
-                  <RefreshCw className={`w-3 h-3 ${isSyncing ? 'animate-spin' : ''}`} />
-                  <span>{isHindi ? 'एआई डेटा रीफ्रेश' : 'Sync AI Feed'}</span>
-                </button>
-              </div>
-            </div>
-
-            {/* 4 Large Clean Metric Blocks */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2">
-              
-              <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-xs transition-colors">
-                <span className="text-xs text-slate-500 dark:text-slate-400 block mb-1 font-medium">
-                  {isHindi ? 'सतत पवन गति' : 'Sustained Wind'}
-                </span>
-                <div className="text-3xl font-heading font-black text-slate-950 dark:text-white">
-                  {current.wind} <span className="text-xs font-normal text-slate-500">{isHindi ? 'किमी/घंटा' : 'km/h'}</span>
-                </div>
-                <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 block">
-                  {isHindi ? `झोंके ${current.gusts} किमी/घंटा` : `Gusts ${current.gusts} km/h`}
-                </span>
-              </div>
-
-              <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-xs transition-colors">
-                <span className="text-xs text-slate-500 dark:text-slate-400 block mb-1 font-medium">
-                  {isHindi ? 'केंद्रीय दबाव' : 'Central Pressure'}
-                </span>
-                <div className="text-3xl font-heading font-black text-slate-950 dark:text-white">
-                  {current.pressure} <span className="text-xs font-normal text-slate-500">{isHindi ? 'एचपीए' : 'hPa'}</span>
-                </div>
-                <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 block">
-                  {isHindi ? 'बैरोमीटर रीडिंग' : 'Barometric Fix'}
-                </span>
-              </div>
-
-              <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-xs transition-colors">
-                <span className="text-xs text-slate-500 dark:text-slate-400 block mb-1 font-medium">
-                  {isHindi ? '48 घंटे में चक्रवात संभावना' : '48h Formation'}
-                </span>
-                <div className="text-3xl font-heading font-black text-amber-600 dark:text-amber-400">
-                  {current.risk48h}
-                </div>
-                <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 block">
-                  {isHindi ? 'एआई वीआईटी मॉडल प्रायिकता' : 'ViT Probability'}
-                </span>
-              </div>
-
-              <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 p-4 rounded-2xl shadow-xs transition-colors">
-                <span className="text-xs text-slate-500 dark:text-slate-400 block mb-1 font-medium">
-                  {isHindi ? 'गति एवं दिशा' : 'Movement'}
-                </span>
-                <div className="text-2xl font-heading font-bold text-slate-950 dark:text-white">
-                  {isHindi ? (current.directionHindi || getDirectionName(current.direction, isHindi)) : current.direction}
-                </div>
-                <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 block">
-                  {isHindi ? `गति ${current.speed} किमी/घंटा` : `Speed ${current.speed} km/h`}
-                </span>
-              </div>
-
-            </div>
-
-            {/* Coastal Corridor Strip */}
-            <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-xs">
-              <div>
-                <span className="text-slate-500 dark:text-slate-400 font-medium block">
-                  {isHindi ? 'अनुमानित तटीय प्रभाव क्षेत्र:' : 'Projected Coastal Corridor:'}
-                </span>
-                <strong className="text-slate-900 dark:text-white font-bold text-sm">
-                  {isHindi ? (current.targetHindi || current.target) : current.target}
-                </strong>
-              </div>
-              <div className="flex items-center gap-3 shrink-0 text-slate-600 dark:text-slate-300">
-                <span>
-                  {isHindi ? 'समय सीमा: ' : 'Window: '}
-                  <strong className="text-slate-900 dark:text-white">
-                    {isHindi ? (current.windowHindi || current.window) : current.window}
-                  </strong>
-                </span>
-                <span className="text-slate-300 dark:text-slate-700">|</span>
-                <span>
-                  {isHindi ? 'डेटा फ़ीड: ' : 'Feed: '}
-                  <strong className="text-emerald-700 dark:text-emerald-400">
-                    {isHindi ? 'इसरो मोसडैक ऑनलाइन' : 'ISRO MOSDAC Online'}
-                  </strong>
-                </span>
-              </div>
-            </div>
-
-            {/* Fast Actions */}
-            <div className="flex flex-wrap items-center gap-3 pt-1">
-              <button
-                onClick={() => navigate('/threat-map')}
-                className="px-5 py-2.5 rounded-xl bg-slate-950 hover:bg-slate-800 text-white dark:bg-white dark:text-slate-950 dark:hover:bg-slate-100 font-semibold text-xs transition-all shadow-xs flex items-center gap-2 cursor-pointer"
-              >
-                <Eye className="w-4 h-4" />
-                <span>{isHindi ? 'जीआईएस रडार मैप देखें' : 'Inspect GIS Radar Map'}</span>
-              </button>
-
-              <button
-                onClick={() => navigate('/threat-map')}
-                className="px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 font-semibold text-xs transition-all shadow-xs flex items-center gap-2 cursor-pointer"
-              >
-                <ShieldAlert className="w-4 h-4 text-red-600 dark:text-red-400" />
-                <span>{isHindi ? 'तटीय जिला आपदा मैट्रिक्स' : 'View District Threat Matrix'}</span>
-              </button>
-            </div>
-
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 font-normal leading-relaxed max-w-5xl">
+              {isHindi
+                ? 'बहु-स्रोत उपग्रह डेटा और संख्यात्मक मौसम मॉडल का उपयोग करके पहचान, वर्गीकरण और 72 घंटे के प्रक्षेपवक्र पूर्वानुमान के लिए वास्तविक समय मौसम विज्ञान निगरानी।'
+                : 'Real-time meteorological intelligence for identification, classification, and 72-hour trajectory prediction using multi-source satellite data and numerical weather models.'}
+            </p>
           </div>
 
-        </div>
-      </section>
+          {/* Live AI Telemetry Feed Status & Diagnostics */}
+          <div className="bg-slate-100/80 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 rounded-xl px-3.5 py-2 sm:py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
+            <div className="flex items-center gap-2">
+              <span className="font-semibold text-slate-800 dark:text-slate-200">
+                {isHindi ? 'लाइव एआई मॉडल डेटा:' : 'Live AI Model Feed:'}
+              </span>
+              <span className="text-slate-600 dark:text-slate-400">
+                {current.vitPattern
+                  ? (isHindi ? `वीआईटी आकारिकी (${current.vitPattern})` : `ViT Morphology (${current.vitPattern})`)
+                  : (isHindi ? 'चक्रवातविज़न सीएनएन v2.1' : 'CycloneVision CNN v2.1')}
+              </span>
+              {current.sst && (
+                <span className="hidden sm:inline text-slate-500 dark:text-slate-400">
+                  • {isHindi ? 'समुद्री तापमान' : 'SST'} {current.sst}°C • {isHindi ? 'पवन अपरूपण' : 'Shear'} {current.shear} kts
+                </span>
+              )}
+            </div>
 
-      {/* =========================================================================
-           STATE EARLY WARNING OVERVIEW BAR
-           ========================================================================= */}
-      <section className="px-4 sm:px-6 lg:px-8 py-4">
-        <div className="max-w-7xl mx-auto">
-          <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 shadow-xs transition-colors">
-            
-            <div className="flex items-center justify-between gap-4 mb-4 border-b border-slate-100 dark:border-slate-800 pb-3">
-              <div className="flex items-center gap-2">
-                <ShieldAlert className="w-4 h-4 text-red-600 dark:text-red-400" />
-                <h3 className="text-xs font-bold text-slate-900 dark:text-slate-200 uppercase tracking-wide">
-                  {isHindi ? 'राज्य आपदा प्रबंधन प्रारंभिक चेतावनी स्थिति' : 'State Disaster Management Early Warning Status'}
-                </h3>
+            <div className="flex items-center gap-2">
+              <span className="text-[0.7rem] text-slate-500 dark:text-slate-400">
+                {lastSyncTime
+                  ? (isHindi ? `सिंक किया गया: ${lastSyncTime}` : `Synced: ${lastSyncTime}`)
+                  : (isHindi ? 'बैकएंड कनेक्ट हो रहा है...' : 'Connecting backend...')}
+              </span>
+              <button
+                onClick={fetchLiveBackendData}
+                disabled={isSyncing}
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white transition-all cursor-pointer disabled:opacity-50"
+                title={isHindi ? "एआई मॉडल निष्कर्ष और महासागरीय टेलीमेट्री रीफ्रेश करें" : "Refresh AI Model Inference & Ocean Telemetry"}
+              >
+                <RefreshCw className={`w-3 h-3 ${isSyncing ? 'animate-spin' : ''}`} />
+                <span>{isHindi ? 'एआई डेटा रीफ्रेश' : 'Sync AI Feed'}</span>
+              </button>
+            </div>
+          </div>
+
+          {/* 4 Clean Metric Blocks */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+            <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 p-3 sm:p-3.5 rounded-xl sm:rounded-2xl shadow-xs transition-colors">
+              <span className="text-xs text-slate-500 dark:text-slate-400 block mb-0.5 font-medium">
+                {isHindi ? 'सतत पवन गति' : 'Sustained Wind'}
+              </span>
+              <div className="text-2xl sm:text-3xl font-heading font-black text-slate-950 dark:text-white">
+                {current.wind} <span className="text-xs font-normal text-slate-500">{isHindi ? 'किमी/घंटा' : 'km/h'}</span>
               </div>
-              <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                {isHindi ? 'लाइव टेलीमेट्री समकालिक' : 'Live Telemetry Synchronized'}
+              <span className="text-[0.7rem] text-slate-500 dark:text-slate-400 mt-0.5 block">
+                {isHindi ? `झोंके ${current.gusts} किमी/घंटा` : `Gusts ${current.gusts} km/h`}
               </span>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5 text-xs">
-              <button
-                type="button"
-                onClick={() => navigate('/state/odisha')}
-                className="flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-white dark:bg-slate-800/60 dark:hover:bg-slate-800 border border-slate-200 hover:border-red-300 dark:border-slate-700 dark:hover:border-red-900 transition-all cursor-pointer shadow-2xs hover:shadow-sm text-left group"
-                title={isHindi ? "विस्तृत ओडिशा चक्रवात एवं मौसम विवरण देखें" : "View detailed Odisha cyclone & district weather intelligence"}
-              >
-                <div className="flex items-center gap-1.5">
-                  <span className="font-semibold text-slate-900 dark:text-slate-100 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
-                    {isHindi ? 'ओडिशा' : 'Odisha'}
-                  </span>
-                  <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-red-600 group-hover:translate-x-0.5 transition-all" />
-                </div>
-                <span className="text-xs font-bold text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-950/50 px-2 py-0.5 rounded-md border border-red-200/60 dark:border-red-900/40">
-                  {isHindi ? 'रेड अलर्ट' : 'Red Alert'}
-                </span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => navigate('/state/west-bengal')}
-                className="flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-white dark:bg-slate-800/60 dark:hover:bg-slate-800 border border-slate-200 hover:border-red-300 dark:border-slate-700 dark:hover:border-red-900 transition-all cursor-pointer shadow-2xs hover:shadow-sm text-left group"
-                title={isHindi ? "विस्तृत पश्चिम बंगाल चक्रवात एवं मौसम विवरण देखें" : "View detailed West Bengal cyclone & district weather intelligence"}
-              >
-                <div className="flex items-center gap-1.5">
-                  <span className="font-semibold text-slate-900 dark:text-slate-100 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
-                    {isHindi ? 'पश्चिम बंगाल' : 'West Bengal'}
-                  </span>
-                  <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-red-600 group-hover:translate-x-0.5 transition-all" />
-                </div>
-                <span className="text-xs font-bold text-red-700 dark:text-red-400 bg-red-50 dark:bg-red-950/50 px-2 py-0.5 rounded-md border border-red-200/60 dark:border-red-900/40">
-                  {isHindi ? 'रेड अलर्ट' : 'Red Alert'}
-                </span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => navigate('/state/andhra-pradesh')}
-                className="flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-white dark:bg-slate-800/60 dark:hover:bg-slate-800 border border-slate-200 hover:border-orange-300 dark:border-slate-700 dark:hover:border-orange-900 transition-all cursor-pointer shadow-2xs hover:shadow-sm text-left group"
-                title={isHindi ? "विस्तृत आंध्र प्रदेश चक्रवात एवं मौसम विवरण देखें" : "View detailed Andhra Pradesh cyclone & district weather intelligence"}
-              >
-                <div className="flex items-center gap-1.5">
-                  <span className="font-semibold text-slate-900 dark:text-slate-100 group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors">
-                    {isHindi ? 'आंध्र प्रदेश' : 'Andhra Pradesh'}
-                  </span>
-                  <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-orange-600 group-hover:translate-x-0.5 transition-all" />
-                </div>
-                <span className="text-xs font-bold text-orange-700 dark:text-orange-400 bg-orange-50 dark:bg-orange-950/50 px-2 py-0.5 rounded-md border border-orange-200/60 dark:border-orange-900/40">
-                  {isHindi ? 'ऑरेंज अलर्ट' : 'Orange Alert'}
-                </span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => navigate('/state/gujarat')}
-                className="flex items-center justify-between p-3 rounded-xl bg-slate-50 hover:bg-white dark:bg-slate-800/60 dark:hover:bg-slate-800 border border-slate-200 hover:border-amber-300 dark:border-slate-700 dark:hover:border-amber-900 transition-all cursor-pointer shadow-2xs hover:shadow-sm text-left group"
-                title={isHindi ? "विस्तृत गुजरात चक्रवात एवं मौसम विवरण देखें" : "View detailed Gujarat cyclone & district weather intelligence"}
-              >
-                <div className="flex items-center gap-1.5">
-                  <span className="font-semibold text-slate-900 dark:text-slate-100 group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
-                    {isHindi ? 'गुजरात' : 'Gujarat'}
-                  </span>
-                  <ChevronRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-amber-600 group-hover:translate-x-0.5 transition-all" />
-                </div>
-                <span className="text-xs font-bold text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/50 px-2 py-0.5 rounded-md border border-amber-200/60 dark:border-amber-900/40">
-                  {isHindi ? 'येलो वॉच' : 'Yellow Watch'}
-                </span>
-              </button>
-            </div>
-
-          </div>
-        </div>
-      </section>
-
-      {/* =========================================================================
-           PUBLIC CITY & COASTAL DANGER TRACKER CTA BANNER (110+ LOCATIONS)
-           ========================================================================= */}
-      <section className="py-6 px-4 sm:px-6 lg:px-8 bg-gradient-to-r from-sky-50/80 via-white to-sky-50/80 dark:from-slate-900/80 dark:via-slate-950 dark:to-slate-900/80 border-t border-b border-slate-200/80 dark:border-slate-800/80 transition-colors">
-        <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-3.5">
-            <div className="p-3 rounded-2xl bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 shrink-0">
-              <Navigation2 className="w-6 h-6" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h3 className="text-base sm:text-lg font-heading font-black text-slate-950 dark:text-white">
-                  {isHindi ? 'क्या आप अपने शहर, बंदरगाह या तटीय क्षेत्र की स्थिति जानना चाहते हैं?' : 'Looking for your City, Port or Beach?'}
-                </h3>
-                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300">
-                  {isHindi ? '110+ तटीय क्षेत्र' : '110+ Coastal Places'}
-                </span>
+            <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 p-3 sm:p-3.5 rounded-xl sm:rounded-2xl shadow-xs transition-colors">
+              <span className="text-xs text-slate-500 dark:text-slate-400 block mb-0.5 font-medium">
+                {isHindi ? 'केंद्रीय दबाव' : 'Central Pressure'}
+              </span>
+              <div className="text-2xl sm:text-3xl font-heading font-black text-slate-950 dark:text-white">
+                {current.pressure} <span className="text-xs font-normal text-slate-500">{isHindi ? 'एचपीए' : 'hPa'}</span>
               </div>
-              <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5">
-                {isHindi 
-                  ? 'बिना लॉगिन के सभी तटीय नगरों के लिए स्थानीय तूफानी हवा का पूर्वानुमान, तूफानी लहर की ऊंचाई, चक्रवात केंद्र की दूरी और सुरक्षा निर्देश देखें।' 
-                  : 'Inspect local gale forecasts, storm surge depths, cyclone eye proximity & safety directives for all coastal towns without login.'}
-              </p>
+              <span className="text-[0.7rem] text-slate-500 dark:text-slate-400 mt-0.5 block">
+                {isHindi ? 'बैरोमीटर रीडिंग' : 'Barometric Fix'}
+              </span>
+            </div>
+
+            <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 p-3 sm:p-3.5 rounded-xl sm:rounded-2xl shadow-xs transition-colors">
+              <span className="text-xs text-slate-500 dark:text-slate-400 block mb-0.5 font-medium">
+                {isHindi ? '48 घंटे में चक्रवात संभावना' : '48h Formation'}
+              </span>
+              <div className="text-2xl sm:text-3xl font-heading font-black text-amber-600 dark:text-amber-400">
+                {current.risk48h}
+              </div>
+              <span className="text-[0.7rem] text-slate-500 dark:text-slate-400 mt-0.5 block">
+                {isHindi ? 'एआई वीआईटी मॉडल प्रायिकता' : 'ViT Probability'}
+              </span>
+            </div>
+
+            <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 p-3 sm:p-3.5 rounded-xl sm:rounded-2xl shadow-xs transition-colors">
+              <span className="text-xs text-slate-500 dark:text-slate-400 block mb-0.5 font-medium">
+                {isHindi ? 'गति एवं दिशा' : 'Movement'}
+              </span>
+              <div className="text-xl sm:text-2xl font-heading font-bold text-slate-950 dark:text-white">
+                {isHindi ? (current.directionHindi || getDirectionName(current.direction, isHindi)) : current.direction}
+              </div>
+              <span className="text-[0.7rem] text-slate-500 dark:text-slate-400 mt-0.5 block">
+                {isHindi ? `गति ${current.speed} किमी/घंटा` : `Speed ${current.speed} km/h`}
+              </span>
             </div>
           </div>
 
-          <button
-            onClick={() => navigate('/city-tracker')}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-slate-950 text-white dark:bg-white dark:text-slate-950 text-xs font-bold hover:bg-sky-700 dark:hover:bg-slate-200 transition-all cursor-pointer shadow-xs shrink-0"
-          >
-            <span>{isHindi ? 'शहर एवं क्षेत्र निगरानी खोलें →' : 'Open City & Area Watch →'}</span>
-          </button>
+          {/* Coastal Corridor Strip */}
+          <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-xl sm:rounded-2xl px-4 py-2.5 sm:py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs shadow-xs">
+            <div>
+              <span className="text-slate-500 dark:text-slate-400 font-medium block">
+                {isHindi ? 'अनुमानित तटीय प्रभाव क्षेत्र:' : 'Projected Coastal Corridor:'}
+              </span>
+              <strong className="text-slate-900 dark:text-white font-bold text-sm">
+                {isHindi ? (current.targetHindi || current.target) : current.target}
+              </strong>
+            </div>
+            <div className="flex items-center gap-3 shrink-0 text-slate-600 dark:text-slate-300">
+              <span>
+                {isHindi ? 'समय सीमा: ' : 'Window: '}
+                <strong className="text-slate-900 dark:text-white">
+                  {isHindi ? (current.windowHindi || current.window) : current.window}
+                </strong>
+              </span>
+              <span className="text-slate-300 dark:text-slate-700">|</span>
+              <span>
+                {isHindi ? 'डेटा फ़ीड: ' : 'Feed: '}
+                <strong className="text-emerald-700 dark:text-emerald-400">
+                  {isHindi ? 'इसरो मोसडैक ऑनलाइन' : 'ISRO MOSDAC Online'}
+                </strong>
+              </span>
+            </div>
+          </div>
+
+          {/* Fast Actions */}
+          <div className="flex flex-wrap items-center gap-3 pt-0.5 pb-1">
+            <button
+              onClick={() => navigate('/threat-map')}
+              className="px-5 py-2.5 rounded-xl bg-slate-950 hover:bg-slate-800 text-white dark:bg-white dark:text-slate-950 dark:hover:bg-slate-100 font-semibold text-xs transition-all shadow-xs flex items-center gap-2 cursor-pointer"
+            >
+              <Eye className="w-4 h-4" />
+              <span>{isHindi ? 'जीआईएस रडार मैप देखें' : 'Inspect GIS Radar Map'}</span>
+            </button>
+
+            <button
+              onClick={() => navigate('/threat-map')}
+              className="px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 font-semibold text-xs transition-all shadow-xs flex items-center gap-2 cursor-pointer"
+            >
+              <ShieldAlert className="w-4 h-4 text-red-600 dark:text-red-400" />
+              <span>{isHindi ? 'तटीय जिला आपदा मैट्रिक्स' : 'View District Threat Matrix'}</span>
+            </button>
+          </div>
+
         </div>
       </section>
-
-      {/* FOOTER */}
-      <footer className="bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 py-10 px-4 sm:px-6 text-xs text-slate-500 dark:text-slate-400 transition-colors">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
-          <div>
-            &copy; 2026 {isHindi ? 'पृथ्वी विज्ञान मंत्रालय, भारत सरकार। सर्वाधिकार सुरक्षित।' : 'Ministry of Earth Sciences, Government of India. All Rights Reserved.'}
-          </div>
-          <div className="flex items-center gap-5 text-slate-600 dark:text-slate-400 font-medium">
-            <a href="https://moes.gov.in" target="_blank" rel="noopener" className="hover:text-slate-900 dark:hover:text-white">
-              {isHindi ? 'एमओईएस' : 'MoES'}
-            </a>
-            <a href="https://mausam.imd.gov.in" target="_blank" rel="noopener" className="hover:text-slate-900 dark:hover:text-white">
-              {isHindi ? 'आईएमडी' : 'IMD'}
-            </a>
-            <a href="https://www.mosdac.gov.in" target="_blank" rel="noopener" className="hover:text-slate-900 dark:hover:text-white">
-              {isHindi ? 'मोसडैक' : 'MOSDAC'}
-            </a>
-            <a href="https://ndma.gov.in" target="_blank" rel="noopener" className="hover:text-slate-900 dark:hover:text-white">
-              {isHindi ? 'एनडीएमए' : 'NDMA'}
-            </a>
-          </div>
-        </div>
-      </footer>
 
     </div>
   );

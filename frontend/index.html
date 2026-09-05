@@ -17,6 +17,12 @@
             document.documentElement.classList.remove('dark');
             document.documentElement.style.colorScheme = 'light';
           }
+          var savedFont = localStorage.getItem('vayu_font_offset');
+          if (savedFont !== null) {
+            var map = { '-3': 75, '-2': 85, '-1': 92, '0': 100, '1': 110, '2': 125, '3': 140, '4': 155 };
+            var pct = map[savedFont] || 100;
+            document.documentElement.style.fontSize = pct + '%';
+          }
         } catch (e) {}
       })();
     </script>
