@@ -8,7 +8,8 @@ import {
   XCircle, ChevronRight, Clock, MapPin, Eye, Radio,
   Activity, Info, Layers, RefreshCw, Sun, Moon, Sparkles,
   ArrowUpRight, BarChart2, ShieldAlert, Play, Pause, Sliders, Crosshair, CloudRain, Maximize2,
-  Search, Waves, Bell, Navigation2, Menu, X, ShieldCheck, Target, TrendingUp, Gauge
+  Search, Waves, Bell, Navigation2, Menu, X, ShieldCheck, Target, TrendingUp, Gauge,
+  Umbrella, SunMedium, ArrowRightCircle
 } from 'lucide-react';
 import LanguageWelcomeAnimation from '../components/LanguageWelcomeAnimation';
 import {
@@ -42,6 +43,93 @@ const MapController = ({ center, zoom }) => {
   }, [center, zoom, map]);
   return null;
 };
+
+const CycloneSwirlIcon = ({ className = "w-6 h-6" }) => (
+  <svg viewBox="0 0 24 24" fill="currentColor" className={className}>
+    <circle cx="12" cy="12" r="2.8" />
+    <path d="M12 2C6.48 2 2 6.48 2 12c0 2.22.73 4.27 1.96 5.92l1.62-1.22A7.94 7.94 0 0 1 4 12c0-4.41 3.59-8 8-8 2.05 0 3.91.78 5.33 2.06l1.45-1.4A9.95 9.95 0 0 0 12 2z" />
+    <path d="M12 22c5.52 0 10-4.48 10-10 0-2.22-.73-4.27-1.96-5.92l-1.62 1.22A7.94 7.94 0 0 1 20 12c0 4.41-3.59 8-8 8-2.05 0-3.91-.78-5.33-2.06l-1.45 1.4A9.95 9.95 0 0 0 12 22z" />
+  </svg>
+);
+
+const SERVICES_DATA = [
+  {
+    id: 'rainfall',
+    title: 'RAINFALL INFORMATION',
+    titleHindi: 'वर्षा की जानकारी',
+    bgColor: 'bg-[#1D82B8]',
+    icon: CloudRain,
+    route: '/city-tracker',
+    routeLabel: 'View Coastal Rainfall Tracker',
+    routeLabelHindi: 'तटीय वर्षा ट्रैकर देखें',
+    badge: 'Live Radar & AWS Gauges',
+    badgeHindi: 'लाइव रडार और मौसम स्टेशन',
+    summary: 'Comprehensive rainfall monitoring network integrating satellite precipitation estimates, Doppler weather radar accumulations, and 850+ coastal automatic weather stations (AWS).',
+    summaryHindi: 'उपग्रह वर्षा अनुमान, डॉपलर मौसम रडार संचय और 850+ तटीय स्वचालित मौसम स्टेशनों को एकीकृत करने वाला व्यापक वर्षा निगरानी नेटवर्क।',
+    stats: [
+      { label: 'Past 24h Peak', labelHindi: '24 घंटे का उच्चतम', val: '185 mm', sub: 'Dhamra Port, Odisha' },
+      { label: 'AWS Reporting', labelHindi: 'सक्रिय स्टेशन', val: '98.4%', sub: 'Real-time telemetry' },
+      { label: 'Flash Flood Alert', labelHindi: 'जलभराव चेतावनी', val: 'Active (Orange)', sub: 'Coastal lowlands' },
+    ]
+  },
+  {
+    id: 'monsoon',
+    title: 'MONSOON INFORMATION',
+    titleHindi: 'मानसून की जानकारी',
+    bgColor: 'bg-[#B8860B]',
+    icon: Umbrella,
+    route: '/bulletins',
+    routeLabel: 'Official Monsoon Bulletins',
+    routeLabelHindi: 'आधिकारिक मानसून बुलेटिन',
+    badge: 'Seasonal Circulation',
+    badgeHindi: 'मौसमी परिसंचरण',
+    summary: 'National monsoon synoptic charts, seasonal rainfall distribution, Northern Limit of Monsoon (NLM) tracking, and agricultural rainfall advisories.',
+    summaryHindi: 'राष्ट्रीय मानसून सिनॉप्टिक चार्ट, मौसमी वर्षा वितरण, मानसून की उत्तरी सीमा (एनएलएम) ट्रैकिंग और कृषि वर्षा सलाह।',
+    stats: [
+      { label: 'Season Departure', labelHindi: 'मौसमी विचलन', val: '+4.2%', sub: 'Above Normal (LPA)' },
+      { label: 'Active Trough', labelHindi: 'सक्रिय ट्रफ रेखा', val: 'Positioned', sub: 'South of normal' },
+      { label: 'Next Pulse', labelHindi: 'अगला स्पंद', val: '+48h to +72h', sub: 'Bay of Bengal' },
+    ]
+  },
+  {
+    id: 'cyclone',
+    title: 'CYCLONE INFORMATION',
+    titleHindi: 'चक्रवात की जानकारी',
+    bgColor: 'bg-[#057A2A]',
+    icon: 'cyclone',
+    route: '/threat-map',
+    routeLabel: 'Inspect GIS Cyclone Radar',
+    routeLabelHindi: 'जीआईएस चक्रवात रडार देखें',
+    badge: 'Critical Warning Active',
+    badgeHindi: 'गंभीर चेतावनी सक्रिय',
+    summary: 'End-to-end tropical cyclogenesis intelligence, multi-spectral satellite imagery, machine-learning track consensus, storm surge hydrodynamics, and district impact matrices.',
+    summaryHindi: 'उष्णकटिबंधीय चक्रवात जनन खुफिया, बहु-स्पेक्ट्रल उपग्रह इमेजरी, मशीन-लर्निंग ट्रैक सहमति, तूफान उछाल हाइड्रोडायनामिक्स और जिला प्रभाव मैट्रिक्स।',
+    stats: [
+      { label: 'Current System', labelHindi: 'वर्तमान प्रणाली', val: 'Invest 92B', sub: 'Bay of Bengal' },
+      { label: 'Wind Intensity', labelHindi: 'पवन तीव्रता', val: '42 km/h', sub: 'Gusts 55 km/h' },
+      { label: '48h Genesis Risk', labelHindi: '48 घंटे का जोखिम', val: '68%', sub: 'ViT Neural Model' },
+    ]
+  },
+  {
+    id: 'climate',
+    title: 'CLIMATE SERVICES',
+    titleHindi: 'जलवायु सेवाएं',
+    bgColor: 'bg-[#881337]',
+    icon: SunMedium,
+    route: '/bulletins',
+    routeLabel: 'Climate Outlook Bulletins',
+    routeLabelHindi: 'जलवायु दृष्टिकोण बुलेटिन',
+    badge: 'Extended Forecasts',
+    badgeHindi: 'दीर्घकालिक पूर्वानुमान',
+    summary: 'Decadal and sub-seasonal climate anomaly tracking, El Niño-Southern Oscillation (ENSO) diagnostic reports, Indian Ocean Dipole (IOD) indices, and ocean heat content (OHC).',
+    summaryHindi: 'दशकीय और उप-मौसमी जलवायु विसंगति ट्रैकिंग, अल नीनो-दक्षिणी दोलन (ईएनएसओ) नैदानिक ​​रिपोर्ट, हिंद महासागर द्विध्रुव (आईओडी) सूचकांक और महासागरीय ऊष्मा सामग्री।',
+    stats: [
+      { label: 'ENSO Phase', labelHindi: 'ईएनएसओ स्थिति', val: 'ENSO-Neutral', sub: 'La Niña developing' },
+      { label: 'IOD Status', labelHindi: 'आईओडी स्थिति', val: 'Neutral', sub: 'Index: +0.12°C' },
+      { label: 'SST Anomaly', labelHindi: 'एसएसटी विसंगति', val: '+0.8°C', sub: 'North Indian Ocean' },
+    ]
+  }
+];
 
 const INITIAL_SYSTEMS = {
   invest92b: {
@@ -491,6 +579,7 @@ const Welcome = () => {
   const [isHindi, setIsHindi] = useState(() => {
     return localStorage.getItem('vayu_is_hindi') === 'true';
   });
+  const [activeServiceModal, setActiveServiceModal] = useState(null);
 
   // Opening & Language Transition Animation state
   const [animState, setAnimState] = useState(() => {
@@ -1086,6 +1175,52 @@ const Welcome = () => {
             </div>
           </div>
 
+          {/* =========================================================================
+               OUR SERVICES SECTION (RAINFALL, MONSOON, CYCLONE, CLIMATE SERVICES)
+               ========================================================================= */}
+          <div className="pt-2 sm:pt-2.5">
+            <div className="border-b border-slate-300 dark:border-slate-800 pb-1 mb-2.5 flex items-center justify-between">
+              <h2 className="text-xs sm:text-sm font-black tracking-wider uppercase text-slate-950 dark:text-white font-heading">
+                {isHindi ? 'हमारी सेवाएं (OUR SERVICES)' : 'OUR SERVICES'}
+              </h2>
+              <span className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-medium hidden sm:inline">
+                {isHindi ? 'भारत मौसम विज्ञान विभाग (IMD) अधिकृत मौसम सेवाएं' : 'National Meteorological & Early Warning Portals'}
+              </span>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 sm:gap-3">
+              {SERVICES_DATA.map((srv) => {
+                const IconComponent = srv.icon === 'cyclone' ? CycloneSwirlIcon : srv.icon;
+                return (
+                  <div
+                    key={srv.id}
+                    onClick={() => setActiveServiceModal(srv)}
+                    className={`${srv.bgColor} rounded-lg sm:rounded-xl p-3 sm:p-3.5 text-white shadow-xs hover:shadow-lg hover:brightness-105 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer group flex items-center gap-3 relative overflow-hidden`}
+                  >
+                    {/* Subtle top gloss reflection */}
+                    <div className="absolute inset-x-0 top-0 h-1/2 bg-gradient-to-b from-white/15 to-transparent pointer-events-none" />
+
+                    {/* Service Icon */}
+                    <div className="shrink-0 p-2 rounded-lg bg-black/15 group-hover:bg-black/25 transition-colors flex items-center justify-center">
+                      <IconComponent className="w-6 h-6 sm:w-7 sm:h-7 text-white" />
+                    </div>
+
+                    {/* Service Title & Read More */}
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-heading font-black text-xs sm:text-[13px] uppercase tracking-wide leading-tight text-white drop-shadow-xs">
+                        {isHindi ? srv.titleHindi : srv.title}
+                      </h3>
+                      <div className="text-[11px] font-semibold text-white/90 flex items-center gap-1 mt-1 group-hover:text-white transition-colors">
+                        <span>{isHindi ? 'अधिक पढ़ें' : 'Read More'}</span>
+                        <ArrowRightCircle className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+
           {/* Fast Actions */}
           <div className="flex flex-wrap items-center gap-3 pt-0.5 pb-1">
             <button
@@ -1107,6 +1242,92 @@ const Welcome = () => {
 
         </div>
       </section>
+
+      {/* Service Details Modal */}
+      {activeServiceModal && (
+        <div 
+          className="fixed inset-0 z-[2000] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200"
+          onClick={() => setActiveServiceModal(null)}
+        >
+          <div 
+            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden animate-in zoom-in-95 duration-200"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Modal Header */}
+            <div className={`${activeServiceModal.bgColor} p-4 sm:p-5 text-white relative`}>
+              <button
+                onClick={() => setActiveServiceModal(null)}
+                className="absolute top-3.5 right-3.5 p-1 rounded-lg bg-black/20 hover:bg-black/35 text-white transition-all cursor-pointer"
+                title={isHindi ? "बंद करें" : "Close"}
+              >
+                <X className="w-4 h-4" />
+              </button>
+              <div className="flex items-center gap-3">
+                <div className="p-2.5 rounded-xl bg-black/20">
+                  {activeServiceModal.icon === 'cyclone' ? (
+                    <CycloneSwirlIcon className="w-7 h-7 text-white" />
+                  ) : (
+                    <activeServiceModal.icon className="w-7 h-7 text-white" />
+                  )}
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-white/80 block">
+                    {isHindi ? activeServiceModal.badgeHindi : activeServiceModal.badge}
+                  </span>
+                  <h3 className="text-base sm:text-lg font-heading font-black tracking-wide">
+                    {isHindi ? activeServiceModal.titleHindi : activeServiceModal.title}
+                  </h3>
+                </div>
+              </div>
+            </div>
+
+            {/* Modal Content */}
+            <div className="p-4 sm:p-5 space-y-4">
+              <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                {isHindi ? activeServiceModal.summaryHindi : activeServiceModal.summary}
+              </p>
+
+              {/* Stats Highlights */}
+              <div className="grid grid-cols-3 gap-2.5 pt-1">
+                {activeServiceModal.stats.map((st, idx) => (
+                  <div key={idx} className="bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 rounded-xl p-2.5 text-center">
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium block truncate">
+                      {isHindi ? st.labelHindi : st.label}
+                    </span>
+                    <span className="text-sm font-black font-heading text-slate-900 dark:text-white block mt-0.5">
+                      {st.val}
+                    </span>
+                    <span className="text-[9.5px] text-slate-500 dark:text-slate-400 block truncate">
+                      {st.sub}
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Modal Actions */}
+              <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-200 dark:border-slate-800">
+                <button
+                  onClick={() => setActiveServiceModal(null)}
+                  className="px-3.5 py-2 rounded-xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+                >
+                  {isHindi ? 'बंद करें' : 'Close'}
+                </button>
+                <button
+                  onClick={() => {
+                    const r = activeServiceModal.route;
+                    setActiveServiceModal(null);
+                    navigate(r);
+                  }}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold text-white ${activeServiceModal.bgColor} hover:brightness-110 transition-all shadow-xs flex items-center gap-1.5 cursor-pointer`}
+                >
+                  <span>{isHindi ? activeServiceModal.routeLabelHindi : activeServiceModal.routeLabel}</span>
+                  <ArrowRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

@@ -105,8 +105,8 @@ const PublicNavbar = ({
           <img 
             src={isDarkMode ? "/vayu-white.png?v=2" : "/vayu.png"} 
             alt="VAYU" 
-            className="h-8 sm:h-9 w-auto object-contain filter drop-shadow-xs transition-transform duration-300 hover:scale-105 cursor-pointer" 
-            style={{ maxHeight: '36px' }}
+            className="h-11 sm:h-12 md:h-[50px] w-auto object-contain filter drop-shadow-xs transition-transform duration-300 hover:scale-105 cursor-pointer" 
+            style={{ maxHeight: '50px' }}
             onClick={() => {
               if (location.pathname === '/') {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
