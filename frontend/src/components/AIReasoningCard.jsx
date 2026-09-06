@@ -85,22 +85,22 @@ export default function AIReasoningCard({
   ];
 
   return (
-    <div className={`p-5 rounded-2xl sm:rounded-3xl bg-white border border-slate-200/90 shadow-xs space-y-4 ${className}`}>
+    <div className={`p-5 rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-900/90 border border-slate-200/90 dark:border-slate-800 shadow-xs space-y-4 text-slate-800 dark:text-slate-100 transition-colors ${className}`}>
       
       {/* Card Header with Confidence Score */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3.5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800/80 pb-3.5">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-sky-50 border border-sky-100 flex items-center justify-center text-sky-600 shadow-2xs">
+          <div className="w-8 h-8 rounded-xl bg-sky-50 dark:bg-sky-950/60 border border-sky-100 dark:border-sky-800/60 flex items-center justify-center text-sky-600 dark:text-sky-400 shadow-2xs">
             <Brain className="w-4 h-4" />
           </div>
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="font-heading font-black text-sm uppercase tracking-wider text-slate-900">
+              <h3 className="font-heading font-black text-sm uppercase tracking-wider text-slate-900 dark:text-white">
                 {isHindi ? 'एआई विश्लेषण: यह पूर्वानुमान क्यों?' : 'AI Reasoning: Why This Prediction?'}
               </h3>
               <DataTypeBadge type={isHistorical ? 'historical' : 'ai'} isHindi={isHindi} />
             </div>
-            <p className="text-[11px] text-slate-500 font-normal mt-0.5">
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 font-normal mt-0.5">
               {isHindi
                 ? 'मौसम विज्ञान कारकों और भौतिक मापदंडों का पारदर्शी न्यूरल मॉडल विश्लेषण'
                 : 'Meteorological indicators and physical drivers underpinning the model forecast'}
@@ -111,12 +111,12 @@ export default function AIReasoningCard({
         {/* AI Model Genuine Confidence Tag */}
         <div className="flex items-center gap-2 self-start sm:self-auto">
           {confidenceScore ? (
-            <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-sky-50 border border-sky-200 text-xs font-mono font-bold text-sky-900 shadow-2xs">
-              <Sparkles className="w-3 h-3 text-sky-500" />
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-sky-50 dark:bg-sky-950/70 border border-sky-200 dark:border-sky-800 text-xs font-mono font-bold text-sky-900 dark:text-sky-300 shadow-2xs">
+              <Sparkles className="w-3 h-3 text-sky-500 dark:text-sky-400" />
               <span>{confidenceType}: {confidenceScore}</span>
             </div>
           ) : (
-            <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-100 border border-slate-200 text-xs font-mono text-slate-600">
+            <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-mono text-slate-600 dark:text-slate-300">
               <AlertCircle className="w-3 h-3 text-slate-400" />
               <span>Confidence: Single Deterministic Run</span>
             </div>
@@ -124,7 +124,7 @@ export default function AIReasoningCard({
 
           <button
             onClick={() => setIsExpanded(!isExpanded)}
-            className="p-1 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+            className="p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
             title={isExpanded ? 'Collapse' : 'Expand'}
             aria-label="Toggle Reasoning Details"
           >
@@ -142,24 +142,24 @@ export default function AIReasoningCard({
               return (
                 <div
                   key={f.id}
-                  className="p-3.5 rounded-2xl bg-slate-50/80 border border-slate-200/80 space-y-2 hover:border-slate-300 hover:bg-slate-50 transition-all"
+                  className="p-3.5 rounded-2xl bg-slate-50/80 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/70 space-y-2 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800/90 transition-all"
                 >
                   <div className="flex items-center justify-between gap-2">
                     <div className="flex items-center gap-2">
-                      <div className="w-6 h-6 rounded-lg bg-white border border-slate-200/80 flex items-center justify-center text-slate-700 shadow-2xs">
+                      <div className="w-6 h-6 rounded-lg bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700 flex items-center justify-center text-slate-700 dark:text-slate-200 shadow-2xs">
                         <IconComp className="w-3.5 h-3.5" />
                       </div>
-                      <span className="font-heading font-bold text-xs text-slate-800">
+                      <span className="font-heading font-bold text-xs text-slate-800 dark:text-slate-200">
                         {f.title}
                       </span>
                       <InfoTooltip term={f.tooltipTerm} isHindi={isHindi} />
                     </div>
-                    <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-white border border-slate-200/80 shadow-2xs ${f.statusColor}`}>
+                    <span className={`text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-700 shadow-2xs ${f.statusColor}`}>
                       {f.metric} &bull; {f.status}
                     </span>
                   </div>
 
-                  <p className="text-[11px] text-slate-600 leading-relaxed">
+                  <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
                     {f.reason}
                   </p>
                 </div>
@@ -168,8 +168,8 @@ export default function AIReasoningCard({
           </div>
 
           {/* Model Summary / Disclaimer */}
-          <div className="p-3.5 rounded-xl bg-sky-50/70 border border-sky-200/80 flex items-start gap-2.5 text-[11px] text-sky-950">
-            <Sparkles className="w-3.5 h-3.5 text-sky-600 shrink-0 mt-0.5" />
+          <div className="p-3.5 rounded-xl bg-sky-50/70 dark:bg-sky-950/40 border border-sky-200/80 dark:border-sky-900/60 flex items-start gap-2.5 text-[11px] text-sky-950 dark:text-sky-200">
+            <Sparkles className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400 shrink-0 mt-0.5" />
             <p className="leading-relaxed">
               <strong>{isHindi ? 'सिस्टम पूर्वानुमान निष्कर्ष:' : 'Model Inference Rationale:'}</strong>{' '}
               {isHindi
