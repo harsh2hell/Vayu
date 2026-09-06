@@ -1,8 +1,7 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Navigate, useLocation } from 'react-router-dom';
 import { 
-  SignedIn, 
-  SignedOut, 
+  useAuth,
   useUser, 
   useClerk 
 } from '@clerk/clerk-react';
@@ -51,36 +50,52 @@ export const AuthConfigurationNotice = () => {
 /**
  * Strict Protected Route Wrapper:
  * Users cannot access /dashboard without a verified Clerk session.
- * Unauthenticated users are redirected directly to login.vayusat.live (or /login in dev).
+ * Uses useAuth() to wait until the session is fully loaded before making redirect decisions,
+ * preventing render-phase bounce loops.
  */
-export const ProtectedRoute = ({ children }) => {
+const ClerkProtectedRoute = ({ children }) => {
   const location = useLocation();
+  const { isLoaded, isSignedIn } = useAuth();
 
+  useEffect(() => {
+    if (isLoaded && !isSignedIn && isProductionDomain()) {
+      const targetUrl = window.location.href;
+      window.location.replace(getAuthUrl(targetUrl));
+    }
+  }, [isLoaded, isSignedIn]);
+
+  // 1. Wait until Clerk has fully loaded the session
+  if (!isLoaded) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center space-y-3">
+        <div className="w-8 h-8 border-2 border-sky-600 border-t-transparent rounded-full animate-spin" />
+        <p className="text-xs font-mono text-slate-500">Verifying session...</p>
+      </div>
+    );
+  }
+
+  // 2. If unauthenticated in development, use React Router Navigate
+  if (!isSignedIn) {
+    if (!isProductionDomain()) {
+      return <Navigate to={`/login?redirect_url=${encodeURIComponent(location.pathname + location.search)}`} replace />;
+    }
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center space-y-3">
+        <div className="w-8 h-8 border-2 border-sky-600 border-t-transparent rounded-full animate-spin" />
+        <p className="text-xs font-mono text-slate-500">Redirecting to login.vayusat.live...</p>
+      </div>
+    );
+  }
+
+  // 3. User is authenticated! Render the dashboard
+  return <>{children}</>;
+};
+
+export const ProtectedRoute = ({ children }) => {
   if (!CLERK_PUBLISHABLE_KEY) {
     return <AuthConfigurationNotice />;
   }
-
-  const authUrl = getAuthUrl(window.location.href);
-
-  return (
-    <>
-      <SignedIn>{children}</SignedIn>
-      <SignedOut>
-        {isProductionDomain() ? (
-          (() => {
-            window.location.href = authUrl;
-            return (
-              <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center text-xs font-mono">
-                Redirecting to secure login gateway...
-              </div>
-            );
-          })()
-        ) : (
-          <Navigate to={`/login?redirect_url=${encodeURIComponent(location.pathname)}`} replace />
-        )}
-      </SignedOut>
-    </>
-  );
+  return <ClerkProtectedRoute>{children}</ClerkProtectedRoute>;
 };
 
 const ClerkUserDisplay = () => {
@@ -156,7 +171,7 @@ const ClerkSignOutButton = ({ onSignOutComplete, className, children }) => {
     if (onSignOutComplete) {
       onSignOutComplete();
     } else {
-      window.location.href = getAuthUrl();
+      window.location.replace(getAuthUrl());
     }
   };
 
@@ -178,7 +193,7 @@ export const SafeSignOutButton = ({ onSignOutComplete, className, children }) =>
         type="button"
         onClick={() => {
           if (onSignOutComplete) onSignOutComplete();
-          else window.location.href = getAuthUrl();
+          else window.location.replace(getAuthUrl());
         }}
         className={className}
       >
