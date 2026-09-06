@@ -11,6 +11,7 @@ import RainfallIntelligence from './pages/RainfallIntelligence';
 import AtmosphericPatterns from './pages/AtmosphericPatterns';
 import CycloneIntelligencePage from './pages/CycloneIntelligencePage';
 import ClimateOceanAnomalies from './pages/ClimateOceanAnomalies';
+import LiveMap from './pages/LiveMap';
 import Login from './pages/Login';
 import DashboardLayout from './components/DashboardLayout';
 import Dashboard from './pages/Dashboard';
@@ -165,6 +166,11 @@ function App() {
       <Route path="/radar" element={<ThreatMap />} />
       <Route path="/gis-radar" element={<ThreatMap />} />
       <Route path="/threat-matrix" element={<ThreatMap />} />
+
+      {/* 3D Live Earth Interactive Simulation Console */}
+      <Route path="/live-map" element={<LiveMap />} />
+      <Route path="/live-earth" element={<LiveMap />} />
+      <Route path="/3d-earth" element={<LiveMap />} />
 
       {/* Unified Safety & Updates (IMD Bulletins & NDMA Safety Protocol) */}
       <Route path="/safety-updates" element={<SafetyUpdates />} />

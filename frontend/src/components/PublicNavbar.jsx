@@ -247,6 +247,11 @@ const PublicNavbar = ({
       match: ['/threat-map', '/radar', '/gis-radar', '/threat-matrix']
     },
     { 
+      path: '/live-map', 
+      label: isHindi ? 'लाइव मैप' : 'Live Map',
+      match: ['/live-map', '/live-earth', '/3d-earth']
+    },
+    { 
       path: '/safety-updates', 
       label: isHindi ? 'सुरक्षा व अपडेट' : 'Safety & Updates',
       match: ['/safety-updates', '/bulletins', '/safety-guide', '/safety', '/updates']

@@ -309,7 +309,7 @@ const Login = ({ initialMode }) => {
               className="inline-flex items-center gap-2 text-xs font-medium text-slate-500 hover:text-slate-800 transition-colors cursor-pointer group"
             >
               <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
-              <span>Back to Public Atlas</span>
+              <span>Back to Home</span>
             </a>
             <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono bg-slate-50 border border-slate-200/80 text-slate-500">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />

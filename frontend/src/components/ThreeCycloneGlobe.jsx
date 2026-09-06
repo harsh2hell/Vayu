@@ -163,13 +163,21 @@ const ThreeCycloneGlobe = ({
   systemName = "Invest 92B", 
   category = "Low Pressure Area",
   risk = "68%",
-  isDark = false 
+  isDark = false,
+  className = "relative w-full h-[520px] sm:h-[580px] lg:h-[620px] flex flex-col items-center justify-between select-none",
+  autoRotate = true,
+  enableWheelZoom = true,
+  cameraDistance = 6.4,
+  zoomStep = 0,
+  showCyclone = true,
+  showTelemetry = true
 }) => {
   const mountRef = useRef(null);
   const globeGroupRef = useRef(null);
   const cycloneGroupRef = useRef(null);
   const cycloneMesh1Ref = useRef(null);
   const cycloneMesh2Ref = useRef(null);
+  const cameraRef = useRef(null);
   const isDraggingRef = useRef(false);
   const previousMousePositionRef = useRef({ x: 0, y: 0 });
   const velocityRef = useRef({ x: 0, y: 0 });
@@ -181,6 +189,7 @@ const ThreeCycloneGlobe = ({
       const eyePos = latLonToVector3(targetLat, targetLon, radius * 1.018);
       cycloneGroupRef.current.position.copy(eyePos);
       cycloneGroupRef.current.lookAt(eyePos.clone().multiplyScalar(2));
+      cycloneGroupRef.current.visible = showCyclone;
     }
 
     if (globeGroupRef.current) {
@@ -189,7 +198,14 @@ const ThreeCycloneGlobe = ({
       globeGroupRef.current.rotation.x = targetX;
       globeGroupRef.current.rotation.y = targetY;
     }
-  }, [targetLat, targetLon]);
+  }, [targetLat, targetLon, showCyclone]);
+
+  // Adjust zoom when cameraDistance or zoomStep changes
+  useEffect(() => {
+    if (cameraRef.current) {
+      cameraRef.current.position.z = Math.max(3.4, Math.min(10.5, cameraDistance - zoomStep * 0.6));
+    }
+  }, [cameraDistance, zoomStep]);
 
   useEffect(() => {
     const mount = mountRef.current;
@@ -201,7 +217,8 @@ const ThreeCycloneGlobe = ({
     // 1. Scene & Camera (Zero clipping, perfectly centered)
     const scene = new THREE.Scene();
     const camera = new THREE.PerspectiveCamera(38, width / height, 0.1, 1000);
-    camera.position.z = 6.4;
+    camera.position.z = Math.max(3.4, Math.min(10.5, cameraDistance - zoomStep * 0.6));
+    cameraRef.current = camera;
 
     // 2. Alpha Transparent WebGL Renderer
     const renderer = new THREE.WebGLRenderer({ 
@@ -491,12 +508,20 @@ const ThreeCycloneGlobe = ({
     };
     window.addEventListener('scroll', handleScroll, { passive: true });
 
+    // Wheel Zoom Support
+    const handleWheel = (e) => {
+      if (!enableWheelZoom) return;
+      e.preventDefault();
+      camera.position.z = Math.max(3.4, Math.min(10.5, camera.position.z + e.deltaY * 0.004));
+    };
+
     mount.addEventListener('mousedown', handleMouseDown);
     window.addEventListener('mousemove', handleMouseMove);
     window.addEventListener('mouseup', handleMouseUp);
     mount.addEventListener('touchstart', handleTouchStart, { passive: true });
     window.addEventListener('touchmove', handleTouchMove, { passive: true });
     window.addEventListener('touchend', handleMouseUp);
+    mount.addEventListener('wheel', handleWheel, { passive: false });
 
     // 12. Animation Loop: NATURAL EARTH ROTATION + ACTIVE CYCLONIC VORTEX SPIN
     let animationFrameId;
@@ -514,7 +539,7 @@ const ThreeCycloneGlobe = ({
         if (Math.abs(velocityRef.current.x) > 0.0001) {
           globeGroup.rotation.y += velocityRef.current.x;
           velocityRef.current.x *= 0.92;
-        } else {
+        } else if (autoRotate) {
           globeGroup.rotation.y += 0.0018;
         }
 
@@ -532,11 +557,11 @@ const ThreeCycloneGlobe = ({
       // =======================================================================
       // ACTIVE CYCLONIC VORTEX SPINNING & BILLOWING (Authentic Fluid Motion)
       // =======================================================================
-      if (cycloneMesh1Ref.current) {
+      if (cycloneMesh1Ref.current && showCyclone) {
         // Counter-clockwise cyclonic vortex spin around storm axis
         cycloneMesh1Ref.current.rotation.z -= 0.014;
       }
-      if (cycloneMesh2Ref.current) {
+      if (cycloneMesh2Ref.current && showCyclone) {
         // Upper troposphere cirrus outflow rotates at slightly different rate
         cycloneMesh2Ref.current.rotation.z -= 0.009;
         // Subtle breathing expansion and contraction
@@ -578,6 +603,7 @@ const ThreeCycloneGlobe = ({
       mount.removeEventListener('touchstart', handleTouchStart);
       window.removeEventListener('touchmove', handleTouchMove);
       window.removeEventListener('touchend', handleMouseUp);
+      mount.removeEventListener('wheel', handleWheel);
       resizeObserver.disconnect();
       if (mount.contains(renderer.domElement)) {
         mount.removeChild(renderer.domElement);
@@ -598,41 +624,45 @@ const ThreeCycloneGlobe = ({
       radarPulseGeo.dispose();
       radarPulseMat.dispose();
     };
-  }, [targetLat, targetLon, isDark]);
+  }, [targetLat, targetLon, isDark, autoRotate, enableWheelZoom, showCyclone]);
 
   return (
-    <div className="relative w-full h-[520px] sm:h-[580px] lg:h-[620px] flex flex-col items-center justify-between select-none">
+    <div className={className}>
       
       {/* Top Floating Telemetry Pills */}
-      <div className="w-full flex items-center justify-between px-2 pt-2 z-10 pointer-events-none">
-        <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md px-3.5 py-2 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm text-xs space-y-0.5 pointer-events-auto">
-          <div className="flex items-center gap-2">
-            <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
-            <span className="font-bold text-slate-950 dark:text-white">{systemName}</span>
-            <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300 font-semibold">
-              Live Cyclone Vortex
-            </span>
+      {showTelemetry && (
+        <div className="w-full flex items-center justify-between px-2 pt-2 z-10 pointer-events-none">
+          <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md px-3.5 py-2 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm text-xs space-y-0.5 pointer-events-auto">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
+              <span className="font-bold text-slate-950 dark:text-white">{systemName}</span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-red-100 dark:bg-red-950 text-red-700 dark:text-red-300 font-semibold">
+                Live Cyclone Vortex
+              </span>
+            </div>
+            <div className="text-[11px] text-slate-500 dark:text-slate-400">
+              Coordinates: <strong className="text-slate-800 dark:text-slate-200">{targetLat}°N, {targetLon}°E</strong>
+            </div>
           </div>
-          <div className="text-[11px] text-slate-500 dark:text-slate-400">
-            Coordinates: <strong className="text-slate-800 dark:text-slate-200">{targetLat}°N, {targetLon}°E</strong>
-          </div>
-        </div>
 
-        <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md px-3 py-1.5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm text-xs font-semibold text-amber-700 dark:text-amber-400 flex items-center gap-1.5 pointer-events-auto">
-          <Sparkles className="w-3.5 h-3.5" />
-          <span>{risk} 48h Risk</span>
+          <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md px-3 py-1.5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm text-xs font-semibold text-amber-700 dark:text-amber-400 flex items-center gap-1.5 pointer-events-auto">
+            <Sparkles className="w-3.5 h-3.5" />
+            <span>{risk} 48h Risk</span>
+          </div>
         </div>
-      </div>
+      )}
 
       {/* Transparent Three.js Canvas */}
       <div ref={mountRef} className="w-full h-full absolute inset-0 cursor-grab active:cursor-grabbing" />
 
       {/* Bottom Hint */}
-      <div className="w-full pb-2 z-10 pointer-events-none text-center">
-        <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium tracking-wide bg-white/60 dark:bg-slate-900/60 backdrop-blur-xs px-3.5 py-1 rounded-full border border-slate-200/60 dark:border-slate-800 shadow-2xs">
-          Active Swirling Cyclone Vortex • Natural 3D Earth Rotation
-        </span>
-      </div>
+      {showTelemetry && (
+        <div className="w-full pb-2 z-10 pointer-events-none text-center">
+          <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium tracking-wide bg-white/60 dark:bg-slate-900/60 backdrop-blur-xs px-3.5 py-1 rounded-full border border-slate-200/60 dark:border-slate-800 shadow-2xs">
+            Active Swirling Cyclone Vortex • Natural 3D Earth Rotation
+          </span>
+        </div>
+      )}
 
     </div>
   );
