@@ -1,11 +1,9 @@
 import React, { useEffect } from 'react';
-import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import Welcome from './pages/Welcome';
 import StateWeather from './pages/StateWeather';
 import CityTracker from './pages/CityTracker';
 import ThreatMap from './pages/ThreatMap';
-import Bulletins from './pages/Bulletins';
-import SafetyGuide from './pages/SafetyGuide';
 import SafetyUpdates from './pages/SafetyUpdates';
 import CityForecast from './pages/CityForecast';
 import AICycloneIntelligence from './pages/AICycloneIntelligence';
@@ -27,84 +25,46 @@ import Performance from './pages/Performance';
 import Architecture from './pages/Architecture';
 import ModelTraining from './pages/ModelTraining';
 import { ProtectedRoute } from './components/auth/ClerkAuth';
-import { isDashboardSubdomain, isProductionDomain, getDashboardUrl } from './utils/domain';
+import { isAuthSubdomain, isProductionDomain, getAuthUrl } from './utils/domain';
 
-// Redirect helper when accessing /dashboard on www.autonex.studio
-const ProductionDashboardRedirect = () => {
+// Redirect helper when accessing /login on production apex domain (vayusat.live)
+const ProductionLoginRedirect = () => {
   const location = useLocation();
   useEffect(() => {
-    // Preserve sub-path (e.g., /dashboard/track -> dashboard.autonex.studio/track)
-    const subPath = location.pathname.replace(/^\/dashboard/, '');
-    window.location.href = getDashboardUrl(subPath);
+    window.location.href = getAuthUrl(location.pathname + location.search);
   }, [location]);
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white text-xs">
-      <span>Redirecting to command dashboard...</span>
+    <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center text-xs font-mono">
+      <span>Redirecting to secure login gateway (login.vayusat.live)...</span>
     </div>
   );
 };
 
 function App() {
-  const isDashboard = isDashboardSubdomain();
+  const isAuth = isAuthSubdomain();
   const isProd = isProductionDomain();
 
-  // ROUTE SET 1: When user is on dashboard.autonex.studio
-  if (isDashboard) {
+  // ROUTE SET 1: When user is on login.vayusat.live
+  if (isAuth) {
     return (
       <Routes>
-        <Route
-          element={
-            <ProtectedRoute>
-              <DashboardLayout />
-            </ProtectedRoute>
-          }
-        >
-          {/* Root on dashboard.autonex.studio renders Dashboard */}
-          <Route index element={<Dashboard />} />
-          <Route path="track" element={<TrackMap />} />
-          <Route path="satellite" element={<Satellite />} />
-          <Route path="detection" element={<Detection />} />
-          <Route path="classification" element={<Classification />} />
-          <Route path="prediction" element={<Prediction />} />
-          <Route path="training" element={<ModelTraining />} />
-          <Route path="alerts" element={<Alerts />} />
-          <Route path="analytics" element={<Analytics />} />
-          <Route path="performance" element={<Performance />} />
-          <Route path="architecture" element={<Architecture />} />
-          <Route path="ai-cyclone" element={<AICycloneIntelligence />} />
-
-          {/* Legacy /dashboard/* aliases so relative internal links keep working */}
-          <Route path="dashboard" element={<Dashboard />} />
-          <Route path="dashboard/track" element={<TrackMap />} />
-          <Route path="dashboard/satellite" element={<Satellite />} />
-          <Route path="dashboard/detection" element={<Detection />} />
-          <Route path="dashboard/classification" element={<Classification />} />
-          <Route path="dashboard/prediction" element={<Prediction />} />
-          <Route path="dashboard/training" element={<ModelTraining />} />
-          <Route path="dashboard/alerts" element={<Alerts />} />
-          <Route path="dashboard/analytics" element={<Analytics />} />
-          <Route path="dashboard/performance" element={<Performance />} />
-          <Route path="dashboard/architecture" element={<Architecture />} />
-          <Route path="dashboard/ai-cyclone" element={<AICycloneIntelligence />} />
-        </Route>
-
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<Login />} />
       </Routes>
     );
   }
 
-  // ROUTE SET 2: When user is on www.autonex.studio (or local dev)
+  // ROUTE SET 2: When user is on vayusat.live (or local development)
   return (
     <Routes>
       {/* Official MoES / IMD Public Cyclone Intelligence Portal */}
       <Route path="/" element={<Welcome />} />
 
-      {/* SIH AI/ML Cyclone Intelligence Hub (Identification, Pattern Classification, Multi-Source Fusion, Track Prediction & Benchmarks) */}
+      {/* SIH AI/ML Cyclone Intelligence Hub */}
       <Route path="/ai-cyclone" element={<AICycloneIntelligence />} />
       <Route path="/ai-intelligence" element={<AICycloneIntelligence />} />
 
-      {/* ── Service Dashboard Pages (from Homepage Service Cards) ── */}
+      {/* Service Dashboard Pages (from Homepage Service Cards) */}
       <Route path="/rainfall-intelligence" element={<RainfallIntelligence />} />
       <Route path="/atmospheric-patterns" element={<AtmosphericPatterns />} />
       <Route path="/cyclone-intelligence" element={<CycloneIntelligencePage />} />
@@ -128,7 +88,7 @@ function App() {
       <Route path="/safety" element={<SafetyUpdates initialTab="safety" />} />
       <Route path="/updates" element={<SafetyUpdates initialTab="bulletins" />} />
 
-      {/* Dedicated City 7-Day Extended Weather Forecast (AQI, Temp, Precip, Wind & Weather Emojis) */}
+      {/* Dedicated City 7-Day Extended Weather Forecast */}
       <Route path="/forecast/:cityId" element={<CityForecast />} />
       <Route path="/city-forecast/:cityId" element={<CityForecast />} />
       <Route path="/forecast" element={<CityForecast />} />
@@ -137,38 +97,38 @@ function App() {
       <Route path="/state/:stateSlug" element={<StateWeather />} />
       <Route path="/state" element={<StateWeather />} />
 
-      {/* Official Department Officer Gateway */}
-      <Route path="/login" element={<Login />} />
-
-      {/* Dashboard route handling:
-          - On production www.autonex.studio: redirects to dept.autonex.studio
-          - On local dev / preview: loads DashboardLayout with ProtectedRoute
+      {/* Official Authentication Gateway:
+          - On production vayusat.live: redirects to login.vayusat.live
+          - On local dev / preview: loads Login component directly
       */}
       {isProd ? (
-        <Route path="/dashboard/*" element={<ProductionDashboardRedirect />} />
+        <Route path="/login" element={<ProductionLoginRedirect />} />
       ) : (
-        <Route
-          path="/dashboard"
-          element={
-            <ProtectedRoute>
-              <DashboardLayout />
-            </ProtectedRoute>
-          }
-        >
-          <Route index element={<Dashboard />} />
-          <Route path="track" element={<TrackMap />} />
-          <Route path="satellite" element={<Satellite />} />
-          <Route path="detection" element={<Detection />} />
-          <Route path="classification" element={<Classification />} />
-          <Route path="prediction" element={<Prediction />} />
-          <Route path="training" element={<ModelTraining />} />
-          <Route path="alerts" element={<Alerts />} />
-          <Route path="analytics" element={<Analytics />} />
-          <Route path="performance" element={<Performance />} />
-          <Route path="architecture" element={<Architecture />} />
-          <Route path="ai-cyclone" element={<AICycloneIntelligence />} />
-        </Route>
+        <Route path="/login" element={<Login />} />
       )}
+
+      {/* Protected Meteorological Command Dashboard (https://vayusat.live/dashboard) */}
+      <Route
+        path="/dashboard"
+        element={
+          <ProtectedRoute>
+            <DashboardLayout />
+          </ProtectedRoute>
+        }
+      >
+        <Route index element={<Dashboard />} />
+        <Route path="track" element={<TrackMap />} />
+        <Route path="satellite" element={<Satellite />} />
+        <Route path="detection" element={<Detection />} />
+        <Route path="classification" element={<Classification />} />
+        <Route path="prediction" element={<Prediction />} />
+        <Route path="training" element={<ModelTraining />} />
+        <Route path="alerts" element={<Alerts />} />
+        <Route path="analytics" element={<Analytics />} />
+        <Route path="performance" element={<Performance />} />
+        <Route path="architecture" element={<Architecture />} />
+        <Route path="ai-cyclone" element={<AICycloneIntelligence />} />
+      </Route>
 
       {/* Catch-all redirect to Public Portal */}
       <Route path="*" element={<Navigate to="/" replace />} />

@@ -1,5 +1,5 @@
-// Domain & Subdomain routing utilities for autonex.studio
-// Handles www.autonex.studio, auth.autonex.studio, dept.autonex.studio, and localhost
+// Domain & Subdomain routing utilities for vayusat.live
+// Handles vayusat.live (Main Portal & /dashboard), login.vayusat.live (Clerk Authentication), and localhost
 
 export const getHostname = () => {
   if (typeof window === 'undefined') return '';
@@ -8,30 +8,24 @@ export const getHostname = () => {
 
 export const isProductionDomain = () => {
   const host = getHostname();
-  return host.endsWith('autonex.studio');
-};
-
-export const isDashboardSubdomain = () => {
-  const host = getHostname();
-  // Support dept.autonex.studio (Primary) or dashboard.autonex.studio (Legacy alias)
-  return (
-    host.startsWith('dept.') ||
-    host.includes('dept-') ||
-    host.startsWith('dashboard.') ||
-    host.includes('dashboard-')
-  );
+  return host.endsWith('vayusat.live');
 };
 
 export const isAuthSubdomain = () => {
   const host = getHostname();
-  return host.startsWith('auth.') || host.includes('auth-');
+  return (
+    host.startsWith('login.') ||
+    host.includes('login-') ||
+    host.startsWith('auth.') ||
+    host.includes('auth-')
+  );
 };
 
 // URL generators for seamless cross-subdomain transitions
 export const getWebsiteUrl = (path = '/') => {
   const cleanPath = path.startsWith('/') ? path : `/${path}`;
   if (isProductionDomain()) {
-    return `https://www.autonex.studio${cleanPath}`;
+    return `https://vayusat.live${cleanPath}`;
   }
   return cleanPath;
 };
@@ -39,15 +33,15 @@ export const getWebsiteUrl = (path = '/') => {
 export const getDashboardUrl = (subPath = '') => {
   const cleanPath = subPath ? (subPath.startsWith('/') ? subPath : `/${subPath}`) : '';
   if (isProductionDomain()) {
-    return `https://dept.autonex.studio${cleanPath}`;
+    return `https://vayusat.live/dashboard${cleanPath}`;
   }
   return `/dashboard${cleanPath}`;
 };
 
 export const getAuthUrl = (redirectTarget) => {
-  const target = redirectTarget || (isProductionDomain() ? 'https://dept.autonex.studio' : '/dashboard');
+  const target = redirectTarget || getDashboardUrl();
   if (isProductionDomain()) {
-    return `https://auth.autonex.studio/sign-in?redirect_url=${encodeURIComponent(target)}`;
+    return `https://login.vayusat.live?redirect_url=${encodeURIComponent(target)}`;
   }
   return `/login?redirect_url=${encodeURIComponent(target)}`;
 };

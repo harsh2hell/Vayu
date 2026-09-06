@@ -3,225 +3,156 @@ import { Navigate, useLocation } from 'react-router-dom';
 import { 
   SignedIn, 
   SignedOut, 
-  SignIn, 
-  UserButton, 
   useUser, 
   useClerk 
 } from '@clerk/clerk-react';
-import { Shield, ArrowRight, User } from 'lucide-react';
-import { getAuthUrl, isProductionDomain, getWebsiteUrl } from '../../utils/domain';
+import { Shield, AlertTriangle, ArrowRight, User } from 'lucide-react';
+import { getAuthUrl, isProductionDomain } from '../../utils/domain';
 
 export const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || '';
 
 /**
- * Checks if the current session has valid portal credentials
+ * Notice displayed when Clerk authentication has not been configured in the environment.
+ * Prevents silent fallback to mock credentials and ensures the application fails securely.
  */
-export const isPortalAuthenticated = () => {
-  try {
-    const raw = localStorage.getItem('vayu_officer_session');
-    if (!raw) return false;
-    const session = JSON.parse(raw);
-    if (!session || !session.username || !session.token) return false;
+export const AuthConfigurationNotice = () => {
+  return (
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col items-center justify-center p-4">
+      <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl relative overflow-hidden text-center space-y-4">
+        <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mx-auto text-amber-400">
+          <AlertTriangle className="w-6 h-6" />
+        </div>
 
-    // Check expiration if set
-    if (session.expiresAt && Date.now() > session.expiresAt) {
-      localStorage.removeItem('vayu_officer_session');
-      return false;
-    }
+        <div>
+          <h2 className="text-lg font-bold text-white tracking-tight">
+            Clerk Authentication Required
+          </h2>
+          <p className="text-xs text-slate-400 mt-1 leading-relaxed">
+            The VAYU Command Dashboard is protected by Clerk Pro authentication (<code className="text-sky-400 font-mono">login.vayusat.live</code>).
+          </p>
+        </div>
 
-    return true;
-  } catch {
-    return false;
-  }
+        <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 text-left font-mono text-[11px] text-slate-400 space-y-1">
+          <p className="text-amber-400 font-semibold">Configuration Missing:</p>
+          <p>Please provide <code className="text-white">VITE_CLERK_PUBLISHABLE_KEY</code> in your environment variables.</p>
+        </div>
+
+        <a
+          href="/"
+          className="inline-flex items-center justify-center gap-1.5 w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium transition-colors"
+        >
+          <span>Return to Public Portal</span>
+        </a>
+      </div>
+    </div>
+  );
 };
 
 /**
  * Strict Protected Route Wrapper:
- * Users cannot access /dashboard without entering valid portal credentials.
- * Direct visits to /dashboard without authentication are immediately redirected to /login.
+ * Users cannot access /dashboard without a verified Clerk session.
+ * Unauthenticated users are redirected directly to login.vayusat.live (or /login in dev).
  */
 export const ProtectedRoute = ({ children }) => {
   const location = useLocation();
 
-  if (CLERK_PUBLISHABLE_KEY) {
-    return (
-      <>
-        <SignedIn>{children}</SignedIn>
-        <SignedOut>
+  if (!CLERK_PUBLISHABLE_KEY) {
+    return <AuthConfigurationNotice />;
+  }
+
+  const authUrl = getAuthUrl(window.location.href);
+
+  return (
+    <>
+      <SignedIn>{children}</SignedIn>
+      <SignedOut>
+        {isProductionDomain() ? (
+          (() => {
+            window.location.href = authUrl;
+            return (
+              <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center text-xs font-mono">
+                Redirecting to secure login gateway...
+              </div>
+            );
+          })()
+        ) : (
           <Navigate to={`/login?redirect_url=${encodeURIComponent(location.pathname)}`} replace />
-        </SignedOut>
-      </>
-    );
-  }
-
-  // Strict authentication guard: redirect to login if session token is missing or invalid
-  if (!isPortalAuthenticated()) {
-    return <Navigate to={`/login?redirect_url=${encodeURIComponent(location.pathname)}`} replace />;
-  }
-
-  return <>{children}</>;
+        )}
+      </SignedOut>
+    </>
+  );
 };
 
 /**
- * Modern login gate when user lands on dashboard unauthenticated
+ * Displays real authenticated Clerk user details (name, email, avatar).
  */
-export const AuthGateFallback = () => {
-  const authUrl = getAuthUrl();
-
-  return (
-    <div className="min-h-screen bg-[#fafbfc] dark:bg-black text-slate-800 dark:text-slate-100 flex flex-col items-center justify-center p-4">
-      {/* 2px National Tricolor Stripe */}
-      <div className="fixed top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#FF9933] via-slate-300 dark:via-slate-700 to-[#138808]" />
-
-      <div className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-2xl relative overflow-hidden">
-        <div className="text-center mb-6">
-          <div className="h-14 flex items-center justify-center mx-auto mb-3">
-            <img 
-              src="/vayu.png" 
-              alt="VAYU" 
-              className="h-12 w-auto object-contain filter drop-shadow-xs" 
-            />
-          </div>
-
-          <div className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full bg-sky-50 dark:bg-sky-950/70 text-sky-800 dark:text-sky-300 border border-sky-200 dark:border-sky-800 mb-2">
-            <Shield className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
-            <span>Restricted Officer Portal</span>
-          </div>
-
-          <h1 className="text-xl font-bold tracking-tight text-slate-950 dark:text-white">
-            Authentication Required
-          </h1>
-          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-            Access to <code className="text-sky-600 font-mono">dept.autonex.studio</code> requires meteorological officer credentials via Clerk Pro.
-          </p>
-        </div>
-
-        {/* Clerk Sign In CTA */}
-        <div className="flex flex-col gap-3">
-          <a
-            href={authUrl}
-            className="w-full py-3 px-4 rounded-xl bg-slate-950 dark:bg-sky-600 hover:bg-slate-800 dark:hover:bg-sky-500 text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-md transition-all cursor-pointer"
-          >
-            <span>Sign In via auth.autonex.studio</span>
-            <ArrowRight className="w-4 h-4" />
-          </a>
-
-          <a
-            href={getWebsiteUrl()}
-            className="w-full py-2.5 px-4 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-medium text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer"
-          >
-            <span>Back to Public Atlas</span>
-          </a>
-        </div>
-
-        <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 text-center">
-          <span className="text-[11px] text-slate-400">
-            Powered by Clerk Pro Custom Domain SSO • auth.autonex.studio
-          </span>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-// Internal component to display user identity when ClerkProvider is active
-const ClerkUserDisplay = () => {
-  const { user } = useUser();
-  const name = user?.fullName || user?.firstName || 'IMD Officer';
-  const email = user?.primaryEmailAddress?.emailAddress || 'officer.cyclone@imd.gov.in';
-
-  return (
-    <div className="flex items-center gap-3">
-      {user?.imageUrl ? (
-        <img src={user.imageUrl} alt={name} className="w-9 h-9 rounded-xl object-cover border border-slate-200 shrink-0" />
-      ) : (
-        <div className="w-9 h-9 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700 font-bold text-xs shrink-0">
-          <User className="w-4 h-4 text-slate-600" />
-        </div>
-      )}
-      <div className="flex flex-col min-w-0 flex-1">
-        <span className="text-xs font-semibold text-slate-900 truncate">{name}</span>
-        <span className="text-[10px] text-slate-500 truncate">{email}</span>
-      </div>
-    </div>
-  );
-};
-
-// Safe Account identity component (uses Clerk user if configured, otherwise test officer session)
 export const OfficerAccountDisplay = () => {
-  if (CLERK_PUBLISHABLE_KEY) {
-    return <ClerkUserDisplay />;
-  }
+  const { user, isLoaded } = useUser();
 
-  let officerName = 'Commander R. Sharma';
-  let officerEmail = 'officer@vayu.imd.gov.in';
-
-  try {
-    const sessionStr = localStorage.getItem('vayu_officer_session');
-    if (sessionStr) {
-      const session = JSON.parse(sessionStr);
-      if (session.name) officerName = session.name;
-      if (session.username) officerEmail = session.username;
-    }
-  } catch (e) {
-    // fallback defaults
-  }
-
-  return (
-    <div className="flex items-center gap-3">
-      <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-700 dark:text-slate-200 font-bold text-xs shrink-0">
-        <User className="w-4 h-4 text-slate-600 dark:text-slate-300" />
-      </div>
-      <div className="flex flex-col min-w-0 flex-1">
-        <span className="text-xs font-semibold text-slate-900 dark:text-white truncate">{officerName}</span>
-        <span className="text-[10px] text-slate-500 dark:text-slate-400 truncate">{officerEmail}</span>
-      </div>
-    </div>
-  );
-};
-
-// Internal sign out handler when Clerk is active
-const ClerkSignOutButton = ({ onSignOutComplete, className, children }) => {
-  const { signOut } = useClerk();
-  return (
-    <button
-      type="button"
-      onClick={async () => {
-        try {
-          localStorage.removeItem('vayu_officer_session');
-        } catch (e) {}
-        try {
-          await signOut();
-        } catch (e) {
-          console.error(e);
-        }
-        onSignOutComplete();
-      }}
-      className={className}
-    >
-      {children}
-    </button>
-  );
-};
-
-export const SafeSignOutButton = ({ onSignOutComplete, className, children }) => {
-  if (CLERK_PUBLISHABLE_KEY) {
+  if (!isLoaded || !user) {
     return (
-      <ClerkSignOutButton onSignOutComplete={onSignOutComplete} className={className}>
-        {children}
-      </ClerkSignOutButton>
+      <div className="flex items-center gap-3">
+        <div className="w-9 h-9 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400 font-bold text-xs shrink-0">
+          <User className="w-4 h-4" />
+        </div>
+        <div className="flex flex-col min-w-0 flex-1">
+          <span className="text-xs font-semibold text-slate-200 truncate">VAYU Officer</span>
+          <span className="text-[10px] text-slate-500 truncate">Authenticated Session</span>
+        </div>
+      </div>
     );
   }
 
+  const name = user.fullName || user.firstName || 'Meteorological Officer';
+  const email = user.primaryEmailAddress?.emailAddress || 'officer@vayusat.live';
+
+  return (
+    <div className="flex items-center gap-3">
+      {user.imageUrl ? (
+        <img 
+          src={user.imageUrl} 
+          alt={name} 
+          className="w-9 h-9 rounded-xl object-cover border border-slate-700 shrink-0" 
+        />
+      ) : (
+        <div className="w-9 h-9 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-200 font-bold text-xs shrink-0">
+          <User className="w-4 h-4 text-slate-400" />
+        </div>
+      )}
+      <div className="flex flex-col min-w-0 flex-1">
+        <span className="text-xs font-semibold text-slate-900 dark:text-white truncate">{name}</span>
+        <span className="text-[10px] text-slate-500 dark:text-slate-400 truncate">{email}</span>
+      </div>
+    </div>
+  );
+};
+
+/**
+ * Sign out button invoking official Clerk signOut() and redirecting to login.vayusat.live.
+ */
+export const SafeSignOutButton = ({ onSignOutComplete, className, children }) => {
+  const { signOut } = useClerk();
+
+  const handleSignOut = async () => {
+    try {
+      if (signOut) {
+        await signOut();
+      }
+    } catch (err) {
+      console.warn('[ClerkAuth] Sign out error:', err);
+    }
+
+    if (onSignOutComplete) {
+      onSignOutComplete();
+    } else {
+      window.location.href = getAuthUrl();
+    }
+  };
+
   return (
     <button
       type="button"
-      onClick={() => {
-        try {
-          localStorage.removeItem('vayu_officer_session');
-        } catch (e) {}
-        onSignOutComplete();
-      }}
+      onClick={handleSignOut}
       className={className}
     >
       {children}

@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Shield, PhoneCall, Sun, Moon, Menu, X, ChevronRight, Clock } from 'lucide-react';
 import { useLiveClock } from '../utils/liveDateTime';
+import { getAuthUrl } from '../utils/domain';
 
 export const FONT_SCALE_MAP = {
   '-3': 75,
@@ -326,7 +327,7 @@ const PublicNavbar = ({
           
           {/* Official Portal Gateway - Collapses smoothly when scrolled past hero section */}
           <button
-            onClick={() => navigate('/login')}
+            onClick={() => { window.location.href = getAuthUrl(); }}
             className={`header-ctrl-btn header-collapsible-item header-collapsible-login hidden xl:inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-slate-900 dark:bg-sky-600 hover:bg-slate-800 dark:hover:bg-sky-500 transition-all shadow-xs cursor-pointer shrink-0 whitespace-nowrap ${
               isPastHero ? 'is-collapsed' : ''
             }`}
@@ -459,7 +460,7 @@ const PublicNavbar = ({
           <button
             onClick={() => {
               setIsMobileMenuOpen(false);
-              navigate('/login');
+              window.location.href = getAuthUrl();
             }}
             className="w-full flex items-center justify-between p-3 rounded-2xl text-white bg-gradient-to-r from-slate-900 via-sky-950 to-slate-900 dark:from-sky-700 dark:via-blue-600 dark:to-indigo-700 shadow-md border border-slate-700/50 dark:border-white/20 active:scale-[0.99] transition-all cursor-pointer"
           >

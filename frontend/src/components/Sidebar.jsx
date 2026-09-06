@@ -305,7 +305,7 @@ const Sidebar = () => {
                   <Shield className="w-3 h-3 text-sky-600" />
                   <span>Central Operations Desk</span>
                 </div>
-                <div className="text-[10px] text-slate-500 mt-0.5">Clerk Pro SSO • autonex.studio</div>
+                <div className="text-[10px] text-slate-500 mt-0.5">Clerk Pro SSO • login.vayusat.live</div>
               </div>
               
               <div className="pt-1">
@@ -341,7 +341,7 @@ const Sidebar = () => {
                   Confirm Logout
                 </h3>
                 <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">
-                  Are you sure you want to end your operational session and return to www.autonex.studio?
+                  Are you sure you want to end your operational session and return to login.vayusat.live?
                 </p>
               </div>
             </div>
