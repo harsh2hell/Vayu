@@ -482,30 +482,10 @@ export async function fetchCycloneById(systemId) {
 export async function fetchLiveOceanTelemetry(basin = 'Bay of Bengal') {
   try {
     const baseUrl = await getLiveBaseUrl();
-    const response = await fetch(`${baseUrl}/api/v1/ocean/telemetry?basin=${encodeURIComponent(basin)}`, { method: 'GET' });
+    const response = await fetch(`${baseUrl}/api/v1/ocean/live-telemetry?basin=${encodeURIComponent(basin)}`, { method: 'GET' });
     if (response.ok) {
-      return await response.json();
-    }
-    // Fallback directly to Open-Meteo if backend route is unavailable
-    const lat = basin === 'Bay of Bengal' ? 15.5 : 15.0;
-    const lon = basin === 'Bay of Bengal' ? 88.0 : 66.0;
-    const omRes = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,surface_pressure,wind_speed_10m,wind_direction_10m,wind_gusts_10m&timezone=Asia%2FKolkata`);
-    if (omRes.ok) {
-      const omData = await omRes.json();
-      const curr = omData.current || {};
-      return {
-        source: 'Open-Meteo Marine Direct Feed',
-        status: 'LIVE_OCEAN_ACTIVE',
-        coordinates: { lat, lon, basin },
-        surface_wind_kmh: Math.round((curr.wind_speed_10m || 28) * 10) / 10,
-        surface_wind_gusts_kmh: Math.round((curr.wind_gusts_10m || 38) * 10) / 10,
-        surface_pressure_hpa: Math.round((curr.surface_pressure || 1008) * 10) / 10,
-        air_temperature_c: Math.round((curr.temperature_2m || 28.5) * 10) / 10,
-        relative_humidity_pct: curr.relative_humidity_2m || 80,
-        wind_direction_deg: curr.wind_direction_10m || 210,
-        is_live_stream: true,
-        timestamp: new Date().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata' }) + ' IST'
-      };
+      const json = await response.json();
+      return json.data || json;
     }
     return null;
   } catch (err) {

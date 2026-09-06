@@ -23,14 +23,8 @@ export default function DataSourceStatusCard({
 }) {
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
 
-  // Generate clean realistic timestamps based on current local time if none passed
-  const getFormattedTime = (minutesAgo = 0) => {
-    const d = new Date(Date.now() - minutesAgo * 60 * 1000);
-    return d.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }) + ' IST';
-  };
-
-  const updateTime = lastUpdated || getFormattedTime(4);
-  const aiAnalysisTime = lastAIAnalysis || getFormattedTime(1);
+  const updateTime = lastUpdated || (isHindi ? 'समय अनुपलब्ध' : 'Timestamp unavailable');
+  const aiAnalysisTime = lastAIAnalysis || (isHindi ? 'समय अनुपलब्ध' : 'Timestamp unavailable');
 
   const FEEDS = [
     {
@@ -54,7 +48,7 @@ export default function DataSourceStatusCard({
         ? (isHindi ? 'ऐतिहासिक डेटा' : 'Historical Archive')
         : (isBackendLive ? (isHindi ? 'कनेक्टेड' : 'Connected') : (isHindi ? 'डेमो / नमूना डेटा' : 'Demo / Sample Data')),
       lastTimeLabel: isHindi ? 'अंतिम अपडेट:' : 'Last Updated:',
-      lastTime: isHistorical ? 'Archive Validated' : getFormattedTime(12),
+      lastTime: isHistorical ? 'Archive Validated' : updateTime,
       provider: 'Indian National Centre for Ocean Information Services'
     },
     {
@@ -66,7 +60,7 @@ export default function DataSourceStatusCard({
         ? (isHindi ? 'सत्यापित अभिलेख' : 'Verified IMD Record') 
         : (isHindi ? 'कनेक्टेड' : 'Connected'),
       lastTimeLabel: isHindi ? 'आधिकारिक बुलेटिन:' : 'Last Bulletin:',
-      lastTime: isHistorical ? 'Recorded Landfall Fix' : getFormattedTime(25),
+      lastTime: isHistorical ? 'Recorded Landfall Fix' : updateTime,
       provider: 'India Meteorological Department (MoES)'
     },
     {

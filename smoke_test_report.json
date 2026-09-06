@@ -13,7 +13,7 @@
     },
     "database": "SQLite (cyclone_intel.db Active with 9 Tables)",
     "background_poller": "ACTIVE",
-    "timestamp": 1788707395.6573062
+    "timestamp": 1788708281.229526
   },
   "satellite_ingestion": {
     "sources_count": 5,
@@ -28,14 +28,14 @@
       "center": "17.16\u00b0N, 87.39\u00b0E",
       "confidence": 100.0,
       "checkpoint": "vayu_detector_mobilenetv3_p3b.pt",
-      "latency_ms": 46.808719635009766
+      "latency_ms": 55.184125900268555
     },
     "biparjoy": {
       "detected": true,
       "center": "18.92\u00b0N, 67.73\u00b0E",
       "confidence": 100.0,
       "checkpoint": "vayu_detector_mobilenetv3_p3b.pt",
-      "latency_ms": 43.74504089355469
+      "latency_ms": 46.150922775268555
     }
   },
   "classification": {
@@ -45,14 +45,14 @@
       "confidence": 97.8,
       "gradcam_foci_count": 3,
       "checkpoint": "vayu_morph_resnet18_p3b.pt",
-      "latency_ms": 84.63120460510254
+      "latency_ms": 96.76384925842285
     },
     "biparjoy": {
       "pattern": "Calm Baseline",
       "confidence": 99.7,
       "gradcam_foci_count": 3,
       "checkpoint": "vayu_morph_resnet18_p3b.pt",
-      "latency_ms": 61.64717674255371
+      "latency_ms": 69.22507286071777
     }
   },
   "trajectory": {
@@ -75,7 +75,7 @@
         72
       ],
       "landfall": "Sundarbans & South 24 Parganas (WB)",
-      "latency_ms": 19.308090209960938
+      "latency_ms": 19.814014434814453
     },
     "biparjoy": {
       "initial_fix": {
@@ -96,19 +96,19 @@
         72
       ],
       "landfall": "Jakhau & Kutch (Gujarat)",
-      "latency_ms": 18.17178726196289
+      "latency_ms": 18.16082000732422
     }
   },
   "uncertainty": {
     "mc_dropout_samples": 25,
     "spread_km": [
       0.0,
-      6.9,
-      9.6,
-      24.1,
-      36.8,
-      41.0,
-      36.6
+      6.3,
+      8.9,
+      21.3,
+      38.1,
+      41.9,
+      40.7
     ],
     "uncertainty_label": "MC-Dropout epistemic spread (Directionally useful but not calibrated)",
     "error_envelope": {
@@ -129,9 +129,9 @@
     "empty_image_status": 500
   },
   "performance": {
-    "avg_detection_ms": 47.14674949645996,
-    "avg_classification_ms": 63.7181282043457,
-    "avg_trajectory_ms": 18.695449829101562,
-    "total_pipeline_ms": 129.56032752990723
+    "avg_detection_ms": 43.430185317993164,
+    "avg_classification_ms": 66.17097854614258,
+    "avg_trajectory_ms": 19.576501846313477,
+    "total_pipeline_ms": 129.17766571044922
   }
 }
