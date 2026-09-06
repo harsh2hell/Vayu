@@ -399,6 +399,9 @@ const Dashboard = () => {
     ]
   });
 
+  // Historical System Flag (Historical Benchmarks vs Live/AI Genesis Systems)
+  const isHistorical = aiPrediction?.system_type === 'HISTORICAL_BENCHMARK' || selectedPreset?.startsWith('cyclone-');
+
   // Time-lapse trajectory playback loop
   useEffect(() => {
     let timer;
@@ -633,6 +636,7 @@ const Dashboard = () => {
   };
 
   const activeWaypoint = aiPrediction.trajectory[timeStepIndex] || aiPrediction.trajectory[0];
+  const prevWaypoint = timeStepIndex > 0 ? aiPrediction.trajectory[timeStepIndex - 1] : null;
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
