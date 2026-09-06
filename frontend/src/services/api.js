@@ -554,13 +554,9 @@ export async function fetchLiveCyclogenesisWatch(basin = 'Bay of Bengal') {
   try {
     const base = await getLiveBaseUrl();
     if (base) {
-<<<<<<< HEAD
-      const res = await fetch(`${base}/api/cyclogenesis-watch?basin=${encodeURIComponent(basin)}`);
-=======
       const res = await fetch(`${base}/api/cyclogenesis-watch?basin=${encodeURIComponent(basin)}`, {
         signal: AbortSignal.timeout(3000)
       });
->>>>>>> 90cb0592f3eaffa258e615ca59e5975664a04470
       if (res.ok) {
         const json = await res.json();
         if (json.data) return { ...json.data, isLive: true, lastUpdated: getFormattedLastUpdated() };

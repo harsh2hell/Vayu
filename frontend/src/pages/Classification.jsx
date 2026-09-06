@@ -69,12 +69,7 @@ const Classification = () => {
           <div className="flex items-center gap-2 flex-wrap">
             <Layers className="w-6 h-6 text-[#003087]" />
             <h1 className="text-xl sm:text-2xl font-bold text-slate-900">AI Cyclone Pattern Classification</h1>
-<<<<<<< HEAD
             <span className="badge badge-navy">ResNet18-Dvorak-Morphology (4 Classes — Experimental Prototype)</span>
-=======
-            <span className="badge badge-navy">PatternNet-ViT v1.8 (5 Morphological Classes)</span>
-            <DataTypeBadge type={classificationResult ? 'ai' : 'demo'} size="xs" label={classificationResult ? 'LIVE AI PREDICTION' : 'AI MODEL ARCHIVE'} />
->>>>>>> 90cb0592f3eaffa258e615ca59e5975664a04470
           </div>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
             Deep Residual Convolutional Network (ResNet-18) classifying Eye Pattern, Curved Band, Shear Pattern, and Calm Baseline with Grad-CAM visual attention. CDO and Embedded Center patterns are retired due to insufficient data.

@@ -114,12 +114,7 @@ const Prediction = () => {
                 <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
                   AI Spatiotemporal Prediction & Trajectory Engine
                 </h1>
-<<<<<<< HEAD
                 <span className="badge badge-navy">2-Layer GRU Seq2Seq</span>
-=======
-                <span className="badge badge-navy">BiLSTM v3.0</span>
-                <DataTypeBadge type="ai" label="AI 72H PREDICTION" size="xs" />
->>>>>>> 90cb0592f3eaffa258e615ca59e5975664a04470
               </div>
               <p className="text-xs sm:text-sm text-slate-500">
                 NOAA IBTrACS NIO 3-Hourly Telemetry • Multi-Horizon 72h Trajectory Forecasting
