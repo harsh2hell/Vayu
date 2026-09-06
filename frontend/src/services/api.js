@@ -66,8 +66,8 @@ function analyzeSatelliteImageInBrowser(imageFileOrBlob, basin = 'Bay of Bengal'
   return new Promise((resolve) => {
     const isArabian = basin.toLowerCase().includes('arabian');
     
-    // Default safe fallback in case image cannot be loaded
-    const getFallback = (cx = 0.52, cy = 0.48) => {
+    // Default safe fallback in case image cannot be loaded or evaluated
+    const getFallback = (cx = 0.52, cy = 0.48, isDetected = true, objectnessScore = 0.958) => {
       const latMin = isArabian ? 12.0 : 14.0;
       const latMax = isArabian ? 22.0 : 21.5;
       const lonMin = isArabian ? 60.0 : 82.0;
@@ -78,25 +78,30 @@ function analyzeSatelliteImageInBrowser(imageFileOrBlob, basin = 'Bay of Bengal'
         success: true,
         isLiveApi: false,
         isClientFallback: true,
-        detected: true,
-        cyclone_detected: true,
-        confidence_percentage: 95.8,
-        objectness: 0.958,
+        detected: isDetected,
+        cyclone_detected: isDetected,
+        confidence_percentage: parseFloat((objectnessScore * 100).toFixed(1)),
+        objectness: objectnessScore,
+        center_localization_available: isDetected,
         model_version: "CycloneVision-MobileNetV3 (Client In-Browser Engine)",
         architecture: "MobileNetV3 Neural Centroid & Cloud Mask Extractor",
-        center: {
+        center: isDetected ? {
           lat,
           lon,
           center_x_norm: cx,
           center_y_norm: cy
-        },
-        coordinates: { latitude: lat, longitude: lon },
-        bounding_box: [
+        } : null,
+        coordinates: isDetected ? { 
+          latitude: lat, 
+          longitude: lon,
+          formatted: `${lat}°N, ${lon}°E`
+        } : null,
+        bounding_box: isDetected ? [
           Math.max(0.05, parseFloat((cy - 0.22).toFixed(3))),
           Math.max(0.05, parseFloat((cx - 0.22).toFixed(3))),
           Math.min(0.95, parseFloat((cy + 0.22).toFixed(3))),
           Math.min(0.95, parseFloat((cx + 0.22).toFixed(3)))
-        ],
+        ] : null,
         dvorak_classification: {
           t_number: "T4.0",
           ci_number: 4.0,
@@ -366,33 +371,55 @@ export async function detectCycloneFromImage(imageFileOrBlob, basin = 'Bay of Be
     if (response && response.ok) {
       const json = await response.json();
       const raw = json.data || json;
-      const detected = raw.cyclone_detected ?? raw.detected ?? true;
-      const objectness = raw.objectness !== undefined ? raw.objectness : ((raw.confidence_percentage ?? 100.0) / 100.0);
+      const isDetected = Boolean(raw.cyclone_detected ?? raw.detected ?? false);
+      const objectness = raw.objectness !== undefined 
+        ? raw.objectness 
+        : ((raw.confidence_percentage ?? 0.0) / 100.0);
+      
       const rawBbox = raw.bounding_box;
       const parsedCx = raw.center?.center_x_norm 
         ?? raw.coordinates?.center_x_norm 
         ?? rawBbox?.center_x_norm 
-        ?? (Array.isArray(rawBbox) ? (rawBbox[1] + rawBbox[3]) / 2 : 0.5);
+        ?? (Array.isArray(rawBbox) ? (rawBbox[1] + rawBbox[3]) / 2 : null);
       const parsedCy = raw.center?.center_y_norm 
         ?? raw.coordinates?.center_y_norm 
         ?? rawBbox?.center_y_norm 
-        ?? (Array.isArray(rawBbox) ? (rawBbox[0] + rawBbox[2]) / 2 : 0.5);
+        ?? (Array.isArray(rawBbox) ? (rawBbox[0] + rawBbox[2]) / 2 : null);
 
-      const center = {
+      // Strict scientific gating: Center localization & bounding box ONLY available when cyclone is detected
+      const center = isDetected && parsedCx !== null && parsedCy !== null ? {
         lat: raw.center?.lat ?? raw.coordinates?.latitude ?? 18.3,
         lon: raw.center?.lon ?? raw.coordinates?.longitude ?? 88.4,
         center_x_norm: parseFloat(Number(parsedCx).toFixed(4)),
         center_y_norm: parseFloat(Number(parsedCy).toFixed(4))
-      };
+      } : null;
+
+      const coordinates = isDetected && center ? (raw.coordinates || { 
+        latitude: center.lat, 
+        longitude: center.lon,
+        formatted: `${center.lat}°N, ${center.lon}°E`
+      }) : null;
+
+      const bounding_box = isDetected ? rawBbox : null;
+
       return { 
         success: true, 
         isLiveApi: true, 
         ...raw,
-        detected,
-        cyclone_detected: detected,
+        detected: isDetected,
+        cyclone_detected: isDetected,
         objectness,
+        center_localization_available: isDetected,
         center,
-        coordinates: raw.coordinates || { latitude: center.lat, longitude: center.lon }
+        coordinates,
+        bounding_box,
+        _raw_debug: {
+          raw_center: raw.center,
+          raw_coordinates: raw.coordinates,
+          raw_bbox: rawBbox,
+          parsed_cx: parsedCx,
+          parsed_cy: parsedCy
+        }
       };
     }
     throw new Error(`API returned ${response?.status || 'network error'}`);
