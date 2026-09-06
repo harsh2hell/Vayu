@@ -203,11 +203,11 @@ const Classification = () => {
           
           <div className="bg-slate-950 relative min-h-[380px] max-h-[480px] flex items-center justify-center overflow-hidden">
             {activeImageSrc ? (
-              <div className="relative w-full h-full flex items-center justify-center">
+              <div className="relative inline-block max-w-full max-h-full">
                 <img
                   src={activeImageSrc}
                   alt="Cyclone Pattern View"
-                  className="w-full h-full object-contain filter brightness-95 contrast-110"
+                  className="max-h-[480px] max-w-full w-auto h-auto object-contain block filter brightness-95 contrast-110"
                 />
 
                 {/* Source and Lifecycle Watermarks */}

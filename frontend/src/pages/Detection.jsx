@@ -193,11 +193,11 @@ const Detection = () => {
 
           <div className="relative bg-slate-950 flex items-center justify-center min-h-[460px] max-h-[560px] overflow-hidden">
             {activeImageSrc ? (
-              <div className="relative w-full h-full flex items-center justify-center">
+              <div className="relative inline-block max-w-full max-h-full">
                 <img 
                   src={activeImageSrc} 
                   alt="Satellite Observation Frame" 
-                  className="w-full h-full object-contain filter brightness-95 contrast-110"
+                  className="max-h-[560px] max-w-full w-auto h-auto object-contain block filter brightness-95 contrast-110"
                 />
 
                 {/* Source and Lifecycle Watermarks */}
@@ -209,6 +209,11 @@ const Detection = () => {
                   }`}>
                     {isCustomUpload ? `USER-UPLOADED IMAGE • ${currentInput?.name}` : `BENCHMARK FRAME: ${currentInput?.name}`}
                   </span>
+                  {isCustomUpload && detectionResult && (
+                    <span className="px-2 py-0.5 rounded text-[9px] font-mono font-medium bg-amber-950/90 text-amber-200 border border-amber-500/40 backdrop-blur-md">
+                      Trained on centered synoptic crops • Regional off-center frames may exhibit localization variance
+                    </span>
+                  )}
                   {!detectionResult && (
                     <span className="px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold bg-red-950/90 text-red-300 border border-red-500/50 backdrop-blur-md shadow-sm">
                       INPUT IMAGE PREVIEW ONLY — NO INFERENCE EXECUTED
@@ -216,14 +221,14 @@ const Detection = () => {
                   )}
                 </div>
 
-                {/* Real Dynamic Bounding Box Overlay (Visible ONLY when inference succeeded) */}
+                {/* Real Dynamic Bounding Box Overlay (Visible ONLY when inference succeeded, strictly mapped to image) */}
                 {detectionResult?.detected && bboxStyle && (
                   <div 
                     className="absolute border-2 border-red-500 bg-red-500/15 rounded transition-all duration-500 pointer-events-none"
                     style={bboxStyle}
                   >
                     <div className="absolute -top-6 left-0 bg-red-600 text-white font-mono text-[10px] font-bold px-2 py-0.5 rounded shadow whitespace-nowrap flex items-center gap-1">
-                      <span>CYCLONE EYE REGRESSION</span>
+                      <span>CYCLONE CENTER FIX</span>
                       <span>({(detectionResult.objectness * 100).toFixed(1)}%)</span>
                     </div>
                   </div>
@@ -337,7 +342,7 @@ const Detection = () => {
 
                 <div className="space-y-2.5 text-xs">
                   <div className="flex justify-between items-center py-1.5 border-b border-slate-100">
-                    <span className="text-slate-500 font-medium">Eye Center Coordinates:</span>
+                    <span className="text-slate-500 font-medium">Vortex Center Fix (Estimated):</span>
                     <span className="font-bold font-mono text-slate-900">
                       {detectionResult.center?.lat?.toFixed(2)}°N, {detectionResult.center?.lon?.toFixed(2)}°E
                     </span>
@@ -403,7 +408,7 @@ const Detection = () => {
                   <div className="text-slate-400 font-bold uppercase text-[10px] mb-1">Inference State Checklist:</div>
                   <div>• Cyclone Detected: <span className="text-amber-700 font-semibold">NOT EVALUATED</span></div>
                   <div>• Objectness Score: <span className="text-amber-700 font-semibold">NOT EVALUATED</span></div>
-                  <div>• Eye Center Fix: <span className="text-amber-700 font-semibold">NOT COMPUTED</span></div>
+                  <div>• Vortex Center Fix: <span className="text-amber-700 font-semibold">NOT COMPUTED</span></div>
                   <div>• Bounding Box: <span className="text-amber-700 font-semibold">NOT COMPUTED</span></div>
                   <div>• Latency: <span className="text-amber-700 font-semibold">NOT MEASURED</span></div>
                 </div>

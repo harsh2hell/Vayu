@@ -332,70 +332,72 @@ const Satellite = () => {
             </div>
 
             {/* Satellite Frame Canvas */}
-            <div className="relative rounded-xl overflow-hidden border border-slate-200 bg-slate-950 aspect-[4/3] flex items-center justify-center shadow-inner">
-              <img
-                src={activeImageSource}
-                alt={imageMetadata.name}
-                className="w-full h-full object-contain select-none"
-                crossOrigin="anonymous"
-              />
+            <div className="relative rounded-xl overflow-hidden border border-slate-200 bg-slate-950 min-h-[460px] max-h-[580px] flex items-center justify-center shadow-inner">
+              <div className="relative inline-block max-w-full max-h-full">
+                <img
+                  src={activeImageSource}
+                  alt={imageMetadata.name}
+                  className="max-h-[560px] max-w-full w-auto h-auto object-contain block select-none"
+                  crossOrigin="anonymous"
+                />
 
-              {/* AI Overlay Layer (Visible only when in 'overlay' mode) */}
-              {visualMode === 'overlay' && detectionResult?.cyclone_detected && (
-                <>
-                  {/* Bounding Box Overlay */}
-                  {showBbox && bboxStyle && (
-                    <div 
-                      className="absolute border-2 border-red-500 bg-red-500/15 rounded transition-all duration-300 pointer-events-none"
-                      style={bboxStyle}
-                    >
-                      <div className="absolute -top-6 left-0 bg-red-600 text-white font-mono text-[9px] font-bold px-2 py-0.5 rounded shadow whitespace-nowrap">
-                        CYCLONE EYE BBOX • MobileNetV3
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Detected Center Fix Pin Marker */}
-                  {showCenterPin && centerStyle && (
-                    <div 
-                      className="absolute -translate-x-1/2 -translate-y-1/2 pointer-events-none transition-all duration-300 z-10"
-                      style={centerStyle}
-                    >
-                      <div className="w-9 h-9 rounded-full border-2 border-amber-300 bg-amber-400/25 animate-ping absolute -top-4.5 -left-4.5" />
-                      <div className="w-6 h-6 rounded-full border-2 border-white bg-red-600 shadow-lg flex items-center justify-center text-white text-[10px] font-bold">
-                        🎯
-                      </div>
-                      <div className="absolute top-4 -left-16 bg-slate-900/90 text-white px-2 py-0.5 rounded text-[9px] font-mono whitespace-nowrap shadow border border-amber-300/40">
-                        {detectionResult.coordinates?.formatted || 'Eye Center'}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* ResNet18 Grad-CAM Attention Foci Overlays */}
-                  {showGradCamFoci && classificationResult?.gradcam_attention_foci?.map((focus, fIdx) => (
-                    <div
-                      key={fIdx}
-                      className="absolute -translate-x-1/2 -translate-y-1/2 pointer-events-none z-10"
-                      style={{
-                        left: `${(focus.x_norm ?? focus.relative_x ?? 0.5) * 100}%`,
-                        top: `${(focus.y_norm ?? focus.relative_y ?? 0.5) * 100}%`
-                      }}
-                    >
+                {/* AI Overlay Layer (Visible only when in 'overlay' mode, tightly bounded to image rect) */}
+                {visualMode === 'overlay' && detectionResult?.cyclone_detected && (
+                  <>
+                    {/* Bounding Box Overlay */}
+                    {showBbox && bboxStyle && (
                       <div 
-                        className="rounded-full border border-amber-400 bg-amber-400/20 animate-pulse"
-                        style={{
-                          width: `${Math.max(28, (focus.activation_intensity ?? focus.intensity_weight ?? 0.7) * 56)}px`,
-                          height: `${Math.max(28, (focus.activation_intensity ?? focus.intensity_weight ?? 0.7) * 56)}px`,
-                          transform: 'translate(-50%, -50%)'
-                        }}
-                      />
-                      <div className="absolute top-2 -left-12 bg-amber-950/90 text-amber-200 border border-amber-400/60 px-1.5 py-0.5 rounded text-[8px] font-mono whitespace-nowrap shadow">
-                        {focus.label || focus.description || `Focus #${fIdx + 1}`} ({(((focus.activation_intensity ?? focus.intensity_weight) || 0.8) * 100).toFixed(0)}%)
+                        className="absolute border-2 border-red-500 bg-red-500/15 rounded transition-all duration-300 pointer-events-none"
+                        style={bboxStyle}
+                      >
+                        <div className="absolute -top-6 left-0 bg-red-600 text-white font-mono text-[9px] font-bold px-2 py-0.5 rounded shadow whitespace-nowrap">
+                          CYCLONE CENTER FIX • MobileNetV3
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </>
-              )}
+                    )}
+
+                    {/* Detected Center Fix Pin Marker */}
+                    {showCenterPin && centerStyle && (
+                      <div 
+                        className="absolute -translate-x-1/2 -translate-y-1/2 pointer-events-none transition-all duration-300 z-10"
+                        style={centerStyle}
+                      >
+                        <div className="w-9 h-9 rounded-full border-2 border-amber-300 bg-amber-400/25 animate-ping absolute -top-4.5 -left-4.5" />
+                        <div className="w-6 h-6 rounded-full border-2 border-white bg-red-600 shadow-lg flex items-center justify-center text-white text-[10px] font-bold">
+                          🎯
+                        </div>
+                        <div className="absolute top-4 -left-16 bg-slate-900/90 text-white px-2 py-0.5 rounded text-[9px] font-mono whitespace-nowrap shadow border border-amber-300/40">
+                          {detectionResult.coordinates?.formatted ? `Center: ${detectionResult.coordinates.formatted}` : 'Vortex Center'}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* ResNet18 Grad-CAM Attention Foci Overlays */}
+                    {showGradCamFoci && classificationResult?.gradcam_attention_foci?.map((focus, fIdx) => (
+                      <div
+                        key={fIdx}
+                        className="absolute -translate-x-1/2 -translate-y-1/2 pointer-events-none z-10"
+                        style={{
+                          left: `${(focus.x_norm ?? focus.relative_x ?? 0.5) * 100}%`,
+                          top: `${(focus.y_norm ?? focus.relative_y ?? 0.5) * 100}%`
+                        }}
+                      >
+                        <div 
+                          className="rounded-full border border-amber-400 bg-amber-400/20 animate-pulse"
+                          style={{
+                            width: `${Math.max(28, (focus.activation_intensity ?? focus.intensity_weight ?? 0.7) * 56)}px`,
+                            height: `${Math.max(28, (focus.activation_intensity ?? focus.intensity_weight ?? 0.7) * 56)}px`,
+                            transform: 'translate(-50%, -50%)'
+                          }}
+                        />
+                        <div className="absolute top-2 -left-12 bg-amber-950/90 text-amber-200 border border-amber-400/60 px-1.5 py-0.5 rounded text-[8px] font-mono whitespace-nowrap shadow">
+                          {focus.label || focus.description || `Focus #${fIdx + 1}`} ({(((focus.activation_intensity ?? focus.intensity_weight) || 0.8) * 100).toFixed(0)}%)
+                        </div>
+                      </div>
+                    ))}
+                  </>
+                )}
+              </div>
 
               {/* Source & Inference Lifecycle Watermarks */}
               <div className="absolute top-2.5 left-2.5 z-10 flex flex-col gap-1 pointer-events-none">
@@ -406,6 +408,11 @@ const Satellite = () => {
                 }`}>
                   {customFile ? 'USER-UPLOADED IMAGE • IN-SESSION ANALYSIS' : `BENCHMARK FRAME: ${selectedPreset.name}`}
                 </span>
+                {customFile && detectionResult && (
+                  <span className="px-2 py-0.5 rounded text-[9px] font-mono font-medium bg-amber-950/90 text-amber-200 border border-amber-500/40 backdrop-blur-md">
+                    Trained on centered synoptic crops • Regional off-center frames may exhibit localization variance
+                  </span>
+                )}
                 {!detectionResult && (
                   <span className="px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold bg-red-950/90 text-red-300 border border-red-500/50 backdrop-blur-md shadow-sm">
                     INPUT IMAGE PREVIEW ONLY — NO INFERENCE EXECUTED

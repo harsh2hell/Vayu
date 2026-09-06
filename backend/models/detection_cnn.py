@@ -53,6 +53,12 @@ class CycloneVisionCNN:
             "cyclone_detected": raw_pred["cyclone_detected"],
             "confidence_percentage": raw_pred["confidence_percentage"],
             "coordinates": raw_pred["coordinates"],
+            "center": raw_pred.get("center", {
+                "lat": raw_pred["coordinates"]["latitude"],
+                "lon": raw_pred["coordinates"]["longitude"],
+                "center_x_norm": raw_pred["bounding_box"]["center_x_norm"],
+                "center_y_norm": raw_pred["bounding_box"]["center_y_norm"]
+            }),
             "dvorak_classification": {
                 "t_number": f"T{ci}",
                 "ci_number": ci,
