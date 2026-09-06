@@ -294,8 +294,8 @@ const Login = ({ initialMode }) => {
       <div
         className="w-full max-w-5xl bg-white rounded-2xl overflow-hidden flex flex-col lg:flex-row"
         style={{
-          boxShadow: '0 1px 3px 0 rgba(0,0,0,0.06), 0 4px 16px -2px rgba(0,0,0,0.06), 0 12px 40px -4px rgba(0,0,0,0.04)',
-          border: '1px solid rgba(226,232,240,0.7)',
+          boxShadow: '0 2px 4px rgba(0,0,0,0.04), 0 6px 14px -2px rgba(0,0,0,0.06), 0 16px 40px -6px rgba(0,0,0,0.08), 0 30px 60px -10px rgba(0,0,0,0.06)',
+          border: '1px solid rgba(226,232,240,0.55)',
           minHeight: 'min(640px, calc(100vh - 80px))',
           maxHeight: 'calc(100vh - 80px)',
         }}
@@ -320,8 +320,8 @@ const Login = ({ initialMode }) => {
           {/* Main form area — centered */}
           <main className="flex-1 flex flex-col items-center justify-center px-6 sm:px-10 lg:px-10 overflow-y-auto">
             <div className="w-full max-w-sm space-y-4">
-              {/* Logo & Title */}
-              <div className="text-center space-y-2 mb-2">
+              {/* Logo */}
+              <div className="text-center mb-2">
                 <div className="inline-flex items-center justify-center h-18 mb-1">
                   <img
                     src="/vayu.png"
@@ -329,12 +329,6 @@ const Login = ({ initialMode }) => {
                     className="h-14 sm:h-16 w-auto object-contain drop-shadow-sm"
                   />
                 </div>
-                <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight font-heading">
-                  {isSignUp ? 'Create Account' : 'Portal Login'}
-                </h1>
-                <p className="text-[11px] text-slate-400 font-mono">
-                  Authorized access to storm intelligence systems
-                </p>
               </div>
 
               {/* Clerk form */}
