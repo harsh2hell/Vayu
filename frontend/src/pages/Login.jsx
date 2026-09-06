@@ -184,12 +184,22 @@ const Login = () => {
       {/* 2px National Tricolor Accent at very top */}
       <div className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#FF9933] via-slate-300 to-[#138808] z-50 opacity-90" />
 
+      {/* Top-Left: "Main Page" Navigation Button */}
+      <button
+        type="button"
+        onClick={() => navigate('/')}
+        className="fixed top-5 left-5 sm:top-6 sm:left-8 z-50 inline-flex items-center gap-2 text-xs font-semibold text-slate-700 hover:text-slate-950 bg-white/90 hover:bg-white backdrop-blur-md px-4 py-2 rounded-full border border-slate-200/90 shadow-sm transition-all cursor-pointer group"
+      >
+        <ArrowLeft className="w-3.5 h-3.5 transition-transform duration-200 group-hover:-translate-x-0.5 text-slate-600 group-hover:text-slate-900" />
+        <span>Main Page</span>
+      </button>
+
       {/* Main Dual-Column Split Card Frame */}
       <div className="w-full max-w-5xl bg-white border border-slate-200/80 rounded-[30px] shadow-xl shadow-slate-200/50 overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[660px] relative">
         
         {/* LEFT COLUMN: Dynamic Cyclone / Alert Curtains Carousel */}
         <div 
-          className="lg:col-span-6 relative m-3 sm:m-3.5 rounded-[24px] overflow-hidden min-h-[460px] lg:min-h-full flex flex-col justify-between p-5 sm:p-7 bg-slate-950 text-white select-none group"
+          className="lg:col-span-6 relative m-3 sm:m-3.5 rounded-[24px] overflow-hidden min-h-[460px] lg:min-h-full flex flex-col justify-end p-5 sm:p-7 bg-slate-950 text-white select-none group"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
         >
@@ -221,20 +231,8 @@ const Login = () => {
             );
           })}
 
-          {/* Top Bar inside Left Card: "Back to website" placed on upper-LEFT with left-pointing arrow */}
-          <div className="relative z-20 flex items-center justify-start">
-            <button
-              type="button"
-              onClick={() => navigate('/')}
-              className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-800 hover:text-slate-950 bg-white/90 hover:bg-white backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/70 shadow-xs transition-all cursor-pointer group"
-            >
-              <ArrowLeft className="w-3.5 h-3.5 transition-transform duration-200 group-hover:-translate-x-0.5 text-slate-700" />
-              <span>Back to website</span>
-            </button>
-          </div>
-
           {/* Dynamic Alert Content Overlay (Clean, no 4 active line, no 2nd line, no metric chips) */}
-          <div className="relative z-20 space-y-2.5 pt-28">
+          <div className="relative z-20 space-y-2.5">
             
             {/* Region Pill */}
             <div>
