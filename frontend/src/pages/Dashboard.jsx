@@ -30,6 +30,8 @@ import {
 } from '../services/api';
 import InfoTooltip from '../components/InfoTooltip';
 import DataTypeBadge from '../components/DataTypeBadge';
+import LastUpdatedBadge from '../components/LastUpdatedBadge';
+import DataUnavailableNotice from '../components/DataUnavailableNotice';
 import CycloneLifecycleBar from '../components/CycloneLifecycleBar';
 import AIReasoningCard from '../components/AIReasoningCard';
 import DataSourceStatusCard from '../components/DataSourceStatusCard';
@@ -397,6 +399,9 @@ const Dashboard = () => {
     ]
   });
 
+  // Historical System Flag (Historical Benchmarks vs Live/AI Genesis Systems)
+  const isHistorical = aiPrediction?.system_type === 'HISTORICAL_BENCHMARK' || selectedPreset?.startsWith('cyclone-');
+
   // Time-lapse trajectory playback loop
   useEffect(() => {
     let timer;
@@ -633,6 +638,7 @@ const Dashboard = () => {
   };
 
   const activeWaypoint = aiPrediction.trajectory[timeStepIndex] || aiPrediction.trajectory[0];
+  const prevWaypoint = timeStepIndex > 0 ? aiPrediction.trajectory[timeStepIndex - 1] : null;
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
@@ -715,7 +721,7 @@ const Dashboard = () => {
               </div>
             </div>
             <DataTypeBadge 
-              type={isHistorical ? 'historical' : (isBackendLive ? 'live' : 'demo')} 
+              type={isHistorical ? 'historical' : (isBackendLive ? 'live' : 'ai')} 
               size="xs" 
             />
           </div>
@@ -807,11 +813,9 @@ const Dashboard = () => {
             </p>
           </div>
 
-          <div className="flex items-center justify-between text-[11px] text-slate-400 font-mono pt-2 border-t border-slate-100">
+          <div className="flex items-center justify-between text-[11px] text-slate-400 font-mono pt-2 border-t border-slate-100 flex-wrap gap-1">
             <span className="text-slate-600 font-medium">Latency 140ms</span>
-            <span className="text-violet-600 font-semibold">
-              {lastUpdatedTime ? `Last Updated: ${lastUpdatedTime}` : 'Last Updated: 16:05 IST'}
-            </span>
+            <LastUpdatedBadge timestamp={lastUpdatedTime} isLive={isBackendLive} source="MOSDAC & AVHRR" size="xs" />
           </div>
         </div>
 

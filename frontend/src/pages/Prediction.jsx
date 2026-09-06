@@ -11,6 +11,8 @@ import {
   RotateCcw, ArrowUpRight, Compass, ShieldAlert, Zap
 } from 'lucide-react';
 import { INTENSITY_FORECAST, PRESSURE_FORECAST } from '../data/mockData';
+import DataTypeBadge from '../components/DataTypeBadge';
+import LastUpdatedBadge from '../components/LastUpdatedBadge';
 
 const FEATURE_IMPORTANCE = [
   { feature: 'Sea Surface Temp (SST)', weight: 34, color: '#DC2626', sub: 'High oceanic thermal energy pool (>28.5°C)' },
@@ -108,11 +110,16 @@ const Prediction = () => {
               <BrainCircuit className="w-6 h-6" />
             </div>
             <div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
                   AI Spatiotemporal Prediction & Trajectory Engine
                 </h1>
+<<<<<<< HEAD
                 <span className="badge badge-navy">2-Layer GRU Seq2Seq</span>
+=======
+                <span className="badge badge-navy">BiLSTM v3.0</span>
+                <DataTypeBadge type="ai" label="AI 72H PREDICTION" size="xs" />
+>>>>>>> 90cb0592f3eaffa258e615ca59e5975664a04470
               </div>
               <p className="text-xs sm:text-sm text-slate-500">
                 NOAA IBTrACS NIO 3-Hourly Telemetry • Multi-Horizon 72h Trajectory Forecasting
@@ -122,7 +129,8 @@ const Prediction = () => {
         </div>
 
         {/* Highlight Scorecard */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 flex-wrap">
+          <LastUpdatedBadge source="BiLSTM Trajectory Engine" size="xs" />
           <div className="bg-emerald-50 border border-emerald-200 px-4 py-2 rounded-xl text-right">
             <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider block">
               72h Trajectory Advantage

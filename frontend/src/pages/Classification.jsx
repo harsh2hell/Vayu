@@ -3,6 +3,8 @@ import { RadarChart, PolarGrid, PolarAngleAxis, Radar, ResponsiveContainer, Tool
 import { CheckCircle, ChevronRight, Upload, Sparkles, Crosshair, Eye, Wind, Layers } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { classifyMorphologyPattern } from '../services/api';
+import DataTypeBadge from '../components/DataTypeBadge';
+import LastUpdatedBadge from '../components/LastUpdatedBadge';
 
 const DEFAULT_CLASSES = [
   { class_id: 'eye_pattern', class_name: 'Eye Pattern (Warm Core)', probability_pct: 0.0, dvorak_range: 'T4.5 – T7.5', color: 'bg-red-500' },
@@ -64,10 +66,15 @@ const Classification = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <Layers className="w-6 h-6 text-[#003087]" />
             <h1 className="text-xl sm:text-2xl font-bold text-slate-900">AI Cyclone Pattern Classification</h1>
+<<<<<<< HEAD
             <span className="badge badge-navy">ResNet18-Dvorak-Morphology (4 Classes — Experimental Prototype)</span>
+=======
+            <span className="badge badge-navy">PatternNet-ViT v1.8 (5 Morphological Classes)</span>
+            <DataTypeBadge type={classificationResult ? 'ai' : 'demo'} size="xs" label={classificationResult ? 'LIVE AI PREDICTION' : 'AI MODEL ARCHIVE'} />
+>>>>>>> 90cb0592f3eaffa258e615ca59e5975664a04470
           </div>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
             Deep Residual Convolutional Network (ResNet-18) classifying Eye Pattern, Curved Band, Shear Pattern, and Calm Baseline with Grad-CAM visual attention. CDO and Embedded Center patterns are retired due to insufficient data.
@@ -78,6 +85,7 @@ const Classification = () => {
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
+          <LastUpdatedBadge source="PatternNet-ViT v1.8" size="xs" />
           <label className="btn-secondary text-xs sm:text-sm py-2 px-3 gap-1.5 cursor-pointer">
             <Upload className="w-3.5 h-3.5" />
             <span>Upload Satellite Frame</span>

@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import PublicNavbar, { applyGlobalFontScale } from '../components/PublicNavbar';
 import IOSGlassCard from '../components/IOSGlassCard';
 import InfoTooltip from '../components/InfoTooltip';
+import DataTypeBadge from '../components/DataTypeBadge';
+import LastUpdatedBadge from '../components/LastUpdatedBadge';
 import { useLiveClock } from '../utils/liveDateTime';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -188,13 +190,13 @@ export default function CycloneIntelligencePage() {
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Multi-spectral satellite tracks, storm surge hydrodynamics &amp; AI genesis prediction</p>
             </div>
           </div>
-          <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 shrink-0">
+          <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 shrink-0 flex-wrap">
             <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-900 text-red-700 dark:text-red-400">
               <span className="relative flex h-2 w-2"><span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75" /><span className="relative inline-flex rounded-full h-2 w-2 bg-red-600" /></span>
               <span className="font-bold">Active Disturbance</span>
             </span>
-            <Clock className="w-3.5 h-3.5 ml-1" />
-            <span>{liveClock.observationStr}</span>
+            <DataTypeBadge type="ai" size="xs" label="AI GENESIS WATCH" />
+            <LastUpdatedBadge timestamp={liveClock.observationStr} source="INSAT-3DR & MOSDAC" size="xs" />
           </div>
         </div>
 

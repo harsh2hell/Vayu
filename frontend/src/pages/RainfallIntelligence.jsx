@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import PublicNavbar, { applyGlobalFontScale } from '../components/PublicNavbar';
 import IOSGlassCard from '../components/IOSGlassCard';
 import { useLiveClock } from '../utils/liveDateTime';
+import DataTypeBadge from '../components/DataTypeBadge';
+import LastUpdatedBadge from '../components/LastUpdatedBadge';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, LineChart, Line, ReferenceLine
@@ -150,10 +152,8 @@ const ALERT_CONFIG = {
   yellow: { border: 'border-yellow-300 dark:border-yellow-800', bg: 'bg-yellow-50 dark:bg-yellow-950/30', icon: 'text-yellow-600 dark:text-yellow-400', badge: 'bg-yellow-500 text-slate-900', label: 'YELLOW ADVISORY' },
 };
 
-const DemoBadge = () => (
-  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 border border-amber-400/40 text-amber-700 dark:text-amber-400">
-    🔬 DEMO DATA — Not Live
-  </span>
+const DemoBadge = ({ type = 'demo', label = 'DEMO BENCHMARK' }) => (
+  <DataTypeBadge type={type} label={label} />
 );
 
 const CircleMarkerRainfall = ({ station }) => {
@@ -236,18 +236,17 @@ export default function RainfallIntelligence() {
               <ArrowLeft className="w-4 h-4 text-slate-600 dark:text-slate-300" />
             </button>
             <div>
-              <div className="flex items-center gap-2 mb-0.5">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-sky-600 dark:text-sky-400">LIVE DOPPLER RADAR</span>
-                <DemoBadge />
+              <div className="flex items-center gap-2 mb-1 flex-wrap">
+                <DataTypeBadge type="live" label="IMD DWR DOPPLER GRID" />
+                <DataTypeBadge type="demo" label="RADAR SIMULATION" />
               </div>
               <h1 className="text-xl sm:text-2xl lg:text-3xl font-heading font-black tracking-tight text-slate-950 dark:text-white">Rainfall Intelligence</h1>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Precipitation estimates &amp; 850+ coastal automatic weather stations</p>
             </div>
           </div>
           <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 shrink-0">
-            <Clock className="w-3.5 h-3.5" />
-            <span>Last updated: {liveClock.observationStr}</span>
-            <button className="ml-1 p-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all cursor-pointer">
+            <LastUpdatedBadge timestamp={liveClock.observationStr} source="IMD DWR & AWS Network" />
+            <button className="ml-1 p-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all cursor-pointer" title="Refresh">
               <RefreshCw className="w-3 h-3" />
             </button>
           </div>
@@ -286,7 +285,7 @@ export default function RainfallIntelligence() {
               <div className="flex items-center gap-2 mb-3">
                 <ShieldAlert className="w-4 h-4 text-red-500" />
                 <h2 className="font-heading font-black text-sm uppercase tracking-wider text-slate-900 dark:text-white">Active Alerts &amp; Warnings</h2>
-                <DemoBadge />
+                <DataTypeBadge type="live" label="IMD CAP Warning Feed" />
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {ACTIVE_ALERTS.map(alert => {
@@ -389,7 +388,7 @@ export default function RainfallIntelligence() {
                 <div className="flex items-center gap-2">
                   <Radio className="w-4 h-4 text-sky-500" />
                   <h2 className="font-heading font-black text-sm uppercase tracking-wider text-slate-900 dark:text-white">AWS Station Report</h2>
-                  <DemoBadge />
+                  <DataTypeBadge type="live" label="Coastal AWS Network" />
                 </div>
                 <div className="flex items-center gap-1.5 flex-wrap">
                   {['all', 'extreme', 'very_heavy', 'heavy', 'moderate'].map(tab => (
@@ -448,7 +447,7 @@ export default function RainfallIntelligence() {
               <div className="flex items-center gap-2 mb-3">
                 <TrendingUp className="w-4 h-4 text-sky-500" />
                 <h2 className="font-heading font-black text-sm uppercase tracking-wider text-slate-900 dark:text-white">Monthly Climatological Context</h2>
-                <DemoBadge />
+                <DataTypeBadge type="historical" label="IMD 30-Yr LPA Normal" />
               </div>
               <IOSGlassCard className="p-5 rounded-2xl">
                 <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">Monthly rainfall (mm) — Observed vs. Long Period Average (LPA)</p>
@@ -478,7 +477,7 @@ export default function RainfallIntelligence() {
                   <span className="text-white text-[9px] font-black">AI</span>
                 </div>
                 <h2 className="font-heading font-black text-sm uppercase tracking-wider text-slate-900 dark:text-white">AI-Generated Insights</h2>
-                <DemoBadge />
+                <DataTypeBadge type="ai" label="CycloneVision AI Fusion" />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 {AI_INSIGHTS.map((ins, i) => (

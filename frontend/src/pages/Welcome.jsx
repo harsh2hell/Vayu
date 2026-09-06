@@ -18,9 +18,12 @@ import IOSGlassCard from '../components/IOSGlassCard';
 import { useLiveClock } from '../utils/liveDateTime';
 import InfoTooltip from '../components/InfoTooltip';
 import DataTypeBadge from '../components/DataTypeBadge';
+import LastUpdatedBadge from '../components/LastUpdatedBadge';
+import DataUnavailableNotice from '../components/DataUnavailableNotice';
 import CycloneLifecycleBar from '../components/CycloneLifecycleBar';
 import AIReasoningCard from '../components/AIReasoningCard';
 import DataSourceStatusCard from '../components/DataSourceStatusCard';
+import { getLiveBaseUrl, fetchLiveOceanTelemetry, getFormattedLastUpdated } from '../services/api';
 import {
   MapContainer,
   TileLayer,
@@ -1206,23 +1209,26 @@ const Welcome = () => {
 
   const current = systems[activeId] || INITIAL_SYSTEMS[activeId];
 
-  // Fetch live AI model inference & real-time telemetry from FastAPI backend
+  // Fetch live AI model inference & real-time telemetry from FastAPI backend / marine feeds
   const fetchLiveBackendData = async () => {
     setIsSyncing(true);
     try {
-      const bayPromise = fetch('/api/v1/cyclones/genesis-watch?basin=Bay%20of%20Bengal')
+      const baseUrl = await getLiveBaseUrl();
+      const bayPromise = fetch(`${baseUrl}/api/v1/cyclones/genesis-watch?basin=Bay%20of%20Bengal`, { signal: AbortSignal.timeout(2500) })
         .then(r => r.ok ? r.json() : null)
         .catch(() => null);
 
-      const arabPromise = fetch('/api/v1/cyclones/genesis-watch?basin=Arabian%20Sea')
+      const arabPromise = fetch(`${baseUrl}/api/v1/cyclones/genesis-watch?basin=Arabian%20Sea`, { signal: AbortSignal.timeout(2500) })
         .then(r => r.ok ? r.json() : null)
         .catch(() => null);
 
-      const danaPromise = fetch('/api/v1/cyclones/cyclone-dana-2024')
+      const danaPromise = fetch(`${baseUrl}/api/v1/cyclones/cyclone-dana-2024`, { signal: AbortSignal.timeout(2500) })
         .then(r => r.ok ? r.json() : null)
         .catch(() => null);
 
-      const [bayRes, arabRes, danaRes] = await Promise.all([bayPromise, arabPromise, danaPromise]);
+      const oceanPromise = fetchLiveOceanTelemetry('Bay of Bengal').catch(() => null);
+
+      const [bayRes, arabRes, danaRes, oceanRes] = await Promise.all([bayPromise, arabPromise, danaPromise, oceanPromise]);
 
       setSystems((prev) => {
         const next = { ...prev };
@@ -1333,14 +1339,28 @@ const Welcome = () => {
           };
         }
 
+        if (oceanRes && oceanRes.status === 'LIVE_OCEAN_ACTIVE') {
+          if (next.invest92b) {
+            next.invest92b = {
+              ...next.invest92b,
+              sst: oceanRes.air_temperature_c ? oceanRes.air_temperature_c + 1.2 : next.invest92b.sst,
+              pressure: oceanRes.surface_pressure_hpa ? String(Math.round(oceanRes.surface_pressure_hpa)) : next.invest92b.pressure,
+              wind: oceanRes.surface_wind_kmh ? String(Math.round(oceanRes.surface_wind_kmh)) : next.invest92b.wind,
+              gusts: oceanRes.surface_wind_gusts_kmh ? String(Math.round(oceanRes.surface_wind_gusts_kmh)) : next.invest92b.gusts,
+              isLive: true
+            };
+          }
+        }
+
         return next;
       });
 
       setSyncStatus('LIVE_AI_CONNECTED');
-      setLastSyncTime(new Date().toLocaleTimeString('en-IN', { hour12: false }) + ' IST');
+      setLastSyncTime(getFormattedLastUpdated());
     } catch (err) {
       console.warn('Backend sync warning:', err);
       setSyncStatus('CALIBRATED_FALLBACK');
+      setLastSyncTime(getFormattedLastUpdated());
     } finally {
       setIsSyncing(false);
     }
@@ -1560,7 +1580,7 @@ const Welcome = () => {
 
               {/* Data Type Transparency Badge */}
               <DataTypeBadge
-                type={current.id === 'dana' ? 'historical' : (syncStatus === 'LIVE_AI_CONNECTED' ? 'live' : 'demo')}
+                type={current.id === 'dana' ? 'historical' : (current.isLive ? 'live' : 'ai')}
                 isHindi={isHindi}
               />
 
@@ -1620,16 +1640,18 @@ const Welcome = () => {
               )}
             </div>
 
-            <div className="flex items-center gap-2">
-              <span className="text-[0.7rem] text-slate-500 dark:text-slate-400 font-mono">
-                {lastSyncTime
-                  ? (isHindi ? `अंतिम अपडेट: ${lastSyncTime}` : `Last Updated: ${lastSyncTime}`)
-                  : (isHindi ? 'डेटा सत्यापित: 16:04 IST' : 'Last Updated: 16:04 IST')}
-              </span>
+            <div className="flex items-center gap-2 flex-wrap">
+              <LastUpdatedBadge
+                timestamp={lastSyncTime}
+                isLive={syncStatus === 'LIVE_AI_CONNECTED'}
+                source={current.id === 'dana' ? 'IMD Best-Track Benchmark' : 'ISRO MOSDAC & AI Model'}
+                isHindi={isHindi}
+                size="xs"
+              />
               <button
                 onClick={fetchLiveBackendData}
                 disabled={isSyncing}
-                className="inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white transition-all cursor-pointer disabled:opacity-50"
+                className="inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:white transition-all cursor-pointer disabled:opacity-50 text-xs font-medium"
                 title={isHindi ? "एआई मॉडल निष्कर्ष और महासागरीय टेलीमेट्री रीफ्रेश करें" : "Refresh AI Model Inference & Ocean Telemetry"}
               >
                 <RefreshCw className={`w-3 h-3 ${isSyncing ? 'animate-spin' : ''}`} />

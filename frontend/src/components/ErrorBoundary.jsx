@@ -40,19 +40,25 @@ class ErrorBoundary extends React.Component {
             <div className="flex flex-col sm:flex-row gap-2.5 justify-center">
               <button
                 onClick={this.handleClearCacheAndReload}
-                className="px-5 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold text-xs transition-colors shadow-lg shadow-cyan-500/20"
+                className="px-4 py-2.5 rounded-xl bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-semibold text-xs transition-colors shadow-lg shadow-cyan-500/20"
               >
                 Clear Cache & Reload
               </button>
               <button
+                onClick={() => window.location.href = '/'}
+                className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-xs transition-colors border border-slate-700"
+              >
+                Back to Home
+              </button>
+              <button
                 onClick={() => window.location.reload()}
-                className="px-5 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-xs transition-colors border border-slate-700"
+                className="px-4 py-2.5 rounded-xl bg-slate-800/60 hover:bg-slate-700/60 text-slate-400 font-medium text-xs transition-colors border border-slate-800"
               >
                 Try Again
               </button>
             </div>
             {this.state.error && (
-              <details className="mt-5 text-left text-[11px] text-rose-400 bg-rose-950/30 p-3 rounded-xl border border-rose-900/40">
+              <details open className="mt-5 text-left text-[11px] text-rose-400 bg-rose-950/30 p-3 rounded-xl border border-rose-900/40">
                 <summary className="cursor-pointer text-slate-400 font-mono">Error details</summary>
                 <pre className="mt-2 overflow-x-auto whitespace-pre-wrap">{this.state.error.toString()}</pre>
               </details>

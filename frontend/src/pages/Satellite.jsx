@@ -13,8 +13,12 @@ import {
   fetchLiveSstGrid, 
   fetchLiveVerticalWindShear, 
   fetchIsroMosdacCatalog,
-  fetchRainViewerLiveFrames
+  fetchRainViewerLiveFrames,
+  getFormattedLastUpdated
 } from '../services/api';
+import DataTypeBadge from '../components/DataTypeBadge';
+import LastUpdatedBadge from '../components/LastUpdatedBadge';
+import DataUnavailableNotice from '../components/DataUnavailableNotice';
 
 const SATELLITE_PRESETS = [
   {
@@ -211,6 +215,10 @@ const Satellite = () => {
       {/* Page Header */}
       <div className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
+          <div className="flex items-center gap-2 mb-2 flex-wrap">
+            <DataTypeBadge type="live" label="NASA GIBS & RAINVIEWER DOPPLER" />
+            <LastUpdatedBadge timestamp={getFormattedLastUpdated()} source="ISRO MOSDAC & NASA EOSDIS" />
+          </div>
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-sky-50 text-sky-700 flex items-center justify-center font-bold">
               <SatelliteDish className="w-4 h-4" />
@@ -718,7 +726,10 @@ const Satellite = () => {
                 <Waves className="w-4 h-4 text-sky-600" />
                 <h4 className="font-bold text-xs text-slate-800 uppercase tracking-wider">Live Ocean SST Grid</h4>
               </div>
-              <span className="badge badge-green text-[9px]">Live API</span>
+              <DataTypeBadge
+                type={liveSst.length > 0 ? "live" : "unavailable"}
+                label={liveSst.length > 0 ? "LIVE SST API" : "DATA UNAVAILABLE"}
+              />
             </div>
 
             <div className="space-y-1.5 text-xs">

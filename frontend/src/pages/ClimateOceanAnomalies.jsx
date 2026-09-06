@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import PublicNavbar, { applyGlobalFontScale } from '../components/PublicNavbar';
 import IOSGlassCard from '../components/IOSGlassCard';
 import { useLiveClock } from '../utils/liveDateTime';
+import DataTypeBadge from '../components/DataTypeBadge';
+import LastUpdatedBadge from '../components/LastUpdatedBadge';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   LineChart, Line, ReferenceLine, BarChart, Bar
@@ -91,10 +93,8 @@ const DATA_SOURCES = [
   { name: 'JAMSTEC SINTEX', desc: 'IOD & Coupled Ocean Model', icon: '🗺️' },
 ];
 
-const DemoBadge = () => (
-  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 border border-amber-400/40 text-amber-700 dark:text-amber-400">
-    🔬 DEMO DATA — Not Live
-  </span>
+const DemoBadge = ({ type = 'demo', label = 'DEMO BENCHMARK' }) => (
+  <DataTypeBadge type={type} label={label} />
 );
 
 const CustomTooltip = ({ active, payload, label }) => {
@@ -171,17 +171,16 @@ export default function ClimateOceanAnomalies() {
               <ArrowLeft className="w-4 h-4 text-slate-600 dark:text-slate-300" />
             </button>
             <div>
-              <div className="flex items-center gap-2 mb-0.5">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-rose-600 dark:text-rose-400">ENSO, IOD &amp; SST WATCH</span>
-                <DemoBadge />
+              <div className="flex items-center gap-2 mb-1 flex-wrap">
+                <DataTypeBadge type="live" label="NOAA CPC & INCOIS SST" />
+                <DataTypeBadge type="ai" label="SEAS5 CLIMATE MODEL" />
               </div>
               <h1 className="text-xl sm:text-2xl lg:text-3xl font-heading font-black tracking-tight text-slate-950 dark:text-white">Climate &amp; Ocean Anomalies</h1>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">ENSO, IOD, sea surface temperature anomalies and their influence on tropical cyclogenesis</p>
             </div>
           </div>
           <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 shrink-0">
-            <Clock className="w-3.5 h-3.5" />
-            <span>Last updated: {liveClock.observationStr}</span>
+            <LastUpdatedBadge timestamp={liveClock.observationStr} source="NOAA CPC & INCOIS" />
           </div>
         </div>
 
@@ -262,7 +261,7 @@ export default function ClimateOceanAnomalies() {
                 <div className="flex items-center gap-2 mb-3">
                   <Activity className="w-4 h-4 text-rose-500" />
                   <h2 className="font-heading font-black text-sm uppercase tracking-wider text-slate-900 dark:text-white">ENSO &amp; IOD Index Trends (21 Months)</h2>
-                  <DemoBadge />
+                  <DataTypeBadge type="live" label="NOAA Monthly Observations" />
                 </div>
                 <IOSGlassCard className="p-5 rounded-2xl">
                   <div className="flex gap-2 mb-4">
@@ -328,7 +327,7 @@ export default function ClimateOceanAnomalies() {
                 <div className="flex items-center gap-2 mb-3">
                   <MapPin className="w-4 h-4 text-red-500" />
                   <h2 className="font-heading font-black text-sm uppercase tracking-wider text-slate-900 dark:text-white">SST Anomaly Map</h2>
-                  <DemoBadge />
+                  <DataTypeBadge type="live" label="INCOIS Buoy & Satellite SST" />
                 </div>
                 <IOSGlassCard interactive={false} className="rounded-2xl overflow-hidden p-0">
                   <div className="h-72 sm:h-80">
@@ -355,7 +354,7 @@ export default function ClimateOceanAnomalies() {
                 <div className="flex items-center gap-2 mb-3">
                   <Waves className="w-4 h-4 text-rose-500" />
                   <h2 className="font-heading font-black text-sm uppercase tracking-wider text-slate-900 dark:text-white">Ocean Heat Content Profile</h2>
-                  <DemoBadge />
+                  <DataTypeBadge type="live" label="INCOIS Argo Float Grid" />
                 </div>
                 <IOSGlassCard className="p-5 rounded-2xl">
                   <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">Depth-integrated temperature &amp; anomaly — North Bay of Bengal (15–20°N, 85–92°E)</p>
@@ -393,7 +392,7 @@ export default function ClimateOceanAnomalies() {
                 <div className="flex items-center gap-2 mb-3">
                   <TrendingUp className="w-4 h-4 text-rose-500" />
                   <h2 className="font-heading font-black text-sm uppercase tracking-wider text-slate-900 dark:text-white">Seasonal Cyclone Outlook</h2>
-                  <DemoBadge />
+                  <DataTypeBadge type="ai" label="Probabilistic AI Ensemble" />
                 </div>
                 <IOSGlassCard className="p-5 rounded-2xl">
                   <p className="text-xs text-slate-500 dark:text-slate-400 mb-4">Projected cyclone count &amp; SST anomaly — Oct–Dec 2026 (probabilistic, not deterministic)</p>
@@ -430,7 +429,7 @@ export default function ClimateOceanAnomalies() {
               <div className="flex items-center gap-2 mb-3">
                 <Globe className="w-4 h-4 text-rose-500" />
                 <h2 className="font-heading font-black text-sm uppercase tracking-wider text-slate-900 dark:text-white">ENSO–IOD Teleconnection Impact Matrix</h2>
-                <DemoBadge />
+                <DataTypeBadge type="historical" label="50-Yr Climatology Archive" />
               </div>
               <IOSGlassCard interactive={false} className="rounded-2xl overflow-hidden p-0">
                 <div className="overflow-x-auto">
@@ -470,7 +469,7 @@ export default function ClimateOceanAnomalies() {
                   <span className="text-white text-[9px] font-black">AI</span>
                 </div>
                 <h2 className="font-heading font-black text-sm uppercase tracking-wider text-slate-900 dark:text-white">AI Climate Interpretation</h2>
-                <DemoBadge />
+                <DataTypeBadge type="ai" label="AI Teleconnection Reasoning" />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 {AI_INSIGHTS.map((ins, i) => (

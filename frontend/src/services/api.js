@@ -10,7 +10,7 @@ let activeBaseUrl = CANDIDATE_URLS[0];
 /**
  * Automatically resolves and caches the live active API base URL.
  */
-async function getLiveBaseUrl() {
+export async function getLiveBaseUrl() {
   for (const url of CANDIDATE_URLS) {
     try {
       const res = await fetch(`${url}/api/health`, { method: 'GET', signal: AbortSignal.timeout(1500) });
@@ -23,6 +23,19 @@ async function getLiveBaseUrl() {
     }
   }
   return activeBaseUrl;
+}
+
+/**
+ * Returns a standardized formatted IST timestamp for UI Last Updated displays.
+ */
+export function getFormattedLastUpdated() {
+  return new Date().toLocaleTimeString('en-IN', {
+    timeZone: 'Asia/Kolkata',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true
+  }) + ' IST';
 }
 
 /**
@@ -539,12 +552,18 @@ export async function fetchRainViewerLiveFrames() {
  */
 export async function fetchLiveCyclogenesisWatch(basin = 'Bay of Bengal') {
   try {
-    const base = await getBackendUrl();
+    const base = await getLiveBaseUrl();
     if (base) {
+<<<<<<< HEAD
       const res = await fetch(`${base}/api/cyclogenesis-watch?basin=${encodeURIComponent(basin)}`);
+=======
+      const res = await fetch(`${base}/api/cyclogenesis-watch?basin=${encodeURIComponent(basin)}`, {
+        signal: AbortSignal.timeout(3000)
+      });
+>>>>>>> 90cb0592f3eaffa258e615ca59e5975664a04470
       if (res.ok) {
         const json = await res.json();
-        if (json.data) return json.data;
+        if (json.data) return { ...json.data, isLive: true, lastUpdated: getFormattedLastUpdated() };
       }
     }
   } catch (err) {
