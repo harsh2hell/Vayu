@@ -23,7 +23,10 @@ const DEFAULT_SUPPORTED_CLASSES = [
 
 const Classification = () => {
   const navigate = useNavigate();
-  const { currentInput, classificationResult, setClassificationResult } = useAnalysisSession();
+  const { currentInput, detectionResult, classificationResult, setClassificationResult } = useAnalysisSession();
+
+  // Strict scientific gating: Distinguish confirmed cyclone morphology from ambient cloud pattern
+  const isCycloneDetected = Boolean(detectionResult && (detectionResult.cyclone_detected || detectionResult.detected));
 
   // Real inference state
   const [isClassifying, setIsClassifying] = useState(false);
@@ -180,6 +183,21 @@ const Classification = () => {
         </div>
       )}
 
+      {/* Negative Detection Gating Notice */}
+      {detectionResult && !isCycloneDetected && (
+        <div className="p-4 bg-amber-50/90 border border-amber-300 rounded-xl flex items-start gap-3 shadow-2xs">
+          <ShieldAlert className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+          <div className="text-xs space-y-1 text-left">
+            <h4 className="font-bold text-amber-950 uppercase tracking-wider font-mono">
+              CYCLONE DETECTION NEGATIVE &bull; MORPHOLOGY UNCONFIRMED
+            </h4>
+            <p className="text-amber-800 leading-relaxed">
+              MobileNetV3 objectness detector classified this frame as ambient / non-cyclonic atmosphere ({((detectionResult.objectness ?? 0) * 100).toFixed(1)}% objectness). ResNet18 morphology classifies visual cloud pattern texture only and does NOT indicate a confirmed tropical cyclone.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Main 3-Column Inspection Grid */}
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
         
@@ -290,7 +308,11 @@ const Classification = () => {
             </div>
             <div className="flex justify-between items-center py-1 border-b border-slate-200">
               <span className="text-slate-500">Output Nature:</span>
-              <span className="font-bold text-slate-800">Visual Morphology Class</span>
+              <span className={`font-bold ${isCycloneDetected ? 'text-slate-800' : 'text-amber-800'}`}>
+                {isCycloneDetected 
+                  ? 'Confirmed Cyclone Morphology' 
+                  : (detectionResult ? 'Visual Cloud Texture (Non-cyclonic / Unconfirmed)' : 'Visual Morphology Class')}
+              </span>
             </div>
             <div className="flex justify-between items-center py-1">
               <span className="text-slate-500">Grad-CAM Attention Foci:</span>

@@ -170,8 +170,11 @@ const Satellite = () => {
   const activeImageSource = currentInput?.imageUrl || selectedPreset.image;
 
 
+  // Strict scientific gating: Bounding box and center fix are ONLY valid when cyclone is detected
+  const isCycloneDetected = Boolean(detectionResult && (detectionResult.cyclone_detected || detectionResult.detected));
+
   // Normalized bbox [ymin, xmin, ymax, xmax] mapping to CSS
-  const bboxStyle = detectionResult?.bounding_box ? {
+  const bboxStyle = isCycloneDetected && detectionResult?.bounding_box ? {
     top: `${Math.max(0, (Array.isArray(detectionResult.bounding_box) ? detectionResult.bounding_box[0] : (detectionResult.bounding_box.ymin ?? 0.2)) * 100)}%`,
     left: `${Math.max(0, (Array.isArray(detectionResult.bounding_box) ? detectionResult.bounding_box[1] : (detectionResult.bounding_box.xmin ?? 0.2)) * 100)}%`,
     height: `${Math.max(8, ((Array.isArray(detectionResult.bounding_box) ? detectionResult.bounding_box[2] - detectionResult.bounding_box[0] : (detectionResult.bounding_box.ymax - detectionResult.bounding_box.ymin) || 0.4)) * 100)}%`,
@@ -179,7 +182,7 @@ const Satellite = () => {
   } : null;
 
   // Normalized center coordinates mapping
-  const centerStyle = detectionResult?.center ? {
+  const centerStyle = isCycloneDetected && detectionResult?.center ? {
     top: `${((detectionResult.center.center_y_norm ?? 0.5) * 100).toFixed(1)}%`,
     left: `${((detectionResult.center.center_x_norm ?? 0.5) * 100).toFixed(1)}%`
   } : null;
@@ -233,40 +236,54 @@ const Satellite = () => {
       />
 
       {/* 2. Target Preset Selector or Custom Upload Indicator */}
-      <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <span className="text-xs font-mono font-bold text-slate-800 uppercase tracking-wider block">
-            Active Satellite Observation Target
-          </span>
-          <p className="text-xs text-slate-500 mt-0.5">
-            {customFile 
-              ? 'Custom user-uploaded satellite frame active. Analyzed in-session (Not persisted).' 
-              : 'Select an official NASA GIBS polar benchmark snapshot or upload your own frame.'}
-          </p>
+      <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-xs space-y-3">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div>
+            <span className="text-xs font-mono font-bold text-slate-800 uppercase tracking-wider block">
+              Active Satellite Observation Target
+            </span>
+            <p className="text-xs text-slate-500 mt-0.5">
+              {customFile 
+                ? 'Custom user-uploaded satellite frame active. Analyzed in-session (Not persisted).' 
+                : 'Select an official NASA GIBS polar benchmark snapshot or upload your own frame.'}
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 flex-wrap">
+            {SATELLITE_PRESETS.map((p) => (
+              <button
+                key={p.id}
+                onClick={() => handleSelectPreset(p)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border flex items-center gap-1.5 cursor-pointer ${
+                  !customFile && selectedPreset.id === p.id
+                    ? 'bg-[#003087] text-white border-[#003087] shadow-2xs'
+                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                }`}
+              >
+                <span>🛰️</span>
+                <span>{p.name}</span>
+              </button>
+            ))}
+
+            {customFile && (
+              <span className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-900 border border-emerald-300 flex items-center gap-1.5">
+                <span>📁</span>
+                <span className="truncate max-w-[160px]">{customFile.name}</span>
+              </span>
+            )}
+          </div>
         </div>
 
-        <div className="flex items-center gap-2 flex-wrap">
-          {SATELLITE_PRESETS.map((p) => (
-            <button
-              key={p.id}
-              onClick={() => handleSelectPreset(p)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border flex items-center gap-1.5 cursor-pointer ${
-                !customFile && selectedPreset.id === p.id
-                  ? 'bg-[#003087] text-white border-[#003087] shadow-2xs'
-                  : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
-              }`}
-            >
-              <span>🛰️</span>
-              <span>{p.name}</span>
-            </button>
-          ))}
-
-          {customFile && (
-            <span className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-900 border border-emerald-300 flex items-center gap-1.5">
-              <span>📁</span>
-              <span className="truncate max-w-[160px]">{customFile.name}</span>
-            </span>
-          )}
+        {/* Input Validation Guidance Notice */}
+        <div className="pt-2.5 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-[11px] text-slate-600">
+          <div>
+            <span className="font-bold text-slate-700">Supported Input:</span>{' '}
+            <span className="text-slate-600">Multi-spectral satellite imagery / raster satellite observation (NASA GIBS, INSAT-3D/3DR, MOSDAC).</span>{' '}
+            <span className="text-slate-400 font-medium text-[10px] block sm:inline">Not: Regional weather-map screenshots, numerical dashboards, or browser UI captures.</span>
+          </div>
+          <div className="text-[10px] text-slate-400 italic shrink-0">
+            * Best results obtained on satellite imagery matching training domain.
+          </div>
         </div>
       </div>
 
@@ -342,7 +359,7 @@ const Satellite = () => {
                 />
 
                 {/* AI Overlay Layer (Visible only when in 'overlay' mode, tightly bounded to image rect) */}
-                {visualMode === 'overlay' && detectionResult?.cyclone_detected && (
+                {visualMode === 'overlay' && isCycloneDetected && (
                   <>
                     {/* Bounding Box Overlay */}
                     {showBbox && bboxStyle && (
@@ -396,6 +413,21 @@ const Satellite = () => {
                       </div>
                     ))}
                   </>
+                )}
+
+                {/* Subtle Negative Detection Badge (When in overlay mode but cyclone was not detected) */}
+                {visualMode === 'overlay' && detectionResult && !isCycloneDetected && (
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-900/90 text-white border border-slate-700/80 px-4 py-2.5 rounded-xl shadow-xl backdrop-blur-md flex items-center gap-2.5 pointer-events-none text-left">
+                    <ShieldAlert className="w-5 h-5 text-amber-400 shrink-0" />
+                    <div>
+                      <div className="text-xs font-mono font-bold uppercase tracking-wider text-red-400">
+                        NO CYCLONE DETECTED
+                      </div>
+                      <div className="text-[10px] text-slate-300 font-mono">
+                        Objectness: {((detectionResult.objectness ?? 0) * 100).toFixed(1)}% &bull; Overlay suppressed
+                      </div>
+                    </div>
+                  </div>
                 )}
               </div>
 
@@ -514,9 +546,9 @@ const Satellite = () => {
                   <div className="flex justify-between items-center">
                     <span className="font-medium">Cyclone Detected:</span>
                     <span className={`font-bold font-mono ${
-                      detectionResult.cyclone_detected ? 'text-emerald-800' : 'text-slate-600'
+                      isCycloneDetected ? 'text-emerald-800' : 'text-slate-600'
                     }`}>
-                      {detectionResult.cyclone_detected ? 'YES' : 'NO CYCLONE DETECTED'}
+                      {isCycloneDetected ? 'YES' : 'NO CYCLONE DETECTED'}
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
@@ -525,40 +557,38 @@ const Satellite = () => {
                       {((detectionResult.objectness ?? (detectionResult.confidence_percentage / 100)) * 100).toFixed(1)}%
                     </span>
                   </div>
-                  {detectionResult.cyclone_detected && (
-                    <>
-                      <div className="flex justify-between items-center">
-                        <span className="font-medium">Center Coordinates:</span>
-                        <span className="font-bold font-mono text-sky-800">
-                          {detectionResult.coordinates?.formatted || `${detectionResult.center?.lat?.toFixed(2)}°N, ${detectionResult.center?.lon?.toFixed(2)}°E`}
-                        </span>
-                      </div>
-                      {detectionResult.bounding_box && (
-                        <div className="flex justify-between items-center text-[11px]">
-                          <span className="text-slate-500">Bounding Box:</span>
-                          <span className="font-mono text-slate-700 font-medium">
-                            {Array.isArray(detectionResult.bounding_box)
-                              ? `[${detectionResult.bounding_box.map(n => typeof n === 'number' ? n.toFixed(2) : n).join(', ')}]`
-                              : `[${detectionResult.bounding_box.ymin?.toFixed(2)}, ${detectionResult.bounding_box.xmin?.toFixed(2)}, ${detectionResult.bounding_box.ymax?.toFixed(2)}, ${detectionResult.bounding_box.xmax?.toFixed(2)}]`}
-                          </span>
-                        </div>
-                      )}
-                    </>
-                  )}
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium">Center Coordinates:</span>
+                    <span className={`font-mono ${isCycloneDetected ? 'font-bold text-sky-800' : 'font-semibold text-slate-500'}`}>
+                      {isCycloneDetected
+                        ? (detectionResult.coordinates?.formatted || `${detectionResult.center?.lat?.toFixed(2)}°N, ${detectionResult.center?.lon?.toFixed(2)}°E`)
+                        : 'NOT AVAILABLE'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center text-[11px]">
+                    <span className="text-slate-500">Bounding Box:</span>
+                    <span className={`font-mono ${isCycloneDetected ? 'text-slate-700 font-medium' : 'text-slate-500'}`}>
+                      {isCycloneDetected && detectionResult.bounding_box
+                        ? (Array.isArray(detectionResult.bounding_box)
+                            ? `[${detectionResult.bounding_box.map(n => typeof n === 'number' ? n.toFixed(2) : n).join(', ')}]`
+                            : `[${detectionResult.bounding_box.ymin?.toFixed(2)}, ${detectionResult.bounding_box.xmin?.toFixed(2)}, ${detectionResult.bounding_box.ymax?.toFixed(2)}, ${detectionResult.bounding_box.xmax?.toFixed(2)}]`)
+                        : 'NOT AVAILABLE'}
+                    </span>
+                  </div>
                 </div>
 
                 {/* If no cyclone detected */}
-                {!detectionResult.cyclone_detected && (
+                {!isCycloneDetected && (
                   <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-600 text-xs space-y-1">
                     <p className="font-bold text-slate-800">NO CYCLONE DETECTED</p>
                     <p className="text-[11px] text-slate-500">
-                      The MobileNetV3 detector classified this frame as ambient / non-cyclonic marine atmosphere. Downstream tropical cyclone morphology and trajectory forecasting are omitted.
+                      The MobileNetV3 detector classified this frame as ambient / non-cyclonic marine atmosphere. Downstream tropical cyclone center localization, bounding box, and morphology are suppressed.
                     </p>
                   </div>
                 )}
 
                 {/* 2. MORPHOLOGY (ResNet18) - Only if cyclone detected */}
-                {detectionResult.cyclone_detected && classificationResult && (
+                {isCycloneDetected && classificationResult && (
                   <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
                     <span className="text-[10px] uppercase font-bold font-mono tracking-wider block text-slate-500">
                       Morphology (ResNet18)
