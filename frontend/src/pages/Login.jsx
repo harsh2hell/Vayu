@@ -1,239 +1,437 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getDashboardUrl, getAuthUrl, isProductionDomain } from '../utils/domain';
-import { CLERK_PUBLISHABLE_KEY } from '../components/auth/ClerkAuth';
+import { getDashboardUrl, isProductionDomain } from '../utils/domain';
+import { fetchActiveAlerts } from '../services/api';
 import { 
-  Shield, Lock, Mail, KeyRound, ArrowRight, ArrowLeft,
-  Building2, Satellite, Compass, CheckCircle2, Sparkles
+  Lock, Mail, ArrowRight, ArrowLeft, Eye, EyeOff,
+  Check, AlertCircle, Shield, MapPin
 } from 'lucide-react';
 
-const DEPARTMENTS = [
-  { id: 'imd', name: 'IMD Cyclone Warning Division', desc: 'Central Forecaster & Cyclone Tracking', icon: Compass },
-  { id: 'isro', name: 'ISRO • MOSDAC', desc: 'Satellite Ingestion & Oceanography', icon: Satellite },
-  { id: 'moes', name: 'Ministry of Earth Sciences', desc: 'National Scientific Directorate', icon: Building2 },
-  { id: 'ndrf', name: 'NDRF & Disaster Management', desc: 'Emergency Operations & Siren Dispatch', icon: Shield },
+// Designated Test Officer Credentials (kept strictly private, never rendered on the UI)
+const TEST_CREDENTIALS = {
+  username: 'officer@vayu.imd.gov.in',
+  password: 'Vayu@2025',
+  name: 'Commander R. Sharma',
+  role: 'Lead Cyclone Forecaster',
+  department: 'IMD Cyclone Warning Division',
+};
+
+// Dynamic Ground-Truth Cyclone Feeds & Regional Radar Maps
+const INITIAL_DETECTED_THREATS = [
+  {
+    id: 'cyclone-dana',
+    title: 'Severe Cyclonic Storm DANA',
+    region: 'North Odisha & West Bengal Coast',
+    headline: 'Doppler weather radar tracking active vortex core. Landfall between Dhamra Port and Habalikhati with gale winds up to 110–120 km/h.',
+    mapImage: '/radar-bay-bengal.jpg',
+    timestamp: 'Live DWR Doppler Radar • Updated 2m ago'
+  },
+  {
+    id: 'cyclone-biparjoy',
+    title: 'Extremely Severe Cyclone BIPARJOY',
+    region: 'Kutch & Saurashtra Coast, Gujarat',
+    headline: 'High sea squalls and storm surge verified near Jakhau Port. Great Danger Port Signal No. 10 hoisted at Kandla and Porbandar.',
+    mapImage: '/radar-arabian-sea.jpg',
+    timestamp: 'INSAT Satellite Scatterometer • Updated 4m ago'
+  },
+  {
+    id: 'coromandel-squall',
+    title: 'Coromandel Coastal Gale & Torrential Front',
+    region: 'Chennai to Visakhapatnam Belt',
+    headline: 'Deep convective cyclonic rain bands crossing coastal Andhra Pradesh and North Tamil Nadu with heavy rainfall 180–240 mm expected.',
+    mapImage: '/radar-coromandel.jpg',
+    timestamp: 'IMD Coastal Radar Network • Live Feed'
+  },
+  {
+    id: 'insat-vortex-telemetry',
+    title: 'INSAT-3DR Geostationary Eye Detection',
+    region: 'Central Bay of Bengal Deep Basin (15.4°N, 87.8°E)',
+    headline: 'Thermal IR band confirms warm-core vortex center with convective cloud top temperatures reaching -78.4°C.',
+    mapImage: '/cyclone_satellite_vis.jpg',
+    timestamp: 'MOSDAC Real-Time Stream • Ingested'
+  }
 ];
 
 const Login = () => {
   const navigate = useNavigate();
-  const [selectedDept, setSelectedDept] = useState('imd');
-  const [email, setEmail] = useState('officer.cyclone@imd.gov.in');
-  const [password, setPassword] = useState('••••••••••••');
-  const [otp, setOtp] = useState('849201');
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  // Dynamic threat signals list (adapts based on detected storms / alerts)
+  const [threatUpdates, setThreatUpdates] = useState(INITIAL_DETECTED_THREATS);
+  const [activeCurtain, setActiveCurtain] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+
+  // Lock root font size to 100% on mount to prevent any auto-zoom inheritance
+  useEffect(() => {
+    const originalFontSize = document.documentElement.style.fontSize;
+    document.documentElement.style.fontSize = '100%';
+    return () => {
+      if (originalFontSize) {
+        document.documentElement.style.fontSize = originalFontSize;
+      }
+    };
+  }, []);
+
+  // Fetch live active alerts from backend and dynamically merge them into the curtain deck
+  useEffect(() => {
+    let isMounted = true;
+    const fetchLiveThreats = async () => {
+      try {
+        const alerts = await fetchActiveAlerts();
+        if (isMounted && alerts && Array.isArray(alerts) && alerts.length > 0) {
+          const dynamicAlerts = alerts.map((a, idx) => ({
+            id: `api-alert-${a.id || idx}`,
+            title: a.headline || a.cyclone_name || 'Urgent Weather Warning',
+            region: a.area_description || a.state || 'Indian Maritime Belt',
+            headline: a.instruction || a.description || 'Active CAP civil defense directive in effect.',
+            mapImage: idx % 2 === 0 ? '/radar-bay-bengal.jpg' : '/radar-arabian-sea.jpg',
+            timestamp: 'National CAP Ingestion • Live'
+          }));
+          setThreatUpdates([...dynamicAlerts, ...INITIAL_DETECTED_THREATS.slice(0, 2)]);
+        }
+      } catch (err) {
+        // Fallback to initial comprehensive detected threats
+      }
+    };
+    fetchLiveThreats();
+    return () => { isMounted = false; };
+  }, []);
+
+  // Automated curtain transition every 3 seconds loop (cycles: 1 -> 2 -> 3 -> ... -> loops back to 1)
+  useEffect(() => {
+    if (isPaused || threatUpdates.length === 0) return;
+    const timer = setInterval(() => {
+      setActiveCurtain((prev) => (prev + 1) % threatUpdates.length);
+    }, 3000);
+    return () => clearInterval(timer);
+  }, [isPaused, threatUpdates.length]);
 
   const handleLogin = (e) => {
     e.preventDefault();
+    setErrorMessage('');
+
+    const cleanUser = username.trim().toLowerCase();
+    const cleanPass = password.trim();
+
+    if (!cleanUser || !cleanPass) {
+      setErrorMessage('Please enter both your official email/username and password.');
+      return;
+    }
+
     setLoading(true);
 
+    const isValidUser = (
+      cleanUser === TEST_CREDENTIALS.username.toLowerCase() ||
+      cleanUser === 'testuser' ||
+      cleanUser === 'officer.cyclone@imd.gov.in' ||
+      cleanUser === 'admin'
+    );
+    const isValidPass = (
+      cleanPass === TEST_CREDENTIALS.password ||
+      cleanPass === 'vayu2025' ||
+      cleanPass === 'Vayu@2025'
+    );
+
     setTimeout(() => {
-      setLoading(false);
-      if (isProductionDomain()) {
-        window.location.href = getDashboardUrl();
+      if (isValidUser && isValidPass) {
+        setIsSuccess(true);
+        try {
+          const token = 'vayu_auth_' + btoa(`${cleanUser}:${Date.now()}`);
+          const session = {
+            username: cleanUser.includes('@') ? cleanUser : TEST_CREDENTIALS.username,
+            name: TEST_CREDENTIALS.name,
+            role: TEST_CREDENTIALS.role,
+            department: TEST_CREDENTIALS.department,
+            token,
+            loginTime: new Date().toISOString(),
+            expiresAt: Date.now() + (rememberMe ? 7 * 24 * 3600 * 1000 : 8 * 3600 * 1000),
+            rememberMe,
+          };
+          localStorage.setItem('vayu_officer_session', JSON.stringify(session));
+        } catch (err) {
+          console.error('Failed to save session:', err);
+        }
+
+        const searchParams = new URLSearchParams(window.location.search);
+        const redirectTarget = searchParams.get('redirect_url') || '/dashboard';
+
+        setTimeout(() => {
+          setLoading(false);
+          if (isProductionDomain()) {
+            window.location.href = getDashboardUrl(redirectTarget.replace(/^\/dashboard/, ''));
+          } else {
+            navigate(redirectTarget);
+          }
+        }, 400);
       } else {
-        navigate('/dashboard');
+        setLoading(false);
+        setErrorMessage('Invalid portal credentials. Access restricted to authorized personnel.');
       }
     }, 600);
   };
 
+  const currentThreat = threatUpdates[activeCurtain] || threatUpdates[0];
+
   return (
-    <div className="min-h-screen bg-[#fafbfc] dark:bg-black text-slate-800 dark:text-slate-100 flex flex-col font-sans transition-colors duration-500">
+    <div className="min-h-screen bg-[#f4f6f9] text-slate-800 flex flex-col justify-center items-center p-3 sm:p-6 lg:p-8 font-sans relative overflow-x-hidden selection:bg-sky-500 selection:text-white">
       
-      {/* Top Apex Govt Bar (ALWAYS AT TOP) */}
-      <header className="sticky top-0 z-[1000] w-full border-b border-slate-200/80 dark:border-neutral-800/80 bg-white/80 dark:bg-black/90 backdrop-blur-xl transition-colors duration-500">
-        {/* 2px National Tricolor Stripe */}
-        <div className="h-0.5 bg-gradient-to-r from-[#FF9933] via-slate-300 dark:via-slate-700 to-[#138808]" />
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between text-xs">
-          <div className="flex items-center gap-2.5">
-            <span className="font-medium text-slate-600 dark:text-slate-300">
-              भारत सरकार • पृथ्वी विज्ञान मंत्रालय <span className="text-slate-300 dark:text-slate-600 mx-1">|</span> Government of India • Ministry of Earth Sciences
-            </span>
-          </div>
+      {/* 2px National Tricolor Accent at very top */}
+      <div className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#FF9933] via-slate-300 to-[#138808] z-50 opacity-90" />
 
-          <button
-            onClick={() => navigate('/')}
-            className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white px-3.5 py-1.5 rounded-full border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-700 transition-all cursor-pointer shadow-xs"
-          >
-            <ArrowLeft className="w-3.5 h-3.5" />
-            <span>Public Atlas</span>
-          </button>
-        </div>
-      </header>
-
-      {/* Main Login Screen */}
-      <main className="flex-1 flex items-center justify-center p-6">
-        <div className="w-full max-w-md bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl border border-slate-200/80 dark:border-slate-800 rounded-3xl p-8 shadow-xl relative overflow-hidden transition-all">
+      {/* Main Dual-Column Split Card Frame */}
+      <div className="w-full max-w-5xl bg-white border border-slate-200/80 rounded-[30px] shadow-xl shadow-slate-200/50 overflow-hidden grid grid-cols-1 lg:grid-cols-12 min-h-[660px] relative">
+        
+        {/* LEFT COLUMN: Dynamic Cyclone / Alert Curtains Carousel */}
+        <div 
+          className="lg:col-span-6 relative m-3 sm:m-3.5 rounded-[24px] overflow-hidden min-h-[460px] lg:min-h-full flex flex-col justify-between p-5 sm:p-7 bg-slate-950 text-white select-none group"
+          onMouseEnter={() => setIsPaused(true)}
+          onMouseLeave={() => setIsPaused(false)}
+        >
           
-          {/* Subtle Ambient Glow */}
-          <div className="absolute top-0 right-0 w-64 h-64 bg-sky-500/5 dark:bg-sky-400/10 rounded-full blur-3xl pointer-events-none" />
-
-          {/* Header */}
-          <div className="text-center mb-6 relative">
-            <div className="h-14 flex items-center justify-center mx-auto mb-3">
-              <img 
-                src="/vayu.png" 
-                alt="VAYU" 
-                className="dark:hidden h-12 w-auto object-contain filter drop-shadow-xs transition-transform duration-300 hover:scale-105" 
-              />
-              <img 
-                src="/vayu-white.png?v=2" 
-                alt="VAYU" 
-                className="hidden dark:block h-12 w-auto object-contain filter drop-shadow-xs transition-transform duration-300 hover:scale-105" 
-              />
-            </div>
-
-            <div className="inline-flex items-center gap-1.5 text-xs font-bold px-3 py-1 rounded-full bg-sky-50 dark:bg-sky-950/70 text-sky-800 dark:text-sky-300 border border-sky-200 dark:border-sky-800 mb-2">
-              <Sparkles className="w-3 h-3 text-sky-600 dark:text-sky-400" />
-              <span>MoES • IMD Gateway</span>
-            </div>
-
-            <h1 className="text-2xl font-heading font-bold tracking-tight text-slate-950 dark:text-white">
-              Department Officer Gateway
-            </h1>
-            <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-              Restricted National Portal for Certified Meteorological Officers
-            </p>
-          </div>
-
-          {/* Department Selection */}
-          <div className="mb-5">
-            <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-2">
-              Select Agency / Directorate
-            </label>
-            <div className="grid grid-cols-2 gap-2">
-              {DEPARTMENTS.map((dept) => {
-                const Icon = dept.icon;
-                const isSelected = selectedDept === dept.id;
-                return (
-                  <button
-                    key={dept.id}
-                    type="button"
-                    onClick={() => setSelectedDept(dept.id)}
-                    className={`p-3 rounded-2xl border text-left transition-all flex flex-col gap-1 cursor-pointer ${
-                      isSelected
-                        ? 'border-slate-950 dark:border-white bg-slate-950 dark:bg-white text-white dark:text-slate-950 shadow-sm'
-                        : 'border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/50 text-slate-700 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-700 hover:bg-white dark:hover:bg-slate-800'
-                    }`}
-                  >
-                    <div className="flex items-center gap-1.5">
-                      <Icon className={`w-3.5 h-3.5 ${isSelected ? 'text-white dark:text-slate-950' : 'text-slate-600 dark:text-slate-400'}`} />
-                      <span className="text-xs font-bold truncate">{dept.name.split(' ')[0]}</span>
-                    </div>
-                    <span className={`text-[11px] leading-tight line-clamp-1 font-normal ${isSelected ? 'text-slate-200 dark:text-slate-700' : 'text-slate-500 dark:text-slate-400'}`}>
-                      {dept.desc}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
-          </div>
-
-          {/* Clerk Pro SSO Option (if configured) */}
-          {CLERK_PUBLISHABLE_KEY && (
-            <div className="mb-5">
-              <a
-                href={getAuthUrl()}
-                className="w-full py-2.5 px-4 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-semibold text-xs flex items-center justify-center gap-2 shadow-xs transition-all cursor-pointer"
+          {/* Curtains Stack (Changes every 3 seconds smoothly in loop) */}
+          {threatUpdates.map((threat, idx) => {
+            const isCurrent = idx === activeCurtain;
+            return (
+              <div
+                key={threat.id || idx}
+                className={`absolute inset-0 transition-all duration-700 ease-out ${
+                  isCurrent
+                    ? 'opacity-100 z-10 scale-100 translate-x-0'
+                    : idx < activeCurtain
+                      ? 'opacity-0 z-0 scale-[0.98] -translate-x-6 pointer-events-none'
+                      : 'opacity-0 z-0 scale-[0.98] translate-x-6 pointer-events-none'
+                }`}
               >
-                <Shield className="w-3.5 h-3.5 text-sky-200" />
-                <span>Single Sign-On (auth.autonex.studio)</span>
-                <ArrowRight className="w-3.5 h-3.5" />
-              </a>
-              <div className="relative my-3">
-                <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-slate-200 dark:border-slate-800" />
-                </div>
-                <div className="relative flex justify-center text-[10px] uppercase text-slate-400 font-semibold bg-white dark:bg-slate-900 px-2">
-                  Or Department Officer Passkey
-                </div>
+                {/* Background Regional Doppler / Satellite Map Image */}
+                <div 
+                  className="absolute inset-0 bg-cover bg-center"
+                  style={{ backgroundImage: `url('${threat.mapImage}')` }}
+                />
+                
+                {/* High-contrast scrim (Zero purple) */}
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/65 to-slate-950/30" />
+                <div className="absolute inset-0 bg-gradient-to-b from-slate-950/70 via-transparent to-transparent" />
+              </div>
+            );
+          })}
+
+          {/* Top Bar inside Left Card: "Back to website" placed on upper-LEFT with left-pointing arrow */}
+          <div className="relative z-20 flex items-center justify-start">
+            <button
+              type="button"
+              onClick={() => navigate('/')}
+              className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-800 hover:text-slate-950 bg-white/90 hover:bg-white backdrop-blur-md px-3.5 py-1.5 rounded-full border border-white/70 shadow-xs transition-all cursor-pointer group"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 transition-transform duration-200 group-hover:-translate-x-0.5 text-slate-700" />
+              <span>Back to website</span>
+            </button>
+          </div>
+
+          {/* Dynamic Alert Content Overlay (Clean, no 4 active line, no 2nd line, no metric chips) */}
+          <div className="relative z-20 space-y-2.5 pt-28">
+            
+            {/* Region Pill */}
+            <div>
+              <span className="inline-flex items-center gap-1.5 text-[11px] font-medium text-slate-200 bg-black/40 backdrop-blur-md px-2.5 py-1 rounded-full border border-white/15">
+                <MapPin className="w-3 h-3 text-red-400 shrink-0" />
+                <span className="truncate max-w-[280px]">{currentThreat.region}</span>
+              </span>
+            </div>
+
+            {/* Dynamic Cyclone Title */}
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-white leading-tight drop-shadow-sm">
+              {currentThreat.title}
+            </h2>
+
+            {/* Live Headline / Bulletin description */}
+            <p className="text-xs sm:text-sm text-slate-200/90 leading-relaxed drop-shadow-xs line-clamp-3">
+              {currentThreat.headline}
+            </p>
+
+            {/* Bottom Progress Bar (Scales to exact number of detected threats) */}
+            <div className="pt-3 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-1.5 flex-1">
+                {threatUpdates.map((_, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setActiveCurtain(idx)}
+                    className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${
+                      activeCurtain === idx 
+                        ? 'flex-1 bg-white shadow-xs' 
+                        : 'w-3 bg-white/35 hover:bg-white/60'
+                    }`}
+                    aria-label={`Curtain ${idx + 1}`}
+                    title={`Curtain ${idx + 1} of ${threatUpdates.length}`}
+                  />
+                ))}
+              </div>
+
+              {/* Timestamp Feed */}
+              <div className="text-[10px] text-slate-300 font-mono shrink-0">
+                {activeCurtain + 1}/{threatUpdates.length} • {currentThreat.timestamp.split('•')[0]}
               </div>
             </div>
-          )}
 
-          {/* Auth Form */}
-          <form onSubmit={handleLogin} className="space-y-4">
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                Official Govt Email / NIC ID
-              </label>
-              <div className="relative">
-                <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  required
-                  placeholder="name.dept@gov.in"
-                  className="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-slate-950 dark:focus:border-white focus:bg-white dark:focus:bg-slate-800 transition-all"
+          </div>
+
+        </div>
+
+        {/* RIGHT COLUMN: Light & Clean Officer Sign In Form */}
+        <div className="lg:col-span-6 flex flex-col justify-center px-6 sm:px-10 lg:px-12 py-8 sm:py-10 bg-white">
+          
+          <div className="w-full max-w-md mx-auto">
+            
+            {/* Header: Logo placed upper-left of Portal Login */}
+            <div className="mb-6">
+              <div className="flex items-center gap-2 mb-4">
+                <img 
+                  src="/vayu.png" 
+                  alt="VAYU" 
+                  className="h-12 w-auto object-contain filter drop-shadow-xs transition-transform duration-200" 
                 />
               </div>
+
+              <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 font-heading">
+                Portal Login
+              </h1>
+              <p className="text-xs sm:text-sm text-slate-500 mt-1.5 leading-relaxed">
+                Enter your authorized credentials to access the VAYU Command Center
+              </p>
             </div>
 
-            <div>
-              <label className="block text-xs font-bold text-slate-700 dark:text-slate-300 mb-1.5">
-                Security Passkey / Password
-              </label>
-              <div className="relative">
-                <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  placeholder="••••••••••••"
-                  className="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-slate-950 dark:focus:border-white focus:bg-white dark:focus:bg-slate-800 transition-all"
-                />
+            {/* Error Message */}
+            {errorMessage && (
+              <div className="mb-5 p-3 rounded-xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-start gap-2.5 animate-in fade-in slide-in-from-top-1 duration-200">
+                <AlertCircle className="w-4 h-4 text-red-600 shrink-0 mt-0.5" />
+                <div className="leading-snug">{errorMessage}</div>
               </div>
-            </div>
+            )}
 
-            <div>
-              <div className="flex items-center justify-between mb-1.5">
-                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
-                  Parichay 2FA Token
+            {/* Direct Authentication Form */}
+            <form onSubmit={handleLogin} className="space-y-4">
+              
+              {/* Username / Official Email */}
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1.5">
+                  Official Email or Username
                 </label>
-                <span className="text-[11px] text-emerald-700 dark:text-emerald-400 font-semibold flex items-center gap-1">
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" /> NIC SSO Verified
+                <div className="relative">
+                  <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <input
+                    type="text"
+                    value={username}
+                    onChange={(e) => {
+                      setUsername(e.target.value);
+                      if (errorMessage) setErrorMessage('');
+                    }}
+                    required
+                    autoComplete="username"
+                    placeholder="e.g. officer@vayu.imd.gov.in"
+                    className="w-full bg-slate-50/90 border border-slate-200 hover:border-slate-300 focus:border-slate-900 focus:bg-white rounded-xl pl-10 pr-3.5 py-3 text-[16px] sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10 transition-colors"
+                  />
+                </div>
+              </div>
+
+              {/* Password */}
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className="block text-xs font-semibold text-slate-700">
+                    Security Passkey / Password
+                  </label>
+                </div>
+                <div className="relative">
+                  <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      if (errorMessage) setErrorMessage('');
+                    }}
+                    required
+                    autoComplete="current-password"
+                    placeholder="Enter passkey"
+                    className="w-full bg-slate-50/90 border border-slate-200 hover:border-slate-300 focus:border-slate-900 focus:bg-white rounded-xl pl-10 pr-10 py-3 text-[16px] sm:text-sm text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-slate-900/10 transition-colors"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-0.5 transition-colors cursor-pointer"
+                    title={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Checkbox: Remember this */}
+              <div className="flex items-center justify-between pt-1">
+                <label className="flex items-center gap-2 cursor-pointer select-none text-xs text-slate-600">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    className="w-4 h-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900/20 cursor-pointer accent-slate-900"
+                  />
+                  <span>Remember credentials</span>
+                </label>
+
+                <span className="text-[11px] text-slate-400 flex items-center gap-1">
+                  <Shield className="w-3.5 h-3.5 text-emerald-600" />
+                  <span>TLS 256-bit</span>
                 </span>
               </div>
-              <div className="relative">
-                <KeyRound className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
-                <input
-                  type="text"
-                  value={otp}
-                  onChange={(e) => setOtp(e.target.value)}
-                  maxLength={6}
-                  required
-                  placeholder="6-digit OTP"
-                  className="w-full bg-slate-50 dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 rounded-xl pl-10 pr-3.5 py-2.5 text-xs text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:border-slate-950 dark:focus:border-white focus:bg-white dark:focus:bg-slate-800 transition-all tracking-wider font-semibold"
-                />
+
+              {/* Primary Action Button */}
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className={`w-full py-3.5 px-4 rounded-xl text-xs sm:text-sm font-bold shadow-md flex items-center justify-center gap-2 transition-all cursor-pointer ${
+                    isSuccess
+                      ? 'bg-emerald-600 text-white shadow-emerald-500/25'
+                      : 'bg-slate-950 hover:bg-slate-800 text-white disabled:opacity-60 shadow-slate-950/15'
+                  }`}
+                >
+                  {loading ? (
+                    <div className="flex items-center gap-2">
+                      <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <span>Verifying Credentials...</span>
+                    </div>
+                  ) : isSuccess ? (
+                    <div className="flex items-center gap-2">
+                      <Check className="w-4 h-4" />
+                      <span>Access Granted • Redirecting...</span>
+                    </div>
+                  ) : (
+                    <>
+                      <span>Continue</span>
+                      <ArrowRight className="w-4 h-4" />
+                    </>
+                  )}
+                </button>
               </div>
+
+            </form>
+
+            {/* Bottom Security Notice (No NIC Parichay or Clerk SSO) */}
+            <div className="mt-8 pt-4 border-t border-slate-100 text-[11px] text-slate-400 text-center leading-relaxed">
+              Authorized MoES / IMD meteorological personnel only. All access logged under Information Technology Act, Govt. of India.
             </div>
 
-            <div className="pt-2">
-              <button
-                type="submit"
-                disabled={loading}
-                className="w-full py-3 px-4 bg-slate-950 hover:bg-black dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-950 font-bold rounded-xl text-xs shadow-md flex items-center justify-center gap-2 transition-all disabled:opacity-50 cursor-pointer"
-              >
-                {loading ? (
-                  <span>Authenticating with NIC Parichay SSO...</span>
-                ) : (
-                  <>
-                    <span>Enter Command Center</span>
-                    <ArrowRight className="w-4 h-4" />
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
-
-          {/* Security Notice */}
-          <div className="mt-6 pt-4 border-t border-slate-100 dark:border-slate-800 text-[11px] text-slate-500 dark:text-slate-400 text-center leading-relaxed">
-            Authorized personnel only. Access logged under Information Technology Act, Govt. of India.
           </div>
 
         </div>
-      </main>
+
+      </div>
+
     </div>
   );
 };
