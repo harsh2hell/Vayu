@@ -9,7 +9,7 @@ import {
 import { OfficerAccountDisplay, SafeSignOutButton } from './auth/ClerkAuth';
 import { getWebsiteUrl, isProductionDomain } from '../utils/domain';
 
-// Professional VAYU Clean Navigation Item
+// Clean, Professional VAYU Navigation Item (Solid White Dashboard Aesthetic)
 const SidebarNavItem = ({ item, isActive, onClick }) => {
   const Icon = item.icon;
 
@@ -17,15 +17,15 @@ const SidebarNavItem = ({ item, isActive, onClick }) => {
     <button
       type="button"
       onClick={onClick}
-      className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold cursor-pointer transition-all duration-150 select-none group ${
+      className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs cursor-pointer transition-all duration-150 select-none group ${
         isActive
-          ? 'bg-blue-50/80 text-[#003087] font-bold border border-blue-200/80 shadow-xs'
-          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70 border border-transparent'
+          ? 'bg-blue-50 text-[#003087] font-bold border border-blue-200/90 shadow-none'
+          : 'bg-transparent text-slate-800 hover:text-slate-950 hover:bg-slate-100/80 font-medium border border-transparent'
       }`}
     >
       <div className="flex items-center gap-2.5 min-w-0">
         <Icon className={`w-4 h-4 shrink-0 transition-colors ${
-          isActive ? 'text-[#003087]' : 'text-slate-400 group-hover:text-slate-600'
+          isActive ? 'text-[#003087]' : 'text-slate-500 group-hover:text-slate-700'
         }`} />
         <span className="truncate tracking-tight">{item.label}</span>
       </div>
@@ -50,57 +50,6 @@ const Sidebar = () => {
   const [isAccountMenuOpen, setIsAccountMenuOpen] = useState(false);
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
   const menuRef = useRef(null);
-  const accountBtnRef = useRef(null);
-  const accountGlareRef = useRef(null);
-
-  const handleAccountMouseMove = (e) => {
-    const btn = accountBtnRef.current;
-    const glare = accountGlareRef.current;
-    if (!btn) return;
-
-    const rect = btn.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const width = rect.width;
-    const height = rect.height;
-    if (width === 0 || height === 0) return;
-
-    const px = (x / width) * 2 - 1;
-    const py = (y / height) * 2 - 1;
-
-    const rotateX = -py * 6;
-    const rotateY = px * 6;
-
-    btn.style.transform = `perspective(800px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-1.5px) scale3d(1.015, 1.015, 1.015) translateZ(8px)`;
-
-    if (glare) {
-      const gx = ((x / width) * 100).toFixed(1);
-      const gy = ((y / height) * 100).toFixed(1);
-      glare.style.opacity = '1';
-      glare.style.background = `radial-gradient(circle at ${gx}% ${gy}%, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.15) 45%, transparent 75%)`;
-    }
-  };
-
-  const handleAccountMouseEnter = () => {
-    const btn = accountBtnRef.current;
-    if (btn) {
-      btn.style.transition = 'transform 0.12s ease-out, box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease';
-    }
-  };
-
-  const handleAccountMouseLeave = () => {
-    const btn = accountBtnRef.current;
-    const glare = accountGlareRef.current;
-
-    if (btn) {
-      btn.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, background 0.3s ease';
-      btn.style.transform = 'perspective(800px) rotateX(0deg) rotateY(0deg) translateY(0px) scale3d(1, 1, 1) translateZ(0px)';
-    }
-
-    if (glare) {
-      glare.style.opacity = '0';
-    }
-  };
 
   const NAV_GROUPS = [
     {
@@ -167,10 +116,13 @@ const Sidebar = () => {
   return (
     <>
       {/* Left Column: Pure White Background, VAYU Logo at top, Operations Nav, Account at bottom */}
-      <aside className="bg-white text-slate-700 flex flex-col justify-between fixed top-0 left-0 h-screen z-40 border-r border-slate-200 w-56 select-none shadow-xs">
+      <aside 
+        className="bg-white text-slate-800 flex flex-col justify-between fixed top-0 left-0 h-screen z-40 border-r border-slate-200 w-56 select-none shadow-none"
+        style={{ backgroundColor: '#ffffff', opacity: 1 }}
+      >
         
-        {/* Top Left: Authentic VAYU Logo on White Background with Continuous Sheen */}
-        <div className="h-[84px] px-3.5 flex items-center border-b border-slate-100 shrink-0">
+        {/* Top Left: Authentic VAYU Logo on Pure White Background with Continuous Sheen */}
+        <div className="h-[84px] px-3.5 flex items-center border-b border-slate-100 shrink-0 bg-white">
           <div 
             className="relative overflow-hidden group rounded-xl p-1 -m-1 flex items-center cursor-pointer"
             onClick={() => navigate('/dashboard')}
@@ -188,10 +140,10 @@ const Sidebar = () => {
         </div>
 
         {/* Navigation Links List Grouped By Operations */}
-        <nav className="flex-1 px-3 py-3 space-y-3.5 overflow-y-auto">
+        <nav className="flex-1 px-3 py-3 space-y-3.5 overflow-y-auto bg-white">
           {NAV_GROUPS.map((group) => (
             <div key={group.title} className="space-y-1">
-              <div className="text-[9px] font-mono uppercase tracking-wider text-slate-400 font-bold px-3 py-0.5 select-none">
+              <div className="text-[10px] font-mono uppercase tracking-wider text-slate-500 font-bold px-3 py-1 select-none">
                 {group.title}
               </div>
               {group.items.map((item) => {
@@ -211,28 +163,18 @@ const Sidebar = () => {
           ))}
         </nav>
 
-        {/* Bottom Left Account Trigger with iOS 3D Glass Effect */}
-        <div className="p-3 border-t border-slate-100 relative" ref={menuRef}>
+        {/* Bottom Left Account Trigger on Clean Solid White */}
+        <div className="p-3 border-t border-slate-200 bg-white relative shrink-0" ref={menuRef}>
           <button
-            ref={accountBtnRef}
             type="button"
             onClick={() => setIsAccountMenuOpen((prev) => !prev)}
-            onMouseMove={handleAccountMouseMove}
-            onMouseEnter={handleAccountMouseEnter}
-            onMouseLeave={handleAccountMouseLeave}
-            className="sidebar-ios-glass-btn w-full flex items-center gap-2 p-2 rounded-xl text-left border border-transparent text-slate-800 cursor-pointer group select-none"
+            className="w-full flex items-center gap-2.5 p-2 rounded-xl text-left hover:bg-slate-100/80 border border-transparent text-slate-800 transition-colors cursor-pointer group select-none"
             title="Account & Session"
           >
-            {/* Specular Glare Layer that follows mouse cursor in 3D */}
-            <div ref={accountGlareRef} className="ios-glass-specular" />
-
-            {/* Glass Top Bevel Reflection Rim */}
-            <div className="ios-glass-bevel" />
-
-            <div className="min-w-0 flex-1 relative z-10 transition-transform duration-200">
+            <div className="min-w-0 flex-1">
               <OfficerAccountDisplay />
             </div>
-            <MoreVertical className="w-4 h-4 text-slate-400 group-hover:text-slate-700 shrink-0 relative z-10 transition-colors" />
+            <MoreVertical className="w-4 h-4 text-slate-400 group-hover:text-slate-700 shrink-0 transition-colors" />
           </button>
 
           {/* Account Sub-menu Popover */}

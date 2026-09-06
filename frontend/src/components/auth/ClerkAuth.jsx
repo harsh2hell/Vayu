@@ -104,11 +104,11 @@ const ClerkUserDisplay = () => {
   if (!isLoaded || !user) {
     return (
       <div className="flex items-center gap-3">
-        <div className="w-9 h-9 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400 font-bold text-xs shrink-0">
+        <div className="w-9 h-9 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 font-bold text-xs shrink-0">
           <User className="w-4 h-4" />
         </div>
         <div className="flex flex-col min-w-0 flex-1">
-          <span className="text-xs font-semibold text-slate-200 truncate">VAYU Officer</span>
+          <span className="text-xs font-semibold text-slate-800 truncate">VAYU Officer</span>
           <span className="text-[10px] text-slate-500 truncate">Authenticated Session</span>
         </div>
       </div>
@@ -124,16 +124,16 @@ const ClerkUserDisplay = () => {
         <img 
           src={user.imageUrl} 
           alt={name} 
-          className="w-9 h-9 rounded-xl object-cover border border-slate-700 shrink-0" 
+          className="w-9 h-9 rounded-xl object-cover border border-slate-200 shrink-0" 
         />
       ) : (
-        <div className="w-9 h-9 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-200 font-bold text-xs shrink-0">
-          <User className="w-4 h-4 text-slate-400" />
+        <div className="w-9 h-9 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 font-bold text-xs shrink-0">
+          <User className="w-4 h-4 text-slate-500" />
         </div>
       )}
       <div className="flex flex-col min-w-0 flex-1">
-        <span className="text-xs font-semibold text-slate-900 dark:text-white truncate">{name}</span>
-        <span className="text-[10px] text-slate-500 dark:text-slate-400 truncate">{email}</span>
+        <span className="text-xs font-semibold text-slate-800 truncate">{name}</span>
+        <span className="text-[10px] text-slate-500 truncate">{email}</span>
       </div>
     </div>
   );
@@ -143,11 +143,11 @@ export const OfficerAccountDisplay = () => {
   if (!CLERK_PUBLISHABLE_KEY) {
     return (
       <div className="flex items-center gap-3">
-        <div className="w-9 h-9 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400 font-bold text-xs shrink-0">
+        <div className="w-9 h-9 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 font-bold text-xs shrink-0">
           <User className="w-4 h-4" />
         </div>
         <div className="flex flex-col min-w-0 flex-1">
-          <span className="text-xs font-semibold text-slate-200 truncate">VAYU Officer</span>
+          <span className="text-xs font-semibold text-slate-800 truncate">VAYU Officer</span>
           <span className="text-[10px] text-slate-500 truncate">Operational Session</span>
         </div>
       </div>

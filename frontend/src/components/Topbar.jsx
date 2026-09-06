@@ -10,7 +10,6 @@ const Topbar = () => {
   const [time, setTime] = useState(new Date());
   const [isMobileAccountOpen, setIsMobileAccountOpen] = useState(false);
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
   const mobileAccountRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
@@ -18,15 +17,6 @@ const Topbar = () => {
   useEffect(() => {
     const t = setInterval(() => setTime(new Date()), 1000);
     return () => clearInterval(t);
-  }, []);
-
-  // Track scroll position for dynamic glass saturation
-  useEffect(() => {
-    const handleScroll = () => {
-      setIsScrolled(window.scrollY > 8);
-    };
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
   // Close mobile account menu when clicking outside
@@ -57,7 +47,7 @@ const Topbar = () => {
 
   return (
     <>
-      <header className={`header-glass-bar h-14 flex items-center justify-between px-3 sm:px-6 sticky top-0 z-30 text-slate-800 transition-all duration-300 ${isScrolled ? 'is-scrolled' : ''}`}>
+      <header className="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-3 sm:px-6 sticky top-0 z-30 text-slate-800">
         
         {/* Left Section: Mobile Brand / Desktop Title */}
         <div className="flex items-center gap-3 min-w-0">
@@ -86,7 +76,7 @@ const Topbar = () => {
         {/* Right Section: Time, Public Portal Link & Mobile Account */}
         <div className="flex items-center gap-2 sm:gap-3">
           {/* Real-time IST Clock */}
-          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-white/40 hover:bg-white/60 backdrop-blur-md border border-white/60 text-xs font-semibold text-slate-700 shadow-2xs transition-all">
+          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
             <Clock className="w-3 h-3 text-slate-400" />
             <span className="font-mono">{istDateString} • {istString} IST</span>
@@ -101,7 +91,7 @@ const Topbar = () => {
                 navigate('/');
               }
             }}
-            className="hidden md:flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 bg-white/40 hover:bg-white/70 backdrop-blur-md border border-white/60 px-3 py-1 rounded-md transition-all cursor-pointer shadow-2xs"
+            className="hidden md:flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 border border-slate-200 px-3 py-1 rounded-md transition-colors cursor-pointer"
           >
             <span>Public Portal</span>
             <ExternalLink className="w-3 h-3" />
@@ -110,7 +100,7 @@ const Topbar = () => {
           {/* Alert Bell */}
           <button
             onClick={() => navigate('/dashboard/alerts')}
-            className="p-1.5 rounded-lg border border-white/60 text-slate-600 hover:text-slate-900 bg-white/40 hover:bg-white/70 backdrop-blur-md transition-all relative cursor-pointer shadow-2xs"
+            className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors relative cursor-pointer"
             title="Active Coastal Alerts"
           >
             <Bell className="w-4 h-4" />
@@ -121,7 +111,7 @@ const Topbar = () => {
           <div className="lg:hidden relative" ref={mobileAccountRef}>
             <button
               onClick={() => setIsMobileAccountOpen(!isMobileAccountOpen)}
-              className="w-8 h-8 rounded-lg bg-white/40 hover:bg-white/70 backdrop-blur-md border border-white/60 flex items-center justify-center text-slate-700 cursor-pointer shadow-2xs transition-all"
+              className="w-8 h-8 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700 cursor-pointer"
               title="Account"
             >
               <User className="w-4 h-4" />
