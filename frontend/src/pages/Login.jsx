@@ -109,20 +109,17 @@ const Login = ({ initialMode }) => {
         <div className="w-full max-w-md space-y-4">
           
           {/* VAYU Identity Header */}
-          <div className="text-center space-y-1.5">
-            <div className="inline-flex items-center justify-center h-14 mb-0.5">
+          <div className="text-center space-y-2 mb-2">
+            <div className="inline-flex items-center justify-center h-20 sm:h-24 mb-1">
               <img 
                 src="/vayu.png" 
                 alt="VAYU Cyclone Intelligence" 
-                className="h-13 sm:h-14 w-auto object-contain filter drop-shadow-xs"
+                className="h-18 sm:h-22 w-auto object-contain filter drop-shadow-sm"
               />
             </div>
-            <h1 className="text-xl sm:text-2xl font-heading font-extrabold text-slate-900 tracking-tight">
-              {isSignUp ? 'Create Officer Account' : 'Command Center Access'}
+            <h1 className="text-2xl sm:text-3xl font-heading font-extrabold text-slate-900 tracking-tight">
+              {isSignUp ? 'Create Account' : 'Portal Login'}
             </h1>
-            <p className="text-xs text-slate-500 max-w-sm mx-auto leading-relaxed">
-              Official Meteorological Intelligence Portal • Ministry of Earth Sciences
-            </p>
           </div>
 
           {/* Official Clerk Authentication Component */}
