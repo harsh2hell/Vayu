@@ -166,11 +166,11 @@ const Sidebar = () => {
 
   return (
     <>
-      {/* Left Column: Pure White Background, VAYU Logo at top, Operations Nav, Account at bottom */}
-      <aside className="bg-white text-slate-700 flex flex-col justify-between fixed top-0 left-0 h-screen z-40 border-r border-slate-200 w-56 select-none shadow-xs">
+      {/* Left Column: Authentic VisionOS Transparent Glass Glossy Sidebar */}
+      <aside className="sidebar-glass-bar text-slate-700 flex flex-col justify-between fixed top-0 left-0 h-screen z-40 w-56 select-none shadow-xs transition-all duration-300">
         
-        {/* Top Left: Authentic VAYU Logo on White Background with Continuous Sheen */}
-        <div className="h-16 px-5 flex items-center border-b border-slate-100 shrink-0">
+        {/* Top Left: Authentic VAYU Logo on Transparent Glossy Glass with Continuous Sheen */}
+        <div className="h-[84px] px-3.5 flex items-center border-b border-white/50 dark:border-white/10 shrink-0">
           <div 
             className="relative overflow-hidden group rounded-xl p-1 -m-1 flex items-center cursor-pointer"
             onClick={() => navigate('/dashboard')}
@@ -179,10 +179,10 @@ const Sidebar = () => {
             <img 
               src="/vayu.png" 
               alt="VAYU" 
-              className="h-10.5 w-auto object-contain filter drop-shadow-xs transition-transform duration-300 group-hover:scale-105" 
+              className="h-[66px] sm:h-[74px] w-auto max-w-[175px] object-contain filter drop-shadow-xs transition-transform duration-300 group-hover:scale-105" 
             />
             <div 
-              className="animate-vayu-sheen absolute inset-y-0 w-20 bg-gradient-to-r from-transparent via-white/85 to-transparent pointer-events-none" 
+              className="animate-vayu-sheen absolute inset-y-0 w-40 bg-gradient-to-r from-transparent via-white/85 to-transparent pointer-events-none" 
             />
           </div>
         </div>
@@ -212,7 +212,7 @@ const Sidebar = () => {
         </nav>
 
         {/* Bottom Left Account Trigger with iOS 3D Glass Effect */}
-        <div className="p-3 border-t border-slate-100 relative" ref={menuRef}>
+        <div className="p-3 border-t border-white/50 dark:border-white/10 relative" ref={menuRef}>
           <button
             ref={accountBtnRef}
             type="button"
@@ -237,8 +237,8 @@ const Sidebar = () => {
 
           {/* Account Sub-menu Popover */}
           {isAccountMenuOpen && (
-            <div className="absolute bottom-full left-3 right-3 mb-2 bg-white border border-slate-200 rounded-2xl shadow-xl p-1.5 z-50 animate-in fade-in slide-in-from-bottom-2 duration-150">
-              <div className="px-3 py-2 border-b border-slate-100">
+            <div className="absolute bottom-full left-3 right-3 mb-2 bg-white/90 dark:bg-slate-900/90 backdrop-blur-2xl border border-white/80 dark:border-white/15 rounded-2xl shadow-xl p-1.5 z-50 animate-in fade-in slide-in-from-bottom-2 duration-150">
+              <div className="px-3 py-2 border-b border-white/60 dark:border-white/10">
                 <div className="text-xs font-bold text-slate-900 flex items-center gap-1.5">
                   <Shield className="w-3 h-3 text-sky-600" />
                   <span>Central Operations Desk</span>
