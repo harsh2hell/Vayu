@@ -620,6 +620,9 @@ export async function compareStormBenchmark(stormId = 'cyclone_dana_2024') {
   return BENCHMARK_STORMS[stormId] || BENCHMARK_STORMS.cyclone_dana_2024;
 }
 
+export const compareWeatherNextBenchmark = compareStormBenchmark;
+
+
 
 /**
  * Fetches Phase 3B/3D measured real-model benchmark metrics.
