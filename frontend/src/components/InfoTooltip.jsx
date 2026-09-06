@@ -24,8 +24,8 @@ export const SCIENTIFIC_TERMS = {
     impact: 'Key factor for structural wind engineering safety.'
   },
   formation_probability: {
-    name: '48h Formation Probability',
-    nameHindi: '48 घंटे चक्रवात जनन संभावना',
+    name: 'Next 48h Formation Probability',
+    nameHindi: 'अगले 48 घंटे चक्रवात जनन संभावना',
     desc: 'The estimated statistical and neural model probability that this tropical disturbance will intensify into at least a Depression within the next 48 hours.',
     descHindi: 'यह दर्शाता है कि अगले 48 घंटों के भीतर यह मौसम प्रणाली गहराकर चक्रवात या अवसाद में तब्दील होगी या नहीं (एआई वीआईटी मॉडल अनुमान)।',
     impact: 'Probability > 60% triggers pre-cyclone watches.'

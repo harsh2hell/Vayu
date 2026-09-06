@@ -1674,7 +1674,7 @@ const Welcome = () => {
             <IOSGlassCard className="p-3.5 sm:p-4 rounded-2xl sm:rounded-3xl">
               <div className="flex items-center justify-between mb-0.5">
                 <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                  {isHindi ? '48 घंटे में चक्रवात संभावना' : '48h Formation'}
+                  {isHindi ? 'अगले 48 घंटे में चक्रवात संभावना' : 'Next 48h Formation'}
                 </span>
                 <InfoTooltip term="formation_probability" isHindi={isHindi} />
               </div>
