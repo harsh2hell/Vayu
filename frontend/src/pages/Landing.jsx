@@ -48,7 +48,7 @@ const Landing = () => {
       name: 'Very Severe Cyclonic Storm "BETA"',
       basin: 'East-Central Arabian Sea',
       coords: '18.2°N, 68.4°E',
-      eyeFix: '18.22°N, 68.39°E (Sub-km Accurate)',
+      eyeFix: '18.22°N, 68.39°E',
       category: 'Very Severe Cyclonic Storm (Cat 3)',
       dvorak: 'T4.0',
       intensity: '120 km/h',
@@ -82,7 +82,7 @@ const Landing = () => {
   };
 
   const benchmarks = [
-    { label: 'Eye Center CLE', value: '25.6 km', sub: 'Mean Distance vs. IBTrACS Ground Truth', icon: Target, badge: 'MobileNetV3' },
+    { label: 'Eye Center CLE', value: '25.6 km', sub: 'Mean CLE (Validation Set) vs. IBTrACS', icon: Target, badge: 'MobileNetV3' },
     { label: '72h Forecast Lead', value: '+86.0 km', sub: 'GRU Outperforms Persistence Baseline', icon: Activity, badge: 'GRU Seq2Seq' },
     { label: 'Multi-Spectral Channels', value: '4 Feeds', sub: 'IR, VIS, WV, Multi-sensor (NASA/MOSDAC)', icon: Satellite, badge: 'Real-Time Ingestion' },
     { label: 'Historical Baseline', value: '34 Storms', sub: 'NOAA IBTrACS NIO Canonical Dataset', icon: History, badge: 'Phase 3B Dataset' },
@@ -101,11 +101,11 @@ const Landing = () => {
     {
       title: 'Deep Learning Vision Detection',
       category: 'Computer Vision',
-      desc: 'Convolutional neural networks detecting cyclonic curvature, spiral banding, and sub-kilometer center coordinates from cloud top brightness.',
+      desc: 'Convolutional neural networks detecting cyclonic curvature, spiral banding, and center coordinates from cloud top brightness.',
       route: '/dashboard/detection',
       icon: Target,
-      tag: 'YOLOv8 + ResNet',
-      stat: '94.2% mAP'
+      tag: 'MobileNetV3-Small',
+      stat: '100% Objectness'
     },
     {
       title: 'Automated Dvorak Classification',
@@ -117,13 +117,13 @@ const Landing = () => {
       stat: 'IMD Standard'
     },
     {
-      title: 'BiLSTM 72h Trajectory Prediction',
+      title: 'GRU Seq2Seq 72h Trajectory Prediction',
       category: 'Time-Series Neural Net',
       desc: 'Recurrent sequence network forecasting storm track coordinates, translation speed, central pressure, and intensity at 6h to 72h horizons.',
       route: '/dashboard/prediction',
       icon: Compass,
       tag: 'Spatio-Temporal Net',
-      stat: '±38 km @ 24h'
+      stat: '197.7 km MAE @ 24h'
     },
     {
       title: 'Interactive 4D Track & Cone Visualizer',
@@ -148,8 +148,8 @@ const Landing = () => {
   const pipelineStages = [
     { num: '01', title: 'Telemetry Ingestion', desc: 'INSAT-3DR & NOAA multi-spectral radiometric calibration', tech: 'HDF5 / GeoTIFF' },
     { num: '02', title: 'Feature Extraction', desc: 'Deep CNN filters detect eye wall & cloud curvature bands', tech: 'Custom PyTorch CNN' },
-    { num: '03', title: 'Dvorak Intensity', desc: 'Automated T-number estimation and central pressure deficit', tech: 'ResNet-50 + Dvorak' },
-    { num: '04', title: '72h Spatio-Temporal', desc: 'BiLSTM forecasting track coordinates & wind speed', tech: 'BiLSTM + Attention' },
+    { num: '03', title: 'Dvorak Intensity', desc: 'Automated T-number estimation and central pressure deficit', tech: 'ResNet18 + Dvorak' },
+    { num: '04', title: '72h Spatio-Temporal', desc: 'GRU Seq2Seq forecasting track coordinates & wind speed', tech: 'GRU Seq2Seq' },
     { num: '05', title: 'Disaster Early Warning', desc: 'Dispatches CAP alerts & coastal impact zone maps', tech: 'ITU-T X.1303 Protocol' },
   ];
 
@@ -276,7 +276,7 @@ const Landing = () => {
               </h1>
 
               <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
-                VAYU integrates INSAT-3DR and NOAA multi-spectral satellite telemetry with deep CNN vision models and BiLSTM neural networks to deliver sub-kilometer eye fixes and actionable early warning intelligence across the North Indian Ocean basin.
+                VAYU integrates INSAT-3DR and NOAA multi-spectral satellite telemetry with deep CNN vision models and GRU Seq2Seq neural networks to deliver automated center localization and actionable early warning intelligence across the North Indian Ocean basin.
               </p>
 
               {/* Action CTAs */}
@@ -326,7 +326,7 @@ const Landing = () => {
                     <h3 className="font-heading font-bold text-sm text-white">Live AI Inference Sandbox</h3>
                   </div>
                   <span className="text-[11px] text-cyan-400 font-mono bg-cyan-950/60 px-2 py-0.5 rounded border border-cyan-500/30">
-                    CycloneForecast-LSTM v2.1
+                    CycloneTrajectoryGRU-Seq2Seq
                   </span>
                 </div>
 
@@ -381,7 +381,7 @@ const Landing = () => {
                   {simulating ? (
                     <div className="py-12 flex flex-col items-center justify-center gap-3 text-slate-400">
                       <RefreshCw className="w-7 h-7 animate-spin text-cyan-400" />
-                      <span className="text-xs font-mono font-medium text-cyan-300">Executing Deep CNN & BiLSTM Inference...</span>
+                      <span className="text-xs font-mono font-medium text-cyan-300">Executing Deep CNN & GRU Seq2Seq Inference...</span>
                     </div>
                   ) : (
                     <>

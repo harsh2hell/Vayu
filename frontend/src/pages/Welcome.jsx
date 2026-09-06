@@ -146,7 +146,7 @@ const SERVICES_DATA = [
     stats: [
       { label: 'Current System', labelHindi: 'वर्तमान प्रणाली', val: 'Invest 92B', sub: 'Bay of Bengal' },
       { label: 'Wind Intensity', labelHindi: 'पवन तीव्रता', val: '42 km/h', sub: 'Gusts 55 km/h' },
-      { label: '48h Genesis Risk', labelHindi: '48 घंटे का जोखिम', val: '68%', sub: 'ViT Neural Model' },
+      { label: '48h Genesis Risk', labelHindi: '48 घंटे का जोखिम', val: '68%', sub: 'AI Prototype Estimate' },
     ]
   },
   {
@@ -1630,7 +1630,7 @@ const Welcome = () => {
               </span>
               <span className="text-slate-600 dark:text-slate-400">
                 {current.vitPattern
-                  ? (isHindi ? `वीआईटी आकारिकी (${current.vitPattern})` : `ViT Morphology (${current.vitPattern})`)
+                  ? (isHindi ? `ResNet18 आकारिकी (${current.vitPattern})` : `ResNet18 Morphology (${current.vitPattern})`)
                   : (isHindi ? 'चक्रवातविज़न सीएनएन v2.1' : 'CycloneVision CNN v2.1')}
               </span>
               {current.sst && (
@@ -1704,7 +1704,7 @@ const Welcome = () => {
                 {current.risk48h}
               </div>
               <span className="text-[0.7rem] text-slate-500 dark:text-slate-400 mt-0.5 block">
-                {isHindi ? 'एआई वीआईटी मॉडल प्रायिकता' : 'ViT Probability'}
+                {isHindi ? 'एआई ResNet18 मॉडल प्रायिकता' : 'ResNet18 Confidence'}
               </span>
             </IOSGlassCard>
 
@@ -2015,7 +2015,7 @@ const Welcome = () => {
                     {isHindi ? '1. वोर्टेक्स पहचान व केंद्र निर्धारण' : '1. Vortex Center Localization'}
                   </h3>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-normal">
-                    {isHindi ? 'स्वायत्त केंद्र फिक्स, 100% ऑब्जेक्टनेस सटीकता एवं Grad-CAM ध्यान हीटमैप' : 'Autonomous vortex center regression, 100% objectness accuracy and Grad-CAM attention heatmaps.'}
+                    {isHindi ? 'स्वायत्त केंद्र फिक्स, 100% ऑब्जेक्टनेस सटीकता (4 परीक्षण फ्रेम) एवं Grad-CAM ध्यान हीटमैप' : 'Autonomous vortex center regression, 100% objectness accuracy (4 held-out test frames) and Grad-CAM attention heatmaps.'}
                   </p>
                 </IOSGlassCard>
 

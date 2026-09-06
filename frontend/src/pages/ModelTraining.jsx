@@ -273,7 +273,7 @@ const ModelTraining = () => {
           </div>
         </div>
 
-        {/* Model 2: ViT */}
+        {/* Model 2: ResNet18 Classifier */}
         <div className="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-xs flex flex-col justify-between space-y-5 hover:border-slate-300 transition-all">
           <div className="space-y-3">
             <div className="flex items-start justify-between gap-3">
@@ -308,7 +308,7 @@ const ModelTraining = () => {
           </div>
         </div>
 
-        {/* Model 3: BiLSTM */}
+        {/* Model 3: GRU Seq2Seq */}
         <div className="bg-white rounded-2xl p-6 border border-slate-200/90 shadow-xs flex flex-col justify-between space-y-5 hover:border-slate-300 transition-all">
           <div className="space-y-3">
             <div className="flex items-start justify-between gap-3">
@@ -572,7 +572,7 @@ const ModelTraining = () => {
                 Bayesian Uncertainty Quantification (Monte Carlo Dropout)
               </h3>
               <p className="text-xs text-slate-500 mt-0.5">
-                Runs N stochastic forward passes on the Physics-Informed BiLSTM to calculate epistemic variance and dynamic 70% confidence cones.
+                Runs N stochastic forward passes on the 2-Layer GRU Seq2Seq to calculate epistemic variance and MC-Dropout uncertainty spread (uncalibrated).
               </p>
             </div>
           </div>
@@ -618,9 +618,9 @@ const ModelTraining = () => {
               </div>
 
               <div className="bg-emerald-50/80 border border-emerald-200/80 rounded-xl p-4 space-y-1">
-                <span className="text-xs font-semibold text-emerald-900 block">70% Uncertainty Cone Vertices</span>
+                <span className="text-xs font-semibold text-emerald-900 block">MC-Dropout Epistemic Spread Vertices</span>
                 <span className="text-2xl font-bold text-emerald-950">{uncertaintyOutput.cone_polygon.length} Spatial Points</span>
-                <p className="text-xs text-emerald-700 font-medium">Calibrated polygon ready for GIS export</p>
+                <p className="text-xs text-emerald-700 font-medium">Uncalibrated polygon for GIS export</p>
               </div>
             </div>
 

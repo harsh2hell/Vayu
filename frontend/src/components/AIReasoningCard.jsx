@@ -9,7 +9,7 @@ import DataTypeBadge from './DataTypeBadge';
  * - Falling central pressure & barometric gradient
  * - Sea Surface Temperature (SST) thermal fuel
  * - Vertical Wind Shear (VWS) column stability
- * - Vision Transformer (ViT) cloud organization & LLCC
+ * - ResNet18 cloud organization & LLCC
  * - Transparent AI Model Confidence (genuinely stated or noted as unavailable)
  */
 export default function AIReasoningCard({
@@ -72,14 +72,14 @@ export default function AIReasoningCard({
     },
     {
       id: 'morphology',
-      title: isHindi ? 'उपग्रह क्लाउड आकारिकी (ViT Pattern)' : 'Vision Transformer Cloud Organization',
+      title: isHindi ? 'उपग्रह क्लाउड आकारिकी (ResNet18 Pattern)' : 'ResNet18 Cloud Morphology Classification',
       icon: Eye,
-      metric: 'ViT v2.1',
+      metric: 'ResNet18',
       status: 'Curved Banding',
       statusColor: 'text-sky-600 dark:text-sky-400',
       reason: isHindi
         ? `इन्फ्रारेड सैटेलाइट चैनलों में ${vitPattern} देखा गया है, जो प्राथमिक चक्रवाती परिसंचरण केंद्र (LLCC) की पुष्टि करता है।`
-        : `Spatial attention weights in the Vision Transformer detect ${vitPattern}, indicating organized low-level cyclonic vorticity.`,
+        : `ResNet18 Grad-CAM attention detects ${vitPattern}, indicating organized low-level cyclonic vorticity.`,
       tooltipTerm: 'dvorak'
     }
   ];

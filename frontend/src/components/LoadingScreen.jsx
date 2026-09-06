@@ -6,7 +6,7 @@ const SYSTEMS_CHECK = [
   { label: 'INSAT-3DR Multi-Spectral Radiometer', status: 'Active (4.0km IR)', ok: true },
   { label: 'MOSDAC Real-Time Geostationary Feed', status: 'Connected (45ms latency)', ok: true },
   { label: 'CycloneVision-CNN v2.1 Inference Engine', status: 'PyTorch Model Loaded', ok: true },
-  { label: 'CycloneForecast-LSTM Spatiotemporal Model', status: 'Calibrated (15yr Archive)', ok: true },
+  { label: 'CycloneTrajectoryGRU-Seq2Seq Model', status: 'Phase 3D Checkpoint Loaded', ok: true },
 ];
 
 const LoadingScreen = () => {

@@ -125,7 +125,7 @@ const Prediction = () => {
 
         {/* Highlight Scorecard */}
         <div className="flex items-center gap-3 flex-wrap">
-          <LastUpdatedBadge source="BiLSTM Trajectory Engine" size="xs" />
+          <LastUpdatedBadge source="GRU Seq2Seq Trajectory Engine" size="xs" />
           <div className="bg-emerald-50 border border-emerald-200 px-4 py-2 rounded-xl text-right">
             <span className="text-[10px] font-bold text-emerald-700 uppercase tracking-wider block">
               72h Trajectory Advantage

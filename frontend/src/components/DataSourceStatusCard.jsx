@@ -72,12 +72,12 @@ export default function DataSourceStatusCard({
     {
       id: 'vayu_ai',
       source: 'VAYU Neural Inference Engine',
-      dataType: isHindi ? 'ViT आकारिकी एवं BiLSTM प्रक्षेपवक्र' : 'ViT Morphology & BiLSTM 72h Trajectory',
+      dataType: isHindi ? 'ResNet18 आकारिकी एवं GRU प्रक्षेपवक्र' : 'ResNet18 Morphology & GRU 72h Trajectory',
       status: 'CONNECTED',
       statusText: isHindi ? 'सक्रिय (Operational)' : 'Operational',
       lastTimeLabel: isHindi ? 'अंतिम एआई विश्लेषण:' : 'Last AI Analysis:',
       lastTime: aiAnalysisTime,
-      provider: 'CycloneVision-CNN v2.1 + BiLSTM Ensemble'
+      provider: 'MobileNetV3 + ResNet18 + GRU Seq2Seq'
     }
   ];
 

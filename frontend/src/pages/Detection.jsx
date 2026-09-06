@@ -36,7 +36,7 @@ const PIPELINE_STAGES = [
     short: 'Feature Extraction',
     icon: Cpu,
     tensor: 'Tensor [B, 512, 14, 14]',
-    desc: 'VGG-16 / ResNet-50 convolutional backbones extracting spiral band curvature, CDO diameter, and eye wall gradient flows.',
+    desc: 'MobileNetV3-Small convolutional backbone extracting spiral band curvature, CDO diameter, and eye wall gradient flows.',
     params: 'Filters: 512, Stride: 2',
     latency: '85ms'
   },

@@ -132,7 +132,7 @@ const TrackMap = () => {
   const [showWindRadii, setShowWindRadii] = useState(true);
   const [showDopplerRadar, setShowDopplerRadar] = useState(true);
 
-  // Dynamic Telemetry Inputs for BiLSTM Engine
+  // Dynamic Telemetry Inputs for GRU Seq2Seq Engine
   const [sstInput, setSstInput] = useState(29.8);
   const [shearInput, setShearInput] = useState(12.0);
   const [forecastData, setForecastData] = useState(null);
@@ -191,7 +191,7 @@ const TrackMap = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-            <DataTypeBadge type="ai" label="AI BiLSTM 72H TRAJECTORY MODEL" />
+            <DataTypeBadge type="ai" label="AI GRU Seq2Seq 72H TRAJECTORY MODEL" />
             <DataTypeBadge type="historical" label="DANA & BIPARJOY BENCHMARKS" />
             <LastUpdatedBadge timestamp={lastUpdated} source="AI Inference Engine & IMD RSMC" />
           </div>
@@ -199,7 +199,7 @@ const TrackMap = () => {
             <h1 className="text-xl sm:text-2xl font-heading font-black text-slate-900 tracking-tight">
               4D Cyclone Trajectory Studio
             </h1>
-            <span className="badge badge-red text-[10px]">Bi-LSTM Neural Engine</span>
+            <span className="badge badge-red text-[10px]">GRU Seq2Seq Neural Engine</span>
             {forecastData?.isLiveApi && (
               <span className="badge badge-green text-[10px] flex items-center gap-1">
                 <CheckCircle className="w-2.5 h-2.5" /> Live API Connected
@@ -207,7 +207,7 @@ const TrackMap = () => {
             )}
           </div>
           <p className="text-xs text-slate-500 font-normal">
-            Physics-informed BiLSTM spatio-temporal forecast engine with dynamic 70% uncertainty cones, real NASA satellite overlays, and coastal strike risk.
+            2-Layer GRU Seq2Seq spatio-temporal forecast engine with MC-Dropout epistemic spread (uncalibrated), real NASA satellite overlays, and coastal strike risk.
           </p>
         </div>
 
@@ -331,7 +331,7 @@ const TrackMap = () => {
                 />
               )}
 
-              {/* 70% Confidence Cone */}
+              {/* MC-Dropout Epistemic Spread Cone */}
               {showCone && (
                 <Polygon
                   positions={conePolygon}

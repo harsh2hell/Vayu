@@ -663,7 +663,7 @@ const Satellite = () => {
             {isAnalyzing && (
               <div className="text-center py-6 px-4 space-y-2">
                 <div className="w-8 h-8 border-3 border-slate-900 border-t-transparent rounded-full animate-spin mx-auto" />
-                <h4 className="font-bold text-xs text-slate-800">Executing ResNet-50 CNN</h4>
+                <h4 className="font-bold text-xs text-slate-800">Executing MobileNetV3-Small CNN</h4>
                 <p className="text-[11px] text-slate-400 font-mono">Passing through SPP layers...</p>
               </div>
             )}

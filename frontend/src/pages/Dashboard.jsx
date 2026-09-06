@@ -666,7 +666,7 @@ const Dashboard = () => {
                 Meteorological Command Overview
               </h1>
               <p className="text-xs sm:text-sm text-slate-500 font-normal max-w-2xl mt-1 leading-relaxed">
-                Real-time AI/ML tropical cyclone trajectory forecasting, sub-kilometer eye fixes, multi-spectral INSAT-3DR ingestion, and automated coastal early warning intelligence.
+                Real-time AI/ML tropical cyclone trajectory forecasting, automated center localization, multi-spectral INSAT-3DR ingestion, and automated coastal early warning intelligence.
               </p>
             </div>
           </div>

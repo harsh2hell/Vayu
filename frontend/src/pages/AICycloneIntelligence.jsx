@@ -664,8 +664,8 @@ const AICycloneIntelligence = () => {
                   <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">
                     Model: ResNet18-Dvorak-Morphology (Experimental)
                   </span>
-                  <DataTypeBadge type="ai" size="xs" label="AI ViT PREDICTION" isHindi={isHindi} />
-                  <LastUpdatedBadge source="PatternNet-ViT v1.8" isHindi={isHindi} size="xs" />
+                  <DataTypeBadge type="ai" size="xs" label="AI ResNet18 PREDICTION" isHindi={isHindi} />
+                  <LastUpdatedBadge source="ResNet18-Dvorak Classifier" isHindi={isHindi} size="xs" />
                 </div>
                 <h2 className="text-xl sm:text-2xl font-black font-heading tracking-tight text-slate-950 dark:text-white mt-1">
                   {isHindi ? '4 चक्रवात आकारिकी पैटर्न (प्रायोगिक प्रोटोटाइप)' : '4 Cyclone Morphological Patterns (Experimental Prototype)'}
@@ -1047,8 +1047,8 @@ const AICycloneIntelligence = () => {
                   <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">
                     Model: CycloneTrajectoryGRU-Seq2Seq
                   </span>
-                  <DataTypeBadge type="ai" size="xs" label="AI BiLSTM PREDICTION" isHindi={isHindi} />
-                  <LastUpdatedBadge source="BiLSTM Trajectory Engine" isHindi={isHindi} size="xs" />
+                  <DataTypeBadge type="ai" size="xs" label="AI GRU Seq2Seq PREDICTION" isHindi={isHindi} />
+                  <LastUpdatedBadge source="GRU Seq2Seq Trajectory Engine" isHindi={isHindi} size="xs" />
                 </div>
                 <h2 className="text-xl sm:text-2xl font-black font-heading tracking-tight text-slate-950 dark:text-white mt-1">
                   {isHindi ? '72-घंटे का एआई प्रक्षेपवक्र एवं तीव्रता पूर्वानुमान' : '72-Hour AI Trajectory & Intensity Prediction Studio'}

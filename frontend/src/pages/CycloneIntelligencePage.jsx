@@ -93,8 +93,8 @@ const HISTORICAL_ANALOGUES = [
 ];
 
 const AI_PREDICTIONS = [
-  { title: '48h Intensification Forecast', value: '68%', detail: 'ViT CNN model ensemble indicates a 68% probability of intensification to Severe Cyclonic Storm category within 48 hours, given the current SST (30.5°C), low shear (8 kts), and high OHC (98 kJ/cm²).', model: 'CycloneVision ViT-L v2.1', conf: 87 },
-  { title: 'Track Consensus (72h)', value: 'NNW at 14 km/h', detail: 'Track consensus from ECMWF, GFS, and IMD NWP models shows 92% agreement on NNW movement. The most likely landfall location is near Visakhapatnam–Srikakulam corridor with a ±120 km uncertainty radius.', model: 'VayuSat Track Ensemble', conf: 91 },
+  { title: '48h Intensification Forecast', value: '68%', detail: 'AI model indicates elevated intensification risk given current SST (30.5°C), low shear (8 kts), and high OHC (98 kJ/cm²). This is an uncalibrated model estimate for scenario demonstration.', model: 'MobileNetV3 + ResNet18 Prototype', conf: 87 },
+  { title: 'Track Consensus (72h)', value: 'NNW at 14 km/h', detail: 'Scenario illustration: Track consensus from multiple NWP sources shows NNW movement. The most likely landfall location is near Visakhapatnam–Srikakulam corridor. Note: VAYU does not currently ingest live ECMWF/GFS data.', model: 'Scenario Illustration', conf: 91 },
   { title: 'Landfall Intensity Estimate', value: '90–110 km/h', detail: 'Intensity at landfall is estimated at 90–110 km/h sustained winds (Severe Cyclonic Storm category) unless further intensification occurs over the 30.5°C SST region in the next 36h.', model: 'Statistical-Dynamical SHIPS', conf: 79 },
 ];
 

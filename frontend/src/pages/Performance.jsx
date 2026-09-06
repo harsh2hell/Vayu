@@ -278,7 +278,7 @@ const Performance = () => {
               <Activity className="w-3.5 h-3.5 text-blue-600" /> Scientific Benchmarking Protocol Note:
             </p>
             <p>
-              VAYU leverages a genuine, lightweight 2-Layer GRU Seq2Seq network running locally on CPU in &lt;15 ms, incorporating satellite morphology and thermodynamic steering. 
+              VAYU leverages a genuine, lightweight 2-Layer GRU Seq2Seq network running locally on CPU in &lt;15 ms (isolated model forward pass; total warm pipeline ~178 ms), incorporating satellite morphology and thermodynamic steering. 
               Google DeepMind WeatherNext / ECMWF HRES operates on 37 vertical pressure levels globally and is rendered here as an external comparative benchmark to prove honest, non-fabricated predictive accuracy.
             </p>
           </div>

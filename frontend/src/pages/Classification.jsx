@@ -80,7 +80,7 @@ const Classification = () => {
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
-          <LastUpdatedBadge source="PatternNet-ViT v1.8" size="xs" />
+          <LastUpdatedBadge source="ResNet18-Dvorak Classifier" size="xs" />
           <label className="btn-secondary text-xs sm:text-sm py-2 px-3 gap-1.5 cursor-pointer">
             <Upload className="w-3.5 h-3.5" />
             <span>Upload Satellite Frame</span>
