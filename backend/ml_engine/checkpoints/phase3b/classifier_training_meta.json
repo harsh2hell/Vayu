@@ -1,0 +1,166 @@
+{
+  "model_name": "ResNet18-Dvorak-Morphology",
+  "num_classes": 4,
+  "classes_trained": [
+    "Eye",
+    "Curved Band",
+    "Shear",
+    "Calm"
+  ],
+  "insufficient_classes": {
+    "CDO": "INSUFFICIENT DATA (0 definitive single-frame polar annotations in NIO archive)",
+    "Embedded Center": "INSUFFICIENT DATA (0 definitive ground-truth annotations in NIO archive)"
+  },
+  "checkpoint_path": "/Users/harsh/Library/CloudStorage/GoogleDrive-harendrapratap5828@gmail.com/My Drive/Tahoe/Documents/ai-cyclone/backend/ml_engine/checkpoints/phase3b/vayu_morph_resnet18_p3b.pt",
+  "checkpoint_sha256": "e28e013e579bd256b73c4b0f1e3c653d7743fc7593d55e76f49d0d8cfb5123a8",
+  "parameters_count": 11246436,
+  "epochs": 40,
+  "learning_rate": 0.001,
+  "seed": 42,
+  "training_samples": 14,
+  "validation_samples": 4,
+  "test_samples": 4,
+  "validation_metrics": {
+    "samples_evaluated": 4,
+    "overall_accuracy": 50.0,
+    "macro_f1": 33.33,
+    "per_class_metrics": {
+      "Eye": {
+        "precision": 50.0,
+        "recall": 100.0,
+        "f1": 66.67,
+        "support": 2
+      },
+      "Curved Band": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 0
+      },
+      "Shear": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 2
+      },
+      "Calm": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 0
+      }
+    },
+    "confusion_matrix": [
+      [
+        2,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        2,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0
+      ]
+    ],
+    "class_labels": [
+      "Eye",
+      "Curved Band",
+      "Shear",
+      "Calm"
+    ]
+  },
+  "test_metrics": {
+    "samples_evaluated": 4,
+    "overall_accuracy": 0.0,
+    "macro_f1": 0.0,
+    "per_class_metrics": {
+      "Eye": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 2
+      },
+      "Curved Band": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 2
+      },
+      "Shear": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 0
+      },
+      "Calm": {
+        "precision": 0.0,
+        "recall": 0.0,
+        "f1": 0.0,
+        "support": 0
+      }
+    },
+    "confusion_matrix": [
+      [
+        0,
+        0,
+        0,
+        2
+      ],
+      [
+        2,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0
+      ],
+      [
+        0,
+        0,
+        0,
+        0
+      ]
+    ],
+    "class_labels": [
+      "Eye",
+      "Curved Band",
+      "Shear",
+      "Calm"
+    ]
+  },
+  "train_storms": [
+    "AMBIENT_CALM",
+    "HUDHUD",
+    "PHAILIN",
+    "TITLI",
+    "AMPHAN",
+    "FANI",
+    "BULBUL"
+  ],
+  "val_storms": [
+    "MOCHA",
+    "OCKHI"
+  ],
+  "test_storms": [
+    "DANA",
+    "BIPARJOY"
+  ]
+}

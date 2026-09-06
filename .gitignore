@@ -36,3 +36,7 @@ venv/
 .venv/
 env/
 *.sqlite3
+
+# Documentation Reports
+VAYU_MASTER_PROJECT_REPORT.md
+

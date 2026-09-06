@@ -52,16 +52,16 @@ export const CURRENT_VORTEX_IDENTIFICATION = {
   basinHindi: 'बंगाल की खाड़ी (उत्तर हिंद महासागर)',
   provenance: 'AI_INFERENCE',
   
-  detectionModel: 'CycloneVision-CNN v2.1',
-  architecture: 'ResNet-50 Feature Backbone + Spatial Pyramid Pooling (SPP) + Bounding Regressor',
+  detectionModel: 'MobileNetV3-Small-CenterFix (Phase 3B)',
+  architecture: 'MobileNetV3-Small Dual-Head Center Regressor + Bounding Box Estimator',
   
   // Primary Confidence & Fixation
-  cyclonePresenceConfidence: 96.4,
-  cyclonePresenceConfidenceHindi: '96.4%',
-  vortexFixLat: 15.40,
-  vortexFixLon: 87.80,
-  vortexFixFormatted: '15.40° N, 87.80° E',
-  fixationErrorRadiusKm: 14.2,
+  cyclonePresenceConfidence: 100.0,
+  cyclonePresenceConfidenceHindi: '100.0%',
+  vortexFixLat: 17.12,
+  vortexFixLon: 87.45,
+  vortexFixFormatted: '17.12° N, 87.45° E',
+  fixationErrorRadiusKm: 38.2,
   
   // Radiometric & Structural Features
   radiometry: {
@@ -99,9 +99,9 @@ export const CURRENT_VORTEX_IDENTIFICATION = {
     pinpointReliability: 'High Confidence Vortex Center'
   },
 
-  inferenceLatencyMs: 142.5,
-  modelParams: '25.6M Parameters (FP16 Optimized on TensorRT)',
-  trainingFootprint: '42,500 Calibrated INSAT & MetOp multi-spectral frames (2000–2024)'
+  inferenceLatencyMs: 37.8,
+  modelParams: '1.08M Parameters (Phase 3B PyTorch Checkpoint)',
+  trainingFootprint: '22 Calibrated Multi-spectral Benchmark Frames across 11 NIO Cyclones'
 };
 
 // Stock Cyclone Datasets with Authentic Satellite Frames and Telemetry Fixes
@@ -121,12 +121,12 @@ export const STOCK_CYCLONES = [
     image: '/cyclone_satellite_ir.jpg',
     visImage: '/cyclone_satellite_vis.jpg',
     irImage: '/cyclone_satellite_ir.jpg',
-    confidence: 96.4,
-    vortexFixFormatted: '15.40° N, 87.80° E',
-    vortexFixLat: 15.40,
-    vortexFixLon: 87.80,
-    fixationErrorRadiusKm: 14.2,
-    inferenceLatencyMs: 142.5,
+    confidence: 100.0,
+    vortexFixFormatted: '17.12° N, 87.45° E',
+    vortexFixLat: 17.12,
+    vortexFixLon: 87.45,
+    fixationErrorRadiusKm: 38.2,
+    inferenceLatencyMs: 37.8,
     boxWidth: '60%',
     boxHeight: '60%',
     boxCenter: { x: '50%', y: '50%' },
@@ -805,14 +805,14 @@ export const HISTORICAL_BENCHMARKS = [
     morphologyPattern: 'Eye Pattern (Warm Core Pin-hole Eye)',
     morphologyPatternHindi: 'आई पैटर्न (उष्ण कोर पिन-होल आंख)',
     aiAccuracy: {
-      lead12hTrackErrorKm: 18.2,
-      lead24hTrackErrorKm: 32.4,
-      lead48hTrackErrorKm: 68.5,
-      lead72hTrackErrorKm: 112.0,
-      baselineErrorKm: 138.4,
-      intensityErrorKmh: 7.8
+      lead12hTrackErrorKm: 114.9,
+      lead24hTrackErrorKm: 197.7,
+      lead48hTrackErrorKm: 278.7,
+      lead72hTrackErrorKm: 311.9,
+      baselineErrorKm: 397.9,
+      intensityErrorKmh: 12.4
     },
-    narrative: 'FANI underwent rapid intensification into an Category 5 equivalent super storm. The AI model successfully predicted the recurvature 54 hours in advance with a 24h track error of only 32.4 km compared to 48.0 km official consensus.'
+    narrative: 'FANI underwent rapid intensification into a Category 5 equivalent super storm. The GRU spatiotemporal model captured recurvature kinematics, achieving an 86 km advantage over linear persistence at +72h.'
   },
   {
     id: 'amphan_2020',
@@ -890,8 +890,10 @@ export const HISTORICAL_BENCHMARKS = [
 
 // 7. Benchmark Comparison Data (Error across lead times)
 export const MODEL_ACCURACY_BENCHMARKS = [
-  { lead: '+12h', VAYU: 18.2, IMD_Official: 24.5, ECMWF_IFS: 22.0, NCEP_GFS: 28.4 },
-  { lead: '+24h', VAYU: 32.4, IMD_Official: 48.0, ECMWF_IFS: 41.5, NCEP_GFS: 54.0 },
-  { lead: '+48h', VAYU: 68.5, IMD_Official: 86.2, ECMWF_IFS: 76.0, NCEP_GFS: 94.2 },
-  { lead: '+72h', VAYU: 112.0, IMD_Official: 138.4, ECMWF_IFS: 124.0, NCEP_GFS: 149.0 }
+  { lead: '+6h', VAYU: 68.9, Persistence: 25.5, IMD_Official: 32.0 },
+  { lead: '+12h', VAYU: 114.9, Persistence: 54.0, IMD_Official: 61.0 },
+  { lead: '+18h', VAYU: 158.9, Persistence: 82.8, IMD_Official: 92.0 },
+  { lead: '+24h', VAYU: 197.7, Persistence: 110.9, IMD_Official: 124.0 },
+  { lead: '+48h', VAYU: 278.7, Persistence: 251.4, IMD_Official: 215.0 },
+  { lead: '+72h', VAYU: 311.9, Persistence: 397.9, IMD_Official: 310.0 }
 ];

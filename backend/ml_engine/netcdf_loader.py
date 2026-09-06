@@ -19,9 +19,10 @@ class NOAANetCDFDataset(Dataset):
       - NOAA IBTrACS NetCDF best-track archives
       - NOAA OISST / Reanalysis atmospheric NetCDF grids
     """
-    def __init__(self, nc_filepath_or_dir: str, target_size: Tuple[int, int] = (224, 224), transform=None):
+    def __init__(self, nc_filepath_or_dir: str, target_size: Tuple[int, int] = (224, 224), transform=None, allow_synthetic_fallback: bool = False):
         self.target_size = target_size
         self.transform = transform
+        self.allow_synthetic_fallback = allow_synthetic_fallback
         self.samples = []
         
         if os.path.isfile(nc_filepath_or_dir) and nc_filepath_or_dir.endswith('.nc'):
@@ -33,15 +34,19 @@ class NOAANetCDFDataset(Dataset):
                         self.samples.append(os.path.join(root, f))
                         
     def __len__(self):
-        return max(len(self.samples), 1)
+        return len(self.samples) if not self.allow_synthetic_fallback else max(len(self.samples), 1)
 
     def extract_variables_from_nc(self, filepath: str) -> Dict[str, np.ndarray]:
         """
         Extracts multi-spectral radiance and atmospheric variables from a single .nc file.
         """
         if not HAS_NETCDF or not os.path.exists(filepath):
-            # Generate synthetic calibrated 3-channel infrared tensor if file not yet on disk
-            ir_channel = np.random.uniform(190, 310, size=self.target_size).astype(np.float32) # Brightness temp in Kelvin
+            if not self.allow_synthetic_fallback:
+                if not HAS_NETCDF:
+                    raise ImportError("netCDF4 library is required to load NetCDF (.nc) files. Install with: pip install netCDF4")
+                raise FileNotFoundError(f"NetCDF file not found: {filepath}. Synthetic fallback is disabled for scientific integrity.")
+            # Explicit demo/testing fallback only
+            ir_channel = np.random.uniform(190, 310, size=self.target_size).astype(np.float32)
             wv_channel = np.random.uniform(210, 270, size=self.target_size).astype(np.float32)
             vis_channel = np.random.uniform(0.0, 1.0, size=self.target_size).astype(np.float32)
             return {
@@ -52,7 +57,8 @@ class NOAANetCDFDataset(Dataset):
                 "mslp_hpa": 975.0,
                 "eye_lat": 15.4,
                 "eye_lon": 87.8,
-                "pattern_class": 0
+                "pattern_class": 0,
+                "is_synthetic": True
             }
 
         try:
@@ -92,6 +98,8 @@ class NOAANetCDFDataset(Dataset):
                     "pattern_class": 0
                 }
         except Exception as e:
+            if not self.allow_synthetic_fallback:
+                raise IOError(f"Failed to read NetCDF file {filepath}: {e}")
             print(f"[NetCDF Reader] Fallback due to: {e}")
             ir_channel = np.random.uniform(190, 310, size=self.target_size).astype(np.float32)
             return {
@@ -102,7 +110,8 @@ class NOAANetCDFDataset(Dataset):
                 "mslp_hpa": 975.0,
                 "eye_lat": 15.4,
                 "eye_lon": 87.8,
-                "pattern_class": 0
+                "pattern_class": 0,
+                "is_synthetic": True
             }
 
     def __getitem__(self, idx):

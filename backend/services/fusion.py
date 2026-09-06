@@ -83,17 +83,22 @@ class MultiSourceDataFusionEngine:
         """
         start_time = time.time()
 
-        # Step 1: Decode & Synthesize Multi-Spectral Channels
+        # Step 1: Decode Satellite Image
+        image_status = "VALID"
+        is_synthetic = False
         if satellite_image_bytes and len(satellite_image_bytes) > 50:
             try:
                 img = Image.open(io.BytesIO(satellite_image_bytes)).convert("RGB")
                 img = img.resize(self.target_grid_size, Image.Resampling.BILINEAR)
                 img_arr = np.array(img, dtype=np.float32) / 255.0
             except Exception:
-                img_arr = np.random.uniform(0.1, 0.9, size=(self.target_grid_size[0], self.target_grid_size[1], 3)).astype(np.float32)
+                # Deterministic neutral baseline when decoding fails - no silent random generation
+                img_arr = np.zeros((self.target_grid_size[0], self.target_grid_size[1], 3), dtype=np.float32)
+                image_status = "DECODE_FAILED"
         else:
-            # Synthetic calibrated frame
-            img_arr = np.random.uniform(0.1, 0.9, size=(self.target_grid_size[0], self.target_grid_size[1], 3)).astype(np.float32)
+            # Deterministic neutral baseline when no image is provided
+            img_arr = np.zeros((self.target_grid_size[0], self.target_grid_size[1], 3), dtype=np.float32)
+            image_status = "NO_IMAGE_PROVIDED"
 
         # Step 2: Compute Multi-Spectral Derived Channels
         tir1_channel = 30.0 - (img_arr[:, :, 0] * 115.0) # Brightness Temp (°C)
@@ -134,6 +139,8 @@ class MultiSourceDataFusionEngine:
                 "coriolis_f_10e5": coriolis_f
             },
             "multi_spectral_radiometry": {
+                "satellite_image_status": image_status,
+                "is_synthetic": is_synthetic,
                 "tir1_brightness_min_temp_c": round(min_cloud_temp_c, 1),
                 "tir1_brightness_avg_temp_c": round(avg_cloud_temp_c, 1),
                 "split_window_diff_avg_c": round(float(np.mean(split_window_diff)), 2),

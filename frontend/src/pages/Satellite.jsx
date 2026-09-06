@@ -13,8 +13,12 @@ import {
   fetchLiveSstGrid, 
   fetchLiveVerticalWindShear, 
   fetchIsroMosdacCatalog,
-  fetchRainViewerLiveFrames
+  fetchRainViewerLiveFrames,
+  getFormattedLastUpdated
 } from '../services/api';
+import DataTypeBadge from '../components/DataTypeBadge';
+import LastUpdatedBadge from '../components/LastUpdatedBadge';
+import DataUnavailableNotice from '../components/DataUnavailableNotice';
 
 const SATELLITE_PRESETS = [
   {
@@ -160,34 +164,33 @@ const Satellite = () => {
       }
       
       const apiResult = await detectCycloneFromImage(imageBlob, 'Bay of Bengal');
-      
       setIsAnalyzing(false);
-      setAnalysisOutput({
-        detected: apiResult.cyclone_detected,
-        confidence: apiResult.confidence_percentage,
-        center: apiResult.coordinates?.formatted || `${selectedPreset.target.lat}, ${selectedPreset.target.lon}`,
-        radius: `${apiResult.radiometric_features?.cdo_radius_km || 240} km`,
-        dvorak: apiResult.dvorak_classification?.t_number || selectedPreset.target.tNumber,
-        category: apiResult.dvorak_classification?.category || 'Severe Cyclonic Storm',
-        minTemp: `${apiResult.radiometric_features?.cloud_top_min_temp_c || -78.4}°C`,
-        eyeStatus: apiResult.radiometric_features?.eye_status || 'Forming Warm Core Eye detected in IR Band',
-        isLiveApi: apiResult.isLiveApi,
-        inferenceTimeMs: apiResult.inference_time_ms
-      });
+
+      if (apiResult && apiResult.success) {
+        setAnalysisOutput({
+          detected: apiResult.cyclone_detected,
+          confidence: apiResult.confidence_percentage,
+          center: apiResult.coordinates?.formatted || `${apiResult.coordinates?.latitude}°N, ${apiResult.coordinates?.longitude}°E`,
+          radius: `${apiResult.radiometric_features?.cdo_radius_km || 240} km`,
+          dvorak: apiResult.dvorak_classification?.t_number || 'T3.5',
+          category: apiResult.dvorak_classification?.category || 'Severe Cyclonic Storm',
+          minTemp: `${apiResult.radiometric_features?.cloud_top_min_temp_c || -78.4}°C`,
+          eyeStatus: apiResult.radiometric_features?.eye_status || 'Analyzed in IR Band',
+          isLiveApi: apiResult.isLiveApi,
+          inferenceTimeMs: apiResult.inference_time_ms
+        });
+      } else {
+        setAnalysisOutput({
+          error: true,
+          message: apiResult?.message || 'MODEL UNAVAILABLE: Backend connection required for live AI inference.'
+        });
+      }
     } catch (err) {
       console.error(err);
       setIsAnalyzing(false);
       setAnalysisOutput({
-        detected: true,
-        confidence: 96.4,
-        center: selectedPreset.target.lat + ', ' + selectedPreset.target.lon,
-        radius: '240 km',
-        dvorak: selectedPreset.target.tNumber,
-        category: 'Severe Cyclonic Storm',
-        minTemp: selectedPreset.target.eyeTemp,
-        eyeStatus: 'Forming Warm Core Eye detected in IR Band',
-        isLiveApi: false,
-        inferenceTimeMs: 142.5
+        error: true,
+        message: 'MODEL UNAVAILABLE: Backend connection required for live AI inference.'
       });
     }
   };
@@ -212,6 +215,10 @@ const Satellite = () => {
       {/* Page Header */}
       <div className="bg-white p-6 rounded-2xl border border-slate-200/90 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
+          <div className="flex items-center gap-2 mb-2 flex-wrap">
+            <DataTypeBadge type="live" label="NASA GIBS & RAINVIEWER DOPPLER" />
+            <LastUpdatedBadge timestamp={getFormattedLastUpdated()} source="ISRO MOSDAC & NASA EOSDIS" />
+          </div>
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-sky-50 text-sky-700 flex items-center justify-center font-bold">
               <SatelliteDish className="w-4 h-4" />
@@ -550,7 +557,7 @@ const Satellite = () => {
             />
 
             {/* AI Bounding Box & Eye Localization Overlay */}
-            {analysisOutput && (
+            {analysisOutput && !analysisOutput.error && (
               <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
                 <div className="w-64 h-64 rounded-full border-2 border-red-500/80 animate-pulse flex items-center justify-center">
                   <div className="w-48 h-48 rounded-full border border-orange-400/60 border-dashed animate-spin" style={{ animationDuration: '25s' }} />
@@ -661,7 +668,19 @@ const Satellite = () => {
               </div>
             )}
 
-            {analysisOutput && (
+            {analysisOutput && analysisOutput.error && (
+              <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-center space-y-2">
+                <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center mx-auto text-red-600 font-bold text-sm">
+                  ⚠️
+                </div>
+                <h4 className="font-bold text-xs text-red-900">MODEL UNAVAILABLE</h4>
+                <p className="text-xs text-red-700 leading-relaxed">
+                  {analysisOutput.message || 'Backend connection required for live AI inference.'}
+                </p>
+              </div>
+            )}
+
+            {analysisOutput && !analysisOutput.error && (
               <div className="space-y-3">
                 <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-3 flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -707,7 +726,10 @@ const Satellite = () => {
                 <Waves className="w-4 h-4 text-sky-600" />
                 <h4 className="font-bold text-xs text-slate-800 uppercase tracking-wider">Live Ocean SST Grid</h4>
               </div>
-              <span className="badge badge-green text-[9px]">Live API</span>
+              <DataTypeBadge
+                type={liveSst.length > 0 ? "live" : "unavailable"}
+                label={liveSst.length > 0 ? "LIVE SST API" : "DATA UNAVAILABLE"}
+              />
             </div>
 
             <div className="space-y-1.5 text-xs">

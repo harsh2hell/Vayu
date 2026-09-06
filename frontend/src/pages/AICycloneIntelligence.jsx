@@ -26,6 +26,9 @@ import {
   MODEL_ACCURACY_BENCHMARKS
 } from '../data/sihCycloneData';
 import { detectCycloneFromImage, classifyMorphologyPattern } from '../services/api';
+import DataTypeBadge from '../components/DataTypeBadge';
+import LastUpdatedBadge from '../components/LastUpdatedBadge';
+import DataUnavailableNotice from '../components/DataUnavailableNotice';
 import { useLiveClock } from '../utils/liveDateTime';
 
 const AICycloneIntelligence = () => {
@@ -176,8 +179,8 @@ const AICycloneIntelligence = () => {
 
             <p className="text-xs sm:text-sm text-slate-300 max-w-4xl leading-relaxed">
               {isHindi
-                ? 'इसरो (INSAT-3D/3DR, ओशनसैट-3) और वैश्विक उपग्रहों के बहु-स्पेक्ट्रल डेटा का उपयोग करके स्वचालित चक्रवात पहचान (CycloneVision-CNN), 5-स्तरीय आकारिकी वर्गीकरण (PatternNet-ViT), और 72 घंटे का द्वि-दिशात्मक एलएसटीएम प्रक्षेपवक्र पूर्वानुमान।'
-                : 'Operational deep learning framework utilizing multi-source satellite streams (INSAT-3D/3DR, Oceansat-3, GPM) for automated vortex identification (CycloneVision-CNN), 5-class morphological Dvorak classification (PatternNet-ViT), and 72-hour Bi-LSTM spatiotemporal trajectory prediction.'}
+                ? 'इसरो (INSAT-3D/3DR, ओशनसैट-3) और वैश्विक उपग्रहों के बहु-स्पेक्ट्रल डेटा का उपयोग करके स्वचालित चक्रवात पहचान (MobileNetV3-Small), 4-स्तरीय आकारिकी वर्गीकरण (ResNet18), और 72 घंटे का GRU Seq2Seq प्रक्षेपवक्र पूर्वानुमान।'
+                : 'Operational deep learning framework utilizing multi-source satellite streams (INSAT-3D/3DR, Oceansat-3, GPM) for automated vortex identification (MobileNetV3-Small dual-head), 4-class morphological Dvorak classification (ResNet18 + Grad-CAM), and 72-hour 2-layer GRU Seq2Seq spatiotemporal trajectory prediction.'}
             </p>
           </div>
 
@@ -285,13 +288,15 @@ const AICycloneIntelligence = () => {
             {/* Module Top Bar */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-4">
               <div>
-                <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-2.5 flex-wrap">
                   <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border border-indigo-400/30">
                     MODULE 1: COMPUTER VISION IDENTIFICATION
                   </span>
                   <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">
                     Model: CycloneVision-CNN v2.1
                   </span>
+                  <DataTypeBadge type="ai" size="xs" label="AI INFERENCE" isHindi={isHindi} />
+                  <LastUpdatedBadge source="CycloneVision-CNN v2.1" isHindi={isHindi} size="xs" />
                 </div>
                 <h2 className="text-xl sm:text-2xl font-black font-heading tracking-tight text-slate-950 dark:text-white mt-1">
                   {isHindi ? 'स्वचालित चक्रवात पहचान एवं भंवर केंद्र निर्धारण' : 'Automated Cyclone Identification & Vortex Fixation'}
@@ -522,7 +527,7 @@ const AICycloneIntelligence = () => {
                   <span>
                     {imageLayer === 'raw' && (isHindi ? 'उच्च-रिज़ॉल्यूशन दृश्य व थर्मल उपग्रह फ्रेम।' : 'High-resolution multispectral meteorological satellite frame.')}
                     {imageLayer === 'gradcam' && (isHindi ? 'Grad-CAM अटेंशन: गहरे संवहनी बादलों पर मॉडल का ध्यान।' : 'Grad-CAM Attention: Deep convective spiral banding activation.')}
-                    {imageLayer === 'bbox' && (isHindi ? 'ResNet-50 बाउंडिंग रिग्रेसर द्वारा अनुमानित केंद्र निर्देशांक।' : 'ResNet-50 bounding regressor predicting circulation center with Smooth-L1 loss.')}
+                    {imageLayer === 'bbox' && (isHindi ? 'MobileNetV3-Small ड्यूल-हेड डिटेक्टर द्वारा अनुमानित केंद्र निर्देशांक।' : 'MobileNetV3-Small dual-head detector predicting circulation center with Smooth-L1 loss.')}
                     {imageLayer === 'radar' && (isHindi ? 'डॉप्लर रडार परावर्तन (dBZ) सर्पिल संवहनी रिंग।' : 'Doppler radar reflectivity (dBZ) composite spiral rainband rings.')}
                   </span>
                   <span className="font-mono text-[10px] text-slate-400">FP16 TensorRT • ISRO MOSDAC</span>
@@ -626,15 +631,15 @@ const AICycloneIntelligence = () => {
                 <div className="bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 p-3.5 text-xs space-y-1.5">
                   <div className="flex justify-between text-slate-600 dark:text-slate-400">
                     <span>Backbone Architecture:</span>
-                    <strong className="text-slate-900 dark:text-white font-mono">ResNet-50 + SPP</strong>
+                    <strong className="text-slate-900 dark:text-white font-mono">MobileNetV3-Small Dual-Head</strong>
                   </div>
                   <div className="flex justify-between text-slate-600 dark:text-slate-400">
                     <span>Inference Cadence:</span>
-                    <strong className="text-slate-900 dark:text-white font-mono">15-Minute Synchronous</strong>
+                    <strong className="text-slate-900 dark:text-white font-mono">Real-Time Ingestion (37.8 ms)</strong>
                   </div>
                   <div className="flex justify-between text-slate-600 dark:text-slate-400">
-                    <span>Training Sample Space:</span>
-                    <strong className="text-slate-900 dark:text-white font-mono">42,500 Calibrated Frames</strong>
+                    <span>Benchmark Sample Space:</span>
+                    <strong className="text-slate-900 dark:text-white font-mono">22 Multi-spectral Frames (11 Cyclones)</strong>
                   </div>
                 </div>
 
@@ -652,21 +657,23 @@ const AICycloneIntelligence = () => {
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-4">
               <div>
-                <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-2.5 flex-wrap">
                   <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-blue-500/15 text-blue-700 dark:text-blue-300 border border-blue-400/30">
                     MODULE 2: PATTERN CLASSIFICATION & STAGES
                   </span>
                   <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">
-                    Model: PatternNet-ViT v1.8
+                    Model: ResNet18-Dvorak-Morphology (Experimental)
                   </span>
+                  <DataTypeBadge type="ai" size="xs" label="AI ViT PREDICTION" isHindi={isHindi} />
+                  <LastUpdatedBadge source="PatternNet-ViT v1.8" isHindi={isHindi} size="xs" />
                 </div>
                 <h2 className="text-xl sm:text-2xl font-black font-heading tracking-tight text-slate-950 dark:text-white mt-1">
-                  {isHindi ? '5 चक्रवात आकारिकी पैटर्न एवं विकास चरण' : '5 Cyclone Morphological Patterns & Lifecycle Stages'}
+                  {isHindi ? '4 चक्रवात आकारिकी पैटर्न (प्रायोगिक प्रोटोटाइप)' : '4 Cyclone Morphological Patterns (Experimental Prototype)'}
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400">
                   {isHindi
-                    ? 'ड्वोरक तकनीक अनुसार 5 मुख्य आकारों (कर्व्ड बैंड, शीयर, सीडीओ, आई, एम्बेडेड सेंटर) का विज़न ट्रांसफार्मर वर्गीकरण।'
-                    : 'Vision Transformer (ViT) multi-class classifier categorizing structural morphology and Dvorak T-number intensities.'}
+                    ? 'ड्वोरक तकनीक अनुसार 4 सत्यापित आकारों (कर्व्ड बैंड, शीयर, आई, शांत बेसलाइन) का ResNet18 वर्गीकरण। सीमित लेबल वाले डेटा के कारण प्रायोगिक मॉडल।'
+                    : 'ResNet18 multi-class classifier with Grad-CAM categorizing structural morphology across 4 Dvorak patterns (Experimental morphology classifier — limited labeled imagery).'}
                 </p>
               </div>
 
@@ -768,7 +775,7 @@ const AICycloneIntelligence = () => {
               {/* Class Probability Distribution Chart (4 Cols) */}
               <div className="lg:col-span-4 bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl border border-slate-200 dark:border-slate-800">
                 <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 block mb-2 uppercase tracking-wider">
-                  ViT Probability Distribution
+                  Morphology Prediction Distribution (ResNet18)
                 </span>
                 <div className="h-44">
                   <ResponsiveContainer width="100%" height="100%">
@@ -786,7 +793,7 @@ const AICycloneIntelligence = () => {
                         tick={{ fontSize: 11, fill: '#64748b' }}
                       />
                       <Tooltip
-                        formatter={(val) => [`${val}%`, 'ViT Probability']}
+                        formatter={(val) => [`${val}%`, 'Model Prediction Confidence']}
                         contentStyle={{
                           borderRadius: '12px',
                           border: '1px solid rgba(255,255,255,0.2)',
@@ -881,13 +888,15 @@ const AICycloneIntelligence = () => {
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-4">
               <div>
-                <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-2.5 flex-wrap">
                   <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-400/30">
                     MODULE 3: MULTI-SOURCE DATA FUSION
                   </span>
                   <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">
                     Constellation Status: 6 Feeds Live
                   </span>
+                  <DataTypeBadge type="live" size="xs" label="LIVE SENSOR STREAMS" isHindi={isHindi} />
+                  <LastUpdatedBadge source="ISRO MOSDAC & INCOIS" isLive={true} isHindi={isHindi} size="xs" />
                 </div>
                 <h2 className="text-xl sm:text-2xl font-black font-heading tracking-tight text-slate-950 dark:text-white mt-1">
                   {isHindi ? 'बहु-स्रोत उपग्रह एवं तटीय रडार एकीकरण' : 'Multi-Source Satellite & Radar Telemetry Fusion'}
@@ -1014,7 +1023,7 @@ const AICycloneIntelligence = () => {
                   <span className="text-[10px] text-emerald-300 font-mono uppercase block">Stage 4</span>
                   <strong className="text-xs sm:text-sm font-bold block text-emerald-200">4. Neural Inference</strong>
                   <p className="text-[10px] text-slate-300">
-                    Inference dispatched to CNN, ViT, and Bi-LSTM models in &lt;150ms.
+                    Warm model inference executed across MobileNetV3, ResNet18, and GRU in ~95-178ms (Cold start: ~1.5s).
                   </p>
                 </div>
               </div>
@@ -1031,13 +1040,15 @@ const AICycloneIntelligence = () => {
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-4">
               <div>
-                <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-2.5 flex-wrap">
                   <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-500/15 text-purple-700 dark:text-purple-300 border border-purple-400/30">
                     MODULE 4: SPATIOTEMPORAL PREDICTION
                   </span>
                   <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">
-                    Model: CycloneForecast-BiLSTM v3.0
+                    Model: CycloneTrajectoryGRU-Seq2Seq
                   </span>
+                  <DataTypeBadge type="ai" size="xs" label="AI BiLSTM PREDICTION" isHindi={isHindi} />
+                  <LastUpdatedBadge source="BiLSTM Trajectory Engine" isHindi={isHindi} size="xs" />
                 </div>
                 <h2 className="text-xl sm:text-2xl font-black font-heading tracking-tight text-slate-950 dark:text-white mt-1">
                   {isHindi ? '72-घंटे का एआई प्रक्षेपवक्र एवं तीव्रता पूर्वानुमान' : '72-Hour AI Trajectory & Intensity Prediction Studio'}
@@ -1157,15 +1168,15 @@ const AICycloneIntelligence = () => {
             {/* Charts Grid: Wind Speed with Uncertainty Cone & Barometric Pressure */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               
-              {/* Chart 1: Wind Speed Forecast & AI Confidence Cone */}
+              {/* Chart 1: Wind Speed Forecast & MC-Dropout Epistemic Spread */}
               <div className="bg-white dark:bg-slate-900/90 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs space-y-3">
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">
-                      Wind Speed Forecast (km/h) & Confidence Cone
+                      Wind Speed Forecast (km/h) & MC-Dropout Epistemic Spread
                     </h4>
                     <span className="text-[11px] text-slate-400">
-                      Shaded area represents AI uncertainty envelope (upper/lower bounds)
+                      Shaded area represents MC-Dropout epistemic spread (Directionally useful, uncalibrated)
                     </span>
                   </div>
                   <span className="text-xs font-bold text-sky-600 dark:text-sky-400 font-mono">
@@ -1200,7 +1211,7 @@ const AICycloneIntelligence = () => {
                         stroke="transparent"
                         fill="#38bdf8"
                         fillOpacity={0.18}
-                        name="Upper Confidence Cone"
+                        name="MC-Dropout Epistemic Upper Bound (Uncalibrated)"
                       />
                       <Area
                         type="monotone"
@@ -1271,7 +1282,7 @@ const AICycloneIntelligence = () => {
                     72-Hour Spatiotemporal Trajectory Waypoints
                   </h4>
                   <span className="text-[11px] text-slate-400">
-                    Derived from Bi-LSTM spatiotemporal model coupling ocean steering vectors
+                    Derived from 2-layer GRU Seq2Seq model coupling ocean steering vectors
                   </span>
                 </div>
                 <span className="text-[10px] font-mono text-indigo-500 font-bold bg-indigo-50 dark:bg-indigo-950/50 px-2.5 py-1 rounded-full border border-indigo-200 dark:border-indigo-800">
@@ -1346,13 +1357,15 @@ const AICycloneIntelligence = () => {
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-4">
               <div>
-                <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-2.5 flex-wrap">
                   <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-400/30">
                     MODULE 5: HISTORICAL VALIDATION & ACCURACY
                   </span>
                   <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">
                     Ground Truth: IMD / RSMC Best Track Archive
                   </span>
+                  <DataTypeBadge type="historical" size="xs" label="GROUND TRUTH ARCHIVE" isHindi={isHindi} />
+                  <LastUpdatedBadge source="IMD & NOAA Best-Track" isHindi={isHindi} size="xs" />
                 </div>
                 <h2 className="text-xl sm:text-2xl font-black font-heading tracking-tight text-slate-950 dark:text-white mt-1">
                   {isHindi ? 'ऐतिहासिक चक्रवात सत्यापन एवं मॉडल सटीकता' : 'Historical Cyclone Ground-Truth Benchmarking'}
@@ -1474,14 +1487,14 @@ const AICycloneIntelligence = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">
-                    Model Accuracy Benchmark vs Global Numerical Weather Prediction (NWP)
+                    Model Accuracy Benchmark vs Linear Persistence Baseline (Held-out Test Storms DANA & BIPARJOY)
                   </h4>
                   <span className="text-[11px] text-slate-400">
-                    Mean Track Error (km) across lead times — Lower is better
+                    Mean Track Error (km) across lead times — Lower is better (Held-out DANA + BIPARJOY benchmark)
                   </span>
                 </div>
                 <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400">
-                  AI Outperforms NWP by ~32%
+                  GRU beats persistence by 86.0 km at +72h on the current held-out benchmark
                 </span>
               </div>
 
@@ -1500,9 +1513,9 @@ const AICycloneIntelligence = () => {
                         fontSize: '11px'
                       }}
                     />
-                    <Bar dataKey="VAYU" fill="#0284c7" radius={[4, 4, 0, 0]} name="VAYU AI (Our Model)" />
-                    <Bar dataKey="IMD_Official" fill="#94a3b8" radius={[4, 4, 0, 0]} name="IMD Official Consensus" />
-                    <Bar dataKey="ECMWF_IFS" fill="#64748b" radius={[4, 4, 0, 0]} name="ECMWF IFS Model" />
+                    <Bar dataKey="VAYU" fill="#0284c7" radius={[4, 4, 0, 0]} name="VAYU AI (GRU Seq2Seq)" />
+                    <Bar dataKey="Persistence" fill="#94a3b8" radius={[4, 4, 0, 0]} name="Linear Persistence Baseline" />
+                    <Bar dataKey="IMD_Official" fill="#64748b" radius={[4, 4, 0, 0]} name="IMD Climatological Reference" />
                   </BarChart>
                 </ResponsiveContainer>
               </div>

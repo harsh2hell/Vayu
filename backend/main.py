@@ -55,6 +55,37 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+@app.on_event("startup")
+async def startup_model_verification():
+    """Logs model name, checkpoint path, SHA-256, and parameter count at startup."""
+    import os
+    import hashlib
+    import backend.ml_engine.models.center_detector as cd
+    import backend.ml_engine.models.dvorak_classifier as dc
+    import backend.ml_engine.models.trajectory_gru as tg
+
+    print("=" * 80)
+    print("VAYU PHASE 3D — PRODUCTION MODEL WIRING VERIFICATION")
+    print("=" * 80)
+    models_to_log = [
+        ("CenterDetector", cyclone_vision_model.model, cd.CHECKPOINT_PATH, "MobileNetV3-Small-CenterFix"),
+        ("DvorakClassifier", pattern_classifier.model, dc.CHECKPOINT_PATH, "ResNet18-Dvorak-Morphology (4 Validated Classes)"),
+        ("TrajectoryGRU", cyclone_forecast_engine.model, tg.CHECKPOINT_PATH, "2-Layer GRU Seq2Seq (+6h to +72h 3-Hourly)")
+    ]
+    for label, m, ckpt, arch in models_to_log:
+        sha = "file_not_found"
+        if os.path.exists(ckpt):
+            with open(ckpt, "rb") as f:
+                sha = hashlib.sha256(f.read()).hexdigest()
+        p_count = sum(p.numel() for p in m.parameters())
+        print(f"[{label}]")
+        print(f"  Architecture:     {arch}")
+        print(f"  Checkpoint Path:  {ckpt}")
+        print(f"  SHA-256:          {sha}")
+        print(f"  Parameter Count:  {p_count:,}")
+        print("-" * 80)
+    print("=" * 80)
+
 # -------------------------------------------------------------
 # Register Modular v1 Routers
 # -------------------------------------------------------------
@@ -82,6 +113,8 @@ class TrackPredictionRequest(BaseModel):
     sst: float = 29.5
     vertical_shear_knots: float = 12.0
     basin: str = "Bay of Bengal"
+    past_track: Optional[List[Dict[str, Any]]] = None
+    storm_id: Optional[str] = None
 
 class BulletinGenerationRequest(BaseModel):
     cyclone_name: str = "Severe Cyclonic Storm DANA"
@@ -126,9 +159,9 @@ def health_check():
         "problem_statement": "SIH26070",
         "version": "4.0.0",
         "models_active": {
-            "detection": "CycloneVision-CNN v2.1 (ResNet-50 + SPP)",
-            "classification": "PatternNet-ViT v1.8 (5 Morphological Classes)",
-            "prediction": "CycloneForecast-LSTM v3.0 (24–72h Horizons)",
+            "detection": "MobileNetV3-Small-CenterFix (Phase 3B, 1,075,431 params)",
+            "classification": "ResNet18-Dvorak-Morphology (Phase 3B, 4 Validated Classes, 11,246,436 params)",
+            "prediction": "CycloneTrajectoryGRU-Seq2Seq (Phase 3D 3-Hourly Spatiotemporal, 41,764 params)",
             "fusion": "CycloneFusion-Engine v2.5 (Multispectral + Ocean + Shear)"
         },
         "database": "SQLite (cyclone_intel.db Active with 9 Tables)",
@@ -153,8 +186,18 @@ async def legacy_classify(file: Optional[UploadFile] = File(None), basin: str = 
 def legacy_predict_track(req: TrackPredictionRequest):
     prediction = cyclone_forecast_engine.predict_trajectory(
         current_lat=req.current_lat, current_lon=req.current_lon, current_wind=req.current_wind,
-        current_mslp=req.current_mslp, sst=req.sst, vertical_shear_knots=req.vertical_shear_knots, basin=req.basin
+        current_mslp=req.current_mslp, sst=req.sst, vertical_shear_knots=req.vertical_shear_knots, basin=req.basin,
+        past_track=req.past_track, storm_id=req.storm_id
     )
+    if not prediction.get("success", False) or prediction.get("forecast_status") == "INSUFFICIENT_HISTORY":
+        return {
+            "success": False,
+            "forecast_status": "INSUFFICIENT_HISTORY",
+            "message": prediction.get("message", "Trajectory forecasting requires at least 4 consecutive historical fixes (9 hours of track telemetry)."),
+            "required_fixes": prediction.get("required_fixes", 4),
+            "provided_fixes": prediction.get("provided_fixes", 0),
+            "available_storms": ["DANA", "BIPARJOY", "MOCHA", "OCKHI", "AMPHAN", "FANI", "BULBUL", "TITLI", "HUDHUD", "PHAILIN"]
+        }
     return {"success": True, "data": prediction}
 
 @app.post("/api/fuse")
@@ -212,10 +255,48 @@ def legacy_history(limit: int = Query(15, ge=1, le=100)):
 def legacy_benchmarks():
     return {
         "success": True,
+        "phase": "Phase 3D Production Real Benchmark (Corrected 3-Hourly Trajectory Horizons)",
+        "scientific_disclosure": "Real dataset benchmark evaluated on held-out North Indian Ocean cyclones (DANA, BIPARJOY).",
         "models": {
-            "detection": { "name": "CycloneVision-CNN v2.1", "accuracy_pct": 96.4, "eye_localization_error_km": 14.2 },
-            "classification": { "name": "PatternNet-ViT v1.8", "accuracy_pct": 94.8, "classes_supported": 5 },
-            "prediction": { "name": "CycloneForecast-LSTM v3.0", "track_mae_24h_km": 32.4, "intensity_mae_24h_kmh": 8.5 }
+            "detection": {
+                "name": "MobileNetV3-Small-CenterFix (Phase 3B)",
+                "checkpoint": "phase3b/vayu_detector_mobilenetv3_p3b.pt",
+                "accuracy_pct": 100.0,
+                "eye_localization_error_km": 52.33,
+                "validation_error_km": 25.65,
+                "test_false_positive_rate": 0.0,
+                "note": "Measured on real NASA GIBS held-out test frames (Cyclone DANA & BIPARJOY)"
+            },
+            "classification": {
+                "name": "ResNet18-Dvorak-Morphology (Phase 3B)",
+                "checkpoint": "phase3b/vayu_morph_resnet18_p3b.pt",
+                "classes_supported": 4,
+                "classes_authenticated": ["Eye Pattern", "Curved Band Pattern", "Shear Pattern", "Calm Baseline"],
+                "classes_insufficient": ["CDO (Insufficient NIO annotations)", "Embedded Center (Insufficient ground truth)"],
+                "validation_accuracy_pct": 50.0,
+                "test_accuracy_pct": 0.0,
+                "note": "Experimental prototype model with severe class imbalance (N=14 train)"
+            },
+            "prediction": {
+                "name": "CycloneTrajectoryGRU-Seq2Seq (Phase 3D Retrained)",
+                "checkpoint": "phase3b/vayu_track_gru_p3b.pt",
+                "sampling_interval_hours": 3.0,
+                "horizons": {
+                    "+6h": {"gru_mae_km": 68.9, "persistence_baseline_km": 25.5, "winner": "Persistence"},
+                    "+12h": {"gru_mae_km": 114.9, "persistence_baseline_km": 54.0, "winner": "Persistence"},
+                    "+18h": {"gru_mae_km": 158.9, "persistence_baseline_km": 82.8, "winner": "Persistence"},
+                    "+24h": {"gru_mae_km": 197.7, "persistence_baseline_km": 110.9, "winner": "Persistence"},
+                    "+48h": {"gru_mae_km": 278.7, "persistence_baseline_km": 251.4, "winner": "Persistence"},
+                    "+72h": {"gru_mae_km": 311.9, "persistence_baseline_km": 397.9, "winner": "GRU (Outperforms Persistence by 86.0 km)"}
+                },
+                "overall_test_mae_km": 178.5,
+                "obsolete_metrics": {
+                    "status": "OBSOLETE — INCORRECT 3-HOUR/6-HOUR LABELING",
+                    "old_reported_24h_km": 96.9,
+                    "old_reported_72h_km": 203.2,
+                    "explanation": "Phase 3B assumed 6-hour interval steps; step offset 4 was actually +12h, and step offset 12 was actually +36h. Phase 3D evaluates true +6h, +12h, +18h, +24h, +48h, +72h horizons."
+                }
+            }
         }
     }
 

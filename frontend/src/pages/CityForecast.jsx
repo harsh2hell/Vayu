@@ -35,6 +35,8 @@ import {
 } from 'lucide-react';
 import PublicNavbar from '../components/PublicNavbar';
 import IOSGlassCard from '../components/IOSGlassCard';
+import DataTypeBadge from '../components/DataTypeBadge';
+import LastUpdatedBadge from '../components/LastUpdatedBadge';
 import { CITY_FORECAST_DATA, getCityForecast, getCityAstronomy } from '../data/cityForecastData';
 import { COASTAL_CITIES_DATA } from '../data/coastalCitiesData';
 import { useLiveClock } from '../utils/liveDateTime';
@@ -660,10 +662,10 @@ const CityForecast = () => {
             </span>
           </div>
 
-          {/* Live Feed Status Tag */}
-          <div className="flex items-center gap-2 bg-emerald-500/10 border border-emerald-500/25 px-3 py-1 rounded-full text-xs text-emerald-700 dark:text-emerald-400 font-semibold">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>{isHindi ? 'इसरो मोसडैक उपग्रह डेटा' : 'ISRO MOSDAC Satellite Telemetry'}</span>
+          {/* Live Feed Status Tag & Timestamp */}
+          <div className="flex items-center gap-2 flex-wrap">
+            <DataTypeBadge type="live" label={isHindi ? 'आईएमडी एडब्ल्यूएस स्टेशन' : 'IMD AWS STATION FEED'} isHindi={isHindi} size="xs" />
+            <LastUpdatedBadge timestamp={liveClock.clockTimeStr + ' IST'} source="IMD AWS" isLive={true} isHindi={isHindi} size="xs" />
           </div>
         </div>
 

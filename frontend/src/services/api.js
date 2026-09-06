@@ -10,7 +10,7 @@ let activeBaseUrl = CANDIDATE_URLS[0];
 /**
  * Automatically resolves and caches the live active API base URL.
  */
-async function getLiveBaseUrl() {
+export async function getLiveBaseUrl() {
   for (const url of CANDIDATE_URLS) {
     try {
       const res = await fetch(`${url}/api/health`, { method: 'GET', signal: AbortSignal.timeout(1500) });
@@ -23,6 +23,19 @@ async function getLiveBaseUrl() {
     }
   }
   return activeBaseUrl;
+}
+
+/**
+ * Returns a standardized formatted IST timestamp for UI Last Updated displays.
+ */
+export function getFormattedLastUpdated() {
+  return new Date().toLocaleTimeString('en-IN', {
+    timeZone: 'Asia/Kolkata',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: true
+  }) + ' IST';
 }
 
 /**
@@ -62,40 +75,17 @@ export async function detectCycloneFromImage(imageFileOrBlob, basin = 'Bay of Be
     }
     throw new Error(`API returned ${response.status}`);
   } catch (err) {
-    console.warn('[VAYU API] Detection inference using fallback:', err);
+    console.error('[VAYU API] Detection inference error:', err);
     return {
-      success: true,
-      isLiveApi: false,
-      model_version: 'CycloneVision-CNN v2.1 (Neural Gateway)',
-      architecture: 'ResNet-50 + Spatial Pyramid Pooling (SPP)',
-      cyclone_detected: true,
-      confidence_percentage: 96.4,
-      coordinates: { latitude: 15.4, longitude: 87.8, formatted: '15.4°N, 87.8°E', basin: basin },
-      dvorak_classification: {
-        t_number: 'T3.5',
-        ci_number: 3.5,
-        category: 'Severe Cyclonic Storm',
-        estimated_wind_speed_kmh: 85,
-        estimated_wind_speed_knots: 46,
-        central_mslp_hpa: 980.0,
-        pressure_deficit_hpa: 13.0
-      },
-      radiometric_features: {
-        cdo_radius_km: 240.0,
-        cloud_top_min_temp_c: -78.4,
-        cloud_top_avg_temp_c: -42.1,
-        convective_cloud_ratio: 0.42,
-        spiral_curvature_deg: 260.0,
-        eye_status: 'Forming Warm Core Eye detected in IR Band'
-      },
-      bounding_box: { ymin: 0.22, xmin: 0.25, ymax: 0.78, xmax: 0.75, center_x_norm: 0.50, center_y_norm: 0.50 },
-      inference_time_ms: 142.5
+      success: false,
+      error: 'MODEL_UNAVAILABLE',
+      message: 'MODEL UNAVAILABLE: Backend connection required for live AI inference.'
     };
   }
 }
 
 /**
- * Classifies satellite frame into the 5 Dvorak morphological patterns.
+ * Classifies satellite frame into the 4 validated Dvorak morphological patterns.
  */
 export async function classifyMorphologyPattern(imageFileOrBlob, basin = 'Bay of Bengal', shearKnots = 12.0) {
   try {
@@ -118,22 +108,28 @@ export async function classifyMorphologyPattern(imageFileOrBlob, basin = 'Bay of
     }
     throw new Error(`API returned ${response.status}`);
   } catch (err) {
-    console.warn('[VAYU API] Classification fallback:', err);
-    return null;
+    console.error('[VAYU API] Classification error:', err);
+    return {
+      success: false,
+      error: 'MODEL_UNAVAILABLE',
+      message: 'MODEL UNAVAILABLE: Backend connection required for live AI inference.'
+    };
   }
 }
 
 /**
- * Predicts 72-hour cyclone spatiotemporal trajectory with BiLSTM.
+ * Predicts 72-hour cyclone spatiotemporal trajectory with Phase 3D GRU.
  */
 export async function predictCycloneTrack(params = {}) {
-  const currentLat = parseFloat(params.lat || 15.4);
-  const currentLon = parseFloat(params.lon || 87.8);
-  const currentWind = parseFloat(params.wind || 85.0);
-  const currentMslp = parseFloat(params.mslp || 980.0);
-  const sst = parseFloat(params.sst || 29.5);
-  const shear = parseFloat(params.shear || 12.0);
-  const basin = params.basin || 'Bay of Bengal';
+  const currentLat = parseFloat(params.current_lat ?? params.lat ?? 18.2);
+  const currentLon = parseFloat(params.current_lon ?? params.lon ?? 88.0);
+  const currentWind = parseFloat(params.current_wind ?? params.wind ?? 55.0);
+  const currentMslp = parseFloat(params.current_mslp ?? params.mslp ?? 988.0);
+  const sst = parseFloat(params.sst ?? 29.5);
+  const shear = parseFloat(params.shear ?? params.vertical_shear_knots ?? 12.0);
+  const basin = params.basin || (currentLon < 77.0 ? 'Arabian Sea' : 'Bay of Bengal');
+  const stormId = params.storm_id || (params.fullName?.includes('DANA') || params.name?.includes('DANA') ? 'DANA' : (params.fullName?.includes('BIPARJOY') || params.name?.includes('BIPARJOY') ? 'BIPARJOY' : undefined));
+  const pastTrack = params.past_track || undefined;
 
   try {
     const baseUrl = await getLiveBaseUrl();
@@ -147,71 +143,32 @@ export async function predictCycloneTrack(params = {}) {
         current_mslp: currentMslp,
         sst: sst,
         vertical_shear_knots: shear,
-        basin: basin
+        basin: basin,
+        storm_id: stormId,
+        past_track: pastTrack
       }),
     });
 
     if (response.ok) {
       const json = await response.json();
-      return { success: true, isLiveApi: true, ...json.data };
+      if (json.success && json.data) {
+        return { success: true, isLiveApi: true, ...json.data };
+      }
+      return {
+        success: false,
+        forecast_status: json.forecast_status || 'ERROR',
+        message: json.message || 'Forecast calculation unavailable.',
+        required_fixes: json.required_fixes,
+        provided_fixes: json.provided_fixes
+      };
     }
     throw new Error(`API returned ${response.status}`);
   } catch (err) {
-    console.warn('[VAYU API] Track prediction using client fallback:', err);
-    const latStep = basin === 'Bay of Bengal' ? 0.68 : 0.60;
-    const lonStep = basin === 'Bay of Bengal' ? -0.52 : 0.22;
-    const intensification = (sst >= 28.5 && shear < 15.0) ? 1.35 : 1.0;
-
-    const steps = [
-      { time: 'NOW', lead_hours: 0, lat: currentLat, lon: currentLon, wind: currentWind, pressure: currentMslp, stage: 'Initial Fix' },
-      { time: '+6h', lead_hours: 6, lat: +(currentLat + latStep * 1.0).toFixed(2), lon: +(currentLon + lonStep * 1.0).toFixed(2), wind: Math.round(currentWind + 8.0 * intensification), pressure: Math.round(currentMslp - 6.0), stage: 'Intensifying' },
-      { time: '+12h', lead_hours: 12, lat: +(currentLat + latStep * 2.2).toFixed(2), lon: +(currentLon + lonStep * 2.1).toFixed(2), wind: Math.round(currentWind + 18.0 * intensification), pressure: Math.round(currentMslp - 14.0), stage: 'Severe Cyclonic Storm' },
-      { time: '+24h', lead_hours: 24, lat: +(currentLat + latStep * 4.1).toFixed(2), lon: +(currentLon + lonStep * 3.8).toFixed(2), wind: Math.round(currentWind + 30.0 * intensification), pressure: Math.round(currentMslp - 25.0), stage: 'Peak Landfall Window' },
-      { time: '+48h', lead_hours: 48, lat: +(currentLat + latStep * 7.0).toFixed(2), lon: +(currentLon + lonStep * 6.0).toFixed(2), wind: Math.round(Math.max(55, currentWind + 15.0)), pressure: Math.round(currentMslp - 16.0), stage: 'Post-Landfall Weakening' },
-      { time: '+72h', lead_hours: 72, lat: +(currentLat + latStep * 9.8).toFixed(2), lon: +(currentLon + lonStep * 7.8).toFixed(2), wind: Math.round(Math.max(40, currentWind - 5.0)), pressure: Math.round(currentMslp - 8.0), stage: 'Depression Dissipation' },
-    ];
-
-    const landfallPt = steps[3];
+    console.error('[VAYU API] Track prediction error:', err);
     return {
-      success: true,
-      isLiveApi: false,
-      model_version: 'CycloneForecast-LSTM v3.0 (Calibrated Engine)',
-      basin: basin,
-      initial_fix: { latitude: currentLat, longitude: currentLon, wind_kmh: currentWind, pressure_hpa: currentMslp },
-      classification: {
-        category: 'Severe Cyclonic Storm',
-        dvorak_t_number: 'T3.5',
-        severity_level: 'HIGH THREAT',
-        peak_sustained_wind_kmh: landfallPt.wind,
-        lowest_mslp_hpa: landfallPt.pressure
-      },
-      landfall_prediction: {
-        target_sector: 'Gopalpur-Kalingapatnam Coastal Corridor',
-        coordinates: `${landfallPt.lat}°N, ${landfallPt.lon}°E`,
-        lat: landfallPt.lat,
-        lon: landfallPt.lon,
-        window: 'T+24 Hours (Next Day 14:30 IST)',
-        surge_estimate: '2.2 – 3.0 meters'
-      },
-      trajectory_forecast: steps,
-      track_polyline: steps.map(s => [s.lat, s.lon]),
-      cone_polygon: [
-        [currentLat, currentLon],
-        [+(currentLat + latStep * 1.5 + 0.6).toFixed(2), +(currentLon + lonStep * 1.5 + 0.8).toFixed(2)],
-        [+(currentLat + latStep * 4.0 + 1.2).toFixed(2), +(currentLon + lonStep * 4.0 + 1.5).toFixed(2)],
-        [+(currentLat + latStep * 7.5 + 2.0).toFixed(2), +(currentLon + lonStep * 7.5 + 1.8).toFixed(2)],
-        [+(currentLat + latStep * 7.5 - 1.5).toFixed(2), +(currentLon + lonStep * 7.5 - 2.0).toFixed(2)],
-        [+(currentLat + latStep * 4.0 - 1.0).toFixed(2), +(currentLon + lonStep * 4.0 - 1.2).toFixed(2)],
-        [+(currentLat + latStep * 1.5 - 0.5).toFixed(2), +(currentLon + lonStep * 1.5 - 0.6).toFixed(2)],
-        [currentLat, currentLon]
-      ],
-      coastal_strike_probabilities: [
-        { district: 'Gopalpur (Ganjam, Odisha)', state: 'Odisha', strike_prob_pct: 82, surge_height_m: '2.5 - 3.2m', rainfall_24h_mm: 240, threat_level: 'RED ALERT' },
-        { district: 'Kalingapatnam (Srikakulam, AP)', state: 'Andhra Pradesh', strike_prob_pct: 68, surge_height_m: '1.8 - 2.4m', rainfall_24h_mm: 180, threat_level: 'RED ALERT' },
-        { district: 'Puri & Jagatsinghpur (Odisha)', state: 'Odisha', strike_prob_pct: 55, surge_height_m: '1.5 - 2.0m', rainfall_24h_mm: 140, threat_level: 'ORANGE ALERT' },
-        { district: 'Visakhapatnam (AP)', state: 'Andhra Pradesh', strike_prob_pct: 42, surge_height_m: '1.0 - 1.5m', rainfall_24h_mm: 90, threat_level: 'YELLOW ALERT' },
-      ],
-      error_envelope: { track_error_24h_km: 32.4, track_error_48h_km: 68.5, track_error_72h_km: 112.0 }
+      success: false,
+      error: 'MODEL_UNAVAILABLE',
+      message: 'MODEL UNAVAILABLE: Backend connection required for live AI inference.'
     };
   }
 }
@@ -595,12 +552,14 @@ export async function fetchRainViewerLiveFrames() {
  */
 export async function fetchLiveCyclogenesisWatch(basin = 'Bay of Bengal') {
   try {
-    const base = await getBackendUrl();
+    const base = await getLiveBaseUrl();
     if (base) {
-      const res = await fetchWithTimeout(`${base}/api/cyclogenesis-watch?basin=${encodeURIComponent(basin)}`, {}, 3000);
+      const res = await fetch(`${base}/api/cyclogenesis-watch?basin=${encodeURIComponent(basin)}`, {
+        signal: AbortSignal.timeout(3000)
+      });
       if (res.ok) {
         const json = await res.json();
-        if (json.data) return json.data;
+        if (json.data) return { ...json.data, isLive: true, lastUpdated: getFormattedLastUpdated() };
       }
     }
   } catch (err) {
@@ -609,5 +568,56 @@ export async function fetchLiveCyclogenesisWatch(basin = 'Bay of Bengal') {
   return null;
 }
 
+/**
+ * Fetches real model inspector telemetry from backend.
+ */
+export async function inspectAIModels() {
+  try {
+    const baseUrl = await getLiveBaseUrl();
+    const res = await fetch(`${baseUrl}/api/v1/ml/inspect`, { method: 'GET' });
+    if (res.ok) {
+      return await res.json();
+    }
+    return null;
+  } catch (err) {
+    console.warn('[VAYU API] Model inspector fetch error:', err);
+    return null;
+  }
+}
 
+/**
+ * Compares VAYU forecasts with WeatherNext/ECMWF comparative benchmark.
+ */
+export async function compareWeatherNextBenchmark(stormId = 'cyclone_dana_2024') {
+  try {
+    const baseUrl = await getLiveBaseUrl();
+    const res = await fetch(`${baseUrl}/api/v1/ml/benchmark-compare?storm_id=${encodeURIComponent(stormId)}`, { method: 'GET' });
+    if (res.ok) {
+      const json = await res.json();
+      return json.data;
+    }
+    return null;
+  } catch (err) {
+    console.warn('[VAYU API] Benchmark compare error:', err);
+    return null;
+  }
+}
+
+/**
+ * Fetches Phase 3B/3D measured real-model benchmark metrics.
+ */
+export async function fetchModelBenchmarks() {
+  try {
+    const baseUrl = await getLiveBaseUrl();
+    const res = await fetch(`${baseUrl}/api/benchmarks`, { method: 'GET' });
+    if (res.ok) {
+      const json = await res.json();
+      return json;
+    }
+    return null;
+  } catch (err) {
+    console.warn('[VAYU API] Failed to fetch benchmarks:', err);
+    return null;
+  }
+}
 

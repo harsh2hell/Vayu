@@ -1,0 +1,146 @@
+{
+  "storm_id": "BIPARJOY_2023",
+  "name": "Extremely Severe Cyclonic Storm BIPARJOY",
+  "basin": "Arabian Sea",
+  "season": "Pre-Monsoon 2023",
+  "bbox": [
+    17.0,
+    64.0,
+    25.0,
+    72.0
+  ],
+  "initial_fix_t0": {
+    "timestamp": "2023-06-14T06:00:00Z",
+    "lat": 21.9,
+    "lon": 66.3,
+    "wind_knots": 85.0,
+    "wind_kmh": 157.0,
+    "mslp_hpa": 966.0,
+    "dvorak_t": 5.0,
+    "stage": "Very Severe Cyclonic Storm"
+  },
+  "history_past_24h": [
+    {
+      "time": "t-18h",
+      "lat": 20.4,
+      "lon": 67.0,
+      "wind_knots": 90.0,
+      "mslp_hpa": 960.0
+    },
+    {
+      "time": "t-12h",
+      "lat": 20.9,
+      "lon": 66.8,
+      "wind_knots": 88.0,
+      "mslp_hpa": 962.0
+    },
+    {
+      "time": "t-6h",
+      "lat": 21.4,
+      "lon": 66.5,
+      "wind_knots": 86.0,
+      "mslp_hpa": 964.0
+    },
+    {
+      "time": "t0",
+      "lat": 21.9,
+      "lon": 66.3,
+      "wind_knots": 85.0,
+      "mslp_hpa": 966.0
+    }
+  ],
+  "future_ground_truth_72h": [
+    {
+      "lead_hours": 6,
+      "lat": 22.3,
+      "lon": 66.8,
+      "wind_knots": 80.0,
+      "mslp_hpa": 968.0,
+      "stage": "Recurving Northeast"
+    },
+    {
+      "lead_hours": 12,
+      "lat": 22.8,
+      "lon": 67.6,
+      "wind_knots": 75.0,
+      "mslp_hpa": 972.0,
+      "stage": "Approaching Saurashtra/Kutch"
+    },
+    {
+      "lead_hours": 18,
+      "lat": 23.3,
+      "lon": 68.6,
+      "wind_knots": 65.0,
+      "mslp_hpa": 978.0,
+      "stage": "Landfall (Near Jakhau Port)"
+    },
+    {
+      "lead_hours": 24,
+      "lat": 23.8,
+      "lon": 69.7,
+      "wind_knots": 48.0,
+      "mslp_hpa": 984.0,
+      "stage": "Inland over Kutch"
+    },
+    {
+      "lead_hours": 48,
+      "lat": 24.6,
+      "lon": 71.4,
+      "wind_knots": 28.0,
+      "mslp_hpa": 994.0,
+      "stage": "Deep Depression (South Rajasthan)"
+    },
+    {
+      "lead_hours": 72,
+      "lat": 25.5,
+      "lon": 73.2,
+      "wind_knots": 18.0,
+      "mslp_hpa": 1002.0,
+      "stage": "Remnant Low"
+    }
+  ],
+  "weathernext_ecmwf_forecast": [
+    {
+      "lead_hours": 6,
+      "lat": 22.25,
+      "lon": 66.85,
+      "wind_knots": 79.0,
+      "mslp_hpa": 969.0
+    },
+    {
+      "lead_hours": 12,
+      "lat": 22.75,
+      "lon": 67.7,
+      "wind_knots": 74.0,
+      "mslp_hpa": 973.0
+    },
+    {
+      "lead_hours": 18,
+      "lat": 23.28,
+      "lon": 68.72,
+      "wind_knots": 64.0,
+      "mslp_hpa": 979.0
+    },
+    {
+      "lead_hours": 24,
+      "lat": 23.75,
+      "lon": 69.8,
+      "wind_knots": 47.0,
+      "mslp_hpa": 985.0
+    },
+    {
+      "lead_hours": 48,
+      "lat": 24.52,
+      "lon": 71.55,
+      "wind_knots": 27.0,
+      "mslp_hpa": 995.0
+    },
+    {
+      "lead_hours": 72,
+      "lat": 25.4,
+      "lon": 73.35,
+      "wind_knots": 17.0,
+      "mslp_hpa": 1003.0
+    }
+  ]
+}

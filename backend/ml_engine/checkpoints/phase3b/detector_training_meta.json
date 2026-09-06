@@ -1,0 +1,59 @@
+{
+  "model_name": "MobileNetV3-Small-CenterFix",
+  "checkpoint_path": "/Users/harsh/Library/CloudStorage/GoogleDrive-harendrapratap5828@gmail.com/My Drive/Tahoe/Documents/ai-cyclone/backend/ml_engine/checkpoints/phase3b/vayu_detector_mobilenetv3_p3b.pt",
+  "checkpoint_sha256": "ace2239bf27ef1718b2d04386d71d95633df04dd52151572787993dae6765c86",
+  "parameters_count": 1075431,
+  "epochs": 35,
+  "learning_rate": 0.0008,
+  "seed": 42,
+  "training_samples": 14,
+  "validation_samples": 4,
+  "test_samples": 4,
+  "validation_metrics": {
+    "samples_evaluated": 4,
+    "true_positives": 4,
+    "true_negatives": 0,
+    "false_positives": 0,
+    "false_negatives": 0,
+    "accuracy": 100.0,
+    "precision": 100.0,
+    "recall": 100.0,
+    "f1_score": 100.0,
+    "mean_cle_pixels_512": 13.85,
+    "mean_cle_km": 25.65,
+    "calm_samples": 0,
+    "false_positive_rate_calm": 0.0
+  },
+  "test_metrics": {
+    "samples_evaluated": 4,
+    "true_positives": 4,
+    "true_negatives": 0,
+    "false_positives": 0,
+    "false_negatives": 0,
+    "accuracy": 100.0,
+    "precision": 100.0,
+    "recall": 100.0,
+    "f1_score": 100.0,
+    "mean_cle_pixels_512": 26.48,
+    "mean_cle_km": 52.33,
+    "calm_samples": 0,
+    "false_positive_rate_calm": 0.0
+  },
+  "train_storms": [
+    "TITLI",
+    "HUDHUD",
+    "BULBUL",
+    "AMBIENT_CALM",
+    "PHAILIN",
+    "AMPHAN",
+    "FANI"
+  ],
+  "val_storms": [
+    "MOCHA",
+    "OCKHI"
+  ],
+  "test_storms": [
+    "DANA",
+    "BIPARJOY"
+  ]
+}

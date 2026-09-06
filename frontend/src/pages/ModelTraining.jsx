@@ -216,7 +216,7 @@ const ModelTraining = () => {
                   AI / ML Training Studio & NetCDF Supercomputing Hub
                 </h1>
                 <p className="text-xs text-slate-500 font-medium mt-0.5">
-                  Multi-Source PyTorch Deep Learning Pipeline • Automated Eye Detection • ViT Pattern Classifier • Uncertainty BiLSTM
+                  Multi-Source PyTorch Deep Learning Pipeline • Automated Eye Detection • ResNet18 Pattern Classifier • 2-Layer GRU Seq2Seq
                 </p>
               </div>
             </div>
@@ -248,27 +248,27 @@ const ModelTraining = () => {
                 </div>
                 <div>
                   <h3 className="font-bold text-base text-slate-900 leading-tight">
-                    CycloneVision-YOLO
+                    MobileNetV3-Small-CenterFix
                   </h3>
                   <p className="text-xs text-slate-500 font-medium mt-0.5">
-                    Spatial Pyramid Pooling (SPP) Eye Detector
+                    Vortex Detection & Eye Regression Engine
                   </p>
                 </div>
               </div>
-              <span className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-sky-50 text-sky-800 border border-sky-200/80 whitespace-nowrap">
-                38.4M Params
+              <span className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 border border-emerald-200/80 whitespace-nowrap">
+                1.08M Params
               </span>
             </div>
 
             <p className="text-xs text-slate-600 leading-relaxed pt-1">
-              Multi-scale ResNet-50 backbone with Spatial Pyramid Pooling for sub-kilometer cyclone vortex pinpointing and bounding box regression.
+              Dual-head MobileNetV3-Small architecture for sub-degree cyclone vortex pinpointing, objectness scoring, and bounding box regression (Phase 3B).
             </p>
           </div>
 
           <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-            <span className="text-xs text-slate-500 font-medium">Eye Fix Accuracy:</span>
+            <span className="text-xs text-slate-500 font-medium">Eye Fix Error (Val / Test):</span>
             <span className="text-xs font-bold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-md border border-emerald-200/60">
-              96.4% Precision
+              25.6 km (Val) / 38.2 km (Test) CLE
             </span>
           </div>
         </div>
@@ -283,27 +283,27 @@ const ModelTraining = () => {
                 </div>
                 <div>
                   <h3 className="font-bold text-base text-slate-900 leading-tight">
-                    PatternNet-ViT
+                    ResNet18-Dvorak-Morphology
                   </h3>
                   <p className="text-xs text-slate-500 font-medium mt-0.5">
-                    Vision Transformer Morphology Classifier
+                    4-Class Dvorak Morphology Classifier
                   </p>
                 </div>
               </div>
               <span className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-indigo-50 text-indigo-800 border border-indigo-200/80 whitespace-nowrap">
-                86.2M Params
+                11.2M Params
               </span>
             </div>
 
             <p className="text-xs text-slate-600 leading-relaxed pt-1">
-              196 multi-spectral patch tokens capturing global spiral cloud correlations across 5 Dvorak morphological classes with Grad-CAM extraction.
+              Deep residual network capturing convective spiral feeder bands across 4 validated Dvorak morphological classes with autograd Grad-CAM (Phase 3B).
             </p>
           </div>
 
           <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-            <span className="text-xs text-slate-500 font-medium">Pattern Accuracy:</span>
+            <span className="text-xs text-slate-500 font-medium">Pattern Validation Score:</span>
             <span className="text-xs font-bold text-indigo-700 bg-indigo-50 px-2.5 py-1 rounded-md border border-indigo-200/60">
-              94.8% Top-1 Score
+              50.0% Validated (4 Classes)
             </span>
           </div>
         </div>
@@ -318,27 +318,27 @@ const ModelTraining = () => {
                 </div>
                 <div>
                   <h3 className="font-bold text-base text-slate-900 leading-tight">
-                    Uncertainty-BiLSTM
+                    CycloneTrajectoryGRU-Seq2Seq
                   </h3>
                   <p className="text-xs text-slate-500 font-medium mt-0.5">
-                    Physics-Informed Trajectory Engine
+                    Spatiotemporal Trajectory Forecaster
                   </p>
                 </div>
               </div>
               <span className="text-xs font-semibold px-2.5 py-1 rounded-lg bg-amber-50 text-amber-800 border border-amber-200/80 whitespace-nowrap">
-                14.1M Params
+                41.8K Params
               </span>
             </div>
 
             <p className="text-xs text-slate-600 leading-relaxed pt-1">
-              Spatiotemporal forecaster integrating ocean sea surface temperature, vertical wind shear, and planetary Coriolis force with Monte Carlo Dropout.
+              2-Layer GRU Seq2Seq with 10 canonical kinematic features, 3-hourly spatiotemporal step offsets, and 25-pass Monte Carlo Dropout epistemic spread (Phase 3D).
             </p>
           </div>
 
           <div className="pt-4 border-t border-slate-100 flex items-center justify-between">
-            <span className="text-xs text-slate-500 font-medium">24h Track Lead Error:</span>
+            <span className="text-xs text-slate-500 font-medium">72h Trajectory Benchmark:</span>
             <span className="text-xs font-bold text-amber-800 bg-amber-50 px-2.5 py-1 rounded-md border border-amber-200/60">
-              ±31.4 km MAE
+              GRU beats persistence by 86.0 km at +72h on current held-out benchmark
             </span>
           </div>
         </div>
@@ -496,10 +496,10 @@ const ModelTraining = () => {
             <div className="flex items-center justify-between border-b border-slate-100 pb-4">
               <div>
                 <h3 className="font-bold text-base text-slate-900">
-                  Multi-Model Training Loss & Trajectory Error Convergence
+                  Continuous Loss & Trajectory Convergence Dashboard
                 </h3>
                 <p className="text-xs text-slate-500 font-medium mt-0.5">
-                  Real-time loss decay across CNN, ViT, and BiLSTM 24h MAE error reduction
+                  Real-time loss decay across MobileNetV3, ResNet18, and GRU Seq2Seq
                 </p>
               </div>
               {trainResult && (
@@ -528,7 +528,7 @@ const ModelTraining = () => {
                   <Tooltip contentStyle={{ fontSize: 12, borderRadius: 12, border: '1px solid #E2E8F0', boxShadow: '0 4px 12px rgba(0,0,0,0.05)' }} />
                   <Legend wrapperStyle={{ fontSize: 12, paddingTop: 10 }} />
                   <Area yAxisId="left" type="monotone" dataKey="cnn_loss" name="CycloneVision-CNN Loss" stroke="#0284C7" fillOpacity={1} fill="url(#cnnGrad)" strokeWidth={2.5} />
-                  <Area yAxisId="left" type="monotone" dataKey="vit_loss" name="PatternNet-ViT Loss" stroke="#6366F1" fillOpacity={1} fill="url(#vitGrad)" strokeWidth={2.5} />
+                  <Area yAxisId="left" type="monotone" dataKey="vit_loss" name="ResNet18 Morphology Loss" stroke="#6366F1" fillOpacity={1} fill="url(#vitGrad)" strokeWidth={2.5} />
                   <Area yAxisId="right" type="monotone" dataKey="mae_track_km" name="24h Track Error (km)" stroke="#EF4444" strokeWidth={2} strokeDasharray="5 5" fill="none" />
                 </AreaChart>
               </ResponsiveContainer>
@@ -539,16 +539,16 @@ const ModelTraining = () => {
               <div className="space-y-0.5">
                 <span className="text-slate-500 text-xs font-medium block">Final 24h MAE</span>
                 <span className="font-bold text-sky-700 text-lg block">
-                  {trainResult ? `${trainResult.metrics.final_24h_track_error_km} km` : '31.4 km'}
+                  {trainResult ? `${trainResult.metrics.final_24h_track_error_km} km` : '197.7 km'}
                 </span>
               </div>
               <div className="space-y-0.5">
-                <span className="text-slate-500 text-xs font-medium block">ViT Accuracy</span>
-                <span className="font-bold text-indigo-700 text-lg block">94.8% Score</span>
+                <span className="text-slate-500 text-xs font-medium block">Morphology Val</span>
+                <span className="font-bold text-indigo-700 text-lg block">50.0% Score</span>
               </div>
               <div className="space-y-0.5">
-                <span className="text-slate-500 text-xs font-medium block">Vmax RMSE</span>
-                <span className="font-bold text-emerald-700 text-lg block">6.8 knots</span>
+                <span className="text-slate-500 text-xs font-medium block">GRU vs Persistence (+72h)</span>
+                <span className="font-bold text-emerald-700 text-lg block">+86.0 km</span>
               </div>
               <div className="space-y-0.5">
                 <span className="text-slate-500 text-xs font-medium block">Saved Weights</span>

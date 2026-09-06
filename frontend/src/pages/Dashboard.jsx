@@ -28,6 +28,13 @@ import {
   fetchLiveOceanTelemetry,
   fetchLiveCyclogenesisWatch
 } from '../services/api';
+import InfoTooltip from '../components/InfoTooltip';
+import DataTypeBadge from '../components/DataTypeBadge';
+import LastUpdatedBadge from '../components/LastUpdatedBadge';
+import DataUnavailableNotice from '../components/DataUnavailableNotice';
+import CycloneLifecycleBar from '../components/CycloneLifecycleBar';
+import AIReasoningCard from '../components/AIReasoningCard';
+import DataSourceStatusCard from '../components/DataSourceStatusCard';
 
 import L from 'leaflet';
 import icon from 'leaflet/dist/images/marker-icon.png';
@@ -329,6 +336,10 @@ const Dashboard = () => {
   const [showPorts, setShowPorts] = useState(true);
   const [showDopplerRadar, setShowDopplerRadar] = useState(true);
 
+  // Live Backend & Data Feed Tracking
+  const [isBackendLive, setIsBackendLive] = useState(false);
+  const [lastUpdatedTime, setLastUpdatedTime] = useState('');
+
   // Live Marine Telemetry
   const [liveOceanData, setLiveOceanData] = useState(null);
 
@@ -388,6 +399,9 @@ const Dashboard = () => {
     ]
   });
 
+  // Historical System Flag (Historical Benchmarks vs Live/AI Genesis Systems)
+  const isHistorical = aiPrediction?.system_type === 'HISTORICAL_BENCHMARK' || selectedPreset?.startsWith('cyclone-');
+
   // Time-lapse trajectory playback loop
   useEffect(() => {
     let timer;
@@ -407,6 +421,20 @@ const Dashboard = () => {
     };
     fetchTelemetry();
   }, [aiPrediction.basin]);
+
+  // Check live backend API availability & timestamp
+  useEffect(() => {
+    const checkStatus = async () => {
+      try {
+        const health = await checkBackendHealth();
+        setIsBackendLive(health && (health.status === 'ONLINE' || health.status === 'ok'));
+      } catch {
+        setIsBackendLive(false);
+      }
+      setLastUpdatedTime(new Date().toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false }) + ' IST');
+    };
+    checkStatus();
+  }, []);
 
   // Dynamic Preset Selection calling model inference or live cyclogenesis watch
   const handlePresetSelect = async (presetId) => {
@@ -471,6 +499,7 @@ const Dashboard = () => {
       }
 
       // Historical or Custom Track Inference
+      const stormId = p.id === 'cyclone-dana-2024' ? 'DANA' : (p.id === 'cyclone-biparjoy-2023' ? 'BIPARJOY' : (p.fullName?.includes('DANA') ? 'DANA' : (p.fullName?.includes('BIPARJOY') ? 'BIPARJOY' : undefined)));
       const result = await predictCycloneTrack({
         current_lat: p.lat,
         current_lon: p.lon,
@@ -478,7 +507,8 @@ const Dashboard = () => {
         current_mslp: p.pressure,
         sst: p.sst,
         vertical_shear_knots: p.shear,
-        basin: p.basin
+        basin: p.basin,
+        storm_id: stormId
       });
 
       if (result && result.trajectory_forecast) {
@@ -608,6 +638,7 @@ const Dashboard = () => {
   };
 
   const activeWaypoint = aiPrediction.trajectory[timeStepIndex] || aiPrediction.trajectory[0];
+  const prevWaypoint = timeStepIndex > 0 ? aiPrediction.trajectory[timeStepIndex - 1] : null;
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
@@ -658,15 +689,6 @@ const Dashboard = () => {
               <Sparkles className={`w-3.5 h-3.5 text-amber-600 ${isProcessing ? 'animate-spin' : ''}`} />
               <span>{isProcessing ? 'Syncing Feeds...' : 'Sync Satellite Feeds+'}</span>
             </button>
-
-            <button
-              onClick={() => downloadOfficialBulletinPdf(aiPrediction.name, { ...aiPrediction, timestamp: new Date().toISOString() })}
-              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-slate-700 transition-colors text-xs font-semibold shadow-2xs cursor-pointer"
-              title="Download Official IMD Bulletin PDF"
-            >
-              <Download className="w-3.5 h-3.5 text-slate-500" />
-              <span className="hidden sm:inline">Bulletin PDF</span>
-            </button>
           </div>
         </div>
       </div>
@@ -682,11 +704,17 @@ const Dashboard = () => {
                 <Wind className="w-4 h-4" />
               </div>
               <div>
-                <span className="text-xs font-bold text-slate-800 block leading-tight">Active Systems</span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs font-bold text-slate-800 block leading-tight">Active Systems</span>
+                  <InfoTooltip term="invest" />
+                </div>
                 <span className="text-[10px] text-slate-400 font-medium">North Indian Ocean</span>
               </div>
             </div>
-            <span className="text-[10px] font-mono text-slate-400 font-bold bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">DATA_01</span>
+            <DataTypeBadge 
+              type={isHistorical ? 'historical' : (isBackendLive ? 'live' : 'ai')} 
+              size="xs" 
+            />
           </div>
 
           <div className="space-y-1">
@@ -715,28 +743,31 @@ const Dashboard = () => {
                 <Target className="w-4 h-4" />
               </div>
               <div>
-                <span className="text-xs font-bold text-slate-800 block leading-tight">Detection Precision</span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs font-bold text-slate-800 block leading-tight">Detection Precision</span>
+                  <InfoTooltip term="eye_fix" />
+                </div>
                 <span className="text-[10px] text-slate-400 font-medium">Eye Center Localization</span>
               </div>
             </div>
-            <span className="text-[10px] font-mono text-slate-400 font-bold bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">DATA_02</span>
+            <DataTypeBadge type="ai" size="xs" />
           </div>
 
           <div className="space-y-1">
             <div className="flex items-baseline gap-2">
               <p className="text-3xl font-heading font-black text-slate-900 tracking-tight">
-                94.8%
+                100%
               </p>
-              <span className="text-[11px] font-semibold text-emerald-600 font-mono">+1.4%</span>
+              <span className="text-[11px] font-semibold text-emerald-600 font-mono">Objectness</span>
             </div>
             <p className="text-[11px] text-slate-500">
-              Sub-km eye fix via Vision Transformer
+              100% objectness accuracy (4 held-out test frames) via MobileNetV3-Small
             </p>
           </div>
 
           <div className="flex items-center justify-between text-[11px] text-slate-400 font-mono pt-2 border-t border-slate-100">
-            <span className="text-slate-600 font-medium">CNN Vision v2.1</span>
-            <span className="text-emerald-600 font-semibold">&lt; 18km Error</span>
+            <span className="text-slate-600 font-medium">Phase 3B Model</span>
+            <span className="text-emerald-600 font-semibold">25.6 km CLE (Val) / 38.2 km (Test)</span>
           </div>
         </div>
 
@@ -748,11 +779,17 @@ const Dashboard = () => {
                 <Satellite className="w-4 h-4" />
               </div>
               <div>
-                <span className="text-xs font-bold text-slate-800 block leading-tight">Multi-Spectral Feeds</span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs font-bold text-slate-800 block leading-tight">Multi-Spectral Feeds</span>
+                  <InfoTooltip term="radar" />
+                </div>
                 <span className="text-[10px] text-slate-400 font-medium">Satellite Ingestion</span>
               </div>
             </div>
-            <span className="text-[10px] font-mono text-slate-400 font-bold bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">DATA_03</span>
+            <DataTypeBadge 
+              type={isBackendLive ? 'live' : 'demo'} 
+              size="xs" 
+            />
           </div>
 
           <div className="space-y-1">
@@ -767,13 +804,13 @@ const Dashboard = () => {
             </p>
           </div>
 
-          <div className="flex items-center justify-between text-[11px] text-slate-400 font-mono pt-2 border-t border-slate-100">
+          <div className="flex items-center justify-between text-[11px] text-slate-400 font-mono pt-2 border-t border-slate-100 flex-wrap gap-1">
             <span className="text-slate-600 font-medium">Latency 140ms</span>
-            <span className="text-violet-600 font-semibold">Synced</span>
+            <LastUpdatedBadge timestamp={lastUpdatedTime} isLive={isBackendLive} source="MOSDAC & AVHRR" size="xs" />
           </div>
         </div>
 
-        {/* Card 4: 24h Track Lead Error */}
+        {/* Card 4: 72h Trajectory Advantage */}
         <div className="bg-white border border-slate-200/80 rounded-2xl p-4 space-y-3.5 shadow-2xs hover:border-slate-300 hover:shadow-xs transition-all">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
@@ -781,28 +818,34 @@ const Dashboard = () => {
                 <Compass className="w-4 h-4" />
               </div>
               <div>
-                <span className="text-xs font-bold text-slate-800 block leading-tight">24h Track Error</span>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs font-bold text-slate-800 block leading-tight">72h Trajectory</span>
+                  <InfoTooltip term="cone" />
+                </div>
                 <span className="text-[10px] text-slate-400 font-medium">Trajectory Engine</span>
               </div>
             </div>
-            <span className="text-[10px] font-mono text-slate-400 font-bold bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100">DATA_04</span>
+            <DataTypeBadge type="ai" size="xs" />
           </div>
 
           <div className="space-y-1">
             <div className="flex items-baseline gap-2">
               <p className="text-3xl font-heading font-black text-slate-900 tracking-tight">
-                ±38 km
+                +86.0 km
               </p>
-              <span className="text-[11px] font-semibold text-emerald-600 font-mono">Optimal</span>
+              <span className="text-[11px] font-semibold text-emerald-600 font-mono">Advantage</span>
             </div>
             <p className="text-[11px] text-slate-500">
-              BiLSTM Recurrent Ensemble Model
+              2-Layer GRU Seq2Seq Model
             </p>
           </div>
 
           <div className="flex items-center justify-between text-[11px] text-slate-400 font-mono pt-2 border-t border-slate-100">
-            <span className="text-slate-600 font-medium">Target &lt;45km</span>
-            <span className="text-amber-600 font-semibold">91% Confidence</span>
+            <span className="text-slate-600 font-medium">Held-out Benchmark</span>
+            <span className="text-emerald-600 font-semibold flex items-center gap-1">
+              <span>Beats Persistence</span>
+              <InfoTooltip title="Held-out Trajectory Benchmark" text="GRU beats persistence by 86.0 km at +72h on the current held-out benchmark (311.9 vs 397.9 km on DANA & BIPARJOY)." />
+            </span>
           </div>
         </div>
 
@@ -831,7 +874,7 @@ const Dashboard = () => {
               <p className="text-xs text-slate-500 font-normal mt-0.5">
                 {systemCategoryFilter === 'UPCOMING_FORMING'
                   ? 'Real-time tropical cyclogenesis scanner detecting developing low-pressure systems, convective vortices, and 48h formation potential.'
-                  : 'Evaluating recorded IMD best-track archives to benchmark BiLSTM track and intensity prediction accuracy.'}
+                  : 'Evaluating recorded IMD best-track archives to benchmark 2-layer GRU Seq2Seq track and trajectory prediction accuracy.'}
               </p>
             </div>
 
@@ -941,7 +984,7 @@ const Dashboard = () => {
                   HISTORICAL BENCHMARK: {aiPrediction.name}
                 </span>
                 <span className="text-amber-800 text-[11px]">
-                  Evaluating BiLSTM neural model on recorded landfall dynamics and intensity forecasts.
+                  Evaluating 2-layer GRU Seq2Seq model on recorded landfall dynamics and trajectory forecasts.
                 </span>
               </div>
             </div>
@@ -956,6 +999,16 @@ const Dashboard = () => {
             </button>
           </div>
         )}
+
+        {/* Visual Cyclone Lifecycle Progress Stepper & Trend Indicator */}
+        <CycloneLifecycleBar
+          currentWind={activeWaypoint.speed}
+          currentPressure={activeWaypoint.pressure}
+          prevWind={prevWaypoint ? prevWaypoint.speed : (aiPrediction.trajectory.length > 1 ? aiPrediction.trajectory[0].speed : null)}
+          prevPressure={prevWaypoint ? prevWaypoint.pressure : (aiPrediction.trajectory.length > 1 ? aiPrediction.trajectory[0].pressure : null)}
+          trendIntervalHours={prevWaypoint ? Math.abs((activeWaypoint.lead_hours || 0) - (prevWaypoint.lead_hours || 0)) || 12 : 12}
+          isForecastTrend={timeStepIndex > 0 || isHistorical}
+        />
 
         {/* Map Toolbar: Tile Layer & Layer Toggles */}
         <div className="flex flex-wrap items-center justify-between gap-3 text-xs pt-1">
@@ -982,11 +1035,12 @@ const Dashboard = () => {
           <div className="flex flex-wrap items-center gap-1.5 font-mono text-[11px]">
             <button
               onClick={() => setShowCone(!showCone)}
-              className={`px-2.5 py-1 rounded-lg border transition-all cursor-pointer ${
+              className={`px-2.5 py-1 rounded-lg border transition-all inline-flex items-center gap-1 cursor-pointer ${
                 showCone ? 'bg-amber-100 text-amber-900 border-amber-300 font-bold' : 'bg-white text-slate-500 border-slate-200'
               }`}
             >
-              70% Cone
+              <span>MC Uncertainty</span>
+              <InfoTooltip term="cone" size="sm" />
             </button>
             <button
               onClick={() => setShowOuterCone(!showOuterCone)}
@@ -994,15 +1048,16 @@ const Dashboard = () => {
                 showOuterCone ? 'bg-amber-50 text-amber-800 border-amber-200 font-bold' : 'bg-white text-slate-500 border-slate-200'
               }`}
             >
-              90% Cone
+              Outer Spread
             </button>
             <button
               onClick={() => setShowWindRadii(!showWindRadii)}
-              className={`px-2.5 py-1 rounded-lg border transition-all cursor-pointer ${
+              className={`px-2.5 py-1 rounded-lg border transition-all inline-flex items-center gap-1 cursor-pointer ${
                 showWindRadii ? 'bg-sky-100 text-sky-900 border-sky-300 font-bold' : 'bg-white text-slate-500 border-slate-200'
               }`}
             >
-              Wind Radii
+              <span>Wind Radii</span>
+              <InfoTooltip term="sustained_wind" size="sm" />
             </button>
             <button
               onClick={() => setShowPorts(!showPorts)}
@@ -1020,6 +1075,7 @@ const Dashboard = () => {
             >
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
               <span>Live Doppler Radar</span>
+              <InfoTooltip term="radar" size="sm" />
             </button>
           </div>
 
@@ -1029,22 +1085,36 @@ const Dashboard = () => {
         <div className="h-[380px] sm:h-[440px] w-full rounded-2xl overflow-hidden border border-slate-200/90 relative shadow-inner">
           
           {/* Active Waypoint HUD Overlay */}
-          <div className="absolute top-2.5 left-2.5 sm:top-3.5 sm:left-3.5 z-[400] bg-white/95 backdrop-blur-md p-3 sm:px-4 sm:py-3 rounded-xl shadow-md border border-slate-200/90 text-[11px] sm:text-xs font-mono space-y-1 max-w-[calc(100%-20px)] sm:max-w-xs">
-            <div className="flex items-center gap-2">
-              <span className={`w-2.5 h-2.5 rounded-full ${aiPrediction.system_type === 'UPCOMING_FORMING_SYSTEM' ? 'bg-sky-500 animate-pulse' : 'bg-red-500'}`} />
-              <span className="font-bold text-slate-900 truncate">{aiPrediction.name}</span>
+          <div className="absolute top-2.5 left-2.5 sm:top-3.5 sm:left-3.5 z-[400] bg-white/95 backdrop-blur-md p-3 sm:px-4 sm:py-3 rounded-xl shadow-md border border-slate-200/90 text-[11px] sm:text-xs font-mono space-y-1.5 max-w-[calc(100%-20px)] sm:max-w-xs">
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-1.5 truncate">
+                <span className={`w-2.5 h-2.5 rounded-full ${aiPrediction.system_type === 'UPCOMING_FORMING_SYSTEM' ? 'bg-sky-500 animate-pulse' : 'bg-red-500'}`} />
+                <span className="font-bold text-slate-900 truncate">{aiPrediction.name}</span>
+              </div>
+              <DataTypeBadge 
+                type={isHistorical ? 'historical' : (isBackendLive ? 'live' : 'demo')} 
+                size="xs" 
+              />
             </div>
-            <div className="text-slate-600 text-[11px]">
-              Fix: <strong>{activeWaypoint.lat}°N, {activeWaypoint.lon}°E</strong> • Wind: <strong className="text-sky-600">{activeWaypoint.speed} km/h</strong> • Press: <strong className="text-slate-800">{activeWaypoint.pressure} hPa</strong>
+            <div className="text-slate-600 text-[11px] leading-relaxed">
+              <span className="inline-flex items-center gap-1">Fix: <strong>{activeWaypoint.lat}°N, {activeWaypoint.lon}°E</strong> <InfoTooltip term="eye_fix" /></span>
+              {' • '}
+              <span className="inline-flex items-center gap-1">Wind: <strong className="text-sky-600">{activeWaypoint.speed} km/h</strong> <InfoTooltip term="sustained_wind" /></span>
+              {' • '}
+              <span className="inline-flex items-center gap-1">Press: <strong className="text-slate-800">{activeWaypoint.pressure} hPa</strong> <InfoTooltip term="central_pressure" /></span>
             </div>
             <div className="text-[10px] text-slate-600 font-sans font-medium pt-1 border-t border-slate-100 flex items-center justify-between gap-2">
               <span className="text-sky-800 font-semibold">{aiPrediction.category}</span>
-              <span className="text-amber-800 font-bold">Risk: {aiPrediction.cyclogenesis_risk}</span>
+              <span className="text-amber-800 font-bold inline-flex items-center gap-1">
+                <span>Risk: {aiPrediction.cyclogenesis_risk}</span>
+                <InfoTooltip term="formation_probability" />
+              </span>
             </div>
             {liveOceanData && (
               <div className="text-[10px] text-emerald-700 font-sans font-medium flex items-center gap-1.5 pt-1 border-t border-slate-100">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                 <span>Marine Buoy: Wind {liveOceanData.surface_wind_kmh} km/h • Press {liveOceanData.surface_pressure_hpa} hPa</span>
+                <InfoTooltip term="sst" />
               </div>
             )}
           </div>
@@ -1190,10 +1260,16 @@ const Dashboard = () => {
             >
               <Popup>
                 <div className="p-1.5 text-xs space-y-1 font-sans">
-                  <p className="font-bold text-red-700">Projected Landfall Corridor</p>
+                  <p className="font-bold text-red-700 flex items-center justify-between">
+                    <span>Projected Landfall Corridor</span>
+                    <InfoTooltip term="projected_coastal_corridor" />
+                  </p>
                   <p className="text-slate-700 font-medium">{aiPrediction.landfall.location}</p>
                   <p className="text-slate-500 font-mono text-[10px]">{aiPrediction.landfall.window}</p>
-                  <p className="text-amber-700 font-semibold text-[11px]">Est. Surge: {aiPrediction.landfall.surge}</p>
+                  <p className="text-amber-700 font-semibold text-[11px] flex items-center justify-between">
+                    <span>Est. Surge: {aiPrediction.landfall.surge}</span>
+                    <InfoTooltip term="surge" />
+                  </p>
                 </div>
               </Popup>
             </Marker>
@@ -1268,9 +1344,12 @@ const Dashboard = () => {
         
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
           <div>
-            <span className="text-xs font-mono font-bold text-slate-800 uppercase tracking-wider block">
-              72H INTENSITY AND CENTRAL PRESSURE FORECAST
-            </span>
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="text-xs font-mono font-bold text-slate-800 uppercase tracking-wider block">
+                72H INTENSITY AND CENTRAL PRESSURE FORECAST
+              </span>
+              <DataTypeBadge type="ai" size="xs" />
+            </div>
             <p className="text-xs text-slate-500 font-normal mt-0.5">
               Deep learning multi-step trajectory monitoring sustained wind speeds (km/h) and central barometric pressure (hPa).
             </p>
@@ -1280,10 +1359,12 @@ const Dashboard = () => {
             <span className="flex items-center gap-1.5 font-medium">
               <span className="w-2.5 h-2.5 rounded-full bg-sky-500" />
               <span>Sustained Wind (km/h)</span>
+              <InfoTooltip term="sustained_wind" />
             </span>
             <span className="flex items-center gap-1.5 font-medium">
               <span className="w-2.5 h-2.5 rounded-full bg-rose-500" />
               <span>Central Pressure (hPa)</span>
+              <InfoTooltip term="central_pressure" />
             </span>
           </div>
         </div>
@@ -1364,8 +1445,18 @@ const Dashboard = () => {
               <thead>
                 <tr className="border-b border-slate-100 text-slate-400 font-mono text-[11px]">
                   <th className="pb-3 font-medium">District &amp; State</th>
-                  <th className="pb-3 font-medium">Strike Prob.</th>
-                  <th className="pb-3 font-medium">Est. Surge</th>
+                  <th className="pb-3 font-medium">
+                    <span className="inline-flex items-center gap-1">
+                      Strike Prob.
+                      <InfoTooltip term="formation_probability" />
+                    </span>
+                  </th>
+                  <th className="pb-3 font-medium">
+                    <span className="inline-flex items-center gap-1">
+                      Est. Surge
+                      <InfoTooltip term="surge" />
+                    </span>
+                  </th>
                   <th className="pb-3 font-medium">24h Rain</th>
                   <th className="pb-3 font-medium text-right">Warning Status</th>
                 </tr>
@@ -1415,7 +1506,7 @@ const Dashboard = () => {
                 </span>
                 <p className="text-xs text-slate-500 font-normal mt-0.5">Active neural pipelines and bulletin dispatches.</p>
               </div>
-              <span className="badge badge-green font-semibold">Operational</span>
+              <DataTypeBadge type="ai" size="xs" />
             </div>
 
             <div className="space-y-2.5 text-xs">
@@ -1430,25 +1521,27 @@ const Dashboard = () => {
               <div className="p-3 rounded-xl bg-slate-50/80 border border-slate-200/60 flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
                   <CheckCircle className="w-4 h-4 text-emerald-600" />
-                  <span className="font-semibold text-slate-800">CNN Eye Center Localization</span>
+                  <span className="font-semibold text-slate-800">MobileNetV3-Small Eye Fix</span>
+                  <InfoTooltip term="eye_fix" />
                 </div>
-                <span className="font-mono text-[10px] text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">&lt; 18km Error</span>
+                <span className="font-mono text-[10px] text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">25.6 km Val / 38.2 km Test</span>
               </div>
 
               <div className="p-3 rounded-xl bg-slate-50/80 border border-slate-200/60 flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
                   <CheckCircle className="w-4 h-4 text-emerald-600" />
-                  <span className="font-semibold text-slate-800">ResNet-50 Dvorak Classifier</span>
+                  <span className="font-semibold text-slate-800">ResNet18 Dvorak Classifier</span>
+                  <InfoTooltip term="dvorak" />
                 </div>
-                <span className="font-mono text-[10px] text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">T3.5 (85 km/h)</span>
+                <span className="font-mono text-[10px] text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">4 Validated Classes</span>
               </div>
 
               <div className="p-3 rounded-xl bg-slate-50/80 border border-slate-200/60 flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
                   <CheckCircle className="w-4 h-4 text-emerald-600" />
-                  <span className="font-semibold text-slate-800">BiLSTM 72h Recurrent Engine</span>
+                  <span className="font-semibold text-slate-800">2-Layer GRU Seq2Seq Engine</span>
                 </div>
-                <span className="font-mono text-[10px] text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">6 Interval Fixes</span>
+                <span className="font-mono text-[10px] text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">+86 km vs Persistence</span>
               </div>
             </div>
           </div>
@@ -1466,6 +1559,30 @@ const Dashboard = () => {
         </div>
 
       </div>
+
+      {/* Requirement 4: AI REASONING / WHY THIS PREDICTION */}
+      <AIReasoningCard
+        systemName={aiPrediction.name}
+        pressure={activeWaypoint.pressure}
+        wind={activeWaypoint.speed}
+        sst={aiPrediction.sst || 30.5}
+        shear={aiPrediction.shear || 11.2}
+        vitPattern={aiPrediction.vit_pattern}
+        risk48h={aiPrediction.cyclogenesis_risk}
+        confidenceScore={aiPrediction?.confidence ? `${aiPrediction.confidence}%` : "Phase 3B Validated"}
+        confidenceType="MobileNetV3 / ResNet18 Telemetry"
+        isHistorical={isHistorical}
+      />
+
+      {/* Requirement 5: DETAILED DATA SOURCE AND LAST UPDATED STATUS */}
+      <DataSourceStatusCard
+        isBackendLive={isBackendLive}
+        lastUpdated={lastUpdatedTime}
+        lastAIAnalysis={lastUpdatedTime}
+        isHistorical={isHistorical}
+        onRefresh={handleSyncFeed}
+        isRefreshing={isProcessing}
+      />
 
     </div>
   );

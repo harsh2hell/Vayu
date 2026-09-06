@@ -33,7 +33,7 @@ const Landing = () => {
       heading: 'North-Northwest (330°)',
       landfall: 'Gopalpur-Kalingapatnam (Odisha/AP)',
       eta: `T+24 Hours (${getDynamicLeadTimestamp(24)})`,
-      confidence: '96.4%',
+      confidence: '100% Objectness',
       riskLevel: 'HIGH',
       trackSteps: [
         { time: 'T+0h', coords: '15.4°N, 87.8°E', wind: '85 km/h', pres: '980 hPa', status: 'Current Fix' },
@@ -58,7 +58,7 @@ const Landing = () => {
       heading: 'North-Northeast (025°)',
       landfall: 'Saurashtra Coast (Gujarat / Porbandar)',
       eta: `T+36 Hours (${getDynamicLeadTimestamp(36)})`,
-      confidence: '94.8%',
+      confidence: '100% Objectness',
       riskLevel: 'CRITICAL',
       trackSteps: [
         { time: 'T+0h', coords: '18.2°N, 68.4°E', wind: '120 km/h', pres: '964 hPa', status: 'Current Fix' },
@@ -82,10 +82,10 @@ const Landing = () => {
   };
 
   const benchmarks = [
-    { label: 'Eye Center Precision', value: '< 18 km', sub: 'Mean Distance vs. Radar Ground Truth', icon: Target, badge: 'CNN Eye Fix' },
-    { label: '24h Forecast Lead', value: '94.8%', sub: 'Trajectory & Intensity Reliability', icon: Activity, badge: 'BiLSTM Engine' },
-    { label: 'Multi-Spectral Channels', value: '4 Feeds', sub: 'IR, VIS, WV, Microwave (INSAT/NOAA)', icon: Satellite, badge: 'Real-Time Ingestion' },
-    { label: 'Historical Baseline', value: '1,250+', sub: '15-Year RSMC & IBTrACS Validated', icon: History, badge: 'Training Dataset' },
+    { label: 'Eye Center CLE', value: '25.6 km', sub: 'Mean Distance vs. IBTrACS Ground Truth', icon: Target, badge: 'MobileNetV3' },
+    { label: '72h Forecast Lead', value: '+86.0 km', sub: 'GRU Outperforms Persistence Baseline', icon: Activity, badge: 'GRU Seq2Seq' },
+    { label: 'Multi-Spectral Channels', value: '4 Feeds', sub: 'IR, VIS, WV, Multi-sensor (NASA/MOSDAC)', icon: Satellite, badge: 'Real-Time Ingestion' },
+    { label: 'Historical Baseline', value: '34 Storms', sub: 'NOAA IBTrACS NIO Canonical Dataset', icon: History, badge: 'Phase 3B Dataset' },
   ];
 
   const modules = [

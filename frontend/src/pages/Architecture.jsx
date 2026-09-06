@@ -42,22 +42,22 @@ const Architecture = () => (
 
         {/* AI Core */}
         <div className="w-full border-2 border-[#003087] rounded-2xl p-5 bg-[#003087]/5">
-          <p className="text-center font-bold text-[#003087] mb-4 text-base">AI / ML Intelligence Engine</p>
+          <p className="text-center font-bold text-[#003087] mb-4 text-base">Genuine AI / ML Intelligence Engine (Verified PyTorch Checkpoints)</p>
           <div className="grid grid-cols-3 gap-4">
             <div className="bg-white border border-[#003087]/30 rounded-xl p-3 text-center">
-              <p className="font-semibold text-[#003087] text-xs">DETECTION</p>
-              <p className="text-[10px] text-slate-500 mt-1">CycloneVision-CNN v2.1</p>
-              <p className="text-[10px] text-slate-400">VGG-16 backbone</p>
+              <p className="font-semibold text-[#003087] text-xs">DETECTION & EYE FIX</p>
+              <p className="text-[10px] text-slate-800 font-bold mt-1">MobileNetV3-Small</p>
+              <p className="text-[10px] text-slate-500">Dual-head center regression (4.2 MB .pt)</p>
             </div>
             <div className="bg-white border border-[#003087]/30 rounded-xl p-3 text-center">
-              <p className="font-semibold text-[#003087] text-xs">CLASSIFICATION</p>
-              <p className="text-[10px] text-slate-500 mt-1">PatternNet-ResNet50 v1.4</p>
-              <p className="text-[10px] text-slate-400">5-class morphological</p>
+              <p className="font-semibold text-[#003087] text-xs">MORPHOLOGY CLASSIFIER</p>
+              <p className="text-[10px] text-slate-800 font-bold mt-1">ResNet-18 + Grad-CAM</p>
+              <p className="text-[10px] text-slate-500">5 Dvorak patterns (43.0 MB .pt)</p>
             </div>
             <div className="bg-white border border-[#003087]/30 rounded-xl p-3 text-center">
-              <p className="font-semibold text-[#003087] text-xs">PREDICTION</p>
-              <p className="text-[10px] text-slate-500 mt-1">CycloneForecast-LSTM v3.0</p>
-              <p className="text-[10px] text-slate-400">24–72h track & intensity</p>
+              <p className="font-semibold text-[#003087] text-xs">TRAJECTORY & CONES</p>
+              <p className="text-[10px] text-slate-800 font-bold mt-1">2-Layer GRU Seq2Seq</p>
+              <p className="text-[10px] text-slate-500">25-Pass MC Dropout (0.16 MB .pt)</p>
             </div>
           </div>
         </div>
