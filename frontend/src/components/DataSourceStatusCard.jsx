@@ -79,14 +79,14 @@ export default function DataSourceStatusCard({
     switch (status) {
       case 'CONNECTED':
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/60">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
             {text}
           </span>
         );
       case 'HISTORICAL':
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-50 text-amber-800 border border-amber-200">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800/60">
             <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
             {text}
           </span>
@@ -94,7 +94,7 @@ export default function DataSourceStatusCard({
       case 'DEMO_DATA':
       default:
         return (
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-purple-50 text-purple-700 border border-purple-200">
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800/60">
             <span className="w-1.5 h-1.5 rounded-full bg-purple-500" />
             {text}
           </span>
@@ -103,17 +103,17 @@ export default function DataSourceStatusCard({
   };
 
   return (
-    <div className={`p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-white border border-slate-200/90 shadow-xs space-y-3.5 ${className}`}>
+    <div className={`p-4 sm:p-5 rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-900/90 border border-slate-200/90 dark:border-slate-800 shadow-xs space-y-3.5 text-slate-800 dark:text-slate-100 transition-colors ${className}`}>
       
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800/80 pb-3">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 rounded-xl bg-slate-100 border border-slate-200/80 flex items-center justify-center text-slate-700 shadow-2xs">
+          <div className="w-8 h-8 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 flex items-center justify-center text-slate-700 dark:text-slate-200 shadow-2xs">
             <Server className="w-4 h-4" />
           </div>
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="font-heading font-black text-xs sm:text-sm uppercase tracking-wider text-slate-900">
+              <span className="font-heading font-black text-xs sm:text-sm uppercase tracking-wider text-slate-900 dark:text-white">
                 {isHindi ? 'डेटा स्रोत एवं वास्तविक स्थिति' : 'Data Feed Status & Transparency'}
               </span>
               <DataTypeBadge
@@ -121,7 +121,7 @@ export default function DataSourceStatusCard({
                 isHindi={isHindi}
               />
             </div>
-            <p className="text-[11px] text-slate-500 font-normal mt-0.5">
+            <p className="text-[11px] text-slate-500 dark:text-slate-400 font-normal mt-0.5">
               {isHindi
                 ? 'प्रत्येक इनपुट स्रोत का पारदर्शी नाम, प्रकार, उपलब्धता एवं अंतिम अपडेट समय'
                 : 'Verified source origins, data feeds, connection integrity, and exact timestamps'}
@@ -135,17 +135,17 @@ export default function DataSourceStatusCard({
             <button
               onClick={onRefresh}
               disabled={isRefreshing}
-              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200/70 text-xs font-semibold transition-all cursor-pointer disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200/70 dark:border-slate-700 text-xs font-semibold transition-all cursor-pointer disabled:opacity-50"
               title="Refresh all data feeds"
             >
-              <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-sky-600' : ''}`} />
+              <RefreshCw className={`w-3.5 h-3.5 ${isRefreshing ? 'animate-spin text-sky-600 dark:text-sky-400' : ''}`} />
               <span>{isRefreshing ? 'Refreshing...' : 'Verify Feeds'}</span>
             </button>
           )}
 
           <button
             onClick={() => setIsDetailsOpen(!isDetailsOpen)}
-            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+            className="p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
             aria-label="Toggle feed details"
           >
             {isDetailsOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
@@ -158,22 +158,22 @@ export default function DataSourceStatusCard({
         {FEEDS.map((feed) => (
           <div
             key={feed.id}
-            className="p-3 rounded-2xl bg-slate-50/80 border border-slate-200/80 space-y-2 hover:border-slate-300 hover:bg-slate-50 transition-all"
+            className="p-3 rounded-2xl bg-slate-50/80 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/70 space-y-2 hover:border-slate-300 dark:hover:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-800/90 transition-all"
           >
             <div className="flex items-center justify-between gap-1.5">
-              <span className="font-heading font-bold text-xs text-slate-900 truncate">
+              <span className="font-heading font-bold text-xs text-slate-900 dark:text-white truncate">
                 {feed.source}
               </span>
               {getStatusBadge(feed.status, feed.statusText)}
             </div>
 
-            <div className="text-[11px] text-slate-500 truncate">
+            <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
               {feed.dataType}
             </div>
 
-            <div className="flex items-center justify-between text-[10px] font-mono pt-1.5 border-t border-slate-200/60 text-slate-700">
-              <span className="text-slate-400 font-sans">{feed.lastTimeLabel}</span>
-              <span className="font-bold text-slate-800">{feed.lastTime}</span>
+            <div className="flex items-center justify-between text-[10px] font-mono pt-1.5 border-t border-slate-200/60 dark:border-slate-700/70 text-slate-700 dark:text-slate-300">
+              <span className="text-slate-400 dark:text-slate-500 font-sans">{feed.lastTimeLabel}</span>
+              <span className="font-bold text-slate-800 dark:text-slate-200">{feed.lastTime}</span>
             </div>
           </div>
         ))}
@@ -181,9 +181,9 @@ export default function DataSourceStatusCard({
 
       {/* Expanded Technical Details Drawer */}
       {isDetailsOpen && (
-        <div className="pt-2 border-t border-slate-100 space-y-2 text-xs">
-          <div className="bg-slate-50/90 p-3 rounded-xl border border-slate-200/80 font-sans text-slate-600 space-y-1">
-            <p className="font-semibold text-slate-900">
+        <div className="pt-2 border-t border-slate-100 dark:border-slate-800/80 space-y-2 text-xs">
+          <div className="bg-slate-50/90 dark:bg-slate-800/70 p-3 rounded-xl border border-slate-200/80 dark:border-slate-700/80 font-sans text-slate-600 dark:text-slate-300 space-y-1">
+            <p className="font-semibold text-slate-900 dark:text-white">
               {isHindi ? 'डेटा विश्वसनीयता एवं सत्यता प्रोटोकॉल (SIH Criteria)' : 'Data Authenticity & Integrity Notice (SIH Criteria):'}
             </p>
             <p className="text-[11px] leading-relaxed">
