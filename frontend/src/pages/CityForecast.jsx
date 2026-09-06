@@ -38,6 +38,7 @@ import PublicNavbar from '../components/PublicNavbar';
 import IOSGlassCard from '../components/IOSGlassCard';
 import DataTypeBadge from '../components/DataTypeBadge';
 import LastUpdatedBadge from '../components/LastUpdatedBadge';
+import WeatherStatusAnimation from '../components/WeatherStatusAnimation';
 import { CITY_FORECAST_DATA, getCityForecast, getCityAstronomy } from '../data/cityForecastData';
 import { COASTAL_CITIES_DATA } from '../data/coastalCitiesData';
 import { useLiveClock } from '../utils/liveDateTime';
@@ -880,13 +881,20 @@ const CityForecast = () => {
                   <span className="text-2xl sm:text-3xl text-sky-600 dark:text-sky-400 ml-1">°C</span>
                 </div>
 
-                <div className="flex items-center gap-3 pl-2 border-l border-slate-200 dark:border-slate-800">
-                  <span className="text-4xl sm:text-5xl" role="img" aria-label={activeDay.condition}>
-                    {activeDay.emoji}
-                  </span>
+                <div className="flex items-center gap-3.5 pl-3 border-l border-slate-200 dark:border-slate-800">
+                  {/* Apple Weather-grade live animated weather status illustration */}
+                  <div className="relative group/weather-anim flex items-center justify-center p-1.5 rounded-2xl bg-white/50 dark:bg-slate-800/50 backdrop-blur-md border border-white/80 dark:border-white/10 shadow-[0_4px_16px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(255,255,255,0.9)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.35),inset_0_1px_1px_rgba(255,255,255,0.06)] transition-all duration-300 hover:scale-105">
+                    <WeatherStatusAnimation
+                      condition={activeDay.condition}
+                      icon={activeDay.icon}
+                      size="lg"
+                      isNight={liveClock.now ? (liveClock.now.getHours() < 6 || liveClock.now.getHours() >= 18) : false}
+                    />
+                  </div>
+
                   <div>
-                    <div className="font-heading font-extrabold text-base sm:text-lg text-slate-900 dark:text-white">
-                      {isHindi ? activeDay.conditionHindi : activeDay.condition}
+                    <div className="font-heading font-extrabold text-base sm:text-lg text-slate-900 dark:text-white flex items-center gap-2">
+                      <span>{isHindi ? activeDay.conditionHindi : activeDay.condition}</span>
                     </div>
                     <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
                       {isHindi ? 'अनुभूत तापमान: ' : 'Feels like: '}
