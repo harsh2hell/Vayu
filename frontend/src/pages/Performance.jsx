@@ -21,7 +21,7 @@ const VERIFIED_BENCHMARKS = {
     basin: 'Arabian Sea',
     steps: [
       { lead_hours: 6, ground_truth: { lat: 20.1, lon: 67.0 }, vayu: { lat: 20.05, lon: 67.08, err_km: 10.1 }, persistence: { lat: 19.8, lon: 67.1, err_km: 34.5 } },
-      { lead_hours: 12, ground_truth: { lat: 20.7, lon: 66.8 }, vayu: { lat: 20.62, lon: 66.91, err_km: 14.2 }, persistence: { lat: 20.1, lon: 67.0, err_km: 70.8 } },
+      { lead_hours: 12, ground_truth: { lat: 20.7, lon: 66.8 }, vayu: { lat: 20.62, lon: 66.91, err_km: 14.6 }, persistence: { lat: 20.1, lon: 67.0, err_km: 70.8 } },
       { lead_hours: 18, ground_truth: { lat: 21.3, lon: 66.6 }, vayu: { lat: 21.18, lon: 66.75, err_km: 19.8 }, persistence: { lat: 20.4, lon: 66.9, err_km: 104.2 } },
       { lead_hours: 24, ground_truth: { lat: 21.9, lon: 66.5 }, vayu: { lat: 21.72, lon: 66.68, err_km: 26.3 }, persistence: { lat: 20.7, lon: 66.8, err_km: 137.6 } },
       { lead_hours: 48, ground_truth: { lat: 22.8, lon: 67.1 }, vayu: { lat: 22.50, lon: 67.35, err_km: 42.1 }, persistence: { lat: 21.9, lon: 66.5, err_km: 118.4 } },

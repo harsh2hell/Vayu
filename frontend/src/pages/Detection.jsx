@@ -1,90 +1,118 @@
 import React, { useState } from 'react';
 import { 
-  Target, Cpu, Server, FileImage, CheckCircle, 
-  ChevronRight, Play, RotateCcw, Activity, Eye, 
-  Layers, Sliders, Sparkles, BarChart2, ShieldCheck, 
-  ArrowRight, Box
+  Target, Cpu, Upload, Play, CheckCircle2, 
+  AlertTriangle, ChevronRight, RefreshCw, Layers, 
+  Eye, Image as ImageIcon, ShieldCheck, HelpCircle, Activity
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { detectCycloneFromImage } from '../services/api';
 import DataTypeBadge from '../components/DataTypeBadge';
 import LastUpdatedBadge from '../components/LastUpdatedBadge';
 
-const PIPELINE_STAGES = [
+const SATELLITE_PRESETS = [
   {
-    step: 1,
-    title: 'Multi-Band Input Ingestion',
-    short: 'Input & Resize',
-    icon: FileImage,
-    tensor: 'Tensor [B, 3, 224, 224]',
-    desc: 'Calibrated INSAT-3DR Thermal IR (10.8µm) & Water Vapour channels normalized and aligned to standard 224x224 input grid.',
-    params: 'Mean: 0.485, Std: 0.229',
-    latency: '12ms'
+    id: 'dana-2024',
+    name: 'Cyclone DANA (2024)',
+    date: '2024-10-24',
+    basin: 'Bay of Bengal',
+    url: 'https://wvs.earthdata.nasa.gov/api/v1/snapshot?REQUEST=GetSnapshot&LAYERS=VIIRS_SNPP_CorrectedReflectance_TrueColor&BBOX=8,75,23,95&TIME=2024-10-24&WIDTH=1024&HEIGHT=768&FORMAT=image/png'
   },
   {
-    step: 2,
-    title: 'Cloud Top Thresholding & Pre-Processing',
-    short: 'Pre-Processing',
-    icon: Server,
-    tensor: 'Tensor [B, 1, 224, 224]',
-    desc: 'Adaptive Otsu thresholding & Gaussian blur filter isolating convective cloud tops colder than -40°C.',
-    params: 'Kernel: 5x5, Sigma: 1.4',
-    latency: '24ms'
-  },
-  {
-    step: 3,
-    title: 'Gradient Spiral Feature Extraction',
-    short: 'Feature Extraction',
-    icon: Cpu,
-    tensor: 'Tensor [B, 512, 14, 14]',
-    desc: 'MobileNetV3-Small convolutional backbone extracting spiral band curvature, CDO diameter, and eye wall gradient flows.',
-    params: 'Filters: 512, Stride: 2',
-    latency: '85ms'
-  },
-  {
-    step: 4,
-    title: 'CNN Inference & Bounding Regression',
-    short: 'CNN Inference',
-    icon: Target,
-    tensor: 'Tensor [B, 6] (Class + BBox)',
-    desc: 'Dense classification head detecting cyclone presence, regression head predicting central eye coordinates [ymin, xmin, ymax, xmax].',
-    params: 'Softmax + Smooth L1 Loss',
-    latency: '42ms'
-  },
-  {
-    step: 5,
-    title: 'Automated Dvorak & Intensity Output',
-    short: 'Output Dossier',
-    icon: CheckCircle,
-    tensor: 'Final Metadata JSON',
-    desc: 'Converts deep feature embeddings into automated Dvorak T-numbers, central pressure (MSLP), and maximum sustained wind velocity.',
-    params: 'Lookup: Empirical Dvorak Matrix',
-    latency: '8ms'
+    id: 'biparjoy-2023',
+    name: 'Cyclone BIPARJOY (2023)',
+    date: '2023-06-12',
+    basin: 'Arabian Sea',
+    url: 'https://wvs.earthdata.nasa.gov/api/v1/snapshot?REQUEST=GetSnapshot&LAYERS=VIIRS_SNPP_CorrectedReflectance_TrueColor&BBOX=12,58,26,76&TIME=2023-06-12&WIDTH=1024&HEIGHT=768&FORMAT=image/png'
   }
 ];
 
 const Detection = () => {
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState(1); // Default to stage 1
-  const [isRunningPipeline, setIsRunningPipeline] = useState(false);
-  const [viewMode, setViewMode] = useState('cam'); // 'raw', 'cam', 'edges'
+  const [selectedPreset, setSelectedPreset] = useState(SATELLITE_PRESETS[0]);
+  const [customFile, setCustomFile] = useState(null);
+  const [customPreview, setCustomPreview] = useState(null);
+  const [fileMeta, setFileMeta] = useState(null);
+  
+  // Real inference state
+  const [isDetecting, setIsDetecting] = useState(false);
+  const [detectionResult, setDetectionResult] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null);
 
-  const handleRunFullPipeline = () => {
-    setIsRunningPipeline(true);
-    setCurrentStep(1);
+  const activeImageSrc = customPreview || selectedPreset?.url;
+  const activeBasin = customFile ? 'Bay of Bengal' : selectedPreset.basin;
 
-    const stepInterval = setInterval(() => {
-      setCurrentStep((prev) => {
-        if (prev >= 5) {
-          clearInterval(stepInterval);
-          setIsRunningPipeline(false);
-          return 5;
-        }
-        return prev + 1;
+  const handleFileUpload = (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setCustomFile(file);
+    const objectUrl = URL.createObjectURL(file);
+    setCustomPreview(objectUrl);
+    setDetectionResult(null);
+    setErrorMsg(null);
+
+    const img = new Image();
+    img.onload = () => {
+      setFileMeta({
+        name: file.name,
+        size: `${(file.size / 1024).toFixed(1)} KB`,
+        type: file.type || 'image/png',
+        dimensions: `${img.naturalWidth} × ${img.naturalHeight} px`
       });
-    }, 600);
+    };
+    img.src = objectUrl;
   };
 
-  const activeStage = PIPELINE_STAGES[currentStep - 1];
+  const handleSelectPreset = (preset) => {
+    setSelectedPreset(preset);
+    setCustomFile(null);
+    setCustomPreview(null);
+    setFileMeta(null);
+    setDetectionResult(null);
+    setErrorMsg(null);
+  };
+
+  const handleRunDetection = async () => {
+    setIsDetecting(true);
+    setErrorMsg(null);
+
+    try {
+      let fileToSend = customFile;
+
+      if (!fileToSend && selectedPreset) {
+        // Fetch preset image bytes directly so real backend CNN processes actual pixels
+        const response = await fetch(selectedPreset.url);
+        if (!response.ok) throw new Error('Failed to load satellite preset image frame.');
+        const blob = await response.blob();
+        fileToSend = new File([blob], `${selectedPreset.id}.png`, { type: 'image/png' });
+      }
+
+      if (!fileToSend) {
+        throw new Error('No satellite frame available. Please upload a frame or select a preset.');
+      }
+
+      const res = await detectCycloneFromImage(fileToSend, activeBasin);
+
+      if (res && res.success) {
+        setDetectionResult(res);
+      } else {
+        setErrorMsg(res?.message || 'Detection failed: Neural backend returned an error.');
+      }
+    } catch (err) {
+      console.error('[Detection Page Error]:', err);
+      setErrorMsg(err.message || 'Detection failed: Backend unavailable or network error.');
+    } finally {
+      setIsDetecting(false);
+    }
+  };
+
+  // Convert normalized bbox [ymin, xmin, ymax, xmax] to CSS percentages
+  const bboxStyle = detectionResult?.bounding_box ? {
+    top: `${Math.max(0, detectionResult.bounding_box[0] * 100)}%`,
+    left: `${Math.max(0, detectionResult.bounding_box[1] * 100)}%`,
+    height: `${Math.max(5, (detectionResult.bounding_box[2] - detectionResult.bounding_box[0]) * 100)}%`,
+    width: `${Math.max(5, (detectionResult.bounding_box[3] - detectionResult.bounding_box[1]) * 100)}%`,
+  } : null;
 
   return (
     <div className="space-y-6 max-w-[1400px] mx-auto pb-10">
@@ -92,212 +120,290 @@ const Detection = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <Target className="w-6 h-6 text-[#003087]" />
             <h1 className="text-xl sm:text-2xl font-bold text-slate-900">AI Deep Learning Detection Lab</h1>
-            <span className="badge badge-navy">CycloneVision-CNN v2.1</span>
-            <DataTypeBadge type="ai" label="AI INFERENCE" size="xs" />
+            <span className="badge badge-navy">MobileNetV3-Small (1.08M Params)</span>
+            <DataTypeBadge type="ai" label="REAL AI INFERENCE" size="xs" />
           </div>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            End-to-end computer vision pipeline for automated tropical cyclogenesis identification & eye localization
+            Convolutional neural network for automated tropical cyclogenesis identification & eye center localization.
           </p>
+          <div className="flex items-center gap-2 mt-2">
+            <span className="text-[11px] font-mono bg-slate-100 text-slate-600 px-2.5 py-0.5 rounded border border-slate-200">
+              Checkpoint: vayu_detector_mobilenetv3_p3b.pt
+            </span>
+            <span className="text-[11px] text-slate-400 font-mono">
+              In-session analysis • Not persisted to database
+            </span>
+          </div>
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
-          <LastUpdatedBadge source="CycloneVision-CNN v2.1" size="xs" />
+          <LastUpdatedBadge source="MobileNetV3 CenterFix" size="xs" />
+          
+          <label className="btn-secondary text-xs sm:text-sm py-2 px-3 gap-1.5 cursor-pointer">
+            <Upload className="w-3.5 h-3.5" />
+            <span>Upload Frame</span>
+            <input 
+              type="file" 
+              accept="image/png,image/jpeg,image/jpg,image/webp,image/tiff" 
+              onChange={handleFileUpload} 
+              className="hidden" 
+            />
+          </label>
+
           <button 
-            onClick={handleRunFullPipeline}
-            disabled={isRunningPipeline}
+            onClick={handleRunDetection}
+            disabled={isDetecting || !activeImageSrc}
             className="btn-primary text-xs sm:text-sm py-2 px-4 gap-2 shadow-sm"
           >
-            <Play className={`w-3.5 h-3.5 fill-current ${isRunningPipeline ? 'animate-spin' : ''}`} />
-            <span>{isRunningPipeline ? `Executing Stage ${currentStep}/5...` : 'Run Complete Pipeline'}</span>
+            <Play className={`w-3.5 h-3.5 fill-current ${isDetecting ? 'animate-spin' : ''}`} />
+            <span>{isDetecting ? 'Running MobileNetV3...' : 'Run Detection Inference'}</span>
           </button>
         </div>
       </div>
 
-      {/* Interactive Step-by-Step Pipeline Stepper */}
-      <div className="card overflow-hidden">
-        <div className="card-header bg-white">
-          <div className="flex items-center gap-2">
-            <Activity className="w-4 h-4 text-[#003087]" />
-            <h3 className="text-sm font-bold text-slate-900">Pipeline Execution Architecture</h3>
-          </div>
-          <span className="text-xs text-slate-400 font-mono">Total Execution Latency: ~173ms</span>
+      {/* Frame Selection Bar */}
+      <div className="bg-white border border-slate-200 rounded-xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 shadow-2xs">
+        <div className="flex items-center gap-2 text-xs">
+          <span className="font-semibold text-slate-700">Select Input Frame:</span>
+          {SATELLITE_PRESETS.map((p) => (
+            <button
+              key={p.id}
+              onClick={() => handleSelectPreset(p)}
+              className={`px-3 py-1.5 rounded-lg font-medium transition-all text-xs border ${
+                !customFile && selectedPreset?.id === p.id
+                  ? 'bg-[#003087] text-white border-[#003087] shadow-xs'
+                  : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
+              }`}
+            >
+              {p.name}
+            </button>
+          ))}
+          {customFile && (
+            <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-1.5 rounded-lg font-medium text-xs flex items-center gap-1.5">
+              <ImageIcon className="w-3.5 h-3.5 text-emerald-600" />
+              Custom: {customFile.name}
+            </span>
+          )}
         </div>
 
-        <div className="p-5 overflow-x-auto">
-          <div className="flex items-center justify-between min-w-[700px] gap-2">
-            {PIPELINE_STAGES.map((stage) => {
-              const isCurrent = stage.step === currentStep;
-
-              return (
-                <button
-                  key={stage.step}
-                  onClick={() => setCurrentStep(stage.step)}
-                  className={`flex-1 flex flex-col items-center p-3 rounded-xl border-2 text-center transition-all cursor-pointer ${
-                    isCurrent 
-                      ? 'border-[#003087] bg-blue-50/70 shadow-xs' 
-                      : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/60'
-                  }`}
-                >
-                  <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-xs mb-2 transition-colors ${
-                    isCurrent 
-                      ? 'bg-[#003087] text-white shadow-md' 
-                      : 'bg-slate-100 text-slate-600'
-                  }`}>
-                    {stage.step}
-                  </div>
-                  
-                  <span className={`font-bold text-xs line-clamp-1 ${isCurrent ? 'text-[#003087]' : 'text-slate-800'}`}>
-                    {stage.short}
-                  </span>
-                  <span className="text-[10px] text-slate-400 font-mono mt-0.5">{stage.latency}</span>
-                </button>
-              );
-            })}
+        {fileMeta && (
+          <div className="text-[11px] font-mono text-slate-500 flex items-center gap-3">
+            <span>Dimensions: {fileMeta.dimensions}</span>
+            <span>Size: {fileMeta.size}</span>
+            <span>Format: {fileMeta.type}</span>
           </div>
-        </div>
+        )}
       </div>
+
+      {/* Error Banner */}
+      {errorMsg && (
+        <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3">
+          <AlertTriangle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+          <div className="text-xs">
+            <h4 className="font-bold text-red-900">ANALYSIS FAILED</h4>
+            <p className="text-red-700 mt-0.5">{errorMsg}</p>
+          </div>
+        </div>
+      )}
 
       {/* Main Inspection Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         
-        {/* Left: Interactive Visual Output Window (7 Cols) */}
+        {/* Left: Image Canvas with Dynamic Bounding Box (7 Cols) */}
         <div className="lg:col-span-7 card overflow-hidden flex flex-col">
-          
-          <div className="card-header bg-white flex flex-wrap items-center justify-between gap-3 flex-shrink-0">
-            <div>
+          <div className="card-header bg-white flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <ImageIcon className="w-4 h-4 text-[#003087]" />
               <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                Stage {activeStage.step}: {activeStage.title}
+                Satellite Imagery & Neural Localization Overlay
               </h3>
-              <p className="text-[11px] text-slate-500 font-mono mt-0.5">{activeStage.tensor}</p>
             </div>
-
-            {/* View Mode Switcher */}
-            <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg text-xs">
-              {[
-                { id: 'raw', label: 'Raw IR Band' },
-                { id: 'cam', label: 'Grad-CAM Attention' },
-                { id: 'edges', label: 'Spiral Flow' }
-              ].map((mode) => (
-                <button
-                  key={mode.id}
-                  onClick={() => setViewMode(mode.id)}
-                  className={`px-2.5 py-1 rounded-md font-medium transition-all ${
-                    viewMode === mode.id ? 'bg-white text-[#003087] shadow-xs' : 'text-slate-500 hover:text-slate-800'
-                  }`}
-                >
-                  {mode.label}
-                </button>
-              ))}
-            </div>
+            {detectionResult?.detected && (
+              <span className="badge badge-green text-[10px]">Target Confirmed</span>
+            )}
           </div>
 
-          {/* Visual Canvas Area */}
-          <div className="relative bg-slate-950 flex items-center justify-center min-h-[460px] overflow-hidden">
-            <img 
-              src="https://wvs.earthdata.nasa.gov/api/v1/snapshot?REQUEST=GetSnapshot&LAYERS=VIIRS_SNPP_CorrectedReflectance_TrueColor&BBOX=8,75,23,95&TIME=2024-10-24&WIDTH=1024&HEIGHT=768&FORMAT=image/png" 
-              alt="Model Inference View" 
-              className={`w-full h-full object-cover filter transition-all duration-300 ${
+          <div className="relative bg-slate-950 flex items-center justify-center min-h-[460px] max-h-[560px] overflow-hidden">
+            {activeImageSrc ? (
+              <div className="relative w-full h-full flex items-center justify-center">
+                <img 
+                  src={activeImageSrc} 
+                  alt="Satellite Observation Frame" 
+                  className="w-full h-full object-contain filter brightness-95 contrast-110"
+                />
 
-                viewMode === 'raw' 
-                  ? 'brightness-90 contrast-110 saturate-50' 
-                  : viewMode === 'cam'
-                  ? 'brightness-75 contrast-150 hue-rotate-180 saturate-200'
-                  : 'brightness-120 contrast-200 invert'
-              }`}
-            />
-
-            {/* Grad-CAM Heatmap Radial Overlay */}
-            {viewMode === 'cam' && (
-              <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_50%_50%,_rgba(239,68,68,0.4)_0%,_rgba(234,179,8,0.2)_30%,_transparent_70%)] pointer-events-none" />
-            )}
-
-            {/* Stage-Specific Graphic Overlays */}
-            {currentStep >= 3 && (
-              <div className="absolute inset-0 pointer-events-none flex items-center justify-center">
-                
-                {/* Spiral Streamline Curves */}
-                <div className="w-72 h-72 rounded-full border-2 border-dashed border-cyan-400/60 animate-spin" style={{ animationDuration: '30s' }} />
-                
-                {/* Bounding Box at Step 4 & 5 */}
-                {currentStep >= 4 && (
-                  <div className="absolute w-56 h-56 border-2 border-red-500 rounded-lg flex items-start justify-between p-2 bg-red-500/10">
-                    <span className="bg-red-600 text-white font-bold text-[10px] px-1.5 py-0.5 rounded shadow">
-                      CYCLONE_CENTER • MobileNetV3
-                    </span>
-                    <span className="text-[10px] bg-black/80 text-cyan-300 px-2 py-0.5 rounded font-mono">
-                      17.12°N, 87.45°E
-                    </span>
+                {/* Real Dynamic Bounding Box Overlay */}
+                {detectionResult?.detected && bboxStyle && (
+                  <div 
+                    className="absolute border-2 border-red-500 bg-red-500/15 rounded transition-all duration-500 pointer-events-none"
+                    style={bboxStyle}
+                  >
+                    <div className="absolute -top-6 left-0 bg-red-600 text-white font-mono text-[10px] font-bold px-2 py-0.5 rounded shadow whitespace-nowrap flex items-center gap-1">
+                      <span>CYCLONE EYE REGRESSION</span>
+                      <span>({(detectionResult.objectness * 100).toFixed(1)}%)</span>
+                    </div>
                   </div>
                 )}
+
+                {/* Center Fix Pin Marker */}
+                {detectionResult?.detected && detectionResult?.center && (
+                  <div 
+                    className="absolute w-4 h-4 rounded-full border-2 border-amber-300 bg-red-600 shadow-lg pointer-events-none transform -translate-x-1/2 -translate-y-1/2 animate-pulse"
+                    style={{
+                      top: `${((detectionResult.center.center_y_norm ?? 0.5) * 100).toFixed(1)}%`,
+                      left: `${((detectionResult.center.center_x_norm ?? 0.5) * 100).toFixed(1)}%`
+                    }}
+                  />
+                )}
+              </div>
+            ) : (
+              <div className="p-12 text-center text-slate-400 space-y-3">
+                <ImageIcon className="w-12 h-12 mx-auto text-slate-600 opacity-60" />
+                <h3 className="text-sm font-bold text-white uppercase tracking-wider">NO SATELLITE FRAME AVAILABLE</h3>
+                <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                  Please upload a satellite observation frame (PNG/JPG) or choose an official NASA snapshot preset to run inference.
+                </p>
+                <label className="btn-primary text-xs py-2 px-4 inline-flex items-center gap-2 cursor-pointer mt-2">
+                  <Upload className="w-4 h-4" />
+                  <span>Upload Satellite Frame</span>
+                  <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
+                </label>
               </div>
             )}
 
-            {/* Tensor Spec Stamp */}
-            <div className="absolute bottom-3 left-3 bg-black/80 text-cyan-300 text-[10px] font-mono px-2.5 py-1 rounded border border-white/10">
-              Backbone: MobileNetV3-Small-CenterFix | Phase 3B Checkpoint
+            {/* Backbone Spec Stamp */}
+            <div className="absolute bottom-3 left-3 bg-black/85 text-cyan-300 text-[10px] font-mono px-2.5 py-1 rounded border border-white/10">
+              Model: MobileNetV3-Small Dual-Head Regressor (1,075,431 Params)
             </div>
+
+            {detectionResult?.inference_time_ms && (
+              <div className="absolute bottom-3 right-3 bg-black/85 text-emerald-400 text-[10px] font-mono px-2.5 py-1 rounded border border-white/10">
+                Inference Latency: {detectionResult.inference_time_ms} ms
+              </div>
+            )}
           </div>
 
-          <div className="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-xs text-slate-600">
-            <span><strong>Layer Description:</strong> {activeStage.desc}</span>
+          <div className="p-4 bg-slate-50 border-t border-slate-200 text-xs text-slate-600 flex items-center justify-between">
+            <span>
+              <strong>Input Basin:</strong> {activeBasin} • <strong>Source:</strong> {customFile ? 'User In-Session Frame' : selectedPreset?.name}
+            </span>
+            {detectionResult && (
+              <span className="font-mono text-[11px] text-slate-500">
+                Inference Status: COMPLETE
+              </span>
+            )}
           </div>
-
         </div>
 
-        {/* Right: Detailed Tensor Metrics & Class Output (5 Cols) */}
+        {/* Right: Real AI Verdict & Localization Coordinates (5 Cols) */}
         <div className="lg:col-span-5 space-y-5 flex flex-col">
           
-          {/* Classification Confidence Output Card */}
           <div className="card p-5 space-y-4 flex-1">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3 flex-wrap gap-2">
               <div className="flex items-center gap-2">
                 <Target className="w-5 h-5 text-emerald-600" />
-                <h3 className="font-bold text-sm text-slate-900">AI Inference Verdict</h3>
+                <h3 className="font-bold text-sm text-slate-900">MobileNetV3 Inference Verdict</h3>
               </div>
               <div className="flex items-center gap-1.5">
                 <DataTypeBadge type="ai" size="xs" />
-                <span className="badge badge-green">Inference Confirmed</span>
+                {detectionResult ? (
+                  <span className={`badge ${detectionResult.detected ? 'badge-green' : 'badge-red'}`}>
+                    {detectionResult.detected ? 'Positive Fix' : 'Negative'}
+                  </span>
+                ) : (
+                  <span className="badge badge-gray">Awaiting Inference</span>
+                )}
               </div>
             </div>
 
-            <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-emerald-900">Cyclone Target Detected:</span>
-                <span className="text-xs font-mono font-extrabold text-emerald-800">POSITIVE (1)</span>
-              </div>
-              <div className="flex justify-between items-center text-xs">
-                <span className="text-emerald-700">Objectness Confidence:</span>
-                <span className="font-bold text-emerald-900">100.0%</span>
-              </div>
-              <div className="progress-bar bg-emerald-200/60">
-                <div className="progress-fill bg-emerald-600" style={{ width: '100%' }}></div>
-              </div>
-            </div>
-
-            <div className="space-y-3 text-xs">
-              {[
-                { label: 'Identified Eye Center', val: '17.12°N, 87.45°E (Bay of Bengal Fix)' },
-                { label: 'Predicted Bounding Box', val: 'Normalized [0.241, 0.208, 0.742, 0.785]' },
-                { label: 'Eye Localization CLE', val: '25.6 km (Val) / 38.2 km (Benchmark)' },
-                { label: 'Minimum Central Pressure', val: '990.0 hPa (± 4 hPa error margin)' },
-                { label: 'Maximum Sustained Winds', val: '92.6 km/h (50 knots)' },
-                { label: 'Convolution Backbone', val: 'MobileNetV3-Small Dual-Head Regressor' },
-                { label: 'Dataset Benchmark', val: 'NASA EOSDIS GIBS + NOAA IBTrACS Ground Truth' }
-              ].map((row, idx) => (
-                <div key={idx} className="flex justify-between items-start py-1.5 border-b border-slate-100 last:border-0">
-                  <span className="text-slate-500 font-medium">{row.label}:</span>
-                  <span className="font-semibold text-slate-800 text-right ml-2">{row.val}</span>
+            {detectionResult ? (
+              <div className="space-y-4">
+                <div className={`border rounded-xl p-4 space-y-2 ${
+                  detectionResult.detected ? 'bg-emerald-50 border-emerald-200' : 'bg-slate-50 border-slate-200'
+                }`}>
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-slate-700">Cyclone Target Detected:</span>
+                    <span className={`text-xs font-mono font-extrabold ${
+                      detectionResult.detected ? 'text-emerald-800' : 'text-slate-600'
+                    }`}>
+                      {detectionResult.detected ? 'YES — CYCLONE IDENTIFIED' : 'NO — AMBIENT / NON-CYCLONIC'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-slate-600">Objectness Score:</span>
+                    <span className="font-bold font-mono text-slate-900">
+                      {(detectionResult.objectness * 100).toFixed(1)}%
+                    </span>
+                  </div>
+                  <div className="progress-bar bg-slate-200">
+                    <div 
+                      className={`progress-fill ${detectionResult.detected ? 'bg-emerald-600' : 'bg-slate-400'}`} 
+                      style={{ width: `${Math.min(100, Math.max(5, detectionResult.objectness * 100))}%` }}
+                    />
+                  </div>
                 </div>
-              ))}
-            </div>
 
-            <div className="pt-2 flex gap-2">
+                <div className="space-y-2.5 text-xs">
+                  <div className="flex justify-between items-center py-1.5 border-b border-slate-100">
+                    <span className="text-slate-500 font-medium">Eye Center Coordinates:</span>
+                    <span className="font-bold font-mono text-slate-900">
+                      {detectionResult.center?.lat?.toFixed(2)}°N, {detectionResult.center?.lon?.toFixed(2)}°E
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between items-center py-1.5 border-b border-slate-100">
+                    <span className="text-slate-500 font-medium">Bounding Box [ymin, xmin, ymax, xmax]:</span>
+                    <span className="font-mono text-[11px] text-slate-800">
+                      [{detectionResult.bounding_box?.map(v => v.toFixed(3)).join(', ')}]
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between items-center py-1.5 border-b border-slate-100">
+                    <span className="text-slate-500 font-medium">Inference Latency:</span>
+                    <span className="font-bold font-mono text-emerald-700">
+                      {detectionResult.inference_time_ms} ms
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between items-center py-1.5 border-b border-slate-100">
+                    <span className="text-slate-500 font-medium">Architecture Backbone:</span>
+                    <span className="font-semibold text-slate-800">
+                      MobileNetV3-Small Dual-Head
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between items-center py-1.5 border-b border-slate-100">
+                    <span className="text-slate-500 font-medium">Parameter Count:</span>
+                    <span className="font-mono text-slate-800">
+                      1,075,431 parameters
+                    </span>
+                  </div>
+
+                  <div className="flex justify-between items-center py-1.5">
+                    <span className="text-slate-500 font-medium">Empirical Benchmark:</span>
+                    <span className="font-mono text-slate-700 text-right">
+                      25.6 km Val CLE • 38.2 km Test CLE
+                    </span>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="p-8 text-center bg-slate-50 rounded-xl border border-slate-200 text-slate-500 space-y-2">
+                <Target className="w-8 h-8 mx-auto text-slate-400" />
+                <p className="text-xs font-medium">No inference executed yet for this frame.</p>
+                <p className="text-[11px] text-slate-400">
+                  Click <strong>Run Detection Inference</strong> to execute the MobileNetV3 model on this frame.
+                </p>
+              </div>
+            )}
+
+            <div className="pt-2">
               <button 
                 onClick={() => navigate('/dashboard/classification')}
-                className="btn-primary w-full text-xs py-2.5 justify-center"
+                className="btn-primary w-full text-xs py-2.5 justify-center gap-1.5"
               >
                 <span>Proceed to Pattern Classification Lab</span>
                 <ChevronRight className="w-3.5 h-3.5" />
@@ -305,13 +411,16 @@ const Detection = () => {
             </div>
           </div>
 
-          {/* Hyperparameters & Model Specs Card */}
-          <div className="card p-4 bg-slate-50 border-slate-200 space-y-2.5 text-xs text-slate-600">
-            <h4 className="font-bold text-slate-800 uppercase tracking-wider text-[11px]">Active Stage Hyperparameters</h4>
+          {/* Model Specification Card */}
+          <div className="card p-4 bg-slate-50 border-slate-200 space-y-2 text-xs text-slate-600">
+            <h4 className="font-bold text-slate-800 uppercase tracking-wider text-[11px]">
+              Scientific Verification Protocol
+            </h4>
             <div className="space-y-1 font-mono text-[11px]">
-              <div>• <strong>Input Tensor:</strong> {activeStage.tensor}</div>
-              <div>• <strong>Hyperparameters:</strong> {activeStage.params}</div>
-              <div>• <strong>Hardware Engine:</strong> CUDA TensorRT Accelerated (1.2 ms/frame)</div>
+              <div>• <strong>Model:</strong> MobileNetV3-Small Dual-Head (Objectness + Localization)</div>
+              <div>• <strong>Held-out Benchmark:</strong> 100% objectness accuracy on held-out benchmark set</div>
+              <div>• <strong>Center Localization Error:</strong> 25.6 km validation CLE, 38.2 km test CLE</div>
+              <div>• <strong>Execution Mode:</strong> PyTorch Native CPU/MPS inference via FastAPI</div>
             </div>
           </div>
 

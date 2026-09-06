@@ -557,7 +557,7 @@ const GisRadar = () => {
                   />
                 )}
 
-                {/* 70% Core Uncertainty Forecast Cone */}
+                {/* MC Dropout Epistemic Uncertainty Forecast Cone */}
                 {showCone && current.cone && (
                   <Polygon
                     positions={current.cone}

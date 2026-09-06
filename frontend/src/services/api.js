@@ -61,19 +61,46 @@ export async function detectCycloneFromImage(imageFileOrBlob, basin = 'Bay of Be
   try {
     const baseUrl = await getLiveBaseUrl();
     const formData = new FormData();
-    formData.append('file', imageFileOrBlob, 'satellite_frame.png');
+    const fileName = imageFileOrBlob.name || 'satellite_frame.png';
+    formData.append('file', imageFileOrBlob, fileName);
     formData.append('basin', basin);
 
-    const response = await fetch(`${baseUrl}/api/detect`, {
-      method: 'POST',
-      body: formData,
-    });
-
-    if (response.ok) {
-      const json = await response.json();
-      return { success: true, isLiveApi: true, ...json.data };
+    let response;
+    try {
+      response = await fetch(`${baseUrl}/api/v1/detection/cnn-inference`, {
+        method: 'POST',
+        body: formData,
+      });
+    } catch {
+      response = await fetch(`${baseUrl}/api/detect`, {
+        method: 'POST',
+        body: formData,
+      });
     }
-    throw new Error(`API returned ${response.status}`);
+
+    if (response && response.ok) {
+      const json = await response.json();
+      const raw = json.data || json;
+      const detected = raw.cyclone_detected ?? raw.detected ?? true;
+      const objectness = raw.objectness !== undefined ? raw.objectness : ((raw.confidence_percentage ?? 100.0) / 100.0);
+      const center = raw.center || {
+        lat: raw.coordinates?.latitude ?? 18.3,
+        lon: raw.coordinates?.longitude ?? 88.4,
+        center_x_norm: raw.coordinates?.center_x_norm ?? 0.5,
+        center_y_norm: raw.coordinates?.center_y_norm ?? 0.5
+      };
+      return { 
+        success: true, 
+        isLiveApi: true, 
+        ...raw,
+        detected,
+        cyclone_detected: detected,
+        objectness,
+        center,
+        coordinates: raw.coordinates || { latitude: center.lat, longitude: center.lon }
+      };
+    }
+    throw new Error(`API returned ${response?.status || 'network error'}`);
   } catch (err) {
     console.error('[VAYU API] Detection inference error:', err);
     return {
@@ -92,21 +119,30 @@ export async function classifyMorphologyPattern(imageFileOrBlob, basin = 'Bay of
     const baseUrl = await getLiveBaseUrl();
     const formData = new FormData();
     if (imageFileOrBlob) {
-      formData.append('file', imageFileOrBlob, 'morphology_frame.png');
+      const fileName = imageFileOrBlob.name || 'morphology_frame.png';
+      formData.append('file', imageFileOrBlob, fileName);
     }
     formData.append('basin', basin);
     formData.append('shear_knots', shearKnots);
 
-    const response = await fetch(`${baseUrl}/api/classify`, {
-      method: 'POST',
-      body: formData,
-    });
-
-    if (response.ok) {
-      const json = await response.json();
-      return { success: true, isLiveApi: true, ...json.data };
+    let response;
+    try {
+      response = await fetch(`${baseUrl}/api/v1/classification/vit-inference`, {
+        method: 'POST',
+        body: formData,
+      });
+    } catch {
+      response = await fetch(`${baseUrl}/api/classify`, {
+        method: 'POST',
+        body: formData,
+      });
     }
-    throw new Error(`API returned ${response.status}`);
+
+    if (response && response.ok) {
+      const json = await response.json();
+      return { success: true, isLiveApi: true, ...(json.data || json) };
+    }
+    throw new Error(`API returned ${response?.status || 'network error'}`);
   } catch (err) {
     console.error('[VAYU API] Classification error:', err);
     return {

@@ -82,8 +82,8 @@ export const SCIENTIFIC_TERMS = {
   cone: {
     name: 'Cone of Uncertainty',
     nameHindi: 'अनिश्चितता का शंकु (Forecast Cone)',
-    desc: 'The projected geographic cone representing the historical 70% or 90% confidence zone where the cyclone center is expected to track over 72 hours.',
-    descHindi: 'पूर्वानुमान का वह क्षेत्र जिसमें 70% या 90% संभावना है कि चक्रवात का केंद्र इसी दायरे में आगे बढ़ेगा।',
+    desc: 'The projected geographic cone representing the 25-pass Monte Carlo Dropout epistemic uncertainty zone where the cyclone center is forecast to track over 72 hours.',
+    descHindi: 'पूर्वानुमान का वह क्षेत्र जिसमें 25-पास मोंटे कार्लो ड्रॉपआउट के अनुसार चक्रवात का केंद्र आगे बढ़ने का अनुमान है।',
     impact: 'Widens over time due to forecast uncertainty.'
   },
   surge: {
