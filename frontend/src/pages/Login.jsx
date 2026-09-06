@@ -36,9 +36,11 @@ const clerkAppearance = {
   }
 };
 
-const Login = () => {
-  const [searchParams] = useSearchParams();
-  const redirectTarget = searchParams.get('redirect_url') || getDashboardUrl();
+/**
+ * Inner component that uses Clerk hooks.
+ * Only mounted when CLERK_PUBLISHABLE_KEY is present and ClerkProvider is active.
+ */
+const ClerkSignInSection = ({ redirectTarget }) => {
   const { isSignedIn, isLoaded } = useUser();
 
   // If already authenticated, redirect directly into the dashboard
@@ -48,13 +50,40 @@ const Login = () => {
     }
   }, [isLoaded, isSignedIn, redirectTarget]);
 
+  return (
+    <div className="flex justify-center">
+      <SignedIn>
+        <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 text-center space-y-3">
+          <div className="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto">
+            <Shield className="w-4 h-4" />
+          </div>
+          <p className="text-xs text-slate-300">Authenticated. Redirecting to Command Dashboard...</p>
+        </div>
+      </SignedIn>
+
+      <SignedOut>
+        <SignIn
+          appearance={clerkAppearance}
+          fallbackRedirectUrl={redirectTarget}
+          signUpUrl={null}
+        />
+      </SignedOut>
+    </div>
+  );
+};
+
+const Login = () => {
+  const [searchParams] = useSearchParams();
+  const redirectTarget = searchParams.get('redirect_url') || getDashboardUrl();
+
+  // If publishable key is not configured in Vercel, render notice without invoking Clerk hooks
   if (!CLERK_PUBLISHABLE_KEY) {
     return <AuthConfigurationNotice />;
   }
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col justify-between relative overflow-hidden font-sans">
-      {/* Subtle Background Glow Elements (Navy Command-Center Aesthetic) */}
+      {/* Subtle Background Glow Elements */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-sky-900/15 rounded-full blur-3xl pointer-events-none" />
       <div className="absolute bottom-0 right-0 w-[500px] h-[500px] bg-indigo-950/20 rounded-full blur-3xl pointer-events-none" />
 
@@ -97,27 +126,10 @@ const Login = () => {
             </p>
           </div>
 
-          {/* Official Clerk SignIn Component */}
-          <div className="flex justify-center">
-            <SignedIn>
-              <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 text-center space-y-3">
-                <div className="w-8 h-8 rounded-full bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto">
-                  <Shield className="w-4 h-4" />
-                </div>
-                <p className="text-xs text-slate-300">Authenticated. Redirecting to Command Dashboard...</p>
-              </div>
-            </SignedIn>
+          {/* Official Clerk SignIn Component (Only mounted if ClerkProvider active) */}
+          <ClerkSignInSection redirectTarget={redirectTarget} />
 
-            <SignedOut>
-              <SignIn
-                appearance={clerkAppearance}
-                fallbackRedirectUrl={redirectTarget}
-                signUpUrl={null}
-              />
-            </SignedOut>
-          </div>
-
-          {/* Clean Provenance Note (No Fake Security Claims) */}
+          {/* Clean Provenance Note */}
           <div className="text-center">
             <p className="text-[11px] text-slate-500 font-mono">
               VAYU AI Meteorological Platform • Clerk Pro Authentication Gateway

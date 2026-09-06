@@ -6,7 +6,7 @@ import {
   useUser, 
   useClerk 
 } from '@clerk/clerk-react';
-import { Shield, AlertTriangle, ArrowRight, User } from 'lucide-react';
+import { AlertTriangle, User } from 'lucide-react';
 import { getAuthUrl, isProductionDomain } from '../../utils/domain';
 
 export const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || '';
@@ -32,14 +32,14 @@ export const AuthConfigurationNotice = () => {
           </p>
         </div>
 
-        <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 text-left font-mono text-[11px] text-slate-400 space-y-1">
-          <p className="text-amber-400 font-semibold">Configuration Missing:</p>
-          <p>Please provide <code className="text-white">VITE_CLERK_PUBLISHABLE_KEY</code> in your environment variables.</p>
+        <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 text-left font-mono text-[11px] text-slate-400 space-y-2">
+          <p className="text-amber-400 font-semibold">Environment Variable Required:</p>
+          <p>Please add <code className="text-white">VITE_CLERK_PUBLISHABLE_KEY</code> in your Vercel Project Settings ➔ Environment Variables, then redeploy.</p>
         </div>
 
         <a
           href="/"
-          className="inline-flex items-center justify-center gap-1.5 w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium transition-colors"
+          className="inline-flex items-center justify-center gap-1.5 w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium transition-colors cursor-pointer"
         >
           <span>Return to Public Portal</span>
         </a>
@@ -83,10 +83,7 @@ export const ProtectedRoute = ({ children }) => {
   );
 };
 
-/**
- * Displays real authenticated Clerk user details (name, email, avatar).
- */
-export const OfficerAccountDisplay = () => {
+const ClerkUserDisplay = () => {
   const { user, isLoaded } = useUser();
 
   if (!isLoaded || !user) {
@@ -127,10 +124,24 @@ export const OfficerAccountDisplay = () => {
   );
 };
 
-/**
- * Sign out button invoking official Clerk signOut() and redirecting to login.vayusat.live.
- */
-export const SafeSignOutButton = ({ onSignOutComplete, className, children }) => {
+export const OfficerAccountDisplay = () => {
+  if (!CLERK_PUBLISHABLE_KEY) {
+    return (
+      <div className="flex items-center gap-3">
+        <div className="w-9 h-9 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-400 font-bold text-xs shrink-0">
+          <User className="w-4 h-4" />
+        </div>
+        <div className="flex flex-col min-w-0 flex-1">
+          <span className="text-xs font-semibold text-slate-200 truncate">VAYU Officer</span>
+          <span className="text-[10px] text-slate-500 truncate">Operational Session</span>
+        </div>
+      </div>
+    );
+  }
+  return <ClerkUserDisplay />;
+};
+
+const ClerkSignOutButton = ({ onSignOutComplete, className, children }) => {
   const { signOut } = useClerk();
 
   const handleSignOut = async () => {
@@ -157,5 +168,27 @@ export const SafeSignOutButton = ({ onSignOutComplete, className, children }) =>
     >
       {children}
     </button>
+  );
+};
+
+export const SafeSignOutButton = ({ onSignOutComplete, className, children }) => {
+  if (!CLERK_PUBLISHABLE_KEY) {
+    return (
+      <button
+        type="button"
+        onClick={() => {
+          if (onSignOutComplete) onSignOutComplete();
+          else window.location.href = getAuthUrl();
+        }}
+        className={className}
+      >
+        {children}
+      </button>
+    );
+  }
+  return (
+    <ClerkSignOutButton onSignOutComplete={onSignOutComplete} className={className}>
+      {children}
+    </ClerkSignOutButton>
   );
 };
