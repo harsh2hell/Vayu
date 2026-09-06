@@ -1622,20 +1622,26 @@ const Welcome = () => {
             </p>
           </div>
 
-          {/* Live AI Telemetry Feed Status & Diagnostics */}
-          <div className="bg-slate-100/80 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl px-3.5 py-2 sm:py-2.5 flex flex-wrap items-center justify-between gap-2 text-xs">
-            <div className="flex items-center gap-2">
-              <span className="font-semibold text-slate-800 dark:text-slate-200">
-                {isHindi ? 'एआई मॉडल फीड:' : 'AI Model Feed:'}
-              </span>
-              <span className="text-slate-600 dark:text-slate-400">
-                {current.vitPattern
-                  ? (isHindi ? `ResNet18 आकारिकी (${current.vitPattern})` : `ResNet18 Morphology (${current.vitPattern})`)
-                  : (isHindi ? 'चक्रवातविज़न सीएनएन v2.1' : 'CycloneVision CNN v2.1')}
+
+          {/* Playful AI Model Feed & Telemetry Header Row */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-indigo-500/10 dark:bg-indigo-400/15 border border-indigo-300/60 dark:border-indigo-400/30 text-indigo-700 dark:text-indigo-300 font-bold shadow-2xs">
+                <BrainCircuit className="w-3.5 h-3.5 text-indigo-500 animate-pulse" />
+                <span>{isHindi ? 'एआई मॉडल फीड:' : 'AI Model Feed:'}</span>
+                <span className="font-mono text-indigo-900 dark:text-indigo-200">
+                  {current.vitPattern
+                    ? (isHindi ? `ResNet18 आकारिकी (${current.vitPattern})` : `ResNet18 Morphology (${current.vitPattern})`)
+                    : (isHindi ? 'चक्रवातविज़न CNN v2.1' : 'CycloneVision CNN v2.1')}
+                </span>
               </span>
               {current.sst && (
-                <span className="hidden sm:inline text-slate-500 dark:text-slate-400">
-                  • {isHindi ? 'समुद्री तापमान' : 'SST'} {current.sst}°C • {isHindi ? 'पवन अपरूपण' : 'Shear'} {current.shear} kts
+                <span className="hidden sm:inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-slate-100/80 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 text-[11px] font-mono border border-slate-200/60 dark:border-white/5">
+                  <Waves className="w-3 h-3 text-sky-500" />
+                  <span>SST {current.sst}°C</span>
+                  <span className="text-slate-300 dark:text-slate-600">•</span>
+                  <Wind className="w-3 h-3 text-cyan-500" />
+                  <span>Shear {current.shear} kts</span>
                 </span>
               )}
             </div>
@@ -1651,77 +1657,147 @@ const Welcome = () => {
               <button
                 onClick={fetchLiveBackendData}
                 disabled={isSyncing}
-                className="inline-flex items-center gap-1 px-3 py-1 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:white transition-all cursor-pointer disabled:opacity-50 text-xs font-medium"
+                className="group inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-2xl bg-gradient-to-r from-sky-500/10 via-indigo-500/10 to-purple-500/10 hover:from-sky-500/20 hover:to-purple-500/20 dark:from-sky-400/15 dark:to-purple-400/15 border border-sky-300/70 dark:border-sky-400/30 text-sky-800 dark:text-sky-200 hover:scale-105 active:scale-95 transition-all cursor-pointer disabled:opacity-50 text-xs font-bold shadow-2xs"
                 title={isHindi ? "एआई मॉडल निष्कर्ष और महासागरीय टेलीमेट्री रीफ्रेश करें" : "Refresh AI Model Inference & Ocean Telemetry"}
               >
-                <RefreshCw className={`w-3 h-3 ${isSyncing ? 'animate-spin' : ''}`} />
+                <RefreshCw className={`w-3.5 h-3.5 text-sky-600 dark:text-sky-400 ${isSyncing ? 'animate-spin' : 'group-hover:rotate-180 transition-transform duration-500'}`} />
                 <span>{isHindi ? 'एआई डेटा रीफ्रेश' : 'Sync AI Feed'}</span>
+                <Sparkles className="w-3 h-3 text-amber-500 group-hover:scale-125 transition-transform" />
               </button>
             </div>
           </div>
 
-          {/* 4 Clean Metric Blocks */}
+          {/* 4 Playful & Interactive Metric Blocks */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-            <IOSGlassCard className="p-3.5 sm:p-4 rounded-2xl sm:rounded-3xl">
-              <div className="flex items-center justify-between mb-0.5">
-                <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                  {isHindi ? 'सतत पवन गति' : 'Sustained Wind'}
+            {/* Card 1: Sustained Wind */}
+            <div className="group p-4 rounded-3xl cursor-default transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.02] hover:shadow-[0_14px_32px_rgba(14,165,233,0.18)] dark:hover:shadow-[0_16px_36px_rgba(14,165,233,0.25)] border border-slate-200/80 dark:border-white/10 hover:border-sky-400 dark:hover:border-sky-400/60 bg-white/90 dark:!bg-[#0c1322]/90 relative overflow-hidden flex flex-col justify-between select-none">
+              <div className="pointer-events-none absolute inset-x-4 top-0 h-0.5 bg-gradient-to-r from-transparent via-sky-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <div className="flex items-center gap-1.5">
+                    <div className="p-1.5 rounded-xl bg-sky-500/10 dark:bg-sky-400/15 border border-sky-300/60 dark:border-sky-400/30 text-sky-600 dark:text-sky-400 group-hover:rotate-45 group-hover:scale-110 transition-transform duration-500 shadow-2xs">
+                      <Wind className="w-3.5 h-3.5" />
+                    </div>
+                    <span className="text-xs font-bold text-slate-600 dark:text-slate-300">
+                      {isHindi ? 'सतत पवन गति' : 'Sustained Wind'}
+                    </span>
+                  </div>
+                  <InfoTooltip term="sustained_wind" isHindi={isHindi} />
+                </div>
+                <div className="text-2xl sm:text-3xl font-heading font-black text-slate-950 dark:text-white flex items-baseline gap-1 mt-1">
+                  <span>{current.wind}</span>
+                  <span className="text-xs font-mono font-bold text-sky-600 dark:text-sky-400">{isHindi ? 'किमी/घंटा' : 'km/h'}</span>
+                </div>
+              </div>
+              <div className="mt-3 pt-2 border-t border-slate-100 dark:border-white/5 flex items-center justify-between text-[11px]">
+                <span className="font-mono font-semibold text-slate-500 dark:text-slate-400">
+                  {isHindi ? `झोंके ${current.gusts} किमी/घं` : `Gusts ${current.gusts} km/h`}
                 </span>
-                <InfoTooltip term="sustained_wind" isHindi={isHindi} />
+                <span className="inline-flex items-center gap-0.5 text-[9px] font-mono font-bold text-sky-700 dark:text-sky-300 bg-sky-500/10 dark:bg-sky-400/15 px-1.5 py-0.5 rounded-md">
+                  T{Math.min(6, Math.max(1, Math.round((current.wind || 40) / 20)))} Beaufort
+                </span>
               </div>
-              <div className="text-2xl sm:text-3xl font-heading font-black text-slate-950 dark:text-white">
-                {current.wind} <span className="text-xs font-normal text-slate-500">{isHindi ? 'किमी/घंटा' : 'km/h'}</span>
-              </div>
-              <div className="flex items-center justify-between text-[0.7rem] text-slate-500 dark:text-slate-400 mt-0.5">
-                <span>{isHindi ? `झोंके ${current.gusts} किमी/घंटा` : `Gusts ${current.gusts} km/h`}</span>
-                <InfoTooltip term="gusts" isHindi={isHindi} />
-              </div>
-            </IOSGlassCard>
+            </div>
 
-            <IOSGlassCard className="p-3.5 sm:p-4 rounded-2xl sm:rounded-3xl">
-              <div className="flex items-center justify-between mb-0.5">
-                <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                  {isHindi ? 'केंद्रीय दबाव' : 'Central Pressure'}
+            {/* Card 2: Central Pressure */}
+            <div className="group p-4 rounded-3xl cursor-default transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.02] hover:shadow-[0_14px_32px_rgba(99,102,241,0.18)] dark:hover:shadow-[0_16px_36px_rgba(99,102,241,0.25)] border border-slate-200/80 dark:border-white/10 hover:border-indigo-400 dark:hover:border-indigo-400/60 bg-white/90 dark:!bg-[#0f1124]/90 relative overflow-hidden flex flex-col justify-between select-none">
+              <div className="pointer-events-none absolute inset-x-4 top-0 h-0.5 bg-gradient-to-r from-transparent via-indigo-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <div className="flex items-center gap-1.5">
+                    <div className="p-1.5 rounded-xl bg-indigo-500/10 dark:bg-indigo-400/15 border border-indigo-300/60 dark:border-indigo-400/30 text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform duration-300 shadow-2xs">
+                      <Gauge className="w-3.5 h-3.5" />
+                    </div>
+                    <span className="text-xs font-bold text-slate-600 dark:text-slate-300">
+                      {isHindi ? 'केंद्रीय दबाव' : 'Central Pressure'}
+                    </span>
+                  </div>
+                  <InfoTooltip term="central_pressure" isHindi={isHindi} />
+                </div>
+                <div className="text-2xl sm:text-3xl font-heading font-black text-slate-950 dark:text-white flex items-baseline gap-1 mt-1">
+                  <span>{current.pressure}</span>
+                  <span className="text-xs font-mono font-bold text-indigo-600 dark:text-indigo-400">{isHindi ? 'एचपीए' : 'hPa'}</span>
+                </div>
+              </div>
+              <div className="mt-3 pt-2 border-t border-slate-100 dark:border-white/5 flex items-center justify-between text-[11px]">
+                <span className="font-medium text-slate-500 dark:text-slate-400">
+                  {isHindi ? 'बैरोमीटर रीडिंग' : 'Barometric Fix'}
                 </span>
-                <InfoTooltip term="central_pressure" isHindi={isHindi} />
+                <span className="inline-flex items-center gap-0.5 text-[9px] font-mono font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-500/10 dark:bg-indigo-400/15 px-1.5 py-0.5 rounded-md">
+                  {current.pressure < 990 ? 'Deep Eye' : 'Low Core'}
+                </span>
               </div>
-              <div className="text-2xl sm:text-3xl font-heading font-black text-slate-950 dark:text-white">
-                {current.pressure} <span className="text-xs font-normal text-slate-500">{isHindi ? 'एचपीए' : 'hPa'}</span>
-              </div>
-              <span className="text-[0.7rem] text-slate-500 dark:text-slate-400 mt-0.5 block">
-                {isHindi ? 'बैरोमीटर रीडिंग' : 'Barometric Fix'}
-              </span>
-            </IOSGlassCard>
+            </div>
 
-            <IOSGlassCard className="p-3.5 sm:p-4 rounded-2xl sm:rounded-3xl">
-              <div className="flex items-center justify-between mb-0.5">
-                <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                  {isHindi ? 'अगले 48 घंटे में चक्रवात संभावना' : 'Next 48h Formation'}
-                </span>
-                <InfoTooltip term="formation_probability" isHindi={isHindi} />
+            {/* Card 3: Next 48h Formation Risk */}
+            <div className="group p-4 rounded-3xl cursor-default transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.02] hover:shadow-[0_14px_32px_rgba(245,158,11,0.2)] dark:hover:shadow-[0_16px_36px_rgba(245,158,11,0.28)] border border-slate-200/80 dark:border-white/10 hover:border-amber-400 dark:hover:border-amber-400/60 bg-white/90 dark:!bg-[#191209]/90 relative overflow-hidden flex flex-col justify-between select-none">
+              <div className="pointer-events-none absolute inset-x-4 top-0 h-0.5 bg-gradient-to-r from-transparent via-amber-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <div className="flex items-center gap-1.5">
+                    <div className="p-1.5 rounded-xl bg-amber-500/10 dark:bg-amber-400/15 border border-amber-300/60 dark:border-amber-400/30 text-amber-600 dark:text-amber-400 group-hover:scale-125 transition-transform duration-300 shadow-2xs">
+                      <Activity className="w-3.5 h-3.5 animate-pulse" />
+                    </div>
+                    <span className="text-xs font-bold text-slate-600 dark:text-slate-300">
+                      {isHindi ? 'अगले 48h संभावना' : 'Next 48h Formation'}
+                    </span>
+                  </div>
+                  <InfoTooltip term="formation_probability" isHindi={isHindi} />
+                </div>
+                <div className="text-2xl sm:text-3xl font-heading font-black bg-gradient-to-r from-amber-600 via-orange-500 to-amber-500 dark:from-amber-400 dark:via-orange-400 dark:to-amber-300 bg-clip-text text-transparent mt-1">
+                  {current.risk48h}
+                </div>
               </div>
-              <div className="text-2xl sm:text-3xl font-heading font-black text-amber-600 dark:text-amber-400">
-                {current.risk48h}
+              <div className="mt-3 pt-2 border-t border-slate-100 dark:border-white/5 space-y-1.5">
+                <div className="flex items-center justify-between text-[11px]">
+                  <span className="font-medium text-slate-500 dark:text-slate-400">
+                    {isHindi ? 'ResNet18 प्रायिकता' : 'ResNet18 Confidence'}
+                  </span>
+                  <span className="font-mono text-[9px] font-bold text-amber-700 dark:text-amber-300 bg-amber-500/10 dark:bg-amber-400/15 px-1.5 py-0.5 rounded-md">
+                    HIGH PROB
+                  </span>
+                </div>
+                {/* Playful mini progress bar */}
+                <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500 rounded-full transition-all duration-700" 
+                    style={{ width: current.risk48h ? (current.risk48h.includes('%') ? current.risk48h : `${parseInt(current.risk48h) || 68}%`) : '68%' }}
+                  />
+                </div>
               </div>
-              <span className="text-[0.7rem] text-slate-500 dark:text-slate-400 mt-0.5 block">
-                {isHindi ? 'एआई ResNet18 मॉडल प्रायिकता' : 'ResNet18 Confidence'}
-              </span>
-            </IOSGlassCard>
+            </div>
 
-            <IOSGlassCard className="p-3.5 sm:p-4 rounded-2xl sm:rounded-3xl">
-              <div className="flex items-center justify-between mb-0.5">
-                <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-                  {isHindi ? 'गति एवं दिशा' : 'Movement'}
+            {/* Card 4: Movement & Direction */}
+            <div className="group p-4 rounded-3xl cursor-default transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.02] hover:shadow-[0_14px_32px_rgba(16,185,129,0.18)] dark:hover:shadow-[0_16px_36px_rgba(16,185,129,0.25)] border border-slate-200/80 dark:border-white/10 hover:border-emerald-400 dark:hover:border-emerald-400/60 bg-white/90 dark:!bg-[#0a1815]/90 relative overflow-hidden flex flex-col justify-between select-none">
+              <div className="pointer-events-none absolute inset-x-4 top-0 h-0.5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <div className="flex items-center gap-1.5">
+                    <div className="p-1.5 rounded-xl bg-emerald-500/10 dark:bg-emerald-400/15 border border-emerald-300/60 dark:border-emerald-400/30 text-emerald-600 dark:text-emerald-400 group-hover:rotate-180 transition-transform duration-700 shadow-2xs">
+                      <Compass className="w-3.5 h-3.5" />
+                    </div>
+                    <span className="text-xs font-bold text-slate-600 dark:text-slate-300">
+                      {isHindi ? 'गति एवं दिशा' : 'Movement'}
+                    </span>
+                  </div>
+                  <InfoTooltip term="movement" isHindi={isHindi} />
+                </div>
+                <div className="text-xl sm:text-2xl font-heading font-black text-slate-950 dark:text-white flex items-center gap-1.5 mt-1">
+                  <Navigation2 className="w-4 h-4 text-emerald-500 -rotate-45 group-hover:-rotate-90 transition-transform duration-500 shrink-0" />
+                  <span className="truncate">
+                    {isHindi ? (current.directionHindi || getDirectionName(current.direction, isHindi)) : current.direction}
+                  </span>
+                </div>
+              </div>
+              <div className="mt-3 pt-2 border-t border-slate-100 dark:border-white/5 flex items-center justify-between text-[11px]">
+                <span className="font-mono font-semibold text-slate-500 dark:text-slate-400">
+                  {isHindi ? `गति ${current.speed} किमी/घं` : `Speed ${current.speed} km/h`}
                 </span>
-                <InfoTooltip term="movement" isHindi={isHindi} />
+                <span className="inline-flex items-center gap-0.5 text-[9px] font-mono font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 dark:bg-emerald-400/15 px-1.5 py-0.5 rounded-md">
+                  Active Track
+                </span>
               </div>
-              <div className="text-xl sm:text-2xl font-heading font-bold text-slate-950 dark:text-white">
-                {isHindi ? (current.directionHindi || getDirectionName(current.direction, isHindi)) : current.direction}
-              </div>
-              <span className="text-[0.7rem] text-slate-500 dark:text-slate-400 mt-0.5 block">
-                {isHindi ? `गति ${current.speed} किमी/घंटा` : `Speed ${current.speed} km/h`}
-              </span>
-            </IOSGlassCard>
+            </div>
           </div>
 
           {/* Requirement 3: Cyclone Development Lifecycle & Trend Stepper */}
