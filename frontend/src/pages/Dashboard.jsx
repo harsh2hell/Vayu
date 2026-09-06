@@ -149,20 +149,24 @@ const Dashboard = () => {
         modelBadge="N=1,148 SYNOPTIC CYCLES"
         actions={
           <>
-            <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200">
-              {Object.values(BENCHMARK_CASES).map((storm) => (
-                <button
-                  key={storm.id}
-                  onClick={() => setSelectedCaseId(storm.id)}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                    selectedCaseId === storm.id
-                      ? 'bg-[#003087] text-white shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  {storm.name}
-                </button>
-              ))}
+            <div className="storm-pill-track-3d">
+              {Object.values(BENCHMARK_CASES).map((storm) => {
+                const isActive = selectedCaseId === storm.id;
+                return (
+                  <button
+                    key={storm.id}
+                    onClick={() => setSelectedCaseId(storm.id)}
+                    className={`storm-pill-3d-btn ${isActive ? 'is-active' : ''}`}
+                  >
+                    {isActive && (
+                      <span className="absolute inset-0 rounded-full overflow-hidden pointer-events-none">
+                        <span className="animate-vayu-sheen absolute inset-y-0 w-20 bg-gradient-to-r from-transparent via-white/35 to-transparent pointer-events-none" />
+                      </span>
+                    )}
+                    <span className="relative z-10">{storm.name}</span>
+                  </button>
+                );
+              })}
             </div>
 
             <button

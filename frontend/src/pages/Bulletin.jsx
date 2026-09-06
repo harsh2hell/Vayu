@@ -98,21 +98,25 @@ const Bulletin = () => {
         actions={
           <div className="flex items-center gap-2">
             <span className="text-xs font-semibold text-slate-600 hidden sm:inline">Storm:</span>
-            <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200">
-              {BENCHMARK_STORMS.map((storm) => (
-                <button
-                  key={storm.id}
-                  onClick={() => setSelectedStormId(storm.id)}
-                  disabled={isGenerating}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                    selectedStormId === storm.id
-                      ? 'bg-[#003087] text-white shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900'
-                  }`}
-                >
-                  {storm.name}
-                </button>
-              ))}
+            <div className="storm-pill-track-3d">
+              {BENCHMARK_STORMS.map((storm) => {
+                const isActive = selectedStormId === storm.id;
+                return (
+                  <button
+                    key={storm.id}
+                    onClick={() => setSelectedStormId(storm.id)}
+                    disabled={isGenerating}
+                    className={`storm-pill-3d-btn ${isActive ? 'is-active' : ''}`}
+                  >
+                    {isActive && (
+                      <span className="absolute inset-0 rounded-full overflow-hidden pointer-events-none">
+                        <span className="animate-vayu-sheen absolute inset-y-0 w-20 bg-gradient-to-r from-transparent via-white/35 to-transparent pointer-events-none" />
+                      </span>
+                    )}
+                    <span className="relative z-10">{storm.name}</span>
+                  </button>
+                );
+              })}
             </div>
           </div>
         }
