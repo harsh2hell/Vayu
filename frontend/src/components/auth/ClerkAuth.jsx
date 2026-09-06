@@ -17,29 +17,29 @@ export const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY 
  */
 export const AuthConfigurationNotice = () => {
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-8 shadow-2xl relative overflow-hidden text-center space-y-4">
-        <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center mx-auto text-amber-400">
+    <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col items-center justify-center p-4">
+      <div className="w-full max-w-md bg-white border border-slate-200 rounded-3xl p-8 shadow-xl text-center space-y-4">
+        <div className="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-200 flex items-center justify-center mx-auto text-amber-600">
           <AlertTriangle className="w-6 h-6" />
         </div>
 
         <div>
-          <h2 className="text-lg font-bold text-white tracking-tight">
+          <h2 className="text-lg font-bold text-slate-900 tracking-tight">
             Clerk Authentication Required
           </h2>
-          <p className="text-xs text-slate-400 mt-1 leading-relaxed">
-            The VAYU Command Dashboard is protected by Clerk Pro authentication (<code className="text-sky-400 font-mono">login.vayusat.live</code>).
+          <p className="text-xs text-slate-500 mt-1 leading-relaxed">
+            The VAYU Command Dashboard is protected by Clerk Pro authentication (<code className="text-sky-600 font-mono">login.vayusat.live</code>).
           </p>
         </div>
 
-        <div className="p-3.5 rounded-xl bg-slate-950/80 border border-slate-800 text-left font-mono text-[11px] text-slate-400 space-y-2">
-          <p className="text-amber-400 font-semibold">Environment Variable Required:</p>
-          <p>Please add <code className="text-white">VITE_CLERK_PUBLISHABLE_KEY</code> in your Vercel Project Settings ➔ Environment Variables, then redeploy.</p>
+        <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-left font-mono text-[11px] text-slate-600 space-y-2">
+          <p className="text-amber-700 font-semibold">Environment Variable Required:</p>
+          <p>Please add <code className="text-slate-900 font-bold">VITE_CLERK_PUBLISHABLE_KEY</code> in your Vercel Project Settings ➔ Environment Variables, then redeploy.</p>
         </div>
 
         <a
           href="/"
-          className="inline-flex items-center justify-center gap-1.5 w-full py-2.5 px-4 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium transition-colors cursor-pointer"
+          className="inline-flex items-center justify-center gap-1.5 w-full py-2.5 px-4 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-medium transition-colors cursor-pointer shadow-xs"
         >
           <span>Return to Public Portal</span>
         </a>
