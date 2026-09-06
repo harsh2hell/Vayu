@@ -153,10 +153,10 @@ const AICycloneIntelligence = () => {
       />
 
       {/* 2. SIH PROBLEM STATEMENT & AUTHENTICITY HEADER */}
-      <div className="bg-gradient-to-r from-sky-50 via-indigo-50/70 to-slate-50 dark:from-slate-900 dark:via-indigo-950 dark:to-slate-950 text-slate-900 dark:text-white border-b border-slate-200/80 dark:border-white/10 py-4 px-4 sm:px-6 lg:px-8 relative overflow-hidden transition-colors duration-300">
-        {/* Luminous background aura */}
-        <div className="pointer-events-none absolute -top-24 right-10 w-96 h-96 bg-sky-400/15 dark:bg-sky-500/15 rounded-full blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-24 left-10 w-96 h-96 bg-indigo-400/15 dark:bg-indigo-500/15 rounded-full blur-3xl" />
+      <div className="bg-gradient-to-r from-sky-50 via-indigo-50/70 to-slate-50 dark:from-slate-950 dark:via-black dark:to-slate-950 text-slate-900 dark:text-white border-b border-slate-200/80 dark:border-white/10 py-4 px-4 sm:px-6 lg:px-8 relative overflow-hidden transition-colors duration-300">
+        {/* Luminous background aura - disabled in dark mode to prevent blue glare */}
+        <div className="pointer-events-none absolute -top-24 right-10 w-96 h-96 bg-sky-400/15 dark:bg-transparent rounded-full blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-24 left-10 w-96 h-96 bg-indigo-400/15 dark:bg-transparent rounded-full blur-3xl" />
 
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row lg:items-center justify-between gap-4 relative z-10">
           <div className="space-y-1.5">
@@ -980,10 +980,10 @@ const AICycloneIntelligence = () => {
             </div>
 
             {/* AI Multi-Source Data Fusion Engine Architecture Diagram */}
-            <div className="bg-gradient-to-br from-sky-50/90 via-indigo-50/60 to-slate-100/80 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950 text-slate-900 dark:text-white border border-slate-200/80 dark:border-white/10 rounded-3xl p-6 sm:p-8 shadow-sm dark:shadow-2xl relative overflow-hidden space-y-6 transition-colors duration-300">
-              {/* Background ambient auras */}
-              <div className="pointer-events-none absolute -top-24 right-10 w-80 h-80 bg-sky-400/10 dark:bg-sky-500/10 rounded-full blur-3xl" />
-              <div className="pointer-events-none absolute -bottom-24 left-10 w-80 h-80 bg-indigo-400/10 dark:bg-indigo-500/10 rounded-full blur-3xl" />
+            <div className="bg-gradient-to-br from-sky-50/90 via-indigo-50/60 to-slate-100/80 dark:from-slate-950 dark:via-black dark:to-slate-950 text-slate-900 dark:text-white border border-slate-200/80 dark:border-white/10 rounded-3xl p-6 sm:p-8 shadow-sm dark:shadow-2xl relative overflow-hidden space-y-6 transition-colors duration-300">
+              {/* Background ambient auras - transparent in dark mode to prevent blue glare */}
+              <div className="pointer-events-none absolute -top-24 right-10 w-80 h-80 bg-sky-400/10 dark:bg-transparent rounded-full blur-3xl" />
+              <div className="pointer-events-none absolute -bottom-24 left-10 w-80 h-80 bg-indigo-400/10 dark:bg-transparent rounded-full blur-3xl" />
 
               <div className="text-center max-w-2xl mx-auto space-y-1 relative z-10">
                 <span className="text-[11px] font-black uppercase tracking-wider text-sky-600 dark:text-sky-400 block font-mono">
