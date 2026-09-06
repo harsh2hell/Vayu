@@ -35,6 +35,7 @@ const Detection = () => {
   
   // Real inference state
   const [isDetecting, setIsDetecting] = useState(false);
+  const [inferenceStatus, setInferenceStatus] = useState('ready'); // 'ready' | 'running' | 'success' | 'error'
   const [detectionResult, setDetectionResult] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
 
@@ -50,6 +51,7 @@ const Detection = () => {
     setCustomPreview(objectUrl);
     setDetectionResult(null);
     setErrorMsg(null);
+    setInferenceStatus('ready');
 
     const img = new Image();
     img.onload = () => {
@@ -70,10 +72,12 @@ const Detection = () => {
     setFileMeta(null);
     setDetectionResult(null);
     setErrorMsg(null);
+    setInferenceStatus('ready');
   };
 
   const handleRunDetection = async () => {
     setIsDetecting(true);
+    setInferenceStatus('running');
     setErrorMsg(null);
 
     try {
@@ -95,12 +99,15 @@ const Detection = () => {
 
       if (res && res.success) {
         setDetectionResult(res);
+        setInferenceStatus('success');
       } else {
         setErrorMsg(res?.message || 'Detection failed: Neural backend returned an error.');
+        setInferenceStatus('error');
       }
     } catch (err) {
       console.error('[Detection Page Error]:', err);
       setErrorMsg(err.message || 'Detection failed: Backend unavailable or network error.');
+      setInferenceStatus('error');
     } finally {
       setIsDetecting(false);
     }
@@ -129,12 +136,12 @@ const Detection = () => {
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
             Convolutional neural network for automated tropical cyclogenesis identification & eye center localization.
           </p>
-          <div className="flex items-center gap-2 mt-2">
+          <div className="flex items-center gap-2 mt-2 flex-wrap">
             <span className="text-[11px] font-mono bg-slate-100 text-slate-600 px-2.5 py-0.5 rounded border border-slate-200">
               Checkpoint: vayu_detector_mobilenetv3_p3b.pt
             </span>
-            <span className="text-[11px] text-slate-400 font-mono">
-              In-session analysis • Not persisted to database
+            <span className="text-[11px] text-amber-800 bg-amber-50 font-mono px-2 py-0.5 rounded border border-amber-200">
+              Page-Local Analysis • Isolated from Command Overview
             </span>
           </div>
         </div>
@@ -235,7 +242,23 @@ const Detection = () => {
                   className="w-full h-full object-contain filter brightness-95 contrast-110"
                 />
 
-                {/* Real Dynamic Bounding Box Overlay */}
+                {/* Source and Lifecycle Watermarks */}
+                <div className="absolute top-2.5 left-2.5 z-10 flex flex-col gap-1 pointer-events-none">
+                  <span className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold border backdrop-blur-md shadow-sm ${
+                    customFile 
+                      ? 'bg-amber-950/85 text-amber-300 border-amber-500/50' 
+                      : 'bg-slate-900/85 text-sky-300 border-white/20'
+                  }`}>
+                    {customFile ? 'USER-UPLOADED IMAGE • IN-SESSION ANALYSIS' : `BENCHMARK FRAME: ${selectedPreset.name}`}
+                  </span>
+                  {!detectionResult && (
+                    <span className="px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold bg-red-950/90 text-red-300 border border-red-500/50 backdrop-blur-md shadow-sm">
+                      INPUT IMAGE PREVIEW ONLY — NO INFERENCE EXECUTED
+                    </span>
+                  )}
+                </div>
+
+                {/* Real Dynamic Bounding Box Overlay (Visible ONLY when inference succeeded) */}
                 {detectionResult?.detected && bboxStyle && (
                   <div 
                     className="absolute border-2 border-red-500 bg-red-500/15 rounded transition-all duration-500 pointer-events-none"
@@ -248,7 +271,7 @@ const Detection = () => {
                   </div>
                 )}
 
-                {/* Center Fix Pin Marker */}
+                {/* Center Fix Pin Marker (Visible ONLY when inference succeeded) */}
                 {detectionResult?.detected && detectionResult?.center && (
                   <div 
                     className="absolute w-4 h-4 rounded-full border-2 border-amber-300 bg-red-600 shadow-lg pointer-events-none transform -translate-x-1/2 -translate-y-1/2 animate-pulse"
@@ -290,11 +313,15 @@ const Detection = () => {
             <span>
               <strong>Input Basin:</strong> {activeBasin} • <strong>Source:</strong> {customFile ? 'User In-Session Frame' : selectedPreset?.name}
             </span>
-            {detectionResult && (
-              <span className="font-mono text-[11px] text-slate-500">
-                Inference Status: COMPLETE
-              </span>
-            )}
+            <span className="font-mono text-[11px]">
+              {inferenceStatus === 'success' && detectionResult ? (
+                <span className="text-emerald-700 font-bold">Inference Status: COMPLETE</span>
+              ) : inferenceStatus === 'running' ? (
+                <span className="text-blue-700 font-bold animate-pulse">Inference Status: RUNNING...</span>
+              ) : (
+                <span className="text-slate-500 font-semibold">NO INFERENCE EXECUTED</span>
+              )}
+            </span>
           </div>
         </div>
 
@@ -313,8 +340,10 @@ const Detection = () => {
                   <span className={`badge ${detectionResult.detected ? 'badge-green' : 'badge-red'}`}>
                     {detectionResult.detected ? 'Positive Fix' : 'Negative'}
                   </span>
+                ) : inferenceStatus === 'running' ? (
+                  <span className="badge badge-yellow animate-pulse">Running MobileNetV3...</span>
                 ) : (
-                  <span className="badge badge-gray">Awaiting Inference</span>
+                  <span className="badge badge-red font-mono text-[10px]">NO INFERENCE EXECUTED</span>
                 )}
               </div>
             </div>
@@ -391,11 +420,28 @@ const Detection = () => {
                 </div>
               </div>
             ) : (
-              <div className="p-8 text-center bg-slate-50 rounded-xl border border-slate-200 text-slate-500 space-y-2">
-                <Target className="w-8 h-8 mx-auto text-slate-400" />
-                <p className="text-xs font-medium">No inference executed yet for this frame.</p>
-                <p className="text-[11px] text-slate-400">
-                  Click <strong>Run Detection Inference</strong> to execute the MobileNetV3 model on this frame.
+              <div className="p-8 text-center bg-slate-50 rounded-xl border border-dashed border-slate-300 text-slate-500 space-y-3">
+                <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center mx-auto text-slate-500">
+                  <Target className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+                    NO INFERENCE EXECUTED
+                  </h4>
+                  <p className="text-[11px] text-slate-500 mt-1 max-w-xs mx-auto">
+                    This is an input image preview. No neural inference has been executed on this frame.
+                  </p>
+                </div>
+                <div className="p-3 bg-white rounded-lg border border-slate-200 text-[11px] text-slate-600 text-left font-mono space-y-1">
+                  <div className="text-slate-400 font-bold uppercase text-[10px] mb-1">Inference State Checklist:</div>
+                  <div>• Cyclone Detected: <span className="text-amber-700 font-semibold">NOT EVALUATED</span></div>
+                  <div>• Objectness Score: <span className="text-amber-700 font-semibold">NOT EVALUATED</span></div>
+                  <div>• Eye Center Fix: <span className="text-amber-700 font-semibold">NOT COMPUTED</span></div>
+                  <div>• Bounding Box: <span className="text-amber-700 font-semibold">NOT COMPUTED</span></div>
+                  <div>• Latency: <span className="text-amber-700 font-semibold">NOT MEASURED</span></div>
+                </div>
+                <p className="text-[11px] text-slate-500">
+                  Click <strong className="text-slate-700">Run Detection Inference</strong> above to execute MobileNetV3 dual-head neural network.
                 </p>
               </div>
             )}

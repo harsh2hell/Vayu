@@ -58,6 +58,7 @@ const Satellite = () => {
 
   // Real AI Inference State
   const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [inferenceStatus, setInferenceStatus] = useState('ready'); // 'ready' | 'running' | 'success' | 'error'
   const [analysisProgressStep, setAnalysisProgressStep] = useState('');
   const [detectionResult, setDetectionResult] = useState(null);
   const [classificationResult, setClassificationResult] = useState(null);
@@ -74,10 +75,11 @@ const Satellite = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Reset previous AI outputs
+    // Reset previous AI outputs immediately
     setDetectionResult(null);
     setClassificationResult(null);
     setAnalysisError(null);
+    setInferenceStatus('ready');
 
     const objectUrl = URL.createObjectURL(file);
     setCustomImageUrl(objectUrl);
@@ -104,6 +106,7 @@ const Satellite = () => {
     setDetectionResult(null);
     setClassificationResult(null);
     setAnalysisError(null);
+    setInferenceStatus('ready');
 
     setImageMetadata({
       name: preset.name,
@@ -116,6 +119,7 @@ const Satellite = () => {
   // Run Real End-to-End AI Analysis: MobileNetV3 + ResNet18 + Grad-CAM
   const handleRunAIAnalysis = async () => {
     setIsAnalyzing(true);
+    setInferenceStatus('running');
     setAnalysisError(null);
     setDetectionResult(null);
     setClassificationResult(null);
@@ -144,6 +148,7 @@ const Satellite = () => {
       // If no cyclone detected, do not run downstream morphology
       if (detRes.cyclone_detected === false) {
         setAnalysisProgressStep('DETECTION: Non-cyclonic frame identified.');
+        setInferenceStatus('success');
         return;
       }
 
@@ -154,11 +159,13 @@ const Satellite = () => {
         throw new Error(clsRes?.message || 'ResNet18 morphological classification failed.');
       }
       setClassificationResult(clsRes);
+      setInferenceStatus('success');
 
       setAnalysisProgressStep('EXPLAINABILITY: Generating Grad-CAM attention foci...');
     } catch (err) {
       console.error('AI Analysis Error:', err);
       setAnalysisError(err.message || 'AI ANALYSIS FAILED: Backend connection required.');
+      setInferenceStatus('error');
     } finally {
       setIsAnalyzing(false);
     }
@@ -411,13 +418,24 @@ const Satellite = () => {
                 </>
               )}
 
-              {/* Watermark Tag */}
-              <div className="absolute top-2.5 left-2.5 z-10 bg-slate-900/80 backdrop-blur-md px-2.5 py-1 rounded-lg text-[10px] font-mono text-white border border-white/20">
-                <span>{customFile ? 'Uploaded Satellite Raster' : selectedPreset.satellite}</span>
+              {/* Source & Inference Lifecycle Watermarks */}
+              <div className="absolute top-2.5 left-2.5 z-10 flex flex-col gap-1 pointer-events-none">
+                <span className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold border backdrop-blur-md shadow-sm ${
+                  customFile 
+                    ? 'bg-amber-950/85 text-amber-300 border-amber-500/50' 
+                    : 'bg-slate-900/85 text-sky-300 border-white/20'
+                }`}>
+                  {customFile ? 'USER-UPLOADED IMAGE • IN-SESSION ANALYSIS' : `BENCHMARK FRAME: ${selectedPreset.name}`}
+                </span>
+                {!detectionResult && (
+                  <span className="px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold bg-red-950/90 text-red-300 border border-red-500/50 backdrop-blur-md shadow-sm">
+                    INPUT IMAGE PREVIEW ONLY — NO INFERENCE EXECUTED
+                  </span>
+                )}
               </div>
 
               {/* Status Stamp */}
-              {detectionResult && (
+              {detectionResult ? (
                 <div className="absolute bottom-2.5 left-2.5 right-2.5 z-10 bg-slate-900/85 backdrop-blur-md p-2 rounded-xl text-[10px] font-mono text-slate-300 border border-white/10 flex items-center justify-between">
                   <span className={detectionResult.cyclone_detected ? "text-emerald-400 font-bold" : "text-slate-400"}>
                     {detectionResult.cyclone_detected ? "Cyclone Detected: YES" : "NO CYCLONE DETECTED"}
@@ -427,6 +445,11 @@ const Satellite = () => {
                       ResNet18: {classificationResult.predicted_pattern}
                     </span>
                   )}
+                </div>
+              ) : (
+                <div className="absolute bottom-2.5 left-2.5 right-2.5 z-10 bg-slate-900/75 backdrop-blur-md px-3 py-1.5 rounded-xl text-[10px] font-mono text-slate-400 border border-white/10 flex items-center justify-between">
+                  <span>Input Raster Loaded ({imageMetadata.dimensions})</span>
+                  <span className="text-amber-400 font-semibold">NO INFERENCE EXECUTED</span>
                 </div>
               )}
             </div>
@@ -480,7 +503,13 @@ const Satellite = () => {
                   AI IMAGE ASSESSMENT
                 </h3>
               </div>
-              <span className="badge badge-navy text-[10px]">Production Pipeline</span>
+              {detectionResult ? (
+                <span className="badge badge-green text-[10px]">Analysis Complete</span>
+              ) : isAnalyzing ? (
+                <span className="badge badge-yellow animate-pulse text-[10px]">Processing Pipeline...</span>
+              ) : (
+                <span className="badge badge-red font-mono text-[10px]">NO INFERENCE EXECUTED</span>
+              )}
             </div>
 
             {detectionResult ? (
@@ -651,26 +680,42 @@ const Satellite = () => {
 
               </div>
             ) : (
-              <div className="p-8 text-center text-slate-400 space-y-3">
-                <Target className="w-8 h-8 mx-auto text-slate-300" />
-                <p className="text-xs font-medium text-slate-600">
-                  Ready for AI Analysis
-                </p>
-                <p className="text-[11px] text-slate-400 max-w-xs mx-auto">
-                  Click <strong>Run AI Analysis</strong> above to execute MobileNetV3 detection, ResNet18 morphology, and Autograd Grad-CAM explainability.
+              <div className="p-8 text-center bg-slate-50 rounded-xl border border-dashed border-slate-300 text-slate-500 space-y-3">
+                <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center mx-auto text-slate-500">
+                  <Target className="w-5 h-5" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+                    NO INFERENCE EXECUTED
+                  </h4>
+                  <p className="text-[11px] text-slate-500 mt-1 max-w-xs mx-auto">
+                    This is an input raster preview. No neural inference has been executed on this frame yet.
+                  </p>
+                </div>
+                <div className="p-3 bg-white rounded-lg border border-slate-200 text-[11px] text-slate-600 text-left font-mono space-y-1">
+                  <div className="text-slate-400 font-bold uppercase text-[10px] mb-1">Pipeline Status:</div>
+                  <div>• MobileNetV3 Detection: <span className="text-amber-700 font-semibold">NOT RUN</span></div>
+                  <div>• ResNet18 Morphology: <span className="text-amber-700 font-semibold">NOT RUN</span></div>
+                  <div>• Autograd Grad-CAM: <span className="text-amber-700 font-semibold">NOT RUN</span></div>
+                </div>
+                <p className="text-[11px] text-slate-500">
+                  Click <strong className="text-slate-700">Run AI Analysis</strong> above to execute the deep learning vision pipeline.
                 </p>
               </div>
             )}
 
-            {/* Navigation CTA */}
-            <div className="pt-2">
+            {/* Navigation Return */}
+            <div className="pt-2 border-t border-slate-100">
               <button
                 onClick={() => navigate('/dashboard')}
-                className="btn-primary w-full text-xs py-2.5 justify-center gap-1.5"
+                className="btn-secondary w-full text-xs py-2.5 justify-center gap-1.5"
               >
-                <span>View Full Command Overview Trajectory</span>
+                <span>Return to Benchmark Command Overview</span>
                 <ChevronRight className="w-3.5 h-3.5" />
               </button>
+              <p className="text-[10px] text-slate-400 font-mono text-center mt-1.5 leading-tight">
+                Command Overview evaluates official benchmark cases (DANA & BIPARJOY). In-session uploads remain strictly isolated to this page.
+              </p>
             </div>
           </div>
 

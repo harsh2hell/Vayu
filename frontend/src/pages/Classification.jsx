@@ -118,7 +118,7 @@ const Classification = () => {
   };
 
   const classesList = classificationResult?.class_probability_distribution || DEFAULT_SUPPORTED_CLASSES;
-  const topPattern = classificationResult?.predicted_pattern || 'Awaiting Inference';
+  const topPattern = classificationResult?.predicted_pattern || 'NO INFERENCE EXECUTED';
   const topConf = classificationResult?.confidence_percentage || 0;
   const gradcamFoci = classificationResult?.gradcam_attention_foci || [];
   const radiometric = classificationResult?.radiometric_indicators;
@@ -230,8 +230,12 @@ const Classification = () => {
                 Grad-CAM Visual Attention Hotspots
               </h3>
             </div>
-            {classificationResult && (
+            {classificationResult ? (
               <span className="badge badge-amber text-[10px]">Autograd Backprop</span>
+            ) : isClassifying ? (
+              <span className="badge badge-yellow animate-pulse text-[10px]">Classifying...</span>
+            ) : (
+              <span className="badge badge-red font-mono text-[10px]">NO INFERENCE EXECUTED</span>
             )}
           </div>
           
@@ -244,8 +248,24 @@ const Classification = () => {
                   className="w-full h-full object-contain filter brightness-95 contrast-110"
                 />
 
-                {/* Real Dynamic Grad-CAM Attention Foci from Backend */}
-                {gradcamFoci.map((focus, idx) => (
+                {/* Source and Lifecycle Watermarks */}
+                <div className="absolute top-2.5 left-2.5 z-10 flex flex-col gap-1 pointer-events-none">
+                  <span className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold border backdrop-blur-md shadow-sm ${
+                    customFile 
+                      ? 'bg-amber-950/85 text-amber-300 border-amber-500/50' 
+                      : 'bg-slate-900/85 text-sky-300 border-white/20'
+                  }`}>
+                    {customFile ? 'USER-UPLOADED IMAGE • IN-SESSION ANALYSIS' : `BENCHMARK FRAME: ${selectedPreset.name}`}
+                  </span>
+                  {!classificationResult && (
+                    <span className="px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold bg-red-950/90 text-red-300 border border-red-500/50 backdrop-blur-md shadow-sm">
+                      INPUT IMAGE PREVIEW ONLY — NO INFERENCE EXECUTED
+                    </span>
+                  )}
+                </div>
+
+                {/* Real Dynamic Grad-CAM Attention Foci from Backend (Visible ONLY when inference has executed) */}
+                {classificationResult && gradcamFoci.map((focus, idx) => (
                   <div
                     key={focus.focus_id || idx}
                     className="absolute pointer-events-none transform -translate-x-1/2 -translate-y-1/2"
@@ -296,7 +316,7 @@ const Classification = () => {
             <div className="flex justify-between items-center py-1 border-b border-slate-200">
               <span className="text-slate-500">Model Confidence:</span>
               <span className="font-bold font-mono text-slate-800">
-                {topConf > 0 ? `${topConf.toFixed(1)}%` : 'Awaiting Inference'}
+                {classificationResult ? `${topConf.toFixed(1)}%` : 'NO INFERENCE EXECUTED'}
               </span>
             </div>
             <div className="flex justify-between items-center py-1 border-b border-slate-200">
@@ -306,7 +326,7 @@ const Classification = () => {
             <div className="flex justify-between items-center py-1">
               <span className="text-slate-500">Grad-CAM Attention Foci:</span>
               <span className="font-semibold text-amber-700">
-                {gradcamFoci.length > 0 ? `${gradcamFoci.length} Hotspots Localized` : 'Awaiting Inference'}
+                {classificationResult && gradcamFoci.length > 0 ? `${gradcamFoci.length} Hotspots Localized` : (classificationResult ? '0 Hotspots' : 'NO INFERENCE EXECUTED')}
               </span>
             </div>
           </div>
@@ -371,7 +391,7 @@ const Classification = () => {
             <div className="flex items-center gap-1.5">
               <CheckCircle className="w-3.5 h-3.5 text-emerald-300" />
               <span className="text-xs text-emerald-300 font-medium">
-                {topConf > 0 ? `Confidence: ${topConf.toFixed(1)}% (ResNet-18)` : 'Awaiting Inference'}
+                {classificationResult ? `Confidence: ${topConf.toFixed(1)}% (ResNet-18)` : 'Inference not run on this frame'}
               </span>
             </div>
           </div>

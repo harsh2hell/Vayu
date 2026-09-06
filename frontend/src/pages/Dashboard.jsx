@@ -333,6 +333,10 @@ const Dashboard = () => {
     if (!p) return;
 
     setIsProcessing(true);
+    // Strict State Reset: Clear previous storm data immediately to prevent cross-case contamination
+    setSatelliteData(null);
+    setAiPrediction(null);
+    setGeneratedBulletin(null);
     setBackendError(null);
     setSatelliteAnalysisError(null);
     setBulletinError(null);
@@ -340,13 +344,14 @@ const Dashboard = () => {
 
     const overallStartTime = performance.now();
 
-    // 1. Mark vision stages as RUNNING
+    // 1. Initial stage statuses for benchmark execution:
+    // Only Stage 1 is RUNNING during ingestion; others are READY awaiting data.
     setPipelineStages(prev => ({
       ...prev,
-      satellite: { ...prev.satellite, status: 'RUNNING', detail: 'Downloading NASA GIBS frame...' },
-      detection: { ...prev.detection, status: 'RUNNING', detail: 'Executing MobileNetV3 dual-head...' },
-      morphology: { ...prev.morphology, status: 'RUNNING', detail: 'Running ResNet18 classifier...' },
-      explainability: { ...prev.explainability, status: 'RUNNING', detail: 'Computing Grad-CAM attention...' },
+      satellite: { ...prev.satellite, status: 'RUNNING', detail: 'Downloading NASA GIBS raster...' },
+      detection: { ...prev.detection, status: 'READY', detail: 'Awaiting raster...' },
+      morphology: { ...prev.morphology, status: 'READY', detail: 'Awaiting detection...' },
+      explainability: { ...prev.explainability, status: 'READY', detail: 'Awaiting morphology...' },
       trajectory: { ...prev.trajectory, status: 'READY', detail: 'Awaiting sequence...' },
       uncertainty: { ...prev.uncertainty, status: 'READY', detail: 'Awaiting trajectory...' },
       impact: { ...prev.impact, status: 'READY', detail: 'Awaiting corridor...' },
@@ -522,9 +527,9 @@ const Dashboard = () => {
             detail: `${districtCount || 3} Districts Warned` 
           },
           bulletin: { 
-            status: 'PASS', 
+            status: 'READY', 
             label: 'Official Advisory PDF', 
-            detail: 'Advisory Ready' 
+            detail: 'Ready for generation' 
           }
         }));
       } else {
@@ -566,7 +571,16 @@ const Dashboard = () => {
         windSpeed: activeWaypoint?.speed || aiPrediction.current_wind,
         pressure: activeWaypoint?.pressure || aiPrediction.current_pressure
       });
-      if (!success) {
+      if (success) {
+        setPipelineStages(prev => ({
+          ...prev,
+          bulletin: { 
+            status: 'PASS', 
+            label: 'Official Advisory PDF', 
+            detail: 'Official PDF Generated' 
+          }
+        }));
+      } else {
         setBulletinError('Failed to generate PDF bulletin from backend.');
       }
     } catch (e) {
@@ -679,16 +693,19 @@ const Dashboard = () => {
       {/* ACTIVE CASE SELECTOR (Only Verified Historical Benchmarks: DANA & BIPARJOY) */}
       <div className="bg-white border border-slate-200/80 rounded-2xl p-4 sm:p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="text-xs font-mono font-bold text-slate-800 uppercase tracking-wider">
               Active Benchmark Case Study
             </span>
             <span className="px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-sky-50 text-sky-700 border border-sky-200">
               IMD Ground Truth Grounded
             </span>
+            <span className="px-2 py-0.5 rounded text-[10px] font-mono font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+              Isolated Benchmark Environment
+            </span>
           </div>
           <p className="text-xs text-slate-500 mt-0.5">
-            Select an official benchmark storm to trigger the live end-to-end AI pipeline demo.
+            Command Overview evaluates verified operational benchmarks (Cyclone DANA & Cyclone BIPARJOY). In-session image uploads on Detection or Satellite labs remain strictly page-local.
           </p>
         </div>
 
