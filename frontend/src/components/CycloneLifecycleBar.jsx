@@ -195,7 +195,7 @@ export default function CycloneLifecycleBar({
                 {/* Current Stage Indicator Tag */}
                 {isCurrent && (
                   <span className="mt-1.5 px-2 py-0.5 rounded-full text-[9px] font-mono font-bold bg-rose-600 text-white shadow-2xs animate-pulse">
-                    CURRENT FIX
+                    {isHindi ? 'तूफान स्थिति' : 'STORM POSITION'}
                   </span>
                 )}
               </div>
