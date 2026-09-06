@@ -9,6 +9,7 @@ import { detectCycloneFromImage } from '../services/api';
 import PageHeader from '../components/PageHeader';
 import EmptyState from '../components/EmptyState';
 import StatusBadge from '../components/StatusBadge';
+import DataTypeBadge from '../components/DataTypeBadge';
 
 const SATELLITE_PRESETS = [
   {
