@@ -64,7 +64,7 @@ const PIPELINE_STAGES = [
 
 const Detection = () => {
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState(4); // Default to final stage
+  const [currentStep, setCurrentStep] = useState(1); // Default to stage 1
   const [isRunningPipeline, setIsRunningPipeline] = useState(false);
   const [viewMode, setViewMode] = useState('cam'); // 'raw', 'cam', 'edges'
 
@@ -129,32 +129,29 @@ const Detection = () => {
         <div className="p-5 overflow-x-auto">
           <div className="flex items-center justify-between min-w-[700px] gap-2">
             {PIPELINE_STAGES.map((stage) => {
-              const isPassed = stage.step < currentStep;
               const isCurrent = stage.step === currentStep;
 
               return (
                 <button
                   key={stage.step}
                   onClick={() => setCurrentStep(stage.step)}
-                  className={`flex-1 flex flex-col items-center p-3 rounded-xl border-2 text-center transition-all ${
+                  className={`flex-1 flex flex-col items-center p-3 rounded-xl border-2 text-center transition-all cursor-pointer ${
                     isCurrent 
                       ? 'border-[#003087] bg-blue-50/70 shadow-xs' 
-                      : isPassed
-                      ? 'border-emerald-300 bg-emerald-50/40 text-emerald-800'
-                      : 'border-slate-200 bg-white hover:border-slate-300'
+                      : 'border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50/60'
                   }`}
                 >
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-xs mb-2 transition-colors ${
                     isCurrent 
                       ? 'bg-[#003087] text-white shadow-md' 
-                      : isPassed 
-                      ? 'bg-emerald-600 text-white' 
-                      : 'bg-slate-100 text-slate-500'
+                      : 'bg-slate-100 text-slate-600'
                   }`}>
-                    {isPassed ? <CheckCircle className="w-5 h-5" /> : stage.step}
+                    {stage.step}
                   </div>
                   
-                  <span className="font-bold text-xs text-slate-800 line-clamp-1">{stage.short}</span>
+                  <span className={`font-bold text-xs line-clamp-1 ${isCurrent ? 'text-[#003087]' : 'text-slate-800'}`}>
+                    {stage.short}
+                  </span>
                   <span className="text-[10px] text-slate-400 font-mono mt-0.5">{stage.latency}</span>
                 </button>
               );
