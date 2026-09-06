@@ -1,11 +1,12 @@
 import { BENCHMARK_STORMS } from '../data/benchmarkData';
 
 const CANDIDATE_URLS = [
+  import.meta.env.VITE_API_URL,
   'http://127.0.0.1:8000',
   'http://localhost:8000',
   'http://127.0.0.1:8001',
   'http://localhost:8001'
-];
+].filter(Boolean);
 
 let activeBaseUrl = CANDIDATE_URLS[0];
 
