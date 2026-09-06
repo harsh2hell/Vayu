@@ -566,9 +566,9 @@ export async function inspectAIModels() {
 }
 
 /**
- * Compares VAYU forecasts with WeatherNext/ECMWF comparative benchmark.
+ * Fetches verified storm comparative benchmark data vs persistence baseline.
  */
-export async function compareWeatherNextBenchmark(stormId = 'cyclone_dana_2024') {
+export async function compareStormBenchmark(stormId = 'cyclone_dana_2024') {
   try {
     const baseUrl = await getLiveBaseUrl();
     const res = await fetch(`${baseUrl}/api/v1/ml/benchmark-compare?storm_id=${encodeURIComponent(stormId)}`, { method: 'GET' });
@@ -582,6 +582,7 @@ export async function compareWeatherNextBenchmark(stormId = 'cyclone_dana_2024')
     return null;
   }
 }
+
 
 /**
  * Fetches Phase 3B/3D measured real-model benchmark metrics.

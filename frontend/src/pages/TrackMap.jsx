@@ -279,7 +279,7 @@ const TrackMap = () => {
                   showCone ? 'bg-amber-100 text-amber-900 border-amber-300 font-bold' : 'bg-slate-50 text-slate-500 border-slate-200'
                 }`}
               >
-                70% Error Cone
+                MC Uncertainty Cone
               </button>
               <button
                 onClick={() => setShowSurge(!showSurge)}
