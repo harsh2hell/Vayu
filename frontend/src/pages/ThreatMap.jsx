@@ -1,9 +1,11 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Wind, AlertTriangle, Satellite, Radio, Sliders, Crosshair, 
   CloudRain, Play, Pause, Compass, MapPin, Activity, ShieldAlert,
-  Search, Waves, ArrowUpRight, Info, PhoneCall
+  Search, Waves, ArrowUpRight, Info, PhoneCall,
+  Ruler, Maximize2, Minimize2, Gauge, Thermometer, Droplets,
+  Share2, ChevronDown, ChevronUp, Check, X, Layers, Plus, Minus
 } from 'lucide-react';
 import { 
   MapContainer, 
@@ -13,7 +15,7 @@ import {
   Polyline, 
   Polygon, 
   Popup, 
-  Marker,
+  Marker, 
   useMap 
 } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -21,6 +23,7 @@ import L from 'leaflet';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 import PublicNavbar from '../components/PublicNavbar';
+import './ZoomEarthControls.css';
 
 L.Marker.prototype.options.icon = L.icon({ 
   iconUrl: icon, 
@@ -34,6 +37,24 @@ const MapController = ({ center, zoom }) => {
   useEffect(() => {
     map.flyTo(center, zoom, { duration: 0.8 });
   }, [center, zoom, map]);
+  return null;
+};
+
+const MapActionHandler = ({ action, setAction, currentCenter, defaultZoom = 6 }) => {
+  const map = useMap();
+  useEffect(() => {
+    if (!action) return;
+    if (action === 'zoomIn') {
+      map.zoomIn();
+    } else if (action === 'zoomOut') {
+      map.zoomOut();
+    } else if (action === 'recenter') {
+      map.flyTo(currentCenter, defaultZoom, { duration: 0.8 });
+    } else if (action === 'resetNorth') {
+      map.setView(currentCenter, defaultZoom);
+    }
+    setAction(null);
+  }, [action, setAction, currentCenter, defaultZoom, map]);
   return null;
 };
 
@@ -64,16 +85,22 @@ const SYSTEMS = {
     threat: "Genesis Watch Active",
     threatHindi: "जनन निगरानी सक्रिय",
     threatColor: "text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/50 border-amber-200 dark:border-amber-800",
+    categoryBadge: "LPA",
+    categoryBadgeColor: "bg-emerald-500",
+    categoryFull: "Low Pressure Area • Developing Genesis",
     waypoints: [
-      { step: '+00h', label: 'Vortex Fix (Observed)', labelHindi: 'भंवर केंद्र (अवलोकित)', lat: 13.5, lon: 88.5, wind: '42 km/h', gusts: '55 km/h', pressure: '1004 hPa', cat: 'Low Pressure Area', catHindi: 'निम्न दबाव क्षेत्र' },
-      { step: '+12h', label: 'Consolidation Phase', labelHindi: 'समेकन चरण', lat: 14.4, lon: 87.6, wind: '50 km/h', gusts: '65 km/h', pressure: '1000 hPa', cat: 'Depression', catHindi: 'अवसाद' },
-      { step: '+24h', label: 'Deepening Center', labelHindi: 'गहराता केंद्र', lat: 15.3, lon: 86.8, wind: '62 km/h', gusts: '80 km/h', pressure: '995 hPa', cat: 'Deep Depression', catHindi: 'गहरा अवसाद' },
-      { step: '+48h', label: 'Tropical Storm Stage', labelHindi: 'चक्रवाती तूफान चरण', lat: 16.5, lon: 85.9, wind: '80 km/h', gusts: '100 km/h', pressure: '988 hPa', cat: 'Cyclonic Storm', catHindi: 'चक्रवाती तूफान' },
-      { step: '+60h', label: 'Near Coastal Inflow', labelHindi: 'तटीय आगमन', lat: 17.8, lon: 85.1, wind: '95 km/h', gusts: '120 km/h', pressure: '980 hPa', cat: 'Severe Cyclonic Storm', catHindi: 'भीषण चक्रवाती तूफान' },
-      { step: '+72h', label: 'Odisha-Andhra Landfall', labelHindi: 'ओडिशा-आंध्र लैंडफॉल', lat: 19.4, lon: 84.7, wind: '110 km/h', gusts: '135 km/h', pressure: '972 hPa', cat: 'Severe Cyclonic Storm', catHindi: 'भीषण चक्रवाती तूफान' }
+      { step: '-12h', date: '06 Sept', time: '15:30', lat: 12.8, lon: 89.2, windKmh: 35, pressureHpa: '1006', cat: 'Low Pressure Area', catHindi: 'निम्न दबाव क्षेत्र', type: 'LPA', typeColor: '#10b981', isPast: true, label: 'Early Circulation' },
+      { step: '+00h', date: '07 Sept', time: '03:30', lat: 13.5, lon: 88.5, windKmh: 42, pressureHpa: '1004', cat: 'Low Pressure Area', catHindi: 'निम्न दबाव क्षेत्र', type: 'LPA', typeColor: '#10b981', isObserved: true, label: 'Vortex Fix (Observed)' },
+      { step: '+12h', date: '07 Sept', time: '15:30', lat: 14.4, lon: 87.6, windKmh: 50, pressureHpa: '1000', cat: 'Depression', catHindi: 'अवसाद', type: 'D', typeColor: '#3b82f6', label: 'Consolidation Phase' },
+      { step: '+24h', date: '08 Sept', time: '03:30', lat: 15.3, lon: 86.8, windKmh: 62, pressureHpa: '995', cat: 'Deep Depression', catHindi: 'गहरा अवसाद', type: 'DD', typeColor: '#06b6d4', label: 'Deepening Center' },
+      { step: '+48h', date: '09 Sept', time: '03:30', lat: 16.5, lon: 85.9, windKmh: 80, pressureHpa: '988', cat: 'Cyclonic Storm', catHindi: 'चक्रवाती तूफान', type: 'CS', typeColor: '#22c55e', label: 'Tropical Storm Stage' },
+      { step: '+60h', date: '09 Sept', time: '15:30', lat: 17.8, lon: 85.1, windKmh: 95, pressureHpa: '980', cat: 'Severe Cyclonic Storm', catHindi: 'भीषण चक्रवाती तूफान', type: 'SCS', typeColor: '#eab308', label: 'Near Coastal Inflow' },
+      { step: '+72h', date: '10 Sept', time: '03:30', lat: 19.4, lon: 84.7, windKmh: 110, pressureHpa: '972', cat: 'Severe Cyclonic Storm', catHindi: 'भीषण चक्रवाती तूफान', type: 'SCS', typeColor: '#f97316', label: 'Odisha-Andhra Landfall' },
+      { step: '+84h', date: '10 Sept', time: '15:30', lat: 20.3, lon: 84.2, windKmh: 75, pressureHpa: '990', cat: 'Cyclonic Storm', catHindi: 'चक्रवाती तूफान', type: 'CS', typeColor: '#22c55e', label: 'Inland Weakening' },
+      { step: '+96h', date: '11 Sept', time: '03:30', lat: 21.1, lon: 83.8, windKmh: 45, pressureHpa: '1002', cat: 'Depression', catHindi: 'अवसाद', type: 'D', typeColor: '#3b82f6', label: 'Remnant Circulation' }
     ],
     track: [
-      [13.5, 88.5], [14.4, 87.6], [15.3, 86.8], [16.5, 85.9], [17.8, 85.1], [19.4, 84.7]
+      [12.8, 89.2], [13.5, 88.5], [14.4, 87.6], [15.3, 86.8], [16.5, 85.9], [17.8, 85.1], [19.4, 84.7], [20.3, 84.2], [21.1, 83.8]
     ],
     cone: [
       [13.5, 88.5], [15.0, 89.8], [18.0, 88.0], [21.0, 86.5],
@@ -106,15 +133,19 @@ const SYSTEMS = {
     threat: "Genesis Watch Active",
     threatHindi: "जनन निगरानी सक्रिय",
     threatColor: "text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/50 border-amber-200 dark:border-amber-800",
+    categoryBadge: "LPA",
+    categoryBadgeColor: "bg-emerald-500",
+    categoryFull: "Low Pressure Area • Arabian Sea Genesis",
     waypoints: [
-      { step: '+00h', label: 'Observed Center', labelHindi: 'अवलोकित केंद्र', lat: 14.8, lon: 66.2, wind: '40 km/h', gusts: '50 km/h', pressure: '1005 hPa', cat: 'Low Pressure Area', catHindi: 'निम्न दबाव क्षेत्र' },
-      { step: '+12h', label: 'North-East Track', labelHindi: 'उत्तर-पूर्व ट्रैक', lat: 16.2, lon: 67.0, wind: '48 km/h', gusts: '60 km/h', pressure: '1001 hPa', cat: 'Depression', catHindi: 'अवसाद' },
-      { step: '+24h', label: 'Maritime Intensification', labelHindi: 'समुद्री तीव्रता', lat: 17.8, lon: 68.1, wind: '58 km/h', gusts: '75 km/h', pressure: '996 hPa', cat: 'Deep Depression', catHindi: 'गहरा अवसाद' },
-      { step: '+48h', label: 'Saurashtra Approach', labelHindi: 'सौराष्ट्र तटीय अग्रगमन', lat: 19.5, lon: 69.0, wind: '75 km/h', gusts: '95 km/h', pressure: '990 hPa', cat: 'Cyclonic Storm', catHindi: 'चक्रवाती तूफान' },
-      { step: '+72h', label: 'Kutch Coastline Outlook', labelHindi: 'कच्छ तटरेखा अनुमान', lat: 21.2, lon: 69.8, wind: '90 km/h', gusts: '115 km/h', pressure: '982 hPa', cat: 'Severe Cyclonic Storm', catHindi: 'भीषण चक्रवाती तूफान' }
+      { step: '-12h', date: '06 Sept', time: '15:30', lat: 14.1, lon: 65.5, windKmh: 32, pressureHpa: '1008', cat: 'Low Pressure Area', catHindi: 'निम्न दबाव क्षेत्र', type: 'LPA', typeColor: '#10b981', isPast: true, label: 'Forming Circulation' },
+      { step: '+00h', date: '07 Sept', time: '03:30', lat: 14.8, lon: 66.2, windKmh: 40, pressureHpa: '1005', cat: 'Low Pressure Area', catHindi: 'निम्न दबाव क्षेत्र', type: 'LPA', typeColor: '#10b981', isObserved: true, label: 'Observed Center' },
+      { step: '+12h', date: '07 Sept', time: '15:30', lat: 16.2, lon: 67.0, windKmh: 48, pressureHpa: '1001', cat: 'Depression', catHindi: 'अवसाद', type: 'D', typeColor: '#3b82f6', label: 'North-East Track' },
+      { step: '+24h', date: '08 Sept', time: '03:30', lat: 17.8, lon: 68.1, windKmh: 58, pressureHpa: '996', cat: 'Deep Depression', catHindi: 'गहरा अवसाद', type: 'DD', typeColor: '#06b6d4', label: 'Maritime Intensification' },
+      { step: '+48h', date: '09 Sept', time: '03:30', lat: 19.5, lon: 69.0, windKmh: 75, pressureHpa: '990', cat: 'Cyclonic Storm', catHindi: 'चक्रवाती तूफान', type: 'CS', typeColor: '#22c55e', label: 'Saurashtra Approach' },
+      { step: '+72h', date: '10 Sept', time: '03:30', lat: 21.2, lon: 69.8, windKmh: 90, pressureHpa: '982', cat: 'Severe Cyclonic Storm', catHindi: 'भीषण चक्रवाती तूफान', type: 'SCS', typeColor: '#f97316', label: 'Kutch Coastline Outlook' }
     ],
     track: [
-      [14.8, 66.2], [16.2, 67.0], [17.8, 68.1], [19.5, 69.0], [21.2, 69.8]
+      [14.1, 65.5], [14.8, 66.2], [16.2, 67.0], [17.8, 68.1], [19.5, 69.0], [21.2, 69.8]
     ],
     cone: [
       [14.8, 66.2], [16.8, 68.5], [19.0, 70.2], [22.0, 71.0],
@@ -147,20 +178,70 @@ const SYSTEMS = {
     threat: "Red Alert",
     threatHindi: "रेड अलर्ट",
     threatColor: "text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/50 border-red-200 dark:border-red-800",
+    categoryBadge: "SCS",
+    categoryBadgeColor: "bg-orange-500",
+    categoryFull: "Severe Cyclonic Storm • Landfall recorded at Dhamra",
     waypoints: [
-      { step: '+00h', label: 'Genesis Phase', labelHindi: 'जनन चरण', lat: 18.2, lon: 88.5, wind: '65 km/h', gusts: '80 km/h', pressure: '996 hPa', cat: 'Cyclonic Storm', catHindi: 'चक्रवाती तूफान' },
-      { step: '+12h', label: 'Rapid Intensification', labelHindi: 'तीव्र गति वृद्धि', lat: 18.9, lon: 88.0, wind: '85 km/h', gusts: '105 km/h', pressure: '988 hPa', cat: 'Severe Cyclonic Storm', catHindi: 'भीषण चक्रवाती तूफान' },
-      { step: '+24h', label: 'Peak Maritime Velocity', labelHindi: 'शीर्ष समुद्री वेग', lat: 19.7, lon: 87.5, wind: '110 km/h', gusts: '125 km/h', pressure: '974 hPa', cat: 'Severe Cyclonic Storm', catHindi: 'भीषण चक्रवाती तूफान' },
-      { step: '+36h', label: 'Dhamra Port Landfall', labelHindi: 'धामरा बंदरगाह लैंडफॉल', lat: 20.8, lon: 86.9, wind: '115 km/h', gusts: '135 km/h', pressure: '970 hPa', cat: 'Severe Cyclonic Storm', catHindi: 'भीषण चक्रवाती तूफान' },
-      { step: '+48h', label: 'Inland Dissipation', labelHindi: 'अंतर्देशीय क्षीणता', lat: 22.1, lon: 85.8, wind: '60 km/h', gusts: '75 km/h', pressure: '992 hPa', cat: 'Depression', catHindi: 'अवसाद' },
-      { step: '+60h', label: 'Remnant Low', labelHindi: 'अवशेष निम्न दबाव', lat: 23.4, lon: 84.8, wind: '35 km/h', gusts: '45 km/h', pressure: '1004 hPa', cat: 'Well Marked Low', catHindi: 'सुस्पष्ट निम्न दबाव' }
+      { step: '-12h', date: '23 Oct', time: '11:30', lat: 17.5, lon: 89.1, windKmh: 55, pressureHpa: '1000', cat: 'Deep Depression', catHindi: 'गहरा अवसाद', type: 'DD', typeColor: '#06b6d4', isPast: true, label: 'Formative Depression' },
+      { step: '+00h', date: '23 Oct', time: '23:30', lat: 18.2, lon: 88.5, windKmh: 65, pressureHpa: '996', cat: 'Cyclonic Storm', catHindi: 'चक्रवाती तूफान', type: 'CS', typeColor: '#22c55e', isObserved: true, label: 'Genesis Phase' },
+      { step: '+12h', date: '24 Oct', time: '11:30', lat: 18.9, lon: 88.0, windKmh: 85, pressureHpa: '988', cat: 'Severe Cyclonic Storm', catHindi: 'भीषण चक्रवाती तूफान', type: 'SCS', typeColor: '#eab308', label: 'Rapid Intensification' },
+      { step: '+24h', date: '24 Oct', time: '23:30', lat: 19.7, lon: 87.5, windKmh: 110, pressureHpa: '974', cat: 'Severe Cyclonic Storm', catHindi: 'भीषण चक्रवाती तूफान', type: 'SCS', typeColor: '#f97316', label: 'Peak Maritime Velocity' },
+      { step: '+36h', date: '25 Oct', time: '05:30', lat: 20.8, lon: 86.9, windKmh: 115, pressureHpa: '970', cat: 'Severe Cyclonic Storm', catHindi: 'भीषण चक्रवाती तूफान', type: 'SCS', typeColor: '#ef4444', label: 'Dhamra Port Landfall' },
+      { step: '+48h', date: '25 Oct', time: '17:30', lat: 22.1, lon: 85.8, windKmh: 60, pressureHpa: '992', cat: 'Depression', catHindi: 'अवसाद', type: 'D', typeColor: '#3b82f6', label: 'Inland Dissipation' },
+      { step: '+60h', date: '26 Oct', time: '05:30', lat: 23.4, lon: 84.8, windKmh: 35, pressureHpa: '1004', cat: 'Well Marked Low', catHindi: 'सुस्पष्ट निम्न दबाव', type: 'LPA', typeColor: '#10b981', label: 'Remnant Low' }
     ],
     track: [
-      [18.2, 88.5], [18.9, 88.0], [19.7, 87.5], [20.8, 86.9], [22.1, 85.8], [23.4, 84.8]
+      [17.5, 89.1], [18.2, 88.5], [18.9, 88.0], [19.7, 87.5], [20.8, 86.9], [22.1, 85.8], [23.4, 84.8]
     ],
     cone: [
       [18.2, 88.5], [19.4, 89.4], [21.0, 88.8], [23.8, 87.2],
       [23.5, 83.2], [20.8, 84.8], [19.0, 86.8], [18.2, 88.5]
+    ]
+  },
+  biparjoy: {
+    id: 'biparjoy',
+    name: "Extremely Severe Cyclonic Storm BIPARJOY (Historical Benchmark)",
+    shortName: "Cyclone BIPARJOY",
+    shortNameHindi: "चक्रवात बिपरजॉय",
+    hindiName: "अति भीषण चक्रवाती तूफान बिपरजॉय (ऐतिहासिक केस अध्ययन)",
+    basin: "East-Central & Northeast Arabian Sea",
+    basinHindi: "पूर्वी-मध्य एवं पूर्वोत्तर अरब सागर",
+    stage: "Extremely Severe Cyclonic Storm",
+    stageHindi: "अति भीषण चक्रवाती तूफान",
+    risk48h: "Category 3 Equivalent",
+    wind: "165",
+    gusts: "185",
+    pressure: "958",
+    speed: "10",
+    direction: "North-Northeast",
+    directionHindi: "उत्तर-उत्तर-पूर्व",
+    lat: 20.8,
+    lon: 67.1,
+    target: "Jakhau Port & Kutch Coast, Gujarat",
+    targetHindi: "जखाऊ बंदरगाह एवं कच्छ तट, गुजरात",
+    window: "Landfall Recorded",
+    windowHindi: "लैंडफॉल दर्ज किया गया",
+    threat: "Extremely Severe Watch",
+    threatHindi: "अति भीषण निगरानी",
+    threatColor: "text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/50 border-purple-200 dark:border-purple-800",
+    categoryBadge: "ESCS",
+    categoryBadgeColor: "bg-purple-600",
+    categoryFull: "Extremely Severe Cyclonic Storm • Category 3 Equivalent",
+    waypoints: [
+      { step: '-24h', date: '13 Jun', time: '05:30', lat: 18.5, lon: 67.2, windKmh: 165, pressureHpa: '958', cat: 'Extremely Severe Cyclonic Storm', catHindi: 'अति भीषण चक्रवाती तूफान', type: 'ESCS', typeColor: '#9333ea', isPast: true, label: 'Peak Intensity' },
+      { step: '-12h', date: '13 Jun', time: '17:30', lat: 19.8, lon: 67.0, windKmh: 155, pressureHpa: '964', cat: 'Very Severe Cyclonic Storm', catHindi: 'बहुत भीषण चक्रवाती तूफान', type: 'VSCS', typeColor: '#f97316', isPast: true, label: 'Northward Recurvature' },
+      { step: '+00h', date: '14 Jun', time: '05:30', lat: 20.8, lon: 67.1, windKmh: 145, pressureHpa: '970', cat: 'Very Severe Cyclonic Storm', catHindi: 'बहुत भीषण चक्रवाती तूफान', type: 'VSCS', typeColor: '#f97316', isObserved: true, label: 'Observed Center Fix' },
+      { step: '+12h', date: '14 Jun', time: '17:30', lat: 21.9, lon: 67.6, windKmh: 135, pressureHpa: '976', cat: 'Very Severe Cyclonic Storm', catHindi: 'बहुत भीषण चक्रवाती तूफान', type: 'VSCS', typeColor: '#f97316', label: 'Saurashtra Coast Approach' },
+      { step: '+24h', date: '15 Jun', time: '05:30', lat: 22.8, lon: 68.3, windKmh: 125, pressureHpa: '982', cat: 'Very Severe Cyclonic Storm', catHindi: 'बहुत भीषण चक्रवाती तूफान', type: 'VSCS', typeColor: '#f97316', label: 'Pre-Landfall Friction' },
+      { step: '+36h', date: '15 Jun', time: '20:30', lat: 23.3, lon: 68.6, windKmh: 115, pressureHpa: '986', cat: 'Severe Cyclonic Storm', catHindi: 'भीषण चक्रवाती तूफान', type: 'SCS', typeColor: '#eab308', label: 'Jakhau Port Landfall' },
+      { step: '+48h', date: '16 Jun', time: '08:30', lat: 24.2, lon: 69.8, windKmh: 75, pressureHpa: '994', cat: 'Cyclonic Storm', catHindi: 'चक्रवाती तूफान', type: 'CS', typeColor: '#22c55e', label: 'Inland Rajasthan Dissipation' }
+    ],
+    track: [
+      [18.5, 67.2], [19.8, 67.0], [20.8, 67.1], [21.9, 67.6], [22.8, 68.3], [23.3, 68.6], [24.2, 69.8]
+    ],
+    cone: [
+      [18.5, 67.2], [20.0, 68.5], [22.5, 69.8], [24.5, 71.0],
+      [24.8, 68.2], [22.8, 66.8], [20.2, 65.8], [18.5, 67.2]
     ]
   }
 };
@@ -474,6 +555,46 @@ const ThreatMap = () => {
   const [showWindRadii, setShowWindRadii] = useState(true);
   const [radarOpacity, setRadarOpacity] = useState(0.85);
 
+  // Zoom Earth Controls States
+  const mapWrapperRef = useRef(null);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [mapAction, setMapAction] = useState(null); // 'zoomIn' | 'zoomOut' | 'recenter' | 'resetNorth'
+  const [isLeftMenuOpen, setIsLeftMenuOpen] = useState(true);
+  const [isRightTableOpen, setIsRightTableOpen] = useState(true);
+  const [satSubMode, setSatSubMode] = useState('live'); // 'live' | 'hd' | 'ir'
+  const [activeForecastLayer, setActiveForecastLayer] = useState('none'); // 'none' | 'precip' | 'wind' | 'temp' | 'humidity' | 'pressure'
+  const [isMeasuring, setIsMeasuring] = useState(false);
+  const [shareToast, setShareToast] = useState(false);
+
+  // Fullscreen change listener
+  useEffect(() => {
+    const handleFsChange = () => {
+      setIsFullscreen(Boolean(document.fullscreenElement));
+    };
+    document.addEventListener('fullscreenchange', handleFsChange);
+    return () => document.removeEventListener('fullscreenchange', handleFsChange);
+  }, []);
+
+  const toggleFullscreen = () => {
+    if (!document.fullscreenElement) {
+      if (mapWrapperRef.current?.requestFullscreen) {
+        mapWrapperRef.current.requestFullscreen();
+      }
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      }
+    }
+  };
+
+  const handleShare = () => {
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(window.location.href);
+      setShareToast(true);
+      setTimeout(() => setShareToast(false), 2500);
+    }
+  };
+
   // 72h Timeline Scrubber & Player
   const [activeStepIndex, setActiveStepIndex] = useState(0);
   const [isPlayingTimeline, setIsPlayingTimeline] = useState(false);
@@ -566,43 +687,47 @@ const ThreatMap = () => {
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-8">
         
         {/* =========================================================================
-             SECTION 1: GEOSPATIAL RADAR & SYSTEM CONTROLS
+             SECTION 1: ZOOM EARTH GEOSPATIAL WORKSTATION & GIS CONSOLE
              ========================================================================= */}
         <section className="space-y-4">
           
-          {/* Page Title & System Tabs */}
+          {/* Header Bar: Title, Live Status & Quick Storm Selector */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-5">
             <div>
               <div className="flex items-center gap-2 mb-1.5">
-                <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-sky-100 dark:bg-sky-950 text-sky-800 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
-                  {isHindi ? 'एकीकृत खतरा मानचित्र (GIS 4.0)' : 'Unified Threat Map (GIS 4.0)'}
+                <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-cyan-100 dark:bg-cyan-950 text-cyan-800 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-800 flex items-center gap-1.5">
+                  <Wind className="w-3 h-3 text-cyan-600 dark:text-cyan-400 animate-vortex-spin" />
+                  {isHindi ? 'ज़ूम अर्थ जीआईएस मोड (VAYU 4.0)' : 'Zoom Earth Interactive Console (VAYU 4.0)'}
                 </span>
                 <span className="flex items-center gap-1 text-xs text-emerald-600 dark:text-emerald-400 font-semibold">
-                  <Radio className="w-3.5 h-3.5 animate-pulse" /> {isHindi ? 'डॉपलर रडार लाइव' : 'DWR Doppler Live'}
+                  <Radio className="w-3.5 h-3.5 animate-pulse" /> {isHindi ? 'डॉपलर रडार लाइव' : 'Live Doppler Feed'}
                 </span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-heading font-black text-slate-950 dark:text-white tracking-tight">
-                {isHindi ? 'तटीय खतरा मानचित्र एवं लाइव जीआईएस रडार' : 'Threat Map • Coastal Risk & Live GIS Radar'}
+                {isHindi ? 'तटीय खतरा मानचित्र एवं ज़ूम अर्थ मौसम कंसोल' : 'Threat Map • Zoom Earth GIS & Storm Tracking Console'}
               </h1>
               <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
                 {isHindi 
-                  ? 'डॉपलर मौसम रडार, उपग्रह इंफ्रारेड, पूर्वानुमान शंकु और 9 तटीय जिलों की आपदा रेटिंग का संपूर्ण एकीकरण।' 
-                  : 'Integrated Doppler radar surveillance, satellite cloud infrared, storm track cone, and multi-hazard district threat ratings.'}
+                  ? 'ज़ूम अर्थ शैली में लाइव उपग्रह, डॉपलर रडार, पवन, वर्षा, तापमान एवं उच्च-घनत्व तूफान ट्रैक तालिका।' 
+                  : 'Zoom Earth style live satellite, Doppler radar, forecast layers, high-density storm track & timeline scrubber.'}
               </p>
             </div>
 
-            {/* System Switcher Tabs */}
-            <div className="flex items-center gap-1.5 p-1 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl">
+            {/* Storm Switcher Pills */}
+            <div className="flex items-center gap-1.5 p-1 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-x-auto max-w-full">
               {Object.keys(SYSTEMS).map((sysKey) => {
                 const sys = SYSTEMS[sysKey];
                 const isSelected = selectedSystemId === sysKey;
                 return (
                   <button
                     key={sysKey}
-                    onClick={() => setSelectedSystemId(sysKey)}
+                    onClick={() => {
+                      setSelectedSystemId(sysKey);
+                      setActiveStepIndex(0);
+                    }}
                     className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer whitespace-nowrap ${
                       isSelected
-                        ? 'bg-white dark:bg-slate-800 text-slate-950 dark:text-white shadow-xs'
+                        ? 'bg-[#ff5500] text-white shadow-md shadow-orange-500/30'
                         : 'text-slate-600 dark:text-slate-400 hover:text-slate-950 dark:hover:text-white'
                     }`}
                   >
@@ -613,174 +738,506 @@ const ThreatMap = () => {
             </div>
           </div>
 
-          {/* GIS Command Bar */}
-          <div className="bg-white dark:bg-slate-900/90 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-wrap items-center justify-between gap-3">
-            
-            {/* Base Map Selector */}
-            <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800/80 p-1 rounded-xl">
-              {Object.keys(BASE_LAYERS).map((key) => {
-                const layer = BASE_LAYERS[key];
-                const isSelected = mapBaseLayer === key;
-                return (
-                  <button
-                    key={key}
-                    onClick={() => setMapBaseLayer(key)}
-                    className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-nowrap ${
-                      isSelected
-                        ? 'bg-white dark:bg-slate-700 text-slate-950 dark:text-white shadow-xs'
-                        : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                    }`}
+          {/* Share notification toast */}
+          {shareToast && (
+            <div className="fixed top-20 right-6 z-[99999] bg-slate-900/95 text-white px-4 py-2.5 rounded-xl shadow-2xl border border-cyan-500/40 text-xs flex items-center gap-2 backdrop-blur-md">
+              <Check className="w-4 h-4 text-emerald-400" />
+              <span>{isHindi ? 'लाइव कंसोल लिंक कॉपी हो गया!' : 'Live storm console URL copied to clipboard!'}</span>
+            </div>
+          )}
+
+          {/* Measuring notice */}
+          {isMeasuring && (
+            <div className="bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-300 p-2.5 rounded-xl text-xs flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Ruler className="w-4 h-4 text-amber-500" />
+                <span><strong>Measure Tool Active:</strong> Click any two points or waypoints to estimate radial distance to cyclone eye.</span>
+              </div>
+              <button 
+                onClick={() => setIsMeasuring(false)}
+                className="text-[11px] font-bold px-2 py-0.5 rounded bg-amber-500/20 hover:bg-amber-500/30"
+              >
+                Exit
+              </button>
+            </div>
+          )}
+
+          {/* =========================================================================
+              ZOOM EARTH INTERACTIVE MAP FRAME
+              ========================================================================= */}
+          <div 
+            ref={mapWrapperRef}
+            className={`relative w-full rounded-2xl overflow-hidden border border-slate-300 dark:border-slate-800 shadow-2xl transition-all select-none ${
+              isFullscreen ? 'fixed inset-0 z-[99999] rounded-none border-0 h-screen w-screen' : 'h-[640px] md:h-[680px]'
+            }`}
+          >
+
+            {/* 1. LEFT FLOATING CONTROL DRAWER (Live Maps + Forecast Maps) */}
+            <div className="absolute top-3 left-3 z-[1000] w-52 sm:w-60 pointer-events-auto">
+              <div className="zoom-earth-glass rounded-2xl p-2.5 sm:p-3 text-white shadow-2xl border border-white/10">
+                {/* Brand Header */}
+                <div className="flex items-center justify-between pb-2 mb-2 border-b border-white/10">
+                  <div className="flex items-center gap-2">
+                    <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-md shadow-cyan-500/40">
+                      <Wind className="w-3.5 h-3.5 text-white animate-vortex-spin" />
+                    </div>
+                    <div>
+                      <span className="font-heading font-black text-xs tracking-wider uppercase text-white block leading-none">
+                        VAYU EARTH
+                      </span>
+                      <span className="text-[9px] text-cyan-400 font-mono tracking-tight font-semibold">
+                        GIS CONSOLE 4.0
+                      </span>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => setIsLeftMenuOpen(!isLeftMenuOpen)}
+                    className="p-1 text-slate-400 hover:text-white rounded-lg hover:bg-white/10 transition cursor-pointer"
+                    title={isLeftMenuOpen ? "Minimize layer panel" : "Expand layer panel"}
                   >
-                    {isHindi && layer.nameHindi ? layer.nameHindi : layer.name}
+                    {isLeftMenuOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
                   </button>
-                );
-              })}
+                </div>
+
+                {isLeftMenuOpen && (
+                  <div className="space-y-2.5 text-xs max-h-[460px] overflow-y-auto zoom-earth-scrollbar pr-0.5">
+                    
+                    {/* LIVE MAPS */}
+                    <div>
+                      <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase block mb-1 px-1">
+                        Live Maps
+                      </span>
+                      <div className="space-y-1">
+                        {/* Satellite item */}
+                        <div className="bg-white/5 hover:bg-white/10 rounded-xl p-2 transition">
+                          <div className="flex items-center justify-between mb-1.5">
+                            <div className="flex items-center gap-2">
+                              <Satellite className="w-4 h-4 text-cyan-400" />
+                              <span className="font-semibold text-white">Satellite</span>
+                            </div>
+                            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+                          </div>
+                          {/* Sub-chips: Live / HD / IR */}
+                          <div className="flex items-center gap-1 mt-1 pl-4">
+                            {['live', 'hd', 'ir'].map((mode) => (
+                              <button
+                                key={mode}
+                                onClick={() => {
+                                  setSatSubMode(mode);
+                                  if (mode === 'ir') {
+                                    setShowSatelliteIR(true);
+                                    setMapBaseLayer('dark');
+                                  } else {
+                                    setMapBaseLayer('satellite');
+                                  }
+                                }}
+                                className={`px-2 py-0.5 rounded text-[10px] font-medium transition cursor-pointer ${
+                                  satSubMode === mode 
+                                    ? 'bg-cyan-500/30 text-cyan-300 border border-cyan-400/40 font-bold' 
+                                    : 'bg-white/5 text-slate-400 hover:text-white'
+                                }`}
+                              >
+                                {mode === 'live' ? '✓ Live' : mode === 'hd' ? 'HD' : 'IR'}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* Radar item */}
+                        <div className={`rounded-xl p-2 transition ${showDopplerRadar ? 'bg-white/10 border border-white/15' : 'bg-white/5 hover:bg-white/10'}`}>
+                          <button
+                            onClick={() => setShowDopplerRadar(!showDopplerRadar)}
+                            className="w-full flex items-center justify-between text-left cursor-pointer"
+                          >
+                            <div className="flex items-center gap-2">
+                              <Radio className="w-4 h-4 text-emerald-400 animate-pulse" />
+                              <span className="font-semibold text-white">Radar</span>
+                            </div>
+                            {showDopplerRadar && <Check className="w-3.5 h-3.5 text-emerald-400" />}
+                          </button>
+
+                          {showDopplerRadar && (
+                            <div className="mt-2 pt-2 border-t border-white/10 flex items-center justify-between gap-1.5 pl-4">
+                              <span className="text-[10px] text-slate-400">Opacity</span>
+                              <input
+                                type="range"
+                                min="0.2"
+                                max="1.0"
+                                step="0.05"
+                                value={radarOpacity}
+                                onChange={(e) => setRadarOpacity(parseFloat(e.target.value))}
+                                className="w-16 sm:w-20 h-1 bg-white/20 rounded accent-emerald-400 cursor-pointer"
+                              />
+                              <span className="text-[10px] font-mono text-emerald-300 font-bold">{Math.round(radarOpacity * 100)}%</span>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* FORECAST MAPS */}
+                    <div className="pt-2 border-t border-white/10">
+                      <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase block mb-1 px-1">
+                        Forecast Maps
+                      </span>
+                      <div className="space-y-0.5">
+                        {[
+                          { id: 'precip', label: 'Precipitation', icon: CloudRain, unit: 'mm/h' },
+                          { id: 'wind', label: 'Wind', icon: Wind, unit: 'km/h' },
+                          { id: 'temp', label: 'Temperature', icon: Thermometer, unit: '°C' },
+                          { id: 'humidity', label: 'Humidity', icon: Droplets, unit: '%' },
+                          { id: 'pressure', label: 'Pressure', icon: Gauge, unit: 'hPa' }
+                        ].map((f) => {
+                          const IconComp = f.icon;
+                          const isActive = activeForecastLayer === f.id;
+                          return (
+                            <button
+                              key={f.id}
+                              onClick={() => setActiveForecastLayer(isActive ? 'none' : f.id)}
+                              className={`w-full flex items-center justify-between px-2 py-1 rounded-lg text-left transition cursor-pointer ${
+                                isActive 
+                                  ? 'bg-blue-600/30 text-blue-300 border border-blue-400/40 font-semibold' 
+                                  : 'text-slate-300 hover:text-white hover:bg-white/5'
+                              }`}
+                            >
+                              <div className="flex items-center gap-2">
+                                <IconComp className={`w-3.5 h-3.5 ${isActive ? 'text-blue-400' : 'text-slate-400'}`} />
+                                <span>{f.label}</span>
+                              </div>
+                              {isActive && <span className="text-[9px] px-1 rounded bg-blue-500/20 text-blue-300 font-mono">{f.unit}</span>}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Tactical Overlays */}
+                    <div className="pt-2 border-t border-white/10 flex items-center justify-between gap-1">
+                      <button
+                        onClick={() => setShowCone(!showCone)}
+                        className={`flex-1 py-1 text-[10px] font-medium rounded text-center transition cursor-pointer ${
+                          showCone ? 'bg-amber-500/30 text-amber-300 border border-amber-400/40' : 'bg-white/5 text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        Cone
+                      </button>
+                      <button
+                        onClick={() => setShowWindRadii(!showWindRadii)}
+                        className={`flex-1 py-1 text-[10px] font-medium rounded text-center transition cursor-pointer ${
+                          showWindRadii ? 'bg-rose-500/30 text-rose-300 border border-rose-400/40' : 'bg-white/5 text-slate-400 hover:text-white'
+                        }`}
+                      >
+                        Radii
+                      </button>
+                    </div>
+
+                  </div>
+                )}
+              </div>
             </div>
 
-            {/* Tactical Layer Toggles */}
-            <div className="flex flex-wrap items-center gap-1.5">
-              <button
-                onClick={() => setShowDopplerRadar(!showDopplerRadar)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl border transition-all cursor-pointer ${
-                  showDopplerRadar
-                    ? 'bg-sky-50 dark:bg-sky-950/70 border-sky-300 dark:border-sky-700 text-sky-700 dark:text-sky-300'
-                    : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-500 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                <CloudRain className="w-3.5 h-3.5" />
-                <span>{isHindi ? 'डॉपलर रडार' : 'Doppler Radar'}</span>
-              </button>
+            {/* 2. RIGHT FLOATING STORM TRACK & FORECAST TABLE CARD (Zoom Earth replica) */}
+            <div className="absolute top-3 right-12 sm:right-16 z-[1000] w-72 sm:w-84 max-h-[520px] flex flex-col pointer-events-auto">
+              <div className="zoom-earth-glass rounded-2xl text-white shadow-2xl border border-white/10 overflow-hidden flex flex-col">
+                
+                {/* Storm Title Header */}
+                <div className="p-3 pb-2 border-b border-white/10 flex items-center justify-between bg-black/20">
+                  <div className="min-w-0 pr-2">
+                    <h3 className="font-heading font-black text-sm tracking-tight text-white truncate">
+                      {isHindi ? (current.hindiName || current.name) : current.name}
+                    </h3>
+                    <div className="flex items-center gap-1.5 text-[10px] text-slate-400 mt-0.5">
+                      <span className="truncate">{isHindi ? current.basinHindi : current.basin}</span>
+                      <span>•</span>
+                      <span className="font-mono text-cyan-300">{current.window}</span>
+                    </div>
+                  </div>
+                  <button 
+                    onClick={() => setIsRightTableOpen(!isRightTableOpen)}
+                    className="p-1 text-slate-400 hover:text-white rounded-lg hover:bg-white/10 transition cursor-pointer shrink-0"
+                    title={isRightTableOpen ? "Minimize forecast table" : "Expand forecast table"}
+                  >
+                    {isRightTableOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                  </button>
+                </div>
 
-              <button
-                onClick={() => setShowSatelliteIR(!showSatelliteIR)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl border transition-all cursor-pointer ${
-                  showSatelliteIR
-                    ? 'bg-purple-50 dark:bg-purple-950/70 border-purple-300 dark:border-purple-700 text-purple-700 dark:text-purple-300'
-                    : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-500 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                <Satellite className="w-3.5 h-3.5" />
-                <span>{isHindi ? 'उपग्रह इंफ्रारेड' : 'Satellite IR'}</span>
-              </button>
+                {isRightTableOpen && (
+                  <>
+                    {/* Forecast Table Header */}
+                    <div className="px-2.5 pt-2 pb-1 text-[10px] font-bold text-slate-400 border-b border-white/10 grid grid-cols-5 gap-1 text-center uppercase tracking-wider bg-white/5">
+                      <span className="text-left col-span-1 pl-1">DATE</span>
+                      <span className="col-span-1">TIME</span>
+                      <span className="col-span-1">TYPE</span>
+                      <span className="col-span-1">WIND</span>
+                      <span className="col-span-1 text-right pr-1">PRESS</span>
+                    </div>
 
-              <button
-                onClick={() => setShowCone(!showCone)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl border transition-all cursor-pointer ${
-                  showCone
-                    ? 'bg-amber-50 dark:bg-amber-950/70 border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-300'
-                    : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-500 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                <AlertTriangle className="w-3.5 h-3.5" />
-                <span>{isHindi ? 'पूर्वानुमान शंकु' : 'Forecast Cone'}</span>
-              </button>
+                    {/* High-density Track Table Rows */}
+                    <div className="overflow-y-auto max-h-[280px] zoom-earth-scrollbar divide-y divide-white/5 text-xs">
+                      {(() => {
+                        const waypoints = current.waypoints || [];
+                        return waypoints.map((wp, idx) => {
+                          const isActive = idx === activeStepIndex;
+                          return (
+                            <div
+                              key={idx}
+                              onClick={() => {
+                                setActiveStepIndex(idx);
+                                setIsPlayingTimeline(false);
+                              }}
+                              className={`grid grid-cols-5 gap-1 items-center px-2.5 py-1.5 cursor-pointer transition select-none ${
+                                isActive 
+                                  ? 'zoom-earth-row-active' 
+                                  : 'hover:bg-white/10 text-slate-300'
+                              }`}
+                            >
+                              {/* Date */}
+                              <div className="col-span-1 text-left pl-1 font-medium text-[11px] truncate">
+                                {wp.date || '07 Sept'}
+                              </div>
 
-              <button
-                onClick={() => setShowWindRadii(!showWindRadii)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl border transition-all cursor-pointer ${
-                  showWindRadii
-                    ? 'bg-rose-50 dark:bg-rose-950/70 border-rose-300 dark:border-rose-700 text-rose-700 dark:text-rose-300'
-                    : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-500 hover:text-slate-900 dark:hover:text-white'
-                }`}
-              >
-                <Wind className="w-3.5 h-3.5" />
-                <span>{isHindi ? 'पवन दायरा' : 'Wind Radii'}</span>
-              </button>
+                              {/* Time */}
+                              <div className="col-span-1 text-center font-mono text-[11px]">
+                                {wp.time || '03:30'}
+                              </div>
+
+                              {/* Type Badge */}
+                              <div className="col-span-1 flex items-center justify-center">
+                                <span 
+                                  className="px-1.5 py-0.5 rounded text-[10px] font-bold tracking-tight text-white"
+                                  style={{ backgroundColor: wp.typeColor || '#10b981' }}
+                                >
+                                  {wp.type || 'LPA'}
+                                </span>
+                              </div>
+
+                              {/* Wind km/h */}
+                              <div className="col-span-1 text-center font-bold font-mono text-[11px]">
+                                {wp.windKmh || wp.wind.replace(' km/h', '')}
+                              </div>
+
+                              {/* Pressure hPa */}
+                              <div className="col-span-1 text-right pr-1 font-mono text-[11px]">
+                                {wp.pressureHpa || wp.pressure.replace(' hPa', '')}
+                              </div>
+                            </div>
+                          );
+                        });
+                      })()}
+                    </div>
+
+                    {/* Bottom Summary Badge & Warnings Button */}
+                    <div className="p-2.5 border-t border-white/10 bg-black/30 space-y-2">
+                      <div className="flex items-center gap-2">
+                        <span className={`px-2 py-0.5 rounded-md text-[10px] font-black text-white ${current.categoryBadgeColor || 'bg-[#ff5500]'}`}>
+                          {current.categoryBadge || 'SCS'}
+                        </span>
+                        <div className="min-w-0 flex-1">
+                          <span className="font-bold text-xs text-white block truncate">
+                            {current.categoryFull || `${current.stage} • ${current.wind} km/h winds`}
+                          </span>
+                          <span className="text-[10px] text-slate-400 block truncate">
+                            {isHindi ? current.targetHindi : current.target}
+                          </span>
+                        </div>
+                      </div>
+
+                      <button
+                        onClick={() => {
+                          const el = document.getElementById('coastal-threat-matrix');
+                          if (el) el.scrollIntoView({ behavior: 'smooth' });
+                        }}
+                        className="w-full py-1.5 px-3 bg-white/10 hover:bg-white/20 active:bg-white/30 rounded-xl text-xs font-bold text-white flex items-center justify-center gap-1.5 transition cursor-pointer border border-white/10 shadow-sm"
+                      >
+                        <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
+                        <span>{isHindi ? 'चेतावनी एवं तटीय अलर्ट विवरण' : 'Latest Warnings and Information'}</span>
+                      </button>
+                    </div>
+                  </>
+                )}
+
+              </div>
             </div>
 
-            {/* Radar Opacity Slider */}
-            {showDopplerRadar && (
-              <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800/60 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs">
-                <Sliders className="w-3.5 h-3.5 text-slate-400" />
-                <span className="text-slate-500 dark:text-slate-400 font-medium">
-                  {isHindi ? 'पारदर्शिता' : 'Opacity'}
-                </span>
-                <input
-                  type="range"
-                  min="0.2"
-                  max="1.0"
-                  step="0.05"
-                  value={radarOpacity}
-                  onChange={(e) => setRadarOpacity(parseFloat(e.target.value))}
-                  className="w-20 h-1.5 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-sky-500"
-                />
-                <span className="font-bold text-slate-700 dark:text-slate-300 min-w-[32px] text-right">
-                  {Math.round(radarOpacity * 100)}%
-                </span>
+            {/* 3. RIGHT FLOATING VERTICAL GIS TOOLBAR */}
+            <div className="absolute top-3 right-3 z-[1000] flex flex-col gap-1.5 pointer-events-auto">
+              
+              {/* Share */}
+              <button
+                onClick={handleShare}
+                className="zoom-earth-glass rounded-xl p-2 text-white/80 hover:text-white hover:bg-white/20 transition cursor-pointer shadow-lg"
+                title="Share storm tracking view"
+              >
+                <Share2 className="w-4 h-4" />
+              </button>
+
+              {/* Measure */}
+              <button
+                onClick={() => setIsMeasuring(!isMeasuring)}
+                className={`zoom-earth-glass rounded-xl p-2 transition cursor-pointer shadow-lg ${
+                  isMeasuring ? 'bg-amber-500/40 text-amber-300 border-amber-400' : 'text-white/80 hover:text-white hover:bg-white/20'
+                }`}
+                title="Measure distance to eye"
+              >
+                <Ruler className="w-4 h-4" />
+              </button>
+
+              {/* Fullscreen */}
+              <button
+                onClick={toggleFullscreen}
+                className="zoom-earth-glass rounded-xl p-2 text-white/80 hover:text-white hover:bg-white/20 transition cursor-pointer shadow-lg"
+                title={isFullscreen ? "Exit Fullscreen" : "Toggle Fullscreen"}
+              >
+                {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+              </button>
+
+              {/* Recenter Vortex */}
+              <button
+                onClick={() => setMapAction('recenter')}
+                className="zoom-earth-glass rounded-xl p-2 text-cyan-400 hover:text-cyan-200 hover:bg-white/20 transition cursor-pointer shadow-lg"
+                title="Recenter storm eye"
+              >
+                <Crosshair className="w-4 h-4" />
+              </button>
+
+              {/* Zoom In */}
+              <button
+                onClick={() => setMapAction('zoomIn')}
+                className="zoom-earth-glass rounded-xl p-2 text-white/80 hover:text-white hover:bg-white/20 transition cursor-pointer shadow-lg"
+                title="Zoom In"
+              >
+                <Plus className="w-4 h-4" />
+              </button>
+
+              {/* Zoom Out */}
+              <button
+                onClick={() => setMapAction('zoomOut')}
+                className="zoom-earth-glass rounded-xl p-2 text-white/80 hover:text-white hover:bg-white/20 transition cursor-pointer shadow-lg"
+                title="Zoom Out"
+              >
+                <Minus className="w-4 h-4" />
+              </button>
+
+              {/* Reset Bearing / North */}
+              <button
+                onClick={() => setMapAction('resetNorth')}
+                className="zoom-earth-glass rounded-xl p-2 text-white/80 hover:text-white hover:bg-white/20 transition cursor-pointer shadow-lg"
+                title="Reset North Orientation"
+              >
+                <Compass className="w-4 h-4" />
+              </button>
+
+            </div>
+
+            {/* 4. ACTIVE FORECAST SCALE LEGEND (If forecast layer active) */}
+            {activeForecastLayer !== 'none' && (
+              <div className="absolute bottom-16 left-4 z-[1000] zoom-earth-glass rounded-xl p-2.5 text-[10px] text-white shadow-xl pointer-events-auto max-w-[220px]">
+                <div className="flex items-center justify-between mb-1 font-semibold uppercase tracking-wider text-slate-300">
+                  <span>
+                    {activeForecastLayer === 'precip' && 'Precipitation (mm/h)'}
+                    {activeForecastLayer === 'wind' && 'Wind Speed (km/h)'}
+                    {activeForecastLayer === 'temp' && 'Sea Surface Temp (°C)'}
+                    {activeForecastLayer === 'humidity' && 'Relative Humidity (%)'}
+                    {activeForecastLayer === 'pressure' && 'Atmospheric Pressure (hPa)'}
+                  </span>
+                </div>
+                <div className="w-full h-2 rounded-full bg-gradient-to-r from-sky-400 via-emerald-400 via-yellow-400 via-orange-500 to-red-600 border border-white/20" />
+                <div className="flex justify-between text-slate-400 font-mono mt-1">
+                  {activeForecastLayer === 'precip' && <><span>0.5</span><span>10</span><span>35</span><span>75+</span></>}
+                  {activeForecastLayer === 'wind' && <><span>20</span><span>65</span><span>120</span><span>200+</span></>}
+                  {activeForecastLayer === 'temp' && <><span>24°</span><span>27°</span><span>29°</span><span>32°C</span></>}
+                  {activeForecastLayer === 'humidity' && <><span>40%</span><span>60%</span><span>80%</span><span>100%</span></>}
+                  {activeForecastLayer === 'pressure' && <><span>940</span><span>970</span><span>995</span><span>1015</span></>}
+                </div>
               </div>
             )}
 
-          </div>
-
-          {/* Map Frame */}
-          <div className="border border-slate-200 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-900 overflow-hidden shadow-md relative h-[560px]">
-            
-            {/* Top-Left Telemetry HUD Card */}
+            {/* 5. BOTTOM CENTERED TIMELINE PLAYBACK BAR (Zoom Earth replica) */}
             {(() => {
               const waypoints = current.waypoints || [];
               const activeWp = waypoints[activeStepIndex] || waypoints[0] || {
-                lat: current.lat, lon: current.lon, wind: current.wind, pressure: current.pressure, cat: current.stage, step: '+00h', label: 'Observed Vortex'
+                date: '07 Sept', time: '03:30', step: '+00h'
               };
+
               return (
-                <div className="absolute top-4 left-4 z-[400] bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200 dark:border-slate-700 p-3.5 rounded-2xl text-xs shadow-lg max-w-xs space-y-2 pointer-events-auto">
-                  <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
-                    <div className="flex items-center gap-2">
-                      <strong className="font-heading text-sm text-slate-950 dark:text-white">
-                        {isHindi ? (current.shortNameHindi || current.shortName) : current.shortName}
-                      </strong>
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 z-[1000] pointer-events-auto flex flex-col items-center gap-1.5">
+                  <div className="zoom-earth-glass px-4 py-2 rounded-2xl text-white shadow-2xl border border-white/10 flex items-center gap-3">
+                    
+                    {/* Play / Pause */}
+                    <button
+                      onClick={() => setIsPlayingTimeline(!isPlayingTimeline)}
+                      className={`w-8 h-8 rounded-full flex items-center justify-center transition cursor-pointer ${
+                        isPlayingTimeline 
+                          ? 'bg-[#ff5500] text-white shadow-lg shadow-orange-500/40 animate-pulse' 
+                          : 'bg-white/15 hover:bg-white/25 text-white'
+                      }`}
+                      title={isPlayingTimeline ? "Pause playback" : "Play 72h forecast track"}
+                    >
+                      {isPlayingTimeline ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 ml-0.5" />}
+                    </button>
+
+                    {/* Step Back */}
+                    <button
+                      onClick={() => {
+                        setActiveStepIndex(prev => (prev > 0 ? prev - 1 : waypoints.length - 1));
+                        setIsPlayingTimeline(false);
+                      }}
+                      className="p-1 text-slate-300 hover:text-white transition cursor-pointer"
+                      title="Previous forecast step"
+                    >
+                      ◀
+                    </button>
+
+                    {/* Current Timestamp Display */}
+                    <div className="flex items-center gap-2 px-2 py-0.5 bg-black/40 rounded-xl border border-white/10">
+                      <span className="font-bold text-xs text-white whitespace-nowrap">
+                        {activeWp.date || '07 Sept'}
+                      </span>
+                      <span className="font-mono text-sm font-black text-cyan-300 tracking-wider">
+                        {activeWp.time || '03:30'}
+                      </span>
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-white/10 text-slate-300 font-mono font-semibold">
+                        {activeWp.step}
+                      </span>
                     </div>
-                    <span className="px-2 py-0.5 rounded-full bg-amber-50 dark:bg-amber-950 text-amber-800 dark:text-amber-300 font-bold text-[10px]">
-                      {activeWp.step}
-                    </span>
+
+                    {/* Step Forward */}
+                    <button
+                      onClick={() => {
+                        setActiveStepIndex(prev => (prev < waypoints.length - 1 ? prev + 1 : 0));
+                        setIsPlayingTimeline(false);
+                      }}
+                      className="p-1 text-slate-300 hover:text-white transition cursor-pointer"
+                      title="Next forecast step"
+                    >
+                      ▶
+                    </button>
+
                   </div>
 
-                  <div className="space-y-1.5 text-slate-600 dark:text-slate-400">
-                    <div className="flex justify-between">
-                      <span>{isHindi ? 'स्थिति:' : 'Status:'}</span>
-                      <strong className="text-slate-900 dark:text-white font-semibold">
-                        {isHindi && activeWp.catHindi ? activeWp.catHindi : activeWp.cat}
-                      </strong>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>{isHindi ? 'भंवर निर्देशांक:' : 'Vortex Fix:'}</span>
-                      <strong className="text-slate-900 dark:text-white font-bold">{activeWp.lat}°N, {activeWp.lon}°E</strong>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>{isHindi ? 'सतत हवाएं:' : 'Sustained Winds:'}</span>
-                      <strong className="text-sky-700 dark:text-sky-400 font-bold">{activeWp.wind}</strong>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>{isHindi ? 'केंद्रीय दबाव:' : 'Central Pressure:'}</span>
-                      <strong className="text-slate-900 dark:text-white font-bold">{activeWp.pressure}</strong>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>{isHindi ? 'लक्ष्य क्षेत्र:' : 'Target:'}</span>
-                      <strong className="text-slate-900 dark:text-white font-medium text-[11px] truncate max-w-[140px]">
-                        {isHindi ? current.targetHindi : current.target}
-                      </strong>
-                    </div>
+                  {/* Scrubber dots */}
+                  <div className="flex items-center gap-1.5 px-3 py-1 zoom-earth-glass rounded-full text-[9px]">
+                    {waypoints.map((wp, i) => (
+                      <button
+                        key={i}
+                        onClick={() => {
+                          setActiveStepIndex(i);
+                          setIsPlayingTimeline(false);
+                        }}
+                        className={`w-2 h-2 rounded-full transition cursor-pointer ${
+                          i === activeStepIndex 
+                            ? 'bg-[#ff5500] scale-125 ring-2 ring-orange-400/50' 
+                            : 'bg-white/30 hover:bg-white/60'
+                        }`}
+                        title={`${wp.date} ${wp.time} (${wp.step})`}
+                      />
+                    ))}
                   </div>
                 </div>
               );
             })()}
 
-            {/* Top-Right Doppler dBZ Reflectivity Scale */}
-            {showDopplerRadar && (
-              <div className="absolute top-4 right-4 z-[400] bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200 dark:border-slate-700 p-2.5 rounded-2xl text-[10px] shadow-lg flex flex-col gap-1 pointer-events-auto">
-                <span className="font-bold text-slate-800 dark:text-slate-200 text-center">
-                  {isHindi ? 'डॉपलर रडार dBZ' : 'Doppler Radar dBZ'}
-                </span>
-                <div className="w-32 h-2.5 rounded-full bg-gradient-to-r from-sky-400 via-emerald-400 via-yellow-400 via-orange-500 to-red-600 border border-slate-300 dark:border-slate-600 shadow-2xs" />
-                <div className="flex justify-between text-slate-500 dark:text-slate-400 font-medium px-0.5">
-                  <span>15 dBZ</span>
-                  <span>35</span>
-                  <span>50</span>
-                  <span>65+ dBZ</span>
-                </div>
-              </div>
-            )}
-
-            {/* Leaflet Map */}
+            {/* 6. LEAFLET MAP CONTAINER */}
             {(() => {
               const waypoints = current.waypoints || [];
               const activeWp = waypoints[activeStepIndex] || waypoints[0] || { lat: current.lat, lon: current.lon };
@@ -791,22 +1248,32 @@ const ThreatMap = () => {
                   center={[activeWp.lat, activeWp.lon]}
                   zoom={6}
                   style={{ width: '100%', height: '100%' }}
+                  zoomControl={false}
                 >
                   <MapController center={[activeWp.lat, activeWp.lon]} zoom={6} />
+                  <MapActionHandler 
+                    action={mapAction} 
+                    setAction={setMapAction} 
+                    currentCenter={[activeWp.lat, activeWp.lon]} 
+                    defaultZoom={6} 
+                  />
 
+                  {/* Base Satellite / GIS TileLayer */}
                   <TileLayer
                     url={activeTile.url}
                     attribution={activeTile.attribution}
                   />
 
+                  {/* Satellite IR Overlay */}
                   {showSatelliteIR && (
                     <TileLayer
                       url="https://tilecache.rainviewer.com/v2/satellite/latest/256/{z}/{x}/{y}/0/0_0.png"
-                      opacity={0.6}
+                      opacity={satSubMode === 'ir' ? 0.75 : 0.55}
                       zIndex={150}
                     />
                   )}
 
+                  {/* Doppler Weather Radar Overlay */}
                   {showDopplerRadar && (
                     <TileLayer
                       url="https://tilecache.rainviewer.com/v2/radar/latest/256/{z}/{x}/{y}/2/1_1.png"
@@ -815,12 +1282,22 @@ const ThreatMap = () => {
                     />
                   )}
 
+                  {/* Forecast Simulation Layer (when selected) */}
+                  {activeForecastLayer === 'precip' && (
+                    <TileLayer
+                      url="https://tilecache.rainviewer.com/v2/radar/latest/256/{z}/{x}/{y}/2/1_1.png"
+                      opacity={0.8}
+                      zIndex={210}
+                    />
+                  )}
+
+                  {/* Forecast Cone */}
                   {showCone && current.cone && (
                     <Polygon
                       positions={current.cone}
                       pathOptions={{
                         fillColor: '#F59E0B',
-                        fillOpacity: 0.18,
+                        fillOpacity: 0.2,
                         color: '#D97706',
                         weight: 2,
                         dashArray: '5, 5'
@@ -828,11 +1305,12 @@ const ThreatMap = () => {
                     />
                   )}
 
+                  {/* Wind Radii (35kt, 50kt, 64kt) */}
                   {showWindRadii && (
                     <>
                       <Circle
                         center={[activeWp.lat, activeWp.lon]}
-                        radius={120000}
+                        radius={130000}
                         pathOptions={{
                           color: '#0284C7',
                           fillColor: '#38BDF8',
@@ -843,7 +1321,7 @@ const ThreatMap = () => {
                       />
                       <Circle
                         center={[activeWp.lat, activeWp.lon]}
-                        radius={70000}
+                        radius={75000}
                         pathOptions={{
                           color: '#EA580C',
                           fillColor: '#F97316',
@@ -853,7 +1331,7 @@ const ThreatMap = () => {
                       />
                       <Circle
                         center={[activeWp.lat, activeWp.lon]}
-                        radius={35000}
+                        radius={40000}
                         pathOptions={{
                           color: '#DC2626',
                           fillColor: '#EF4444',
@@ -864,18 +1342,19 @@ const ThreatMap = () => {
                     </>
                   )}
 
+                  {/* Track Polyline */}
                   {current.track && (
                     <Polyline
                       positions={current.track}
                       pathOptions={{
                         color: '#0284C7',
-                        weight: 3,
+                        weight: 3.5,
                         dashArray: '4, 6'
                       }}
                     />
                   )}
 
-                  {/* Inactive Forecast Waypoints */}
+                  {/* Inactive Track Waypoints */}
                   {waypoints.map((wp, i) => {
                     const isSelected = i === activeStepIndex;
                     if (isSelected) return null;
@@ -883,9 +1362,9 @@ const ThreatMap = () => {
                       <CircleMarker
                         key={i}
                         center={[wp.lat, wp.lon]}
-                        radius={i === 0 ? 6.5 : 4.5}
+                        radius={wp.isObserved ? 6.5 : 4.5}
                         pathOptions={{
-                          fillColor: i === 0 ? '#DC2626' : '#0284C7',
+                          fillColor: wp.typeColor || '#0284C7',
                           fillOpacity: 0.95,
                           color: '#ffffff',
                           weight: 2
@@ -897,11 +1376,11 @@ const ThreatMap = () => {
                         <Popup>
                           <div className="p-1 text-xs space-y-1 font-sans">
                             <strong className="text-slate-900 block font-heading">
-                              {isHindi && wp.labelHindi ? wp.labelHindi : wp.label}
+                              {isHindi && wp.labelHindi ? wp.labelHindi : (wp.label || wp.cat)}
                             </strong>
                             <div className="text-slate-600">
-                              {isHindi ? 'समय: ' : 'Lead Time: '}
-                              <strong>{wp.step}</strong>
+                              {isHindi ? 'समय: ' : 'Time: '}
+                              <strong>{wp.date} {wp.time} ({wp.step})</strong>
                             </div>
                             <div className="text-slate-600">
                               {isHindi ? 'स्थिति: ' : 'Position: '}
@@ -909,16 +1388,16 @@ const ThreatMap = () => {
                             </div>
                             <div className="text-slate-600">
                               {isHindi ? 'पवन: ' : 'Wind: '}
-                              <strong>{wp.wind}</strong> ({isHindi ? 'झोंके: ' : 'Gusts: '}{wp.gusts})
+                              <strong>{wp.windKmh || wp.wind} km/h</strong>
                             </div>
                             <div className="text-slate-600">
                               {isHindi ? 'दबाव: ' : 'Pressure: '}
-                              <strong>{wp.pressure}</strong>
+                              <strong>{wp.pressureHpa || wp.pressure} hPa</strong>
                             </div>
                             <div className="text-slate-600">
-                              {isHindi ? 'चरण: ' : 'Stage: '}
+                              {isHindi ? 'श्रेणी: ' : 'Category: '}
                               <strong className="text-amber-700">
-                                {isHindi && wp.catHindi ? wp.catHindi : wp.cat}
+                                {wp.type} ({isHindi && wp.catHindi ? wp.catHindi : wp.cat})
                               </strong>
                             </div>
                           </div>
@@ -927,7 +1406,7 @@ const ThreatMap = () => {
                     );
                   })}
 
-                  {/* Active Vortex Center Marker (Red Point with White Border - Blinks during timelapse) */}
+                  {/* Active Vortex Center Marker */}
                   <Marker
                     position={[activeWp.lat, activeWp.lon]}
                     icon={activeBlinkingIcon}
@@ -939,14 +1418,14 @@ const ThreatMap = () => {
                     <Popup>
                       <div className="p-1 text-xs space-y-1 font-sans">
                         <div className="flex items-center gap-1.5 pb-1 border-b border-slate-100">
-                          <span className="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+                          <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
                           <strong className="text-slate-900 block font-heading">
-                            {isHindi && activeWp.labelHindi ? activeWp.labelHindi : activeWp.label}
+                            {isHindi && activeWp.labelHindi ? activeWp.labelHindi : (activeWp.label || activeWp.cat)}
                           </strong>
                         </div>
                         <div className="text-slate-600 pt-1">
-                          {isHindi ? 'समय: ' : 'Lead Time: '}
-                          <strong className="text-red-600 font-bold">{activeWp.step}</strong>
+                          {isHindi ? 'समय: ' : 'Time: '}
+                          <strong className="text-red-600 font-bold">{activeWp.date} {activeWp.time} ({activeWp.step})</strong>
                         </div>
                         <div className="text-slate-600">
                           {isHindi ? 'स्थिति: ' : 'Position: '}
@@ -954,75 +1433,23 @@ const ThreatMap = () => {
                         </div>
                         <div className="text-slate-600">
                           {isHindi ? 'पवन: ' : 'Wind: '}
-                          <strong>{activeWp.wind}</strong> ({isHindi ? 'झोंके: ' : 'Gusts: '}{activeWp.gusts})
+                          <strong>{activeWp.windKmh || activeWp.wind} km/h</strong>
                         </div>
                         <div className="text-slate-600">
                           {isHindi ? 'दबाव: ' : 'Pressure: '}
-                          <strong>{activeWp.pressure}</strong>
+                          <strong>{activeWp.pressureHpa || activeWp.pressure} hPa</strong>
                         </div>
                         <div className="text-slate-600">
-                          {isHindi ? 'चरण: ' : 'Stage: '}
+                          {isHindi ? 'श्रेणी: ' : 'Stage: '}
                           <strong className="text-amber-700">
-                            {isHindi && activeWp.catHindi ? activeWp.catHindi : activeWp.cat}
+                            {activeWp.type} ({isHindi && activeWp.catHindi ? activeWp.catHindi : activeWp.cat})
                           </strong>
                         </div>
                       </div>
                     </Popup>
                   </Marker>
+
                 </MapContainer>
-              );
-            })()}
-
-            {/* Bottom Scrubber Bar */}
-            {(() => {
-              const waypoints = current.waypoints || [];
-              return (
-                <div className="absolute bottom-4 left-4 right-4 z-[400] bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200 dark:border-slate-700 p-2.5 rounded-2xl shadow-lg flex flex-wrap items-center justify-between gap-3 pointer-events-auto">
-                  
-                  <button
-                    onClick={() => setIsPlayingTimeline(!isPlayingTimeline)}
-                    className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl font-bold text-xs shadow-xs transition-all cursor-pointer ${
-                      isPlayingTimeline
-                        ? 'bg-red-600 text-white shadow-md shadow-red-500/30 ring-2 ring-red-400/50 scale-105'
-                        : 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 hover:opacity-90'
-                    }`}
-                    title={isPlayingTimeline ? (isHindi ? "पूर्वानुमान प्लेबैक रोकें" : "Pause 72h Forecast Playback") : (isHindi ? "72h पूर्वानुमान प्लेबैक शुरू करें" : "Play 72h Forecast Playback")}
-                  >
-                    {isPlayingTimeline ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
-                    <span>{isPlayingTimeline ? (isHindi ? 'रोकें' : 'Pause') : (isHindi ? '72 घंटे चलाएं' : 'Play 72h')}</span>
-                  </button>
-
-                  <div className="flex items-center gap-1.5 overflow-x-auto py-1">
-                    {waypoints.map((wp, idx) => {
-                      const isSelected = idx === activeStepIndex;
-                      return (
-                        <button
-                          key={idx}
-                          onClick={() => {
-                            setActiveStepIndex(idx);
-                            setIsPlayingTimeline(false);
-                          }}
-                          className={`px-3 py-1 text-xs font-semibold rounded-xl border transition-all cursor-pointer whitespace-nowrap ${
-                            isSelected
-                              ? 'bg-sky-600 text-white border-sky-600 shadow-xs'
-                              : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-700'
-                          }`}
-                        >
-                          {wp.step}
-                        </button>
-                      );
-                    })}
-                  </div>
-
-                  <button
-                    onClick={() => setActiveStepIndex(0)}
-                    className="flex items-center gap-1 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-950 dark:hover:text-white px-2.5 py-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer"
-                  >
-                    <Crosshair className="w-3.5 h-3.5 text-sky-500" />
-                    <span>{isHindi ? 'प्रारंभिक केंद्र' : 'Eye Origin'}</span>
-                  </button>
-
-                </div>
               );
             })()}
 

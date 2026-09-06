@@ -1,0 +1,68 @@
+/* Zoom Earth High-Tech Geospatial Console Styles */
+
+.zoom-earth-glass {
+  background: rgba(10, 15, 29, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 1px 1px rgba(255, 255, 255, 0.05);
+}
+
+.zoom-earth-glass-subtle {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Orange Active Row Highlighter */
+.zoom-earth-row-active {
+  background: #ff5500 !important;
+  color: #ffffff !important;
+  font-weight: 700 !important;
+  box-shadow: 0 4px 14px rgba(255, 85, 0, 0.45);
+}
+
+.zoom-earth-row-active td {
+  color: #ffffff !important;
+}
+
+/* Custom Thin Scrollbar */
+.zoom-earth-scrollbar::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+.zoom-earth-scrollbar::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+}
+.zoom-earth-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 4px;
+}
+.zoom-earth-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 85, 0, 0.6);
+}
+
+/* Vortex Spinner */
+@keyframes spin-slow {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.animate-vortex-spin {
+  animation: spin-slow 8s linear infinite;
+}
+
+/* Pulse Glow */
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 15px rgba(255, 85, 0, 0.6), 0 0 30px rgba(255, 85, 0, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 25px rgba(255, 85, 0, 0.9), 0 0 50px rgba(255, 85, 0, 0.5);
+  }
+}
+
+.vortex-glowing-core {
+  animation: glow-pulse 2s infinite ease-in-out;
+}

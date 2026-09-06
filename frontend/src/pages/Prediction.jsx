@@ -9,10 +9,11 @@ import {
   Navigation, ArrowRight, Info
 } from 'lucide-react';
 import { 
-  MapContainer, TileLayer, Marker, Popup, Polyline, Polygon 
+  Marker, Popup, Polyline, Polygon 
 } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import VayuCycloneMap from '../components/VayuCycloneMap';
 import { useNavigate } from 'react-router-dom';
 import { predictCycloneTrack } from '../services/api';
 import { useAnalysisSession } from '../context/AnalysisSessionContext';
@@ -247,17 +248,12 @@ const Prediction = () => {
                 <span className="text-xs font-mono">Executing 2-Layer GRU Seq2Seq & 25-Pass MC Dropout...</span>
               </div>
             ) : (
-              <MapContainer
+              <VayuCycloneMap
                 key={`${selectedStormId}-${trajectoryList.length}`}
                 center={mapCenter}
                 zoom={6}
-                style={{ width: '100%', height: '100%' }}
+                height="100%"
               >
-                <TileLayer
-                  url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{x}/{y}"
-                  attribution="Tiles &copy; Esri &mdash; Earthstar Geographics"
-                />
-
                 {/* Real 25-pass MC Dropout Uncertainty Polygon from Backend */}
                 {conePolygon.length > 2 && (
                   <Polygon
@@ -312,7 +308,7 @@ const Prediction = () => {
                     </Marker>
                   );
                 })}
-              </MapContainer>
+              </VayuCycloneMap>
             )}
 
             {/* Scientific Notice overlay */}
