@@ -266,7 +266,7 @@ const Sidebar = () => {
       <aside className="bg-white text-slate-700 flex flex-col justify-between fixed top-0 left-0 h-screen z-40 border-r border-slate-200 w-56 select-none shadow-xs">
         
         {/* Top Left: Authentic VAYU Logo on White Background with Continuous Sheen */}
-        <div className="h-16 px-4 flex items-center border-b border-slate-100 shrink-0">
+        <div className="h-[72px] px-4 flex items-center border-b border-slate-100 shrink-0">
           <div 
             className="relative overflow-hidden group rounded-xl p-1 -m-1 flex items-center cursor-pointer"
             onClick={() => navigate('/dashboard')}
@@ -275,10 +275,10 @@ const Sidebar = () => {
             <img 
               src="/vayu.png" 
               alt="VAYU" 
-              className="h-12 sm:h-[50px] w-auto object-contain filter drop-shadow-xs transition-transform duration-300 group-hover:scale-105" 
+              className="h-[56px] sm:h-[62px] w-auto object-contain filter drop-shadow-xs transition-transform duration-300 group-hover:scale-105" 
             />
             <div 
-              className="animate-vayu-sheen absolute inset-y-0 w-24 bg-gradient-to-r from-transparent via-white/85 to-transparent pointer-events-none" 
+              className="animate-vayu-sheen absolute inset-y-0 w-32 bg-gradient-to-r from-transparent via-white/85 to-transparent pointer-events-none" 
             />
           </div>
         </div>
