@@ -1753,8 +1753,8 @@ const Welcome = () => {
             shear={current.shear || 11.2}
             vitPattern={current.vitPattern || "Curved Banding / LLCC"}
             risk48h={current.risk48h || "68%"}
-            confidenceScore={current.vitConfidence ? `${current.vitConfidence}%` : "94.8%"}
-            confidenceType="Vision Transformer (ViT)"
+            confidenceScore={current.vitConfidence ? `${current.vitConfidence}%` : "Phase 3B Validated"}
+            confidenceType="MobileNetV3 / ResNet18 Telemetry"
             isHistorical={current.id === 'dana'}
             isHindi={isHindi}
           />
@@ -1955,8 +1955,8 @@ const Welcome = () => {
                   </h2>
                   <p className="text-xs text-slate-600 dark:text-slate-300 max-w-3xl mt-1 leading-relaxed">
                     {isHindi
-                      ? 'इन्सैट-3डीआर, ओशनसैट-3 और डॉप्लर रडार से वास्तविक समय उपग्रह डेटा संलयन द्वारा वोर्टेक्स केंद्र पहचान, 5 डोवोरक पैटर्न वर्गीकरण और 72 घंटे का न्यूरल ट्रैक व तीव्रता पूर्वानुमान।'
-                      : 'Real-time multi-source data fusion from INSAT-3DR, Oceansat-3, and IMD Doppler Radars powering automated vortex identification (±14.2 km fix), 5 morphological pattern classifications, and 72-hour neural spatiotemporal track & intensity predictions.'}
+                      ? 'बहु-स्रोत उपग्रह डेटा संलयन द्वारा वोर्टेक्स केंद्र पहचान (MobileNetV3), 4 डोवोरक पैटर्न वर्गीकरण (ResNet18) और 72 घंटे का न्यूरल ट्रैक पूर्वानुमान (GRU Seq2Seq)।'
+                      : 'Multi-source satellite data fusion powering automated vortex identification (MobileNetV3 center fix), 4 validated Dvorak morphology classifications (ResNet18), and 72-hour neural spatiotemporal trajectory predictions (GRU Seq2Seq).'}
                   </p>
                 </div>
 
@@ -1986,14 +1986,14 @@ const Welcome = () => {
                       <Crosshair className="w-4 h-4" />
                     </div>
                     <span className="text-[10px] font-extrabold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-md">
-                      96.4% Conf.
+                      MobileNetV3
                     </span>
                   </div>
                   <h3 className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
-                    {isHindi ? '1. वोर्टेक्स पहचान व विश्वास स्कोर' : '1. Vortex Identification'}
+                    {isHindi ? '1. वोर्टेक्स पहचान व केंद्र निर्धारण' : '1. Vortex Center Localization'}
                   </h3>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-normal">
-                    {isHindi ? 'केंद्र फिक्स 15.40°N 87.80°E (त्रुटि ±14.2 किमी) व Grad-CAM ध्यान हीटमैप' : 'Autonomous center fix at 15.40°N 87.80°E (±14.2 km error) with Grad-CAM heatmaps.'}
+                    {isHindi ? 'स्वायत्त केंद्र फिक्स, 100% ऑब्जेक्टनेस सटीकता एवं Grad-CAM ध्यान हीटमैप' : 'Autonomous vortex center regression, 100% objectness accuracy and Grad-CAM attention heatmaps.'}
                   </p>
                 </IOSGlassCard>
 
@@ -2008,14 +2008,14 @@ const Welcome = () => {
                       <Layers className="w-4 h-4" />
                     </div>
                     <span className="text-[10px] font-extrabold text-purple-600 dark:text-purple-400 bg-purple-500/10 px-2 py-0.5 rounded-md">
-                      5 Classes
+                      4 Patterns
                     </span>
                   </div>
                   <h3 className="text-xs font-bold text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
                     {isHindi ? '2. संरचनात्मक पैटर्न वर्गीकरण' : '2. Pattern Classification'}
                   </h3>
                   <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1 leading-normal">
-                    {isHindi ? 'डोवोरक आकारिकी (Curved Band 62%) एवं 6-चरणीय विकास चक्र' : 'Dvorak morphological models (Curved Band 62%) & 6-stage lifecycle analysis.'}
+                    {isHindi ? 'डोवोरक आकारिकी (आई, कर्व्ड बैंड, शियर, शांत बेसलाइन) एवं आईएमडी विकास चक्र' : 'ResNet18 4-pattern morphology analysis (Eye, Curved Band, Shear, Calm) & IMD lifecycle stage.'}
                   </p>
                 </IOSGlassCard>
 

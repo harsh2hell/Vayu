@@ -1,0 +1,242 @@
+{
+  "model_name": "CycloneTrajectoryGRU-Seq2Seq",
+  "checkpoint_path": "/Users/harsh/Library/CloudStorage/GoogleDrive-harendrapratap5828@gmail.com/My Drive/Tahoe/Documents/ai-cyclone/backend/ml_engine/checkpoints/phase3b/vayu_track_gru_p3b.pt",
+  "checkpoint_sha256": "560fb5650d232eb9e702e3595410a2e9b3b7a1a8d11b04096e4ae48a4176980a",
+  "parameters_count": 41764,
+  "epochs": 60,
+  "learning_rate": 0.001,
+  "seed": 42,
+  "train_samples": 334,
+  "val_samples": 100,
+  "test_samples": 144,
+  "validation_eval": {
+    "horizons": {
+      "+6h": {
+        "samples": 98,
+        "gru_mean_km": 63.5,
+        "gru_median_km": 59.3,
+        "gru_max_km": 195.2,
+        "baseline_mean_km": 35.8,
+        "baseline_median_km": 32.5,
+        "gru_beats_baseline": false
+      },
+      "+12h": {
+        "samples": 94,
+        "gru_mean_km": 115.7,
+        "gru_median_km": 104.8,
+        "gru_max_km": 367.3,
+        "baseline_mean_km": 74.7,
+        "baseline_median_km": 64.4,
+        "gru_beats_baseline": false
+      },
+      "+18h": {
+        "samples": 90,
+        "gru_mean_km": 176.2,
+        "gru_median_km": 162.7,
+        "gru_max_km": 395.0,
+        "baseline_mean_km": 117.0,
+        "baseline_median_km": 105.2,
+        "gru_beats_baseline": false
+      },
+      "+24h": {
+        "samples": 86,
+        "gru_mean_km": 229.6,
+        "gru_median_km": 196.5,
+        "gru_max_km": 482.7,
+        "baseline_mean_km": 163.5,
+        "baseline_median_km": 143.2,
+        "gru_beats_baseline": false
+      },
+      "+48h": {
+        "samples": 70,
+        "gru_mean_km": 425.3,
+        "gru_median_km": 371.7,
+        "gru_max_km": 1081.8,
+        "baseline_mean_km": 395.7,
+        "baseline_median_km": 351.6,
+        "gru_beats_baseline": false
+      },
+      "+72h": {
+        "samples": 54,
+        "gru_mean_km": 641.3,
+        "gru_median_km": 575.7,
+        "gru_max_km": 1274.3,
+        "baseline_mean_km": 688.0,
+        "baseline_median_km": 674.7,
+        "gru_beats_baseline": true
+      }
+    },
+    "per_storm": {
+      "MOCHA": {
+        "+6h": 61.6,
+        "+12h": 114.8,
+        "+18h": 175.4,
+        "+24h": 234.2,
+        "+48h": 494.3,
+        "+72h": 716.9
+      },
+      "OCKHI": {
+        "+6h": 65.3,
+        "+12h": 116.5,
+        "+18h": 176.9,
+        "+24h": 225.7,
+        "+48h": 367.2,
+        "+72h": 580.9
+      }
+    },
+    "overall_mean_km": 238.0,
+    "overall_median_km": 159.7,
+    "overall_max_km": 1274.3
+  },
+  "test_eval": {
+    "horizons": {
+      "+6h": {
+        "samples": 142,
+        "gru_mean_km": 68.9,
+        "gru_median_km": 60.9,
+        "gru_max_km": 202.5,
+        "baseline_mean_km": 25.5,
+        "baseline_median_km": 24.4,
+        "gru_beats_baseline": false
+      },
+      "+12h": {
+        "samples": 138,
+        "gru_mean_km": 114.9,
+        "gru_median_km": 111.9,
+        "gru_max_km": 272.1,
+        "baseline_mean_km": 54.0,
+        "baseline_median_km": 47.9,
+        "gru_beats_baseline": false
+      },
+      "+18h": {
+        "samples": 134,
+        "gru_mean_km": 158.9,
+        "gru_median_km": 153.3,
+        "gru_max_km": 328.6,
+        "baseline_mean_km": 82.8,
+        "baseline_median_km": 74.2,
+        "gru_beats_baseline": false
+      },
+      "+24h": {
+        "samples": 130,
+        "gru_mean_km": 197.7,
+        "gru_median_km": 187.7,
+        "gru_max_km": 352.8,
+        "baseline_mean_km": 110.9,
+        "baseline_median_km": 103.8,
+        "gru_beats_baseline": false
+      },
+      "+48h": {
+        "samples": 114,
+        "gru_mean_km": 278.7,
+        "gru_median_km": 259.6,
+        "gru_max_km": 575.5,
+        "baseline_mean_km": 251.4,
+        "baseline_median_km": 234.1,
+        "gru_beats_baseline": false
+      },
+      "+72h": {
+        "samples": 98,
+        "gru_mean_km": 311.9,
+        "gru_median_km": 235.7,
+        "gru_max_km": 778.0,
+        "baseline_mean_km": 397.9,
+        "baseline_median_km": 375.4,
+        "gru_beats_baseline": true
+      }
+    },
+    "per_storm": {
+      "DANA": {
+        "+6h": 48.9,
+        "+12h": 96.7,
+        "+18h": 143.5,
+        "+24h": 187.8,
+        "+48h": 442.3,
+        "+72h": 710.2
+      },
+      "BIPARJOY": {
+        "+6h": 75.2,
+        "+12h": 120.4,
+        "+18h": 163.4,
+        "+24h": 200.4,
+        "+48h": 243.9,
+        "+72h": 256.3
+      }
+    },
+    "overall_mean_km": 178.5,
+    "overall_median_km": 154.1,
+    "overall_max_km": 778.0
+  },
+  "mc_dropout_uncertainty_dana": {
+    "+6h": {
+      "mean_position": [
+        15.49,
+        91.82
+      ],
+      "sigma_lat_deg": 0.053,
+      "sigma_lon_deg": 0.084,
+      "spread_radius_km": 11.0
+    },
+    "+12h": {
+      "mean_position": [
+        15.64,
+        91.64
+      ],
+      "sigma_lat_deg": 0.064,
+      "sigma_lon_deg": 0.126,
+      "spread_radius_km": 15.7
+    },
+    "+18h": {
+      "mean_position": [
+        15.86,
+        91.45
+      ],
+      "sigma_lat_deg": 0.136,
+      "sigma_lon_deg": 0.177,
+      "spread_radius_km": 24.7
+    },
+    "+24h": {
+      "mean_position": [
+        16.19,
+        91.12
+      ],
+      "sigma_lat_deg": 0.213,
+      "sigma_lon_deg": 0.24,
+      "spread_radius_km": 35.6
+    },
+    "+48h": {
+      "mean_position": [
+        16.44,
+        91.03
+      ],
+      "sigma_lat_deg": 0.188,
+      "sigma_lon_deg": 0.221,
+      "spread_radius_km": 32.2
+    },
+    "+72h": {
+      "mean_position": [
+        15.96,
+        91.82
+      ],
+      "sigma_lat_deg": 0.175,
+      "sigma_lon_deg": 0.146,
+      "spread_radius_km": 25.3
+    }
+  },
+  "train_storms": [
+    "AMPHAN",
+    "FANI",
+    "BULBUL",
+    "TITLI",
+    "HUDHUD",
+    "PHAILIN"
+  ],
+  "val_storms": [
+    "MOCHA",
+    "OCKHI"
+  ],
+  "test_storms": [
+    "DANA",
+    "BIPARJOY"
+  ]
+}

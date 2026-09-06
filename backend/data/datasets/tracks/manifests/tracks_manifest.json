@@ -1,0 +1,120 @@
+{
+  "dataset_name": "VAYU North Indian Ocean Trajectory Benchmark",
+  "version": "1.0-real",
+  "source": "NOAA NCEI IBTrACS v04r01",
+  "raw_archive": "data/datasets/tracks/raw/ibtracs_nio_1990_2024_raw.csv",
+  "total_nio_storms_post_1990": 367,
+  "total_nio_track_rows_post_1990": 14408,
+  "landmark_storms_count": 10,
+  "landmark_total_points": 618,
+  "splits": {
+    "train": [
+      "AMPHAN",
+      "FANI",
+      "BULBUL",
+      "TITLI",
+      "HUDHUD",
+      "PHAILIN"
+    ],
+    "validation": [
+      "MOCHA",
+      "OCKHI"
+    ],
+    "test": [
+      "DANA",
+      "BIPARJOY"
+    ]
+  },
+  "storms": {
+    "2024295N15092": {
+      "name": "DANA",
+      "season": 2024,
+      "split": "test",
+      "point_count": 39,
+      "peak_wind_kts": 60.0,
+      "min_pres_hpa": 986.0,
+      "period": "2024-10-21 to 2024-10-26"
+    },
+    "2023156N10067": {
+      "name": "BIPARJOY",
+      "season": 2023,
+      "split": "test",
+      "point_count": 113,
+      "peak_wind_kts": 90.0,
+      "min_pres_hpa": 958.0,
+      "period": "2023-06-05 to 2023-06-19"
+    },
+    "2023129N08091": {
+      "name": "MOCHA",
+      "season": 2023,
+      "split": "validation",
+      "point_count": 51,
+      "peak_wind_kts": 115.0,
+      "min_pres_hpa": 938.0,
+      "period": "2023-05-08 to 2023-05-15"
+    },
+    "2017333N06082": {
+      "name": "OCKHI",
+      "season": 2017,
+      "split": "validation",
+      "point_count": 57,
+      "peak_wind_kts": 85.0,
+      "min_pres_hpa": 976.0,
+      "period": "2017-11-28 to 2017-12-05"
+    },
+    "2020136N10088": {
+      "name": "AMPHAN",
+      "season": 2020,
+      "split": "train",
+      "point_count": 51,
+      "peak_wind_kts": 130.0,
+      "min_pres_hpa": 920.0,
+      "period": "2020-05-15 to 2020-05-21"
+    },
+    "2019116N02090": {
+      "name": "FANI",
+      "season": 2019,
+      "split": "train",
+      "point_count": 71,
+      "peak_wind_kts": 115.0,
+      "min_pres_hpa": 932.0,
+      "period": "2019-04-25 to 2019-05-04"
+    },
+    "2019302N11118": {
+      "name": "BULBUL",
+      "season": 2019,
+      "split": "train",
+      "point_count": 75,
+      "peak_wind_kts": 75.0,
+      "min_pres_hpa": 976.0,
+      "period": "2019-11-01 to 2019-11-11"
+    },
+    "2018281N14088": {
+      "name": "TITLI",
+      "season": 2018,
+      "split": "train",
+      "point_count": 40,
+      "peak_wind_kts": 80.0,
+      "min_pres_hpa": 972.0,
+      "period": "2018-10-08 to 2018-10-12"
+    },
+    "2014279N11096": {
+      "name": "HUDHUD",
+      "season": 2014,
+      "split": "train",
+      "point_count": 66,
+      "peak_wind_kts": 100.0,
+      "min_pres_hpa": 950.0,
+      "period": "2014-10-06 to 2014-10-14"
+    },
+    "2013281N12098": {
+      "name": "PHAILIN",
+      "season": 2013,
+      "split": "train",
+      "point_count": 55,
+      "peak_wind_kts": 115.0,
+      "min_pres_hpa": 940.0,
+      "period": "2013-10-07 to 2013-10-14"
+    }
+  }
+}

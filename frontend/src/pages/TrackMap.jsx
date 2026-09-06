@@ -143,6 +143,7 @@ const TrackMap = () => {
     const runPrediction = async () => {
       setIsLoadingForecast(true);
       const init = currentSystem.initialFix;
+      const stormId = selectedBasin === 'Bay of Bengal' ? 'DANA' : 'BIPARJOY';
       const res = await predictCycloneTrack({
         lat: init.lat,
         lon: init.lon,
@@ -150,7 +151,8 @@ const TrackMap = () => {
         mslp: init.mslp,
         sst: sstInput,
         shear: shearInput,
-        basin: selectedBasin
+        basin: selectedBasin,
+        storm_id: stormId
       });
       setForecastData(res);
       setIsLoadingForecast(false);
@@ -159,34 +161,13 @@ const TrackMap = () => {
     runPrediction();
   }, [selectedBasin, sstInput, shearInput]);
 
-  const timeSteps = forecastData?.trajectory_forecast || [
-    { time: 'NOW', lead_hours: 0, lat: currentSystem.initialFix.lat, lon: currentSystem.initialFix.lon, wind: currentSystem.initialFix.wind, pressure: currentSystem.initialFix.mslp, stage: 'Initial Fix' },
-    { time: '+6h', lead_hours: 6, lat: currentSystem.initialFix.lat + 0.7, lon: currentSystem.initialFix.lon - 0.5, wind: 95, pressure: 974, stage: 'Intensifying' },
-    { time: '+12h', lead_hours: 12, lat: currentSystem.initialFix.lat + 1.5, lon: currentSystem.initialFix.lon - 1.1, wind: 105, pressure: 965, stage: 'Severe Cyclonic Storm' },
-    { time: '+24h', lead_hours: 24, lat: currentSystem.initialFix.lat + 2.8, lon: currentSystem.initialFix.lon - 2.0, wind: 120, pressure: 955, stage: 'Landfall Window' },
-    { time: '+48h', lead_hours: 48, lat: currentSystem.initialFix.lat + 4.8, lon: currentSystem.initialFix.lon - 3.1, wind: 90, pressure: 968, stage: 'Inland Weakening' },
-    { time: '+72h', lead_hours: 72, lat: currentSystem.initialFix.lat + 6.6, lon: currentSystem.initialFix.lon - 4.0, wind: 65, pressure: 980, stage: 'Depression Dissipation' },
-  ];
-
-  const currentPoint = timeSteps[activeStep] || timeSteps[0];
+  const timeSteps = (forecastData && forecastData.success) ? (forecastData.trajectory_forecast || []) : [];
+  const currentPoint = timeSteps[activeStep] || timeSteps[0] || {
+    time: 'NOW', lead_hours: 0, lat: currentSystem.initialFix.lat, lon: currentSystem.initialFix.lon, wind: currentSystem.initialFix.wind, pressure: currentSystem.initialFix.mslp, stage: 'Initial Fix'
+  };
   const predictedSlice = timeSteps.slice(0, activeStep + 1).map(p => [p.lat, p.lon]);
-  const conePolygon = forecastData?.cone_polygon || [
-    [currentSystem.initialFix.lat, currentSystem.initialFix.lon],
-    [currentSystem.initialFix.lat + 1.5, currentSystem.initialFix.lon + 0.8],
-    [currentSystem.initialFix.lat + 4.0, currentSystem.initialFix.lon + 1.5],
-    [currentSystem.initialFix.lat + 7.5, currentSystem.initialFix.lon + 1.8],
-    [currentSystem.initialFix.lat + 7.5, currentSystem.initialFix.lon - 2.0],
-    [currentSystem.initialFix.lat + 4.0, currentSystem.initialFix.lon - 1.2],
-    [currentSystem.initialFix.lat + 1.5, currentSystem.initialFix.lon - 0.6],
-    [currentSystem.initialFix.lat, currentSystem.initialFix.lon]
-  ];
-
-  const districtStrikes = forecastData?.coastal_strike_probabilities || [
-    { district: 'Gopalpur (Ganjam, Odisha)', state: 'Odisha', strike_prob_pct: 84, surge_height_m: '2.5 - 3.2m', rainfall_24h_mm: 240, threat_level: 'RED ALERT' },
-    { district: 'Kalingapatnam (AP)', state: 'Andhra Pradesh', strike_prob_pct: 68, surge_height_m: '1.8 - 2.4m', rainfall_24h_mm: 180, threat_level: 'RED ALERT' },
-    { district: 'Puri & Jagatsinghpur (Odisha)', state: 'Odisha', strike_prob_pct: 55, surge_height_m: '1.5 - 2.0m', rainfall_24h_mm: 140, threat_level: 'ORANGE ALERT' },
-    { district: 'Visakhapatnam (AP)', state: 'Andhra Pradesh', strike_prob_pct: 42, surge_height_m: '1.0 - 1.5m', rainfall_24h_mm: 90, threat_level: 'YELLOW ALERT' },
-  ];
+  const conePolygon = (forecastData && forecastData.success) ? (forecastData.cone_polygon || []) : [];
+  const districtStrikes = (forecastData && forecastData.success) ? (forecastData.coastal_strike_probabilities || []) : [];
 
   // Animation playback loop
   useEffect(() => {

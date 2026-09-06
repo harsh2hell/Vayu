@@ -1,16 +1,18 @@
 from fastapi import APIRouter, File, UploadFile, Form, HTTPException
 from typing import Optional, Dict, Any
 from ..models.pattern_classifier import pattern_classifier, MORPHOLOGICAL_CLASSES
+from ..ml_engine.models.dvorak_classifier import INSUFFICIENT_CLASSES
 
 router = APIRouter(prefix="/api/v1/classification", tags=["Morphological Pattern Classification"])
 
 @router.get("/classes")
 def get_morphological_classes():
-    """Returns definitions and meteorological criteria for all 5 Dvorak morphological patterns."""
+    """Returns definitions and meteorological criteria for all 4 Phase 3B validated Dvorak morphological patterns."""
     return {
         "success": True,
         "count": len(MORPHOLOGICAL_CLASSES),
-        "classes": MORPHOLOGICAL_CLASSES
+        "classes": MORPHOLOGICAL_CLASSES,
+        "insufficient_data_classes": INSUFFICIENT_CLASSES
     }
 
 @router.post("/vit-inference")

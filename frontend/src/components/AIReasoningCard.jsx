@@ -20,8 +20,8 @@ export default function AIReasoningCard({
   shear = 11.2,
   vitPattern = 'Curved Banding / Low-Level Circulation Center (LLCC)',
   risk48h = '68%',
-  confidenceScore = '94.8%',
-  confidenceType = 'ViT Model Probability',
+  confidenceScore = 'Phase 3B Validated',
+  confidenceType = 'MobileNetV3 / ResNet18 Telemetry',
   isHistorical = false,
   isHindi = false,
   className = ''

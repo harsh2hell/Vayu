@@ -494,6 +494,7 @@ const Dashboard = () => {
       }
 
       // Historical or Custom Track Inference
+      const stormId = p.id === 'cyclone-dana-2024' ? 'DANA' : (p.id === 'cyclone-biparjoy-2023' ? 'BIPARJOY' : (p.fullName?.includes('DANA') ? 'DANA' : (p.fullName?.includes('BIPARJOY') ? 'BIPARJOY' : undefined)));
       const result = await predictCycloneTrack({
         current_lat: p.lat,
         current_lon: p.lon,
@@ -501,7 +502,8 @@ const Dashboard = () => {
         current_mslp: p.pressure,
         sst: p.sst,
         vertical_shear_knots: p.shear,
-        basin: p.basin
+        basin: p.basin,
+        storm_id: stormId
       });
 
       if (result && result.trajectory_forecast) {
@@ -757,18 +759,18 @@ const Dashboard = () => {
           <div className="space-y-1">
             <div className="flex items-baseline gap-2">
               <p className="text-3xl font-heading font-black text-slate-900 tracking-tight">
-                94.8%
+                100%
               </p>
-              <span className="text-[11px] font-semibold text-emerald-600 font-mono">+1.4%</span>
+              <span className="text-[11px] font-semibold text-emerald-600 font-mono">Objectness</span>
             </div>
             <p className="text-[11px] text-slate-500">
-              Sub-km eye fix via Vision Transformer
+              100% objectness accuracy (4 held-out test frames) via MobileNetV3-Small
             </p>
           </div>
 
           <div className="flex items-center justify-between text-[11px] text-slate-400 font-mono pt-2 border-t border-slate-100">
-            <span className="text-slate-600 font-medium">CNN Vision v2.1</span>
-            <span className="text-emerald-600 font-semibold">&lt; 18km Error</span>
+            <span className="text-slate-600 font-medium">Phase 3B Model</span>
+            <span className="text-emerald-600 font-semibold">25.6 km CLE (Val) / 38.2 km (Test)</span>
           </div>
         </div>
 
@@ -813,7 +815,7 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Card 4: 24h Track Lead Error */}
+        {/* Card 4: 72h Trajectory Advantage */}
         <div className="bg-white border border-slate-200/80 rounded-2xl p-4 space-y-3.5 shadow-2xs hover:border-slate-300 hover:shadow-xs transition-all">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2.5">
@@ -822,7 +824,7 @@ const Dashboard = () => {
               </div>
               <div>
                 <div className="flex items-center gap-1.5">
-                  <span className="text-xs font-bold text-slate-800 block leading-tight">24h Track Error</span>
+                  <span className="text-xs font-bold text-slate-800 block leading-tight">72h Trajectory</span>
                   <InfoTooltip term="cone" />
                 </div>
                 <span className="text-[10px] text-slate-400 font-medium">Trajectory Engine</span>
@@ -834,20 +836,20 @@ const Dashboard = () => {
           <div className="space-y-1">
             <div className="flex items-baseline gap-2">
               <p className="text-3xl font-heading font-black text-slate-900 tracking-tight">
-                ±38 km
+                +86.0 km
               </p>
-              <span className="text-[11px] font-semibold text-emerald-600 font-mono">Optimal</span>
+              <span className="text-[11px] font-semibold text-emerald-600 font-mono">Advantage</span>
             </div>
             <p className="text-[11px] text-slate-500">
-              BiLSTM Recurrent Ensemble Model
+              2-Layer GRU Seq2Seq Model
             </p>
           </div>
 
           <div className="flex items-center justify-between text-[11px] text-slate-400 font-mono pt-2 border-t border-slate-100">
-            <span className="text-slate-600 font-medium">Target &lt;45km</span>
-            <span className="text-amber-600 font-semibold flex items-center gap-1">
-              <span>91% Confidence</span>
-              <InfoTooltip title="Neural Ensemble Confidence" text="Estimated from 50 Monte-Carlo perturbations over the BiLSTM latent space." />
+            <span className="text-slate-600 font-medium">Held-out Benchmark</span>
+            <span className="text-emerald-600 font-semibold flex items-center gap-1">
+              <span>Beats Persistence</span>
+              <InfoTooltip title="Held-out Trajectory Benchmark" text="GRU beats persistence by 86.0 km at +72h on the current held-out benchmark (311.9 vs 397.9 km on DANA & BIPARJOY)." />
             </span>
           </div>
         </div>
@@ -877,7 +879,7 @@ const Dashboard = () => {
               <p className="text-xs text-slate-500 font-normal mt-0.5">
                 {systemCategoryFilter === 'UPCOMING_FORMING'
                   ? 'Real-time tropical cyclogenesis scanner detecting developing low-pressure systems, convective vortices, and 48h formation potential.'
-                  : 'Evaluating recorded IMD best-track archives to benchmark BiLSTM track and intensity prediction accuracy.'}
+                  : 'Evaluating recorded IMD best-track archives to benchmark 2-layer GRU Seq2Seq track and trajectory prediction accuracy.'}
               </p>
             </div>
 
@@ -987,7 +989,7 @@ const Dashboard = () => {
                   HISTORICAL BENCHMARK: {aiPrediction.name}
                 </span>
                 <span className="text-amber-800 text-[11px]">
-                  Evaluating BiLSTM neural model on recorded landfall dynamics and intensity forecasts.
+                  Evaluating 2-layer GRU Seq2Seq model on recorded landfall dynamics and trajectory forecasts.
                 </span>
               </div>
             </div>
@@ -1042,7 +1044,7 @@ const Dashboard = () => {
                 showCone ? 'bg-amber-100 text-amber-900 border-amber-300 font-bold' : 'bg-white text-slate-500 border-slate-200'
               }`}
             >
-              <span>70% Cone</span>
+              <span>MC Uncertainty</span>
               <InfoTooltip term="cone" size="sm" />
             </button>
             <button
@@ -1051,7 +1053,7 @@ const Dashboard = () => {
                 showOuterCone ? 'bg-amber-50 text-amber-800 border-amber-200 font-bold' : 'bg-white text-slate-500 border-slate-200'
               }`}
             >
-              90% Cone
+              Outer Spread
             </button>
             <button
               onClick={() => setShowWindRadii(!showWindRadii)}
@@ -1524,27 +1526,27 @@ const Dashboard = () => {
               <div className="p-3 rounded-xl bg-slate-50/80 border border-slate-200/60 flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
                   <CheckCircle className="w-4 h-4 text-emerald-600" />
-                  <span className="font-semibold text-slate-800">CNN Eye Center Localization</span>
+                  <span className="font-semibold text-slate-800">MobileNetV3-Small Eye Fix</span>
                   <InfoTooltip term="eye_fix" />
                 </div>
-                <span className="font-mono text-[10px] text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">&lt; 18km Error</span>
+                <span className="font-mono text-[10px] text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">25.6 km Val / 38.2 km Test</span>
               </div>
 
               <div className="p-3 rounded-xl bg-slate-50/80 border border-slate-200/60 flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
                   <CheckCircle className="w-4 h-4 text-emerald-600" />
-                  <span className="font-semibold text-slate-800">ResNet-50 Dvorak Classifier</span>
+                  <span className="font-semibold text-slate-800">ResNet18 Dvorak Classifier</span>
                   <InfoTooltip term="dvorak" />
                 </div>
-                <span className="font-mono text-[10px] text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">T3.5 (85 km/h)</span>
+                <span className="font-mono text-[10px] text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">4 Validated Classes</span>
               </div>
 
               <div className="p-3 rounded-xl bg-slate-50/80 border border-slate-200/60 flex items-center justify-between">
                 <div className="flex items-center gap-2.5">
                   <CheckCircle className="w-4 h-4 text-emerald-600" />
-                  <span className="font-semibold text-slate-800">BiLSTM 72h Recurrent Engine</span>
+                  <span className="font-semibold text-slate-800">2-Layer GRU Seq2Seq Engine</span>
                 </div>
-                <span className="font-mono text-[10px] text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">6 Interval Fixes</span>
+                <span className="font-mono text-[10px] text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">+86 km vs Persistence</span>
               </div>
             </div>
           </div>
@@ -1572,8 +1574,8 @@ const Dashboard = () => {
         shear={aiPrediction.shear || 11.2}
         vitPattern={aiPrediction.vit_pattern}
         risk48h={aiPrediction.cyclogenesis_risk}
-        confidenceScore="94.8%"
-        confidenceType="CNN / ViT Classification"
+        confidenceScore={aiPrediction?.confidence ? `${aiPrediction.confidence}%` : "Phase 3B Validated"}
+        confidenceType="MobileNetV3 / ResNet18 Telemetry"
         isHistorical={isHistorical}
       />
 

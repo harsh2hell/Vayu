@@ -115,7 +115,7 @@ export const CYCLONE_BY_YEAR = [
 ];
 
 export const MODEL_METRICS = {
-  detection: { accuracy: 94.2, precision: 92.8, recall: 91.6, f1: 92.2, version: 'CycloneVision-CNN v2.1', dataset: '42,500 images' },
-  classification: { accuracy: 89.7, precision: 88.1, recall: 87.4, f1: 87.7, version: 'PatternNet-ResNet50 v1.4', dataset: '38,200 images' },
-  prediction: { trackMAE: 32.4, intensityMAE: 8.5, version: 'CycloneForecast-LSTM v3.0', dataset: '15 years RSMC data' },
+  detection: { accuracy: 100.0, eyeLocalizationErrorKm: 38.2, falsePositiveRate: 0.0, version: 'MobileNetV3-Small-CenterFix (Phase 3B)', dataset: 'NASA EOSDIS GIBS + IBTrACS' },
+  classification: { accuracy: 50.0, macroF1: 33.4, classesCount: 4, version: 'ResNet18-Dvorak-Morphology (Phase 3B)', dataset: '4 Validated Dvorak Patterns' },
+  prediction: { trackMAE24h: 197.7, trackMAE72h: 311.9, persistenceBaseline72h: 397.9, version: 'CycloneTrajectoryGRU-Seq2Seq (Phase 3D)', dataset: 'NOAA IBTrACS NIO 3-Hourly Telemetry' },
 };

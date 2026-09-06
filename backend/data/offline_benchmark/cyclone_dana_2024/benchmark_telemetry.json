@@ -1,0 +1,146 @@
+{
+  "storm_id": "DANA_2024",
+  "name": "Severe Cyclonic Storm DANA",
+  "basin": "Bay of Bengal",
+  "season": "Post-Monsoon 2024",
+  "bbox": [
+    14.0,
+    84.0,
+    23.0,
+    93.0
+  ],
+  "initial_fix_t0": {
+    "timestamp": "2024-10-24T06:00:00Z",
+    "lat": 18.2,
+    "lon": 88.0,
+    "wind_knots": 55.0,
+    "wind_kmh": 102.0,
+    "mslp_hpa": 988.0,
+    "dvorak_t": 3.5,
+    "stage": "Severe Cyclonic Storm"
+  },
+  "history_past_24h": [
+    {
+      "time": "t-18h",
+      "lat": 16.2,
+      "lon": 90.0,
+      "wind_knots": 35.0,
+      "mslp_hpa": 998.0
+    },
+    {
+      "time": "t-12h",
+      "lat": 16.8,
+      "lon": 89.4,
+      "wind_knots": 40.0,
+      "mslp_hpa": 994.0
+    },
+    {
+      "time": "t-6h",
+      "lat": 17.5,
+      "lon": 88.7,
+      "wind_knots": 50.0,
+      "mslp_hpa": 990.0
+    },
+    {
+      "time": "t0",
+      "lat": 18.2,
+      "lon": 88.0,
+      "wind_knots": 55.0,
+      "mslp_hpa": 988.0
+    }
+  ],
+  "future_ground_truth_72h": [
+    {
+      "lead_hours": 6,
+      "lat": 19.1,
+      "lon": 87.5,
+      "wind_knots": 60.0,
+      "mslp_hpa": 985.0,
+      "stage": "Severe Cyclonic Storm"
+    },
+    {
+      "lead_hours": 12,
+      "lat": 19.9,
+      "lon": 87.2,
+      "wind_knots": 62.0,
+      "mslp_hpa": 984.0,
+      "stage": "Peak Intensity"
+    },
+    {
+      "lead_hours": 18,
+      "lat": 20.8,
+      "lon": 86.9,
+      "wind_knots": 60.0,
+      "mslp_hpa": 986.0,
+      "stage": "Landfall (Dhamra/Habalikhati)"
+    },
+    {
+      "lead_hours": 24,
+      "lat": 21.2,
+      "lon": 86.5,
+      "wind_knots": 45.0,
+      "mslp_hpa": 992.0,
+      "stage": "Inland Weakening"
+    },
+    {
+      "lead_hours": 48,
+      "lat": 21.8,
+      "lon": 85.8,
+      "wind_knots": 25.0,
+      "mslp_hpa": 1002.0,
+      "stage": "Deep Depression"
+    },
+    {
+      "lead_hours": 72,
+      "lat": 22.3,
+      "lon": 85.1,
+      "wind_knots": 18.0,
+      "mslp_hpa": 1006.0,
+      "stage": "Well-Marked Low"
+    }
+  ],
+  "weathernext_ecmwf_forecast": [
+    {
+      "lead_hours": 6,
+      "lat": 19.05,
+      "lon": 87.62,
+      "wind_knots": 58.0,
+      "mslp_hpa": 986.0
+    },
+    {
+      "lead_hours": 12,
+      "lat": 19.82,
+      "lon": 87.31,
+      "wind_knots": 61.0,
+      "mslp_hpa": 985.0
+    },
+    {
+      "lead_hours": 18,
+      "lat": 20.75,
+      "lon": 87.02,
+      "wind_knots": 59.0,
+      "mslp_hpa": 987.0
+    },
+    {
+      "lead_hours": 24,
+      "lat": 21.15,
+      "lon": 86.68,
+      "wind_knots": 46.0,
+      "mslp_hpa": 993.0
+    },
+    {
+      "lead_hours": 48,
+      "lat": 21.9,
+      "lon": 85.95,
+      "wind_knots": 24.0,
+      "mslp_hpa": 1003.0
+    },
+    {
+      "lead_hours": 72,
+      "lat": 22.45,
+      "lon": 85.3,
+      "wind_knots": 17.0,
+      "mslp_hpa": 1007.0
+    }
+  ]
+}

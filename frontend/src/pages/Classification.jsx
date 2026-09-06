@@ -5,17 +5,15 @@ import { useNavigate } from 'react-router-dom';
 import { classifyMorphologyPattern } from '../services/api';
 
 const DEFAULT_CLASSES = [
-  { class_id: 'cdo_pattern', class_name: 'Central Dense Overcast (CDO)', probability_pct: 68.5, dvorak_range: 'T3.5 – T4.5', color: 'bg-blue-600' },
-  { class_id: 'curved_band', class_name: 'Curved Band Pattern', probability_pct: 18.2, dvorak_range: 'T1.5 – T3.5', color: 'bg-sky-500' },
-  { class_id: 'shear_pattern', class_name: 'Shear Pattern', probability_pct: 8.4, dvorak_range: 'T1.5 – T3.0', color: 'bg-amber-500' },
-  { class_id: 'eye_pattern', class_name: 'Eye Pattern (Warm Core)', probability_pct: 3.5, dvorak_range: 'T4.5 – T7.5', color: 'bg-red-500' },
-  { class_id: 'embedded_center', class_name: 'Embedded Center Pattern', probability_pct: 1.4, dvorak_range: 'T3.5 – T5.5', color: 'bg-indigo-500' },
+  { class_id: 'eye_pattern', class_name: 'Eye Pattern (Warm Core)', probability_pct: 0.0, dvorak_range: 'T4.5 – T7.5', color: 'bg-red-500' },
+  { class_id: 'curved_band', class_name: 'Curved Band Pattern', probability_pct: 0.0, dvorak_range: 'T1.5 – T3.5', color: 'bg-sky-500' },
+  { class_id: 'shear_pattern', class_name: 'Shear Pattern', probability_pct: 0.0, dvorak_range: 'T1.5 – T3.0', color: 'bg-amber-500' },
+  { class_id: 'ambient_calm', class_name: 'Calm Baseline', probability_pct: 0.0, dvorak_range: 'T0.0', color: 'bg-emerald-500' },
 ];
 
 const radarData = [
   { feature: 'Spiral Curvature', value: 85 },
   { feature: 'Eyewall Core', value: 72 },
-  { feature: 'CDO Symmetry', value: 88 },
   { feature: 'Convective Cloud', value: 78 },
   { feature: 'SST Coupling', value: 92 },
   { feature: 'Low Shear', value: 80 },
@@ -23,7 +21,7 @@ const radarData = [
 
 const Classification = () => {
   const navigate = useNavigate();
-  const [selectedClass, setSelectedClass] = useState('cdo_pattern');
+  const [selectedClass, setSelectedClass] = useState('curved_band');
   const [customFile, setCustomFile] = useState(null);
   const [customImage, setCustomImage] = useState(null);
   const [isClassifying, setIsClassifying] = useState(false);
@@ -42,18 +40,23 @@ const Classification = () => {
     setIsClassifying(true);
     const res = await classifyMorphologyPattern(customFile, 'Bay of Bengal', 12.0);
     setIsClassifying(false);
-    if (res) {
+    if (res && res.success) {
       setClassificationResult(res);
       if (res.class_probability_distribution && res.class_probability_distribution.length > 0) {
         setSelectedClass(res.class_probability_distribution[0].class_id);
       }
+    } else {
+      setClassificationResult({
+        error: true,
+        message: res?.message || 'MODEL UNAVAILABLE: Backend connection required for live AI inference.'
+      });
     }
   };
 
-  const classesList = classificationResult?.class_probability_distribution || DEFAULT_CLASSES;
-  const topClass = classificationResult?.predicted_pattern || 'Central Dense Overcast (CDO)';
-  const topConf = classificationResult?.confidence_percentage || 68.5;
-  const dvorakCode = classificationResult?.dvorak_classification?.t_number || 'T3.5';
+  const classesList = (classificationResult && !classificationResult.error) ? classificationResult.class_probability_distribution : DEFAULT_CLASSES;
+  const topClass = classificationResult?.predicted_pattern || (classificationResult?.error ? 'MODEL UNAVAILABLE' : 'Ready for Classification');
+  const topConf = classificationResult?.confidence_percentage || 0;
+  const dvorakCode = classificationResult?.dvorak_classification?.t_number || 'T--';
 
   return (
     <div className="space-y-6 max-w-[1400px] mx-auto pb-10">
@@ -64,10 +67,13 @@ const Classification = () => {
           <div className="flex items-center gap-2">
             <Layers className="w-6 h-6 text-[#003087]" />
             <h1 className="text-xl sm:text-2xl font-bold text-slate-900">AI Cyclone Pattern Classification</h1>
-            <span className="badge badge-navy">PatternNet-ViT v1.8 (5 Morphological Classes)</span>
+            <span className="badge badge-navy">ResNet18-Dvorak-Morphology (4 Classes — Experimental Prototype)</span>
           </div>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Vision Transformer (ViT) architecture classifying Curved Band, Shear, CDO, Eye, and Embedded Center patterns with Grad-CAM attention.
+            Deep Residual Convolutional Network (ResNet-18) classifying Eye Pattern, Curved Band, Shear Pattern, and Calm Baseline with Grad-CAM visual attention. CDO and Embedded Center patterns are retired due to insufficient data.
+          </p>
+          <p className="text-[11px] text-amber-800 bg-amber-50 px-3 py-1.5 rounded-lg border border-amber-200 mt-2">
+            Experimental morphology classifier — limited labeled imagery (14 training frames across 4 classes; 0% held-out test accuracy in Phase 3B benchmark).
           </p>
         </div>
 
@@ -84,7 +90,7 @@ const Classification = () => {
             className="btn-primary text-xs sm:text-sm py-2 px-4 gap-2 shadow-sm"
           >
             <Sparkles className="w-4 h-4 text-amber-300" />
-            <span>{isClassifying ? 'Running ViT Classifier...' : 'Run Morphological AI Classifier'}</span>
+            <span>{isClassifying ? 'Running Neural Classifier...' : 'Run Morphological AI Classifier'}</span>
           </button>
         </div>
       </div>
@@ -114,7 +120,7 @@ const Classification = () => {
             </div>
 
             <div className="absolute bottom-2 left-2 bg-black/80 text-cyan-300 font-mono text-[10px] px-2 py-1 rounded">
-              Attention Head: ViT-B/16 Layer 12
+              Model: ResNet-18 Phase 3B (4 Classes)
             </div>
           </div>
 
@@ -128,12 +134,12 @@ const Classification = () => {
               <span className="font-bold text-sky-800">{dvorakCode}</span>
             </div>
             <div className="flex justify-between border-b border-slate-100 pb-1.5">
-              <span className="text-slate-500">IMD Classification:</span>
-              <span className="font-bold text-slate-800">{classificationResult?.dvorak_classification?.category || 'Severe Cyclonic Storm'}</span>
+              <span className="text-slate-500">Confidence:</span>
+              <span className="font-bold text-slate-800">{topConf > 0 ? `${topConf}%` : 'N/A'}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-slate-500">Peak Sustained Wind:</span>
-              <span className="font-bold text-red-600">{classificationResult?.dvorak_classification?.estimated_wind_speed_kmh || 100} km/h</span>
+              <span className="font-bold text-red-600">{classificationResult?.dvorak_classification?.estimated_wind_speed_kmh ? `${classificationResult.dvorak_classification.estimated_wind_speed_kmh} km/h` : 'N/A'}</span>
             </div>
           </div>
         </div>
@@ -176,7 +182,7 @@ const Classification = () => {
             <h3 className="text-base font-bold mb-1">{topClass}</h3>
             <div className="flex items-center gap-2">
               <CheckCircle className="w-4 h-4 text-emerald-300" />
-              <span className="text-xs font-semibold text-emerald-300">Confidence: {topConf}%</span>
+              <span className="text-xs font-semibold text-emerald-300">Model Prediction Confidence: {topConf}% (Experimental Prototype)</span>
             </div>
           </div>
         </div>
@@ -201,7 +207,7 @@ const Classification = () => {
           <div className="p-4 border-t border-slate-100 space-y-2.5 text-xs flex-1">
             <div className="flex justify-between border-b border-slate-100 pb-1.5">
               <span className="text-slate-500">Backbone Architecture:</span>
-              <span className="font-semibold text-slate-800">Vision Transformer (ViT-B/16)</span>
+              <span className="font-semibold text-slate-800">ResNet18 + Grad-CAM</span>
             </div>
             <div className="flex justify-between border-b border-slate-100 pb-1.5">
               <span className="text-slate-500">Grad-CAM Hotspots:</span>
@@ -209,7 +215,7 @@ const Classification = () => {
             </div>
             <div className="flex justify-between">
               <span className="text-slate-500">Training Dataset:</span>
-              <span className="font-semibold text-slate-800">WMO / IMD Classified Archive</span>
+              <span className="font-semibold text-slate-800">22 Real Satellite Frames (14 Train, 4 Val, 4 Test)</span>
             </div>
           </div>
 

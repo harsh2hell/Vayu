@@ -224,10 +224,10 @@ const Detection = () => {
                 {currentStep >= 4 && (
                   <div className="absolute w-56 h-56 border-2 border-red-500 rounded-lg flex items-start justify-between p-2 bg-red-500/10">
                     <span className="bg-red-600 text-white font-bold text-[10px] px-1.5 py-0.5 rounded shadow">
-                      CYCLONE_CENTER • 96.4%
+                      CYCLONE_CENTER • MobileNetV3
                     </span>
                     <span className="text-[10px] bg-black/80 text-cyan-300 px-2 py-0.5 rounded font-mono">
-                      15.4°N, 87.8°E
+                      17.12°N, 87.45°E
                     </span>
                   </div>
                 )}
@@ -236,7 +236,7 @@ const Detection = () => {
 
             {/* Tensor Spec Stamp */}
             <div className="absolute bottom-3 left-3 bg-black/80 text-cyan-300 text-[10px] font-mono px-2.5 py-1 rounded border border-white/10">
-              Layer: conv5_block3_out | Gradient: Norm-L2
+              Backbone: MobileNetV3-Small-CenterFix | Phase 3B Checkpoint
             </div>
           </div>
 
@@ -265,23 +265,23 @@ const Detection = () => {
                 <span className="text-xs font-mono font-extrabold text-emerald-800">POSITIVE (1)</span>
               </div>
               <div className="flex justify-between items-center text-xs">
-                <span className="text-emerald-700">Classification Confidence:</span>
-                <span className="font-bold text-emerald-900">96.4%</span>
+                <span className="text-emerald-700">Objectness Confidence:</span>
+                <span className="font-bold text-emerald-900">100.0%</span>
               </div>
               <div className="progress-bar bg-emerald-200/60">
-                <div className="progress-fill bg-emerald-600" style={{ width: '96.4%' }}></div>
+                <div className="progress-fill bg-emerald-600" style={{ width: '100%' }}></div>
               </div>
             </div>
 
             <div className="space-y-3 text-xs">
               {[
-                { label: 'Identified Eye Center', val: '15.4°N, 87.8°E (West-Central Bay of Bengal)' },
-                { label: 'Estimated CDO Diameter', val: '240 km' },
-                { label: 'Automated Dvorak Number', val: 'T3.0 (Severe Cyclone Potential)' },
-                { label: 'Minimum Central Pressure', val: '980 hPa (± 3 hPa error margin)' },
-                { label: 'Maximum Sustained Winds', val: '85 km/h (46 knots)' },
-                { label: 'Convolution Backbone', val: 'ResNet-50 + Spatial Pyramid Pooling' },
-                { label: 'Dataset Benchmark', val: 'MOSDAC 40,000+ IR Historical Archive' }
+                { label: 'Identified Eye Center', val: '17.12°N, 87.45°E (Bay of Bengal Fix)' },
+                { label: 'Predicted Bounding Box', val: 'Normalized [0.241, 0.208, 0.742, 0.785]' },
+                { label: 'Eye Localization CLE', val: '25.6 km (Val) / 38.2 km (Benchmark)' },
+                { label: 'Minimum Central Pressure', val: '990.0 hPa (± 4 hPa error margin)' },
+                { label: 'Maximum Sustained Winds', val: '92.6 km/h (50 knots)' },
+                { label: 'Convolution Backbone', val: 'MobileNetV3-Small Dual-Head Regressor' },
+                { label: 'Dataset Benchmark', val: 'NASA EOSDIS GIBS + NOAA IBTrACS Ground Truth' }
               ].map((row, idx) => (
                 <div key={idx} className="flex justify-between items-start py-1.5 border-b border-slate-100 last:border-0">
                   <span className="text-slate-500 font-medium">{row.label}:</span>
