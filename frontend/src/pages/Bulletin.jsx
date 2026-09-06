@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
-  FileText, Download, CheckCircle, AlertTriangle, 
-  RefreshCw, ShieldCheck, MapPin, Wind
+  Download, CheckCircle, AlertTriangle, 
+  RefreshCw, ArrowRight, ChevronLeft
 } from 'lucide-react';
 import { downloadOfficialBulletinPdf } from '../services/api';
 import DataTypeBadge from '../components/DataTypeBadge';
@@ -218,10 +219,22 @@ const Bulletin = () => {
         </div>
 
         {/* Action Panel */}
-        <div className="pt-2 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-100">
-          <div className="text-xs text-slate-500 flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-            <span>Document digitally stamped with verified MoES / IMD operational headers.</span>
+        <div className="pt-4 flex flex-col sm:flex-row items-center justify-between gap-4 border-t border-slate-100">
+          <div className="flex items-center gap-2 flex-wrap">
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="btn-secondary text-xs py-2.5 px-3.5 gap-1.5 cursor-pointer"
+            >
+              <ChevronLeft className="w-3.5 h-3.5" />
+              <span>Command Overview</span>
+            </button>
+            <button
+              onClick={() => navigate('/dashboard/impact')}
+              className="btn-secondary text-xs py-2.5 px-3.5 gap-1.5 cursor-pointer"
+            >
+              <span>Impact Matrix</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
           </div>
 
           <button
