@@ -120,10 +120,14 @@ const Classification = () => {
     }
   };
 
-  const classesList = classificationResult?.class_probability_distribution || DEFAULT_SUPPORTED_CLASSES;
+  const classesList = Array.isArray(classificationResult?.class_probability_distribution)
+    ? classificationResult.class_probability_distribution
+    : DEFAULT_SUPPORTED_CLASSES;
   const topPattern = classificationResult?.predicted_pattern || 'NO INFERENCE EXECUTED';
   const topConf = classificationResult?.confidence_percentage || 0;
-  const gradcamFoci = classificationResult?.gradcam_attention_foci || [];
+  const gradcamFoci = Array.isArray(classificationResult?.gradcam_attention_foci)
+    ? classificationResult.gradcam_attention_foci
+    : [];
   const radiometric = classificationResult?.radiometric_indicators;
 
   return (
