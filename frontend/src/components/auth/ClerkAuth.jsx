@@ -1,4 +1,5 @@
 import React from 'react';
+import { Navigate, useLocation } from 'react-router-dom';
 import { 
   SignedIn, 
   SignedOut, 
@@ -13,26 +14,52 @@ import { getAuthUrl, isProductionDomain, getWebsiteUrl } from '../../utils/domai
 export const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || '';
 
 /**
- * Protected Route Wrapper
- * If Clerk key is configured:
- *  - Signed in: renders children
- *  - Signed out: prompts authentication via Clerk Pro custom domain auth.autonex.studio
- * If Clerk key is not yet configured:
- *  - Renders children in Demo Mode with setup notification banner
+ * Checks if the current session has valid portal credentials
+ */
+export const isPortalAuthenticated = () => {
+  try {
+    const raw = localStorage.getItem('vayu_officer_session');
+    if (!raw) return false;
+    const session = JSON.parse(raw);
+    if (!session || !session.username || !session.token) return false;
+
+    // Check expiration if set
+    if (session.expiresAt && Date.now() > session.expiresAt) {
+      localStorage.removeItem('vayu_officer_session');
+      return false;
+    }
+
+    return true;
+  } catch {
+    return false;
+  }
+};
+
+/**
+ * Strict Protected Route Wrapper:
+ * Users cannot access /dashboard without entering valid portal credentials.
+ * Direct visits to /dashboard without authentication are immediately redirected to /login.
  */
 export const ProtectedRoute = ({ children }) => {
-  if (!CLERK_PUBLISHABLE_KEY) {
-    return <>{children}</>;
+  const location = useLocation();
+
+  if (CLERK_PUBLISHABLE_KEY) {
+    return (
+      <>
+        <SignedIn>{children}</SignedIn>
+        <SignedOut>
+          <Navigate to={`/login?redirect_url=${encodeURIComponent(location.pathname)}`} replace />
+        </SignedOut>
+      </>
+    );
   }
 
-  return (
-    <>
-      <SignedIn>{children}</SignedIn>
-      <SignedOut>
-        <AuthGateFallback />
-      </SignedOut>
-    </>
-  );
+  // Strict authentication guard: redirect to login if session token is missing or invalid
+  if (!isPortalAuthenticated()) {
+    return <Navigate to={`/login?redirect_url=${encodeURIComponent(location.pathname)}`} replace />;
+  }
+
+  return <>{children}</>;
 };
 
 /**
@@ -120,20 +147,34 @@ const ClerkUserDisplay = () => {
   );
 };
 
-// Safe Account identity component (uses Clerk user if configured, otherwise fallback)
+// Safe Account identity component (uses Clerk user if configured, otherwise test officer session)
 export const OfficerAccountDisplay = () => {
   if (CLERK_PUBLISHABLE_KEY) {
     return <ClerkUserDisplay />;
   }
 
+  let officerName = 'Commander R. Sharma';
+  let officerEmail = 'officer@vayu.imd.gov.in';
+
+  try {
+    const sessionStr = localStorage.getItem('vayu_officer_session');
+    if (sessionStr) {
+      const session = JSON.parse(sessionStr);
+      if (session.name) officerName = session.name;
+      if (session.username) officerEmail = session.username;
+    }
+  } catch (e) {
+    // fallback defaults
+  }
+
   return (
     <div className="flex items-center gap-3">
-      <div className="w-9 h-9 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700 font-bold text-xs shrink-0">
-        <User className="w-4 h-4 text-slate-600" />
+      <div className="w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 flex items-center justify-center text-slate-700 dark:text-slate-200 font-bold text-xs shrink-0">
+        <User className="w-4 h-4 text-slate-600 dark:text-slate-300" />
       </div>
       <div className="flex flex-col min-w-0 flex-1">
-        <span className="text-xs font-semibold text-slate-900 truncate">IMD Officer</span>
-        <span className="text-[10px] text-slate-500 truncate">officer.cyclone@imd.gov.in</span>
+        <span className="text-xs font-semibold text-slate-900 dark:text-white truncate">{officerName}</span>
+        <span className="text-[10px] text-slate-500 dark:text-slate-400 truncate">{officerEmail}</span>
       </div>
     </div>
   );
@@ -146,6 +187,9 @@ const ClerkSignOutButton = ({ onSignOutComplete, className, children }) => {
     <button
       type="button"
       onClick={async () => {
+        try {
+          localStorage.removeItem('vayu_officer_session');
+        } catch (e) {}
         try {
           await signOut();
         } catch (e) {
@@ -173,6 +217,9 @@ export const SafeSignOutButton = ({ onSignOutComplete, className, children }) =>
     <button
       type="button"
       onClick={() => {
+        try {
+          localStorage.removeItem('vayu_officer_session');
+        } catch (e) {}
         onSignOutComplete();
       }}
       className={className}

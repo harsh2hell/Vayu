@@ -324,16 +324,16 @@ const PublicNavbar = ({
         {/* RIGHT SIDE CONTROLS: OFFICER LOGIN, HELPLINE, LANGUAGE, FONT, THEME, MOBILE HAMBURGER */}
         <div className="header-controls-row flex items-center gap-1.5 sm:gap-2 shrink-0 flex-nowrap">
           
-          {/* Official Officer Gateway - Collapses smoothly when scrolled past hero section */}
+          {/* Official Portal Gateway - Collapses smoothly when scrolled past hero section */}
           <button
             onClick={() => navigate('/login')}
             className={`header-ctrl-btn header-collapsible-item header-collapsible-login hidden xl:inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-slate-900 dark:bg-sky-600 hover:bg-slate-800 dark:hover:bg-sky-500 transition-all shadow-xs cursor-pointer shrink-0 whitespace-nowrap ${
               isPastHero ? 'is-collapsed' : ''
             }`}
-            title={isHindi ? "आधिकारिक आईएमडी / एमओईएस अधिकारी लॉगिन पोर्टल" : "Official IMD / MoES Officer Login Gateway"}
+            title={isHindi ? "आधिकारिक आईएमडी / एमओईएस पोर्टल लॉगिन" : "Official IMD / MoES Portal Login"}
           >
             <Shield className="w-3.5 h-3.5 text-amber-400 dark:text-sky-200 shrink-0" />
-            <span className="hidden 2xl:inline whitespace-nowrap">{isHindi ? 'अधिकारी लॉगिन' : 'Officer Login'}</span>
+            <span className="hidden 2xl:inline whitespace-nowrap">{isHindi ? 'पोर्टल लॉगिन' : 'Portal Login'}</span>
             <span className="2xl:hidden inline whitespace-nowrap">{isHindi ? 'लॉगिन' : 'Login'}</span>
           </button>
 
@@ -469,7 +469,7 @@ const PublicNavbar = ({
               </div>
               <div className="text-left">
                 <div className="text-xs font-bold tracking-tight">
-                  {isHindi ? 'अधिकारी लॉगिन पोर्टल' : 'Official Officer Login'}
+                  {isHindi ? 'पोर्टल लॉगिन' : 'Official Portal Login'}
                 </div>
                 <div className="text-[10px] text-slate-300 dark:text-sky-100 font-medium">
                   {isHindi ? 'आईएमडी / एमओईएस प्राधिकृत' : 'IMD / MoES Operational Gateway'}
