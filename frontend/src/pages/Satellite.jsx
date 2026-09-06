@@ -336,7 +336,7 @@ const Satellite = () => {
               <div className="relative inline-block max-w-full max-h-full">
                 <img
                   src={activeImageSource}
-                  alt={imageMetadata.name}
+                  alt={currentInput?.name || selectedPreset?.name || 'Satellite Observation Frame'}
                   className="max-h-[560px] max-w-full w-auto h-auto object-contain block select-none"
                   crossOrigin="anonymous"
                 />
