@@ -114,12 +114,12 @@ const Detection = () => {
     }
   };
 
-  // Convert normalized bbox [ymin, xmin, ymax, xmax] to CSS percentages
+  // Convert normalized bbox [ymin, xmin, ymax, xmax] or {ymin, xmin, ymax, xmax} to CSS percentages
   const bboxStyle = detectionResult?.bounding_box ? {
-    top: `${Math.max(0, detectionResult.bounding_box[0] * 100)}%`,
-    left: `${Math.max(0, detectionResult.bounding_box[1] * 100)}%`,
-    height: `${Math.max(5, (detectionResult.bounding_box[2] - detectionResult.bounding_box[0]) * 100)}%`,
-    width: `${Math.max(5, (detectionResult.bounding_box[3] - detectionResult.bounding_box[1]) * 100)}%`,
+    top: `${Math.max(0, (Array.isArray(detectionResult.bounding_box) ? detectionResult.bounding_box[0] : (detectionResult.bounding_box.ymin ?? 0.2)) * 100)}%`,
+    left: `${Math.max(0, (Array.isArray(detectionResult.bounding_box) ? detectionResult.bounding_box[1] : (detectionResult.bounding_box.xmin ?? 0.2)) * 100)}%`,
+    height: `${Math.max(5, ((Array.isArray(detectionResult.bounding_box) ? (detectionResult.bounding_box[2] - detectionResult.bounding_box[0]) : (detectionResult.bounding_box.ymax - detectionResult.bounding_box.ymin)) || 0.4) * 100)}%`,
+    width: `${Math.max(5, ((Array.isArray(detectionResult.bounding_box) ? (detectionResult.bounding_box[3] - detectionResult.bounding_box[1]) : (detectionResult.bounding_box.xmax - detectionResult.bounding_box.xmin)) || 0.4) * 100)}%`,
   } : null;
 
   return (
@@ -374,7 +374,11 @@ const Detection = () => {
                   <div className="flex justify-between items-center py-1.5 border-b border-slate-100">
                     <span className="text-slate-500 font-medium">Bounding Box [ymin, xmin, ymax, xmax]:</span>
                     <span className="font-mono text-[11px] text-slate-800">
-                      [{detectionResult.bounding_box?.map(v => v.toFixed(3)).join(', ')}]
+                      {Array.isArray(detectionResult.bounding_box)
+                        ? `[${detectionResult.bounding_box.map(v => typeof v === 'number' ? v.toFixed(3) : v).join(', ')}]`
+                        : detectionResult.bounding_box && typeof detectionResult.bounding_box === 'object'
+                          ? `[${Number(detectionResult.bounding_box.ymin ?? 0).toFixed(3)}, ${Number(detectionResult.bounding_box.xmin ?? 0).toFixed(3)}, ${Number(detectionResult.bounding_box.ymax ?? 0).toFixed(3)}, ${Number(detectionResult.bounding_box.xmax ?? 0).toFixed(3)}]`
+                          : 'N/A'}
                     </span>
                   </div>
 
