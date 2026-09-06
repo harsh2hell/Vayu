@@ -1,100 +1,60 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Target, Cpu, Upload, Play, CheckCircle2, 
   AlertTriangle, ChevronRight, RefreshCw, Layers, 
-  Eye, Image as ImageIcon, ShieldCheck, HelpCircle, Activity
+  Eye, Image as ImageIcon, ShieldCheck, HelpCircle, Activity,
+  ArrowLeftRight
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { detectCycloneFromImage } from '../services/api';
+import { useAnalysisSession } from '../context/AnalysisSessionContext';
 import PageHeader from '../components/PageHeader';
 import EmptyState from '../components/EmptyState';
 import StatusBadge from '../components/StatusBadge';
 import DataTypeBadge from '../components/DataTypeBadge';
 
-const SATELLITE_PRESETS = [
-  {
-    id: 'dana-2024',
-    name: 'Cyclone DANA (2024)',
-    date: '2024-10-24',
-    basin: 'Bay of Bengal',
-    url: 'https://wvs.earthdata.nasa.gov/api/v1/snapshot?REQUEST=GetSnapshot&LAYERS=VIIRS_SNPP_CorrectedReflectance_TrueColor&BBOX=8,75,23,95&TIME=2024-10-24&WIDTH=1024&HEIGHT=768&FORMAT=image/png'
-  },
-  {
-    id: 'biparjoy-2023',
-    name: 'Cyclone BIPARJOY (2023)',
-    date: '2023-06-12',
-    basin: 'Arabian Sea',
-    url: 'https://wvs.earthdata.nasa.gov/api/v1/snapshot?REQUEST=GetSnapshot&LAYERS=VIIRS_SNPP_CorrectedReflectance_TrueColor&BBOX=12,58,26,76&TIME=2023-06-12&WIDTH=1024&HEIGHT=768&FORMAT=image/png'
-  }
-];
-
 const Detection = () => {
   const navigate = useNavigate();
-  const [selectedPreset, setSelectedPreset] = useState(SATELLITE_PRESETS[0]);
-  const [customFile, setCustomFile] = useState(null);
-  const [customPreview, setCustomPreview] = useState(null);
-  const [fileMeta, setFileMeta] = useState(null);
+  const { currentInput, detectionResult, setDetectionResult } = useAnalysisSession();
   
   // Real inference state
   const [isDetecting, setIsDetecting] = useState(false);
-  const [inferenceStatus, setInferenceStatus] = useState('ready'); // 'ready' | 'running' | 'success' | 'error'
-  const [detectionResult, setDetectionResult] = useState(null);
+  const [inferenceStatus, setInferenceStatus] = useState(detectionResult ? 'success' : 'ready');
   const [errorMsg, setErrorMsg] = useState(null);
 
-  const activeImageSrc = customPreview || selectedPreset?.url;
-  const activeBasin = customFile ? 'Bay of Bengal' : selectedPreset.basin;
+  // Keep inferenceStatus in sync with detectionResult
+  useEffect(() => {
+    if (detectionResult) {
+      setInferenceStatus('success');
+    } else {
+      setInferenceStatus('ready');
+    }
+  }, [detectionResult]);
 
-  const handleFileUpload = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setCustomFile(file);
-    const objectUrl = URL.createObjectURL(file);
-    setCustomPreview(objectUrl);
-    setDetectionResult(null);
-    setErrorMsg(null);
-    setInferenceStatus('ready');
-
-    const img = new Image();
-    img.onload = () => {
-      setFileMeta({
-        name: file.name,
-        size: `${(file.size / 1024).toFixed(1)} KB`,
-        type: file.type || 'image/png',
-        dimensions: `${img.naturalWidth} × ${img.naturalHeight} px`
-      });
-    };
-    img.src = objectUrl;
-  };
-
-  const handleSelectPreset = (preset) => {
-    setSelectedPreset(preset);
-    setCustomFile(null);
-    setCustomPreview(null);
-    setFileMeta(null);
-    setDetectionResult(null);
-    setErrorMsg(null);
-    setInferenceStatus('ready');
-  };
+  const activeImageSrc = currentInput?.imageUrl;
+  const activeBasin = currentInput?.basin || 'Bay of Bengal';
+  const isCustomUpload = currentInput?.inputType === 'upload';
+  const fileMeta = currentInput?.metadata;
 
   const handleRunDetection = async () => {
+    if (!currentInput) return;
     setIsDetecting(true);
     setInferenceStatus('running');
     setErrorMsg(null);
 
     try {
-      let fileToSend = customFile;
+      let fileToSend = currentInput.file;
 
-      if (!fileToSend && selectedPreset) {
+      if (!fileToSend && currentInput.imageUrl) {
         // Fetch preset image bytes directly so real backend CNN processes actual pixels
-        const response = await fetch(selectedPreset.url);
+        const response = await fetch(currentInput.imageUrl);
         if (!response.ok) throw new Error('Failed to load satellite preset image frame.');
         const blob = await response.blob();
-        fileToSend = new File([blob], `${selectedPreset.id}.png`, { type: 'image/png' });
+        fileToSend = new File([blob], `${currentInput.sessionId}.png`, { type: 'image/png' });
       }
 
       if (!fileToSend) {
-        throw new Error('No satellite frame available. Please upload a frame or select a preset.');
+        throw new Error('No satellite frame available. Please select or upload a frame in Satellite Studio.');
       }
 
       const res = await detectCycloneFromImage(fileToSend, activeBasin);
@@ -136,59 +96,68 @@ const Detection = () => {
         actions={
           <>
             <span className="text-[11px] text-amber-800 bg-amber-50 font-mono px-2 py-0.5 rounded border border-amber-200 hidden sm:inline-block">
-              Page-Local Analysis • Isolated from Command Overview
+              Page-Local Analysis • Shared Session
             </span>
-            <label className="btn-secondary text-xs sm:text-sm py-2 px-3 gap-1.5 cursor-pointer">
-              <Upload className="w-3.5 h-3.5" />
-              <span>Upload Frame</span>
-              <input 
-                type="file" 
-                accept="image/png,image/jpeg,image/jpg,image/webp,image/tiff" 
-                onChange={handleFileUpload} 
-                className="hidden" 
-              />
-            </label>
+            <button
+              onClick={() => navigate('/dashboard/satellite')}
+              className="btn-secondary text-xs sm:text-sm py-2 px-3 gap-1.5"
+            >
+              <ArrowLeftRight className="w-3.5 h-3.5" />
+              <span>Change Input</span>
+            </button>
             <button 
               onClick={handleRunDetection}
               disabled={isDetecting || !activeImageSrc}
               className="btn-primary text-xs sm:text-sm py-2 px-4 gap-2 shadow-xs"
             >
               <Play className={`w-3.5 h-3.5 fill-current ${isDetecting ? 'animate-spin' : ''}`} />
-              <span>{isDetecting ? 'Running MobileNetV3...' : 'Run Detection Inference'}</span>
+              <span>
+                {isDetecting 
+                  ? 'Running MobileNetV3...' 
+                  : detectionResult 
+                    ? 'Re-run Detection' 
+                    : 'Run Detection Inference'}
+              </span>
             </button>
           </>
         }
       />
 
-      {/* Frame Selection Bar */}
+      {/* Frame Selection / Shared Session Bar */}
       <div className="bg-white border border-slate-200 rounded-xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 shadow-2xs">
-        <div className="flex items-center gap-2 text-xs">
-          <span className="font-semibold text-slate-700">Select Input Frame:</span>
-          {SATELLITE_PRESETS.map((p) => (
-            <button
-              key={p.id}
-              onClick={() => handleSelectPreset(p)}
-              className={`px-3 py-1.5 rounded-lg font-medium transition-all text-xs border ${
-                !customFile && selectedPreset?.id === p.id
-                  ? 'bg-[#003087] text-white border-[#003087] shadow-xs'
-                  : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
-              }`}
-            >
-              {p.name}
-            </button>
-          ))}
-          {customFile && (
-            <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-1.5 rounded-lg font-medium text-xs flex items-center gap-1.5">
-              <ImageIcon className="w-3.5 h-3.5 text-emerald-600" />
-              Custom: {customFile.name}
+        <div className="flex flex-wrap items-center gap-2 text-xs">
+          <span className="font-bold text-slate-700 uppercase tracking-wider text-[11px]">
+            Current Analysis Input:
+          </span>
+          {currentInput ? (
+            <span className={`px-3 py-1.5 rounded-lg font-semibold text-xs flex items-center gap-1.5 border ${
+              isCustomUpload 
+                ? 'bg-amber-50 text-amber-900 border-amber-300' 
+                : 'bg-blue-50 text-[#003087] border-blue-200'
+            }`}>
+              <ImageIcon className="w-3.5 h-3.5" />
+              <span>{currentInput.name}</span>
+              <span className="text-[10px] font-normal opacity-80">({currentInput.source})</span>
+            </span>
+          ) : (
+            <span className="bg-slate-100 text-slate-500 px-3 py-1.5 rounded-lg text-xs">
+              No active session
             </span>
           )}
+          
+          <button
+            onClick={() => navigate('/dashboard/satellite')}
+            className="text-xs text-[#003087] hover:underline font-semibold flex items-center gap-1 ml-1"
+          >
+            <span>Change Input in Satellite Studio</span>
+            <ChevronRight className="w-3 h-3" />
+          </button>
         </div>
 
         {fileMeta && (
           <div className="text-[11px] font-mono text-slate-500 flex items-center gap-3">
             <span>Dimensions: {fileMeta.dimensions}</span>
-            <span>Size: {fileMeta.size}</span>
+            {fileMeta.sizeKb && <span>Size: {fileMeta.sizeKb} KB</span>}
             <span>Format: {fileMeta.type}</span>
           </div>
         )}
@@ -234,11 +203,11 @@ const Detection = () => {
                 {/* Source and Lifecycle Watermarks */}
                 <div className="absolute top-2.5 left-2.5 z-10 flex flex-col gap-1 pointer-events-none">
                   <span className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold border backdrop-blur-md shadow-sm ${
-                    customFile 
+                    isCustomUpload 
                       ? 'bg-amber-950/85 text-amber-300 border-amber-500/50' 
                       : 'bg-slate-900/85 text-sky-300 border-white/20'
                   }`}>
-                    {customFile ? 'USER-UPLOADED IMAGE • IN-SESSION ANALYSIS' : `BENCHMARK FRAME: ${selectedPreset.name}`}
+                    {isCustomUpload ? `USER-UPLOADED IMAGE • ${currentInput?.name}` : `BENCHMARK FRAME: ${currentInput?.name}`}
                   </span>
                   {!detectionResult && (
                     <span className="px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold bg-red-950/90 text-red-300 border border-red-500/50 backdrop-blur-md shadow-sm">
@@ -274,15 +243,17 @@ const Detection = () => {
             ) : (
               <div className="p-12 text-center text-slate-400 space-y-3">
                 <ImageIcon className="w-12 h-12 mx-auto text-slate-600 opacity-60" />
-                <h3 className="text-sm font-bold text-white uppercase tracking-wider">NO SATELLITE FRAME AVAILABLE</h3>
+                <h3 className="text-sm font-bold text-white uppercase tracking-wider">NO ACTIVE ANALYSIS SESSION</h3>
                 <p className="text-xs text-slate-400 max-w-sm mx-auto">
-                  Please upload a satellite observation frame (PNG/JPG) or choose an official NASA snapshot preset to run inference.
+                  Please select an official benchmark frame or upload a satellite observation image in Satellite Studio.
                 </p>
-                <label className="btn-primary text-xs py-2 px-4 inline-flex items-center gap-2 cursor-pointer mt-2">
-                  <Upload className="w-4 h-4" />
-                  <span>Upload Satellite Frame</span>
-                  <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
-                </label>
+                <button 
+                  onClick={() => navigate('/dashboard/satellite')}
+                  className="btn-primary text-xs py-2 px-4 inline-flex items-center gap-2 cursor-pointer mt-2"
+                >
+                  <ImageIcon className="w-4 h-4" />
+                  <span>Open Satellite Imagery Studio</span>
+                </button>
               </div>
             )}
 
@@ -300,7 +271,7 @@ const Detection = () => {
 
           <div className="p-4 bg-slate-50 border-t border-slate-200 text-xs text-slate-600 flex items-center justify-between">
             <span>
-              <strong>Input Basin:</strong> {activeBasin} • <strong>Source:</strong> {customFile ? 'User In-Session Frame' : selectedPreset?.name}
+              <strong>Input Basin:</strong> {activeBasin} • <strong>Source:</strong> {currentInput?.source || 'N/A'}
             </span>
             <span className="font-mono text-[11px]">
               {inferenceStatus === 'success' && detectionResult ? (

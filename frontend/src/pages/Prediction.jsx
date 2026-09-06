@@ -15,6 +15,7 @@ import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { useNavigate } from 'react-router-dom';
 import { predictCycloneTrack } from '../services/api';
+import { useAnalysisSession } from '../context/AnalysisSessionContext';
 import DataTypeBadge from '../components/DataTypeBadge';
 import LastUpdatedBadge from '../components/LastUpdatedBadge';
 import PageHeader from '../components/PageHeader';
@@ -56,11 +57,14 @@ const createWaypointIcon = (isNow, isLandfall) => L.divIcon({
 
 const Prediction = () => {
   const navigate = useNavigate();
+  const { currentInput } = useAnalysisSession();
   const [selectedStormId, setSelectedStormId] = useState('DANA');
   const [forecastData, setForecastData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState(null);
   const [chartMetric, setChartMetric] = useState('wind'); // 'wind' | 'pressure'
+
+  const isCustomUpload = currentInput?.inputType === 'upload';
 
   const activeStorm = VERIFIED_STORMS.find(s => s.id === selectedStormId) || VERIFIED_STORMS[0];
 
@@ -156,13 +160,49 @@ const Prediction = () => {
         }
       />
 
-      {/* Trajectory Requirement Disclosure for Uploaded Frames */}
-      <InfoCallout
-        title="Trajectory Kinematics Protocol"
-        badge={`Active: ${activeStorm.name}`}
-      >
-        Deep GRU Seq2Seq autoregression requires historical track sequence data (IBTrACS 3-hourly fixes). Arbitrary single-frame uploads execute detection/classification, while trajectory forecasting runs on verified sequence tracks.
-      </InfoCallout>
+      {/* Uploaded Image Temporal Sequence Scientific Disclosure */}
+      {isCustomUpload ? (
+        <div className="p-4 bg-amber-50 border border-amber-300 rounded-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-2xs">
+          <div className="space-y-1">
+            <div className="flex items-center gap-2">
+              <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-200 text-amber-900 uppercase">
+                Temporal Sequence Required
+              </span>
+              <span className="text-xs font-bold text-amber-950">
+                CURRENT ANALYSIS IMAGE: {currentInput?.name}
+              </span>
+            </div>
+            <p className="text-xs text-amber-800 max-w-3xl leading-relaxed">
+              Trajectory forecasting requires a valid temporal track sequence. A single uploaded satellite frame cannot provide the historical sequence required by the GRU. Showing verified historical benchmark sequence below.
+            </p>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="text-xs font-semibold text-slate-700">Select Storm:</span>
+            <div className="flex items-center gap-1.5 bg-white p-1 rounded-lg border border-amber-200">
+              {VERIFIED_STORMS.map((storm) => (
+                <button
+                  key={storm.id}
+                  onClick={() => setSelectedStormId(storm.id)}
+                  className={`px-2.5 py-1 rounded text-xs font-semibold transition-all ${
+                    selectedStormId === storm.id
+                      ? 'bg-[#003087] text-white'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  {storm.id}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+      ) : (
+        <InfoCallout
+          title="Trajectory Kinematics Protocol"
+          badge={`Active: ${activeStorm.name}`}
+        >
+          Deep GRU Seq2Seq autoregression requires historical track sequence data (IBTrACS 3-hourly fixes). Single-frame observations provide spatial fix & morphology, while trajectory forecasting executes on verified sequence tracks.
+        </InfoCallout>
+      )}
 
       {/* Error Banner */}
       {errorMsg && (

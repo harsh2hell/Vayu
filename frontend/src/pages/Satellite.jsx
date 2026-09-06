@@ -17,6 +17,7 @@ import PageHeader from '../components/PageHeader';
 import EmptyState from '../components/EmptyState';
 import StatusBadge from '../components/StatusBadge';
 import InfoCallout from '../components/InfoCallout';
+import { useAnalysisSession, DEFAULT_PRESETS } from '../context/AnalysisSessionContext';
 
 const SATELLITE_PRESETS = [
   {
@@ -46,24 +47,26 @@ const SATELLITE_PRESETS = [
 const Satellite = () => {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
+  
+  // Shared Analysis Session Context
+  const {
+    currentInput,
+    detectionResult,
+    classificationResult,
+    setInputFromUpload,
+    setInputFromPreset,
+    setFullPipelineResults
+  } = useAnalysisSession();
 
-  // Selected Preset or Uploaded File
-  const [selectedPreset, setSelectedPreset] = useState(SATELLITE_PRESETS[0]);
-  const [customFile, setCustomFile] = useState(null);
-  const [customImageUrl, setCustomImageUrl] = useState(null);
-  const [imageMetadata, setImageMetadata] = useState({
-    name: SATELLITE_PRESETS[0].name,
-    sizeKb: null,
-    dimensions: '1024 × 768 px',
-    type: 'NASA GIBS Tile Snapshot'
-  });
+  // Active Preset matching session or default
+  const selectedPreset = SATELLITE_PRESETS.find(p => p.id === currentInput?.presetId) || SATELLITE_PRESETS[0];
+  const isCustomUpload = currentInput?.inputType === 'upload';
+  const customFile = isCustomUpload ? currentInput.file : null;
 
   // Real AI Inference State
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [inferenceStatus, setInferenceStatus] = useState('ready'); // 'ready' | 'running' | 'success' | 'error'
+  const [inferenceStatus, setInferenceStatus] = useState(detectionResult ? 'success' : 'ready');
   const [analysisProgressStep, setAnalysisProgressStep] = useState('');
-  const [detectionResult, setDetectionResult] = useState(null);
-  const [classificationResult, setClassificationResult] = useState(null);
   const [analysisError, setAnalysisError] = useState(null);
 
   // Visualization View: 'overlay' | 'original'
@@ -77,44 +80,32 @@ const Satellite = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Reset previous AI outputs immediately
-    setDetectionResult(null);
-    setClassificationResult(null);
     setAnalysisError(null);
     setInferenceStatus('ready');
 
     const objectUrl = URL.createObjectURL(file);
-    setCustomImageUrl(objectUrl);
-    setCustomFile(file);
 
-    // Read natural image dimensions
+    // Read natural image dimensions and register authoritative session input
     const img = new Image();
     img.onload = () => {
-      setImageMetadata({
-        name: file.name,
-        sizeKb: (file.size / 1024).toFixed(1),
+      setInputFromUpload(file, objectUrl, {
         dimensions: `${img.naturalWidth} × ${img.naturalHeight} px`,
+        sizeKb: (file.size / 1024).toFixed(1),
         type: file.type || 'image/png'
-      });
+      }, 'Bay of Bengal');
     };
     img.src = objectUrl;
   };
 
   // Switch to a verified historical preset
   const handleSelectPreset = (preset) => {
-    setSelectedPreset(preset);
-    setCustomFile(null);
-    setCustomImageUrl(null);
-    setDetectionResult(null);
-    setClassificationResult(null);
     setAnalysisError(null);
     setInferenceStatus('ready');
-
-    setImageMetadata({
+    setInputFromPreset({
+      id: preset.id,
       name: preset.name,
-      sizeKb: null,
-      dimensions: '1024 × 768 px',
-      type: 'NASA GIBS Tile Snapshot'
+      url: preset.image,
+      basin: preset.basin
     });
   };
 
@@ -123,16 +114,14 @@ const Satellite = () => {
     setIsAnalyzing(true);
     setInferenceStatus('running');
     setAnalysisError(null);
-    setDetectionResult(null);
-    setClassificationResult(null);
 
     try {
-      let imageBlob = customFile;
+      let imageBlob = currentInput?.file;
 
       // If analyzing a preset without custom upload, download preset image bytes
-      if (!imageBlob) {
+      if (!imageBlob && currentInput?.imageUrl) {
         setAnalysisProgressStep('SATELLITE: Loading satellite snapshot raster...');
-        const fetchRes = await fetch(selectedPreset.image);
+        const fetchRes = await fetch(currentInput.imageUrl);
         if (!fetchRes.ok) throw new Error('Failed to retrieve preset satellite frame.');
         imageBlob = await fetchRes.blob();
       } else {
@@ -141,26 +130,31 @@ const Satellite = () => {
 
       // 1. Run MobileNetV3-Small Detection
       setAnalysisProgressStep('DETECTION: Running MobileNetV3-Small...');
-      const detRes = await detectCycloneFromImage(imageBlob, selectedPreset?.basin || 'Bay of Bengal');
+      const detRes = await detectCycloneFromImage(imageBlob, currentInput?.basin || 'Bay of Bengal');
       if (!detRes || !detRes.success) {
         throw new Error(detRes?.message || 'MobileNetV3 detection inference failed.');
       }
-      setDetectionResult(detRes);
 
       // If no cyclone detected, do not run downstream morphology
       if (detRes.cyclone_detected === false) {
         setAnalysisProgressStep('DETECTION: Non-cyclonic frame identified.');
+        setFullPipelineResults({ detectionResult: detRes, classificationResult: null });
         setInferenceStatus('success');
         return;
       }
 
       // 2. Run ResNet18 Morphology Classification + Grad-CAM
       setAnalysisProgressStep('CLASSIFICATION: Running ResNet18 Morphology...');
-      const clsRes = await classifyMorphologyPattern(imageBlob, selectedPreset?.basin || 'Bay of Bengal', 12.0);
+      const clsRes = await classifyMorphologyPattern(imageBlob, currentInput?.basin || 'Bay of Bengal', 12.0);
       if (!clsRes || !clsRes.success) {
         throw new Error(clsRes?.message || 'ResNet18 morphological classification failed.');
       }
-      setClassificationResult(clsRes);
+
+      // Save to shared analysis session
+      setFullPipelineResults({
+        detectionResult: detRes,
+        classificationResult: clsRes
+      });
       setInferenceStatus('success');
 
       setAnalysisProgressStep('EXPLAINABILITY: Generating Grad-CAM attention foci...');
@@ -173,7 +167,8 @@ const Satellite = () => {
     }
   };
 
-  const activeImageSource = customImageUrl || selectedPreset.image;
+  const activeImageSource = currentInput?.imageUrl || selectedPreset.image;
+
 
   // Normalized bbox [ymin, xmin, ymax, xmax] mapping to CSS
   const bboxStyle = detectionResult?.bounding_box ? {
@@ -432,7 +427,7 @@ const Satellite = () => {
                 </div>
               ) : (
                 <div className="absolute bottom-2.5 left-2.5 right-2.5 z-10 bg-slate-900/75 backdrop-blur-md px-3 py-1.5 rounded-xl text-[10px] font-mono text-slate-400 border border-white/10 flex items-center justify-between">
-                  <span>Input Raster Loaded ({imageMetadata.dimensions})</span>
+                  <span>Input Raster Loaded ({currentInput?.metadata?.dimensions || '1024 × 768 px'})</span>
                   <span className="text-amber-400 font-semibold">NO INFERENCE EXECUTED</span>
                 </div>
               )}
@@ -442,18 +437,18 @@ const Satellite = () => {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono bg-slate-50 p-2.5 rounded-xl border border-slate-200">
               <div>
                 <span className="text-[10px] text-slate-400 block uppercase">Filename</span>
-                <span className="font-bold text-slate-800 truncate block" title={imageMetadata.name}>
-                  {imageMetadata.name}
+                <span className="font-bold text-slate-800 truncate block" title={currentInput?.name}>
+                  {currentInput?.name || 'Satellite Frame'}
                 </span>
               </div>
               <div>
                 <span className="text-[10px] text-slate-400 block uppercase">Dimensions</span>
-                <span className="font-bold text-slate-800">{imageMetadata.dimensions}</span>
+                <span className="font-bold text-slate-800">{currentInput?.metadata?.dimensions || '1024 × 768 px'}</span>
               </div>
               <div>
                 <span className="text-[10px] text-slate-400 block uppercase">Format / Size</span>
                 <span className="font-bold text-slate-800">
-                  {imageMetadata.sizeKb ? `${imageMetadata.sizeKb} KB` : 'GeoTIFF / PNG'}
+                  {currentInput?.metadata?.sizeKb ? `${currentInput.metadata.sizeKb} KB` : 'GeoTIFF / PNG'}
                 </span>
               </div>
               <div>
@@ -461,6 +456,7 @@ const Satellite = () => {
                 <span className="font-bold text-slate-500">In-Session Only</span>
               </div>
             </div>
+
 
           </div>
 
