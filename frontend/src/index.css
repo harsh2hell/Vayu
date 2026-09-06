@@ -1166,3 +1166,10 @@ header .header-theme-btn {
   }
 }
 
+/* Clerk card custom overrides: Remove internal logo and welcome subtitle */
+.cl-logoBox,
+.cl-logoImage,
+.cl-headerSubtitle {
+  display: none !important;
+}
+

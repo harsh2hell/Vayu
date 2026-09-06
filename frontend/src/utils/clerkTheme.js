@@ -16,9 +16,11 @@ export const clerkLightTheme = {
   },
   elements: {
     rootBox: 'w-full',
+    logoBox: '!hidden hidden',
+    logoImage: '!hidden hidden',
     card: 'bg-white shadow-xl border border-slate-200/90 rounded-2xl p-6 sm:p-8 text-slate-900',
     headerTitle: 'text-slate-900 font-bold text-xl font-heading text-center tracking-tight',
-    headerSubtitle: 'text-slate-500 text-xs text-center mt-1 leading-relaxed',
+    headerSubtitle: '!hidden hidden',
     socialButtonsBlockButton: 'border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold py-2.5 shadow-2xs transition-all',
     socialButtonsBlockButtonText: 'text-slate-700 font-medium text-xs',
     formButtonPrimary: 'bg-sky-600 hover:bg-sky-500 text-white font-semibold text-xs py-2.5 shadow-xs transition-all cursor-pointer',
