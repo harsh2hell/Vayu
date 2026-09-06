@@ -7,11 +7,7 @@ const DashboardLayout = () => {
   return (
     <div className="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans flex antialiased selection:bg-sky-500 selection:text-white relative overflow-x-hidden">
       
-      {/* Ambient luminous glow orbs behind glass sidebar & header */}
-      <div className="fixed top-0 left-0 w-80 h-96 bg-gradient-to-br from-sky-400/20 via-indigo-300/10 to-transparent blur-3xl pointer-events-none z-0" />
-      <div className="fixed bottom-0 left-0 w-72 h-80 bg-gradient-to-tr from-teal-300/15 via-sky-200/10 to-transparent blur-3xl pointer-events-none z-0" />
-
-      {/* Left Column: VisionOS Transparent Glossy Glass Sidebar */}
+      {/* Left Column: Fixed White Sidebar */}
       <Sidebar />
       
       {/* Main Content Area (offset by left column width on desktop) */}
