@@ -6,6 +6,7 @@ import './index.css';
 import App from './App.jsx';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
 import { getDashboardUrl, getAuthUrl } from './utils/domain';
+import { clerkLightTheme } from './utils/clerkTheme';
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 
@@ -16,6 +17,7 @@ createRoot(document.getElementById('root')).render(
         {PUBLISHABLE_KEY ? (
           <ClerkProvider 
             publishableKey={PUBLISHABLE_KEY}
+            appearance={clerkLightTheme}
             signInFallbackRedirectUrl={getDashboardUrl()}
             signUpFallbackRedirectUrl={getDashboardUrl()}
             afterSignOutUrl={getAuthUrl()}

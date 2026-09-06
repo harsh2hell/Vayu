@@ -47,6 +47,8 @@ function App() {
   if (isAuth) {
     return (
       <Routes>
+        <Route path="/sign-up" element={<Login initialMode="signUp" />} />
+        <Route path="/signup" element={<Login initialMode="signUp" />} />
         <Route path="*" element={<Login />} />
       </Routes>
     );
@@ -100,9 +102,17 @@ function App() {
           - On local dev / preview: loads Login component directly
       */}
       {isProd ? (
-        <Route path="/login" element={<ProductionLoginRedirect />} />
+        <>
+          <Route path="/login" element={<ProductionLoginRedirect />} />
+          <Route path="/sign-up" element={<ProductionLoginRedirect />} />
+          <Route path="/signup" element={<ProductionLoginRedirect />} />
+        </>
       ) : (
-        <Route path="/login" element={<Login />} />
+        <>
+          <Route path="/login" element={<Login />} />
+          <Route path="/sign-up" element={<Login initialMode="signUp" />} />
+          <Route path="/signup" element={<Login initialMode="signUp" />} />
+        </>
       )}
 
       {/* Protected Meteorological Command Dashboard (https://vayusat.live/dashboard) */}
