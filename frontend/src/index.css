@@ -934,6 +934,203 @@ header .header-theme-btn {
               inset 0 1px 1px rgba(255, 255, 255, 0.15) !important;
 }
 
+<<<<<<< HEAD
+=======
+/* =========================================================================
+   3D LIQUID GLASS PILL SELECTOR TRACK & BUTTONS
+   Apple VisionOS tactile floating glass pills with specular lighting
+   ========================================================================= */
+.storm-pill-track-3d {
+  background: rgba(255, 255, 255, 0.72) !important;
+  backdrop-filter: blur(28px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(200%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.85) !important;
+  box-shadow: inset 0 1.5px 2px 0 rgba(255, 255, 255, 1),
+              0 8px 24px -4px rgba(0, 0, 0, 0.08),
+              0 2px 6px -1px rgba(0, 0, 0, 0.04) !important;
+  border-radius: 9999px !important;
+  padding: 4px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  transform-style: preserve-3d !important;
+  perspective: 800px !important;
+}
+
+.dark .storm-pill-track-3d {
+  background: rgba(15, 23, 42, 0.7) !important;
+  backdrop-filter: blur(28px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(200%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.2),
+              0 12px 32px -4px rgba(0, 0, 0, 0.6) !important;
+}
+
+.storm-pill-3d-btn {
+  position: relative !important;
+  border-radius: 9999px !important;
+  padding: 6px 16px !important;
+  font-size: 12px !important;
+  font-weight: 700 !important;
+  cursor: pointer !important;
+  user-select: none !important;
+  transform-style: preserve-3d !important;
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              background 0.35s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.3s ease,
+              color 0.25s ease !important;
+}
+
+/* Inactive button */
+.storm-pill-3d-btn:not(.is-active) {
+  background: transparent !important;
+  border: 1px solid transparent !important;
+  color: #475569 !important;
+}
+
+.storm-pill-3d-btn:not(.is-active):hover {
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: blur(16px) !important;
+  -webkit-backdrop-filter: blur(16px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.95) !important;
+  color: #0f172a !important;
+  box-shadow: 0 4px 14px -2px rgba(0, 0, 0, 0.08),
+              inset 0 1px 1.5px rgba(255, 255, 255, 1) !important;
+  transform: translateY(-1px) scale(1.02) !important;
+}
+
+.dark .storm-pill-3d-btn:not(.is-active):hover {
+  background: rgba(255, 255, 255, 0.12) !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  color: #f8fafc !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5) !important;
+}
+
+/* Active 3D Oceanic Liquid Glass Pill */
+.storm-pill-3d-btn.is-active {
+  background: linear-gradient(135deg, #002b7a 0%, #003087 35%, #0284c7 100%) !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(255, 255, 255, 0.6) !important;
+  backdrop-filter: blur(28px) saturate(200%) !important;
+  -webkit-backdrop-filter: blur(28px) saturate(200%) !important;
+  box-shadow: 0 10px 25px -2px rgba(2, 132, 199, 0.5),
+              0 4px 12px -1px rgba(0, 48, 135, 0.4),
+              0 0 20px 2px rgba(56, 189, 248, 0.4),
+              inset 0 1.5px 2px 0 rgba(255, 255, 255, 0.9),
+              inset 0 -1.5px 2px 0 rgba(0, 0, 0, 0.3) !important;
+  transform: perspective(800px) translateZ(8px) translateY(-1.5px) scale(1.03) !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4) !important;
+}
+
+.storm-pill-3d-btn.is-active:hover {
+  box-shadow: 0 14px 32px -2px rgba(2, 132, 199, 0.6),
+              0 6px 16px -1px rgba(0, 48, 135, 0.5),
+              0 0 28px 3px rgba(56, 189, 248, 0.55),
+              inset 0 2px 2.5px 0 rgba(255, 255, 255, 1),
+              inset 0 -1.5px 2px 0 rgba(0, 0, 0, 0.35) !important;
+  transform: perspective(800px) translateZ(12px) translateY(-2.5px) scale(1.05) !important;
+}
+
+.storm-pill-3d-btn:active {
+  transform: perspective(800px) translateZ(2px) translateY(0px) scale(0.98) !important;
+  box-shadow: 0 4px 12px rgba(2, 84, 199, 0.35),
+              inset 0 1px 1px rgba(255, 255, 255, 0.6) !important;
+}
+
+/* =========================================================================
+   SIDEBAR IOS 3D GLASS HOVER EFFECT
+   Apple-grade frosted glass, dynamic specular rim lighting & 3D tactile lift
+   ========================================================================= */
+.sidebar-ios-glass-btn {
+  position: relative;
+  overflow: hidden;
+  transform-style: preserve-3d;
+  will-change: transform, box-shadow, background, border-color;
+  transition: transform 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.28s cubic-bezier(0.16, 1, 0.3, 1),
+              background 0.22s ease,
+              border-color 0.22s ease,
+              color 0.18s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Inactive item hover: iOS Frosted Liquid Glass matching site-wide 3D cards */
+.sidebar-ios-glass-btn:not(.is-active):hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(240, 249, 255, 0.9) 100%) !important;
+  backdrop-filter: blur(24px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(190%) !important;
+  border-color: rgba(255, 255, 255, 0.98) !important;
+  box-shadow: 0 20px 40px -8px rgba(0, 0, 0, 0.12),
+              0 6px 20px -2px rgba(2, 132, 199, 0.16),
+              0 0 16px 1px rgba(56, 189, 248, 0.18),
+              inset 0 1.5px 2px rgba(255, 255, 255, 1),
+              inset 0 -1px 1.5px rgba(56, 189, 248, 0.25) !important;
+  color: #020617 !important;
+}
+
+.dark .sidebar-ios-glass-btn:not(.is-active):hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.16) 0%, rgba(255, 255, 255, 0.06) 100%) !important;
+  backdrop-filter: blur(24px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(190%) !important;
+  border-color: rgba(255, 255, 255, 0.32) !important;
+  box-shadow: 0 24px 48px -8px rgba(0, 0, 0, 0.85),
+              0 0 24px 2px rgba(56, 189, 248, 0.22),
+              inset 0 1.5px 2px rgba(255, 255, 255, 0.28),
+              inset 0 -1px 1.5px rgba(56, 189, 248, 0.35) !important;
+  color: #f8fafc !important;
+}
+
+/* Active selected item: Translucent 3D Glass Pill (No Dark Mode/Black Cast) */
+.sidebar-ios-glass-btn.is-active {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.96) 0%, rgba(240, 249, 255, 0.90) 60%, rgba(224, 242, 254, 0.85) 100%) !important;
+  backdrop-filter: blur(24px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(190%) !important;
+  border: 1px solid rgba(186, 230, 253, 0.95) !important;
+  box-shadow: 0 8px 24px -2px rgba(2, 132, 199, 0.20),
+              0 2px 6px 0 rgba(0, 0, 0, 0.04),
+              0 0 16px 1px rgba(56, 189, 248, 0.22),
+              inset 0 2px 2px 0 rgba(255, 255, 255, 1),
+              inset 0 -1.5px 2px 0 rgba(56, 189, 248, 0.35) !important;
+  color: #020617 !important;
+}
+
+.sidebar-ios-glass-btn.is-active:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.98) 0%, rgba(240, 249, 255, 0.94) 60%, rgba(224, 242, 254, 0.90) 100%) !important;
+  box-shadow: 0 16px 36px -6px rgba(2, 132, 199, 0.28),
+              0 4px 12px -2px rgba(0, 0, 0, 0.06),
+              0 0 24px 2px rgba(56, 189, 248, 0.35),
+              inset 0 2px 2px 0 rgba(255, 255, 255, 1),
+              inset 0 -1.5px 2px 0 rgba(56, 189, 248, 0.45) !important;
+  border-color: rgba(56, 189, 248, 0.85) !important;
+}
+
+.dark .sidebar-ios-glass-btn.is-active {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.12) 60%, rgba(56, 189, 248, 0.12) 100%) !important;
+  backdrop-filter: blur(24px) saturate(190%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(190%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.38) !important;
+  box-shadow: 0 0 24px 2px rgba(56, 189, 248, 0.28),
+              0 8px 28px rgba(0, 0, 0, 0.75),
+              inset 0 2px 1.5px 0 rgba(255, 255, 255, 0.7),
+              inset 0 -1.5px 2px 0 rgba(56, 189, 248, 0.45) !important;
+  color: #f8fafc !important;
+}
+
+.dark .sidebar-ios-glass-btn.is-active:hover {
+  box-shadow: 0 0 32px 3px rgba(56, 189, 248, 0.38),
+              0 12px 36px rgba(0, 0, 0, 0.85),
+              inset 0 2px 1.5px 0 rgba(255, 255, 255, 0.8),
+              inset 0 -1.5px 2px 0 rgba(56, 189, 248, 0.55) !important;
+  border-color: rgba(56, 189, 248, 0.6) !important;
+}
+
+/* Tactile press */
+.sidebar-ios-glass-btn:active {
+  transform: scale(0.975) translateY(0px) !important;
+  transition: transform 0.1s ease !important;
+}
+>>>>>>> ddf5837ddaa573adf5ee92b121d963c9b83f14cc
 
 /* =========================================================================
    APPLE VISIONOS / IOS-STYLE 3D GLASSMORPHISM HOVER SYSTEM
