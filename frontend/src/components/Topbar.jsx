@@ -31,15 +31,14 @@ const Topbar = () => {
   }, []);
 
   const getPageTitle = () => {
-    if (location.pathname.includes('/track')) return '4D Track Visualizer';
-    if (location.pathname.includes('/satellite')) return 'Satellite Telemetry (INSAT)';
-    if (location.pathname.includes('/detection')) return 'AI Vision Detection';
+    if (location.pathname.includes('/satellite')) return 'Satellite Imagery';
+    if (location.pathname.includes('/detection')) return 'Cyclone Detection';
     if (location.pathname.includes('/classification')) return 'Morphology Classification';
-    if (location.pathname.includes('/prediction')) return '72h Trajectory Studio';
-    if (location.pathname.includes('/alerts')) return 'CAP Early Warnings';
-    if (location.pathname.includes('/analytics')) return 'Historical Storm DB';
-    if (location.pathname.includes('/performance')) return 'AI Model Benchmarks';
-    if (location.pathname.includes('/architecture')) return 'Pipeline Architecture';
+    if (location.pathname.includes('/trajectory') || location.pathname.includes('/prediction') || location.pathname.includes('/track')) return 'Trajectory Forecast';
+    if (location.pathname.includes('/impact') || location.pathname.includes('/alerts')) return 'Impact & Landfall';
+    if (location.pathname.includes('/archives') || location.pathname.includes('/analytics')) return 'Storm Archives';
+    if (location.pathname.includes('/models') || location.pathname.includes('/training') || location.pathname.includes('/performance') || location.pathname.includes('/architecture')) return 'AI Model Intelligence';
+    if (location.pathname.includes('/bulletin')) return 'Official Bulletin';
     return 'Command Overview';
   };
 

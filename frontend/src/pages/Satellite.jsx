@@ -704,16 +704,31 @@ const Satellite = () => {
               </div>
             )}
 
-            {/* Navigation Return */}
-            <div className="pt-2 border-t border-slate-100">
+            {/* Downstream Navigation */}
+            <div className="pt-2 border-t border-slate-100 space-y-2">
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => navigate('/dashboard/detection')}
+                  className="btn-primary text-xs py-2 justify-center gap-1"
+                >
+                  <span>Cyclone Detection</span>
+                  <ChevronRight className="w-3 h-3" />
+                </button>
+                <button
+                  onClick={() => navigate('/dashboard/classification')}
+                  className="btn-primary text-xs py-2 justify-center gap-1"
+                >
+                  <span>Morphology</span>
+                  <ChevronRight className="w-3 h-3" />
+                </button>
+              </div>
               <button
                 onClick={() => navigate('/dashboard')}
-                className="btn-secondary w-full text-xs py-2.5 justify-center gap-1.5"
+                className="btn-secondary w-full text-xs py-2 justify-center gap-1.5"
               >
-                <span>Return to Benchmark Command Overview</span>
-                <ChevronRight className="w-3.5 h-3.5" />
+                <span>Return to Command Overview</span>
               </button>
-              <p className="text-[10px] text-slate-400 font-mono text-center mt-1.5 leading-tight">
+              <p className="text-[10px] text-slate-400 font-mono text-center leading-tight">
                 Command Overview evaluates official benchmark cases (DANA & BIPARJOY). In-session uploads remain strictly isolated to this page.
               </p>
             </div>

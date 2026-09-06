@@ -14,16 +14,14 @@ import ClimateOceanAnomalies from './pages/ClimateOceanAnomalies';
 import Login from './pages/Login';
 import DashboardLayout from './components/DashboardLayout';
 import Dashboard from './pages/Dashboard';
-import TrackMap from './pages/TrackMap';
 import Satellite from './pages/Satellite';
 import Detection from './pages/Detection';
 import Classification from './pages/Classification';
 import Prediction from './pages/Prediction';
-import Alerts from './pages/Alerts';
 import Analytics from './pages/Analytics';
-import Performance from './pages/Performance';
-import Architecture from './pages/Architecture';
 import ModelTraining from './pages/ModelTraining';
+import Impact from './pages/Impact';
+import Bulletin from './pages/Bulletin';
 import { ProtectedRoute } from './components/auth/ClerkAuth';
 import { isAuthSubdomain, isProductionDomain, getAuthUrl } from './utils/domain';
 
@@ -116,18 +114,36 @@ function App() {
           </ProtectedRoute>
         }
       >
+        {/* 1. COMMAND */}
         <Route index element={<Dashboard />} />
-        <Route path="track" element={<TrackMap />} />
+
+        {/* 2. AI VISION */}
         <Route path="satellite" element={<Satellite />} />
         <Route path="detection" element={<Detection />} />
         <Route path="classification" element={<Classification />} />
-        <Route path="prediction" element={<Prediction />} />
-        <Route path="training" element={<ModelTraining />} />
-        <Route path="alerts" element={<Alerts />} />
-        <Route path="analytics" element={<Analytics />} />
-        <Route path="performance" element={<Performance />} />
-        <Route path="architecture" element={<Architecture />} />
-        <Route path="ai-cyclone" element={<AICycloneIntelligence />} />
+
+        {/* 3. FORECAST */}
+        <Route path="trajectory" element={<Prediction />} />
+        <Route path="impact" element={<Impact />} />
+
+        {/* 4. HISTORICAL */}
+        <Route path="archives" element={<Analytics />} />
+
+        {/* 5. AI SYSTEM */}
+        <Route path="models" element={<ModelTraining />} />
+
+        {/* 6. REPORTS */}
+        <Route path="bulletin" element={<Bulletin />} />
+
+        {/* Backward-Compatible Route Aliases & Redirects */}
+        <Route path="track" element={<Navigate to="/dashboard/trajectory" replace />} />
+        <Route path="prediction" element={<Navigate to="/dashboard/trajectory" replace />} />
+        <Route path="alerts" element={<Navigate to="/dashboard/impact" replace />} />
+        <Route path="analytics" element={<Navigate to="/dashboard/archives" replace />} />
+        <Route path="training" element={<Navigate to="/dashboard/models" replace />} />
+        <Route path="performance" element={<Navigate to="/dashboard/models" replace />} />
+        <Route path="architecture" element={<Navigate to="/dashboard/models" replace />} />
+        <Route path="ai-cyclone" element={<Navigate to="/ai-cyclone" replace />} />
       </Route>
 
       {/* Catch-all redirect to Public Portal */}

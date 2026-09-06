@@ -1,9 +1,10 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { 
-  User, LogOut, MoreVertical, Shield,
-  Activity, Map, Satellite, Crosshair, Layers,
-  Compass, Bell, Database, Gauge, Sparkles, Cpu
+  LogOut, MoreVertical, Shield,
+  Activity, Satellite, Crosshair, Layers,
+  Compass, Database, Cpu,
+  MapPin, FileText
 } from 'lucide-react';
 import { OfficerAccountDisplay, SafeSignOutButton } from './auth/ClerkAuth';
 import { getWebsiteUrl, isProductionDomain } from '../utils/domain';
@@ -197,17 +198,46 @@ const Sidebar = () => {
     }
   };
 
-  const NAV_ITEMS = [
-    { path: '/dashboard', label: 'Command Overview', icon: Activity, exact: true },
-    { path: '/dashboard/track', label: '4D Track Visualizer', icon: Map },
-    { path: '/dashboard/satellite', label: 'Satellite (INSAT)', icon: Satellite },
-    { path: '/dashboard/detection', label: 'AI Detection', icon: Crosshair },
-    { path: '/dashboard/classification', label: 'Classification', icon: Layers },
-    { path: '/dashboard/prediction', label: 'Trajectory Studio', icon: Compass },
-    { path: '/dashboard/alerts', label: 'Coastal Warnings', icon: Bell },
-    { path: '/dashboard/analytics', label: 'Storm Archives', icon: Database },
-    { path: '/dashboard/performance', label: 'Model Benchmarks', icon: Gauge },
-    { path: '/dashboard/training', label: 'AI Model Intelligence', icon: Cpu },
+  const NAV_GROUPS = [
+    {
+      title: 'COMMAND',
+      items: [
+        { path: '/dashboard', label: 'Command Overview', icon: Activity, exact: true },
+      ]
+    },
+    {
+      title: 'AI VISION',
+      items: [
+        { path: '/dashboard/satellite', label: 'Satellite Imagery', icon: Satellite },
+        { path: '/dashboard/detection', label: 'Cyclone Detection', icon: Crosshair },
+        { path: '/dashboard/classification', label: 'Morphology Classification', icon: Layers },
+      ]
+    },
+    {
+      title: 'FORECAST',
+      items: [
+        { path: '/dashboard/trajectory', label: 'Trajectory Forecast', icon: Compass },
+        { path: '/dashboard/impact', label: 'Impact & Landfall', icon: MapPin },
+      ]
+    },
+    {
+      title: 'HISTORICAL',
+      items: [
+        { path: '/dashboard/archives', label: 'Storm Archives', icon: Database },
+      ]
+    },
+    {
+      title: 'AI SYSTEM',
+      items: [
+        { path: '/dashboard/models', label: 'Model Intelligence', icon: Cpu },
+      ]
+    },
+    {
+      title: 'REPORTS',
+      items: [
+        { path: '/dashboard/bulletin', label: 'Official Bulletin', icon: FileText },
+      ]
+    }
   ];
 
   const handleLogoutSuccess = () => {
@@ -253,24 +283,28 @@ const Sidebar = () => {
           </div>
         </div>
 
-        {/* Navigation Links List */}
-        <nav className="flex-1 px-3 py-3 space-y-1 overflow-y-auto">
-          <div className="text-[10px] font-mono uppercase tracking-wider text-slate-400 font-bold px-3 mb-2 select-none">
-            Operations Desk
-          </div>
-          {NAV_ITEMS.map((item) => {
-            const isActive = item.exact 
-              ? location.pathname === item.path 
-              : location.pathname.startsWith(item.path);
-            return (
-              <SidebarNavItem
-                key={item.path}
-                item={item}
-                isActive={isActive}
-                onClick={() => navigate(item.path)}
-              />
-            );
-          })}
+        {/* Navigation Links List Grouped By Operations */}
+        <nav className="flex-1 px-3 py-3 space-y-3.5 overflow-y-auto">
+          {NAV_GROUPS.map((group) => (
+            <div key={group.title} className="space-y-1">
+              <div className="text-[9px] font-mono uppercase tracking-wider text-slate-400 font-bold px-3 py-0.5 select-none">
+                {group.title}
+              </div>
+              {group.items.map((item) => {
+                const isActive = item.exact 
+                  ? location.pathname === item.path 
+                  : location.pathname.startsWith(item.path);
+                return (
+                  <SidebarNavItem
+                    key={item.path}
+                    item={item}
+                    isActive={isActive}
+                    onClick={() => navigate(item.path)}
+                  />
+                );
+              })}
+            </div>
+          ))}
         </nav>
 
         {/* Bottom Left Account Trigger with iOS 3D Glass Effect */}

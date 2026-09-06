@@ -451,7 +451,7 @@ const Detection = () => {
                 onClick={() => navigate('/dashboard/classification')}
                 className="btn-primary w-full text-xs py-2.5 justify-center gap-1.5"
               >
-                <span>Proceed to Pattern Classification Lab</span>
+                <span>Proceed to Morphology Classification</span>
                 <ChevronRight className="w-3.5 h-3.5" />
               </button>
             </div>
