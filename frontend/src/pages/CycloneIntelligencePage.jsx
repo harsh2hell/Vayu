@@ -48,7 +48,7 @@ const INTENSITY_TIMELINE = [
   { time: '−36h', wind: 34, pressure: 1006, label: 'Deep Depression' },
   { time: '−24h', wind: 38, pressure: 1005, label: 'Cyclonic Storm' },
   { time: '−12h', wind: 40, pressure: 1004, label: 'Track forecast' },
-  { time: 'Now', wind: 42, pressure: 1004, label: 'Current fix' },
+  { time: 'Now', wind: 42, pressure: 1004, label: 'Storm position' },
   { time: '+12h', wind: 48, pressure: 1002, label: 'Intensification' },
   { time: '+24h', wind: 58, pressure: 999, label: 'Severe CS' },
   { time: '+36h', wind: 72, pressure: 994, label: 'Very Severe CS' },

@@ -502,7 +502,7 @@ export const CYCLONE_LIFECYCLE_STAGES = [
     pressureRange: '990 – 996 hPa',
     dvorak: 'T2.5 – T3.0',
     status: 'ACTIVE_STAGE', // Currently happening
-    detectedAt: `${getDynamicLeadTimestamp(0)} (Current Fix)`,
+    detectedAt: `${getDynamicLeadTimestamp(0)} (Storm Position)`,
     summary: 'Compact vortex with Central Dense Overcast (CDO) consolidating. High probability of upgrading to Cyclonic Storm.'
   },
   {
