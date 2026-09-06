@@ -211,11 +211,11 @@ const Analytics = () => {
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
                 <ShieldCheck className="w-5 h-5 text-emerald-600" />
-                <h3 className="font-bold text-sm text-slate-900">Historical Dossier Details</h3>
+                <h3 className="font-bold text-sm text-slate-900">Historical Dossier Details (Observed Reference)</h3>
               </div>
               {selectedStorm && (
                 <span className="badge badge-navy text-[10px] font-mono">
-                  {selectedStorm.system_id}
+                  {selectedStorm.system_id} • BEST TRACK
                 </span>
               )}
             </div>
@@ -228,6 +228,9 @@ const Analytics = () => {
                 </div>
 
                 <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2 text-xs">
+                  <span className="text-[10px] uppercase font-bold font-mono tracking-wider block text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 w-fit">
+                    OBSERVED / BEST TRACK REFERENCE DATA
+                  </span>
                   <div className="flex justify-between">
                     <span className="text-slate-500">Official IMD Category:</span>
                     <span className="font-bold text-slate-900">{selectedStorm.category}</span>

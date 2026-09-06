@@ -464,7 +464,7 @@ const Satellite = () => {
               <span>Scientific Sequence Protocol</span>
             </div>
             <p className="text-[11px] text-blue-800 leading-relaxed">
-              A single satellite frame legitimately supports visual detection, center localization, morphology classification, and Grad-CAM explainability. Trajectory forecasting requires a temporal storm sequence / valid historical track (3-hourly fixes).
+              Trajectory forecasting requires a valid temporal storm sequence. A single uploaded frame legitimately supports visual detection, center localization, morphology classification, and Grad-CAM explainability.
             </p>
           </div>
         </div>
@@ -486,7 +486,7 @@ const Satellite = () => {
             {detectionResult ? (
               <div className="space-y-3.5 text-xs">
                 
-                {/* 1. Detection */}
+                {/* 1. DETECTION (MobileNetV3-Small) */}
                 <div className={`p-3 rounded-xl border space-y-1.5 ${
                   detectionResult.cyclone_detected 
                     ? 'bg-emerald-50 border-emerald-200 text-emerald-950' 
@@ -509,6 +509,26 @@ const Satellite = () => {
                       {((detectionResult.objectness ?? (detectionResult.confidence_percentage / 100)) * 100).toFixed(1)}%
                     </span>
                   </div>
+                  {detectionResult.cyclone_detected && (
+                    <>
+                      <div className="flex justify-between items-center">
+                        <span className="font-medium">Center Coordinates:</span>
+                        <span className="font-bold font-mono text-sky-800">
+                          {detectionResult.coordinates?.formatted || `${detectionResult.center?.lat?.toFixed(2)}°N, ${detectionResult.center?.lon?.toFixed(2)}°E`}
+                        </span>
+                      </div>
+                      {detectionResult.bounding_box && (
+                        <div className="flex justify-between items-center text-[11px]">
+                          <span className="text-slate-500">Bounding Box:</span>
+                          <span className="font-mono text-slate-700 font-medium">
+                            {Array.isArray(detectionResult.bounding_box)
+                              ? `[${detectionResult.bounding_box.map(n => typeof n === 'number' ? n.toFixed(2) : n).join(', ')}]`
+                              : `[${detectionResult.bounding_box.ymin?.toFixed(2)}, ${detectionResult.bounding_box.xmin?.toFixed(2)}, ${detectionResult.bounding_box.ymax?.toFixed(2)}, ${detectionResult.bounding_box.xmax?.toFixed(2)}]`}
+                          </span>
+                        </div>
+                      )}
+                    </>
+                  )}
                 </div>
 
                 {/* If no cyclone detected */}
@@ -516,35 +536,14 @@ const Satellite = () => {
                   <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-600 text-xs space-y-1">
                     <p className="font-bold text-slate-800">NO CYCLONE DETECTED</p>
                     <p className="text-[11px] text-slate-500">
-                      The MobileNetV3 detector classified this frame as ambient / non-cyclonic marine atmosphere. Downstream tropical cyclone morphology was omitted to prevent misleading classification.
+                      The MobileNetV3 detector classified this frame as ambient / non-cyclonic marine atmosphere. Downstream tropical cyclone morphology and trajectory forecasting are omitted.
                     </p>
                   </div>
                 )}
 
-                {/* 2. Location (Center Fix) */}
-                {detectionResult.cyclone_detected && (
-                  <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
-                    <span className="text-[10px] uppercase font-bold font-mono tracking-wider block text-slate-500">
-                      Location (Center Fix)
-                    </span>
-                    <div className="flex justify-between items-center">
-                      <span className="text-slate-600">Center Coordinates:</span>
-                      <span className="font-bold font-mono text-sky-800">
-                        {detectionResult.coordinates?.formatted || `${detectionResult.center?.lat?.toFixed(2)}°N, ${detectionResult.center?.lon?.toFixed(2)}°E`}
-                      </span>
-                    </div>
-                    {detectionResult.coordinates?.basin && (
-                      <div className="flex justify-between items-center text-[11px]">
-                        <span className="text-slate-500">Basin:</span>
-                        <span className="font-medium text-slate-700">{detectionResult.coordinates.basin}</span>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* 3. Morphology (ResNet18) */}
-                {classificationResult && (
-                  <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5">
+                {/* 2. MORPHOLOGY (ResNet18) - Only if cyclone detected */}
+                {detectionResult.cyclone_detected && classificationResult && (
+                  <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
                     <span className="text-[10px] uppercase font-bold font-mono tracking-wider block text-slate-500">
                       Morphology (ResNet18)
                     </span>
@@ -558,92 +557,91 @@ const Satellite = () => {
                         {classificationResult.confidence_percentage?.toFixed(1)}%
                       </span>
                     </div>
-                    <p className="text-[11px] text-slate-500 mt-1">
-                      {classificationResult.pattern_description}
-                    </p>
+
+                    {/* Class Distribution without Dvorak T-numbers */}
+                    {classificationResult.class_probability_distribution && (
+                      <div className="pt-1.5 border-t border-slate-200/80 space-y-1.5">
+                        <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
+                          Class Distribution
+                        </span>
+                        {classificationResult.class_probability_distribution.map((item, idx) => (
+                          <div key={item.class_id || idx} className="space-y-0.5">
+                            <div className="flex justify-between text-[11px]">
+                              <span className="text-slate-700">{item.class_name}</span>
+                              <span className="font-mono font-semibold text-slate-800">{item.probability_pct?.toFixed(1)}%</span>
+                            </div>
+                            <div className="w-full bg-slate-200 rounded-full h-1.5 overflow-hidden">
+                              <div 
+                                className="bg-[#003087] h-1.5 rounded-full" 
+                                style={{ width: `${Math.min(100, Math.max(1, item.probability_pct || 0))}%` }} 
+                              />
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
 
-                {/* 4. Intensity / Dvorak Assessment */}
+                {/* 3. EXPLAINABILITY (Grad-CAM) - Only if cyclone detected */}
+                {detectionResult.cyclone_detected && (
+                  <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5 text-xs">
+                    <span className="text-[10px] uppercase font-bold font-mono tracking-wider block text-slate-500">
+                      Explainability (Grad-CAM)
+                    </span>
+                    <div className="flex justify-between items-center">
+                      <span className="text-slate-600">Attention Foci:</span>
+                      <span className="font-bold text-amber-700 font-mono">
+                        {classificationResult?.gradcam_attention_foci?.length 
+                          ? `${classificationResult.gradcam_attention_foci.length} Hotspots Localized` 
+                          : (classificationResult ? 'Available' : 'Pending')}
+                      </span>
+                    </div>
+                    {classificationResult?.gradcam_attention_foci?.length > 0 && (
+                      <div className="pt-1 space-y-1">
+                        {classificationResult.gradcam_attention_foci.map((focus, idx) => (
+                          <div key={idx} className="flex justify-between items-center text-[11px] text-slate-600">
+                            <span>{focus.label || focus.description || `Focus #${idx + 1}`}</span>
+                            <span className="font-mono font-medium text-amber-700">
+                              {focus.activation_intensity ? `${(focus.activation_intensity * 100).toFixed(0)}%` : 'Active'}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* 4. INTENSITY ASSESSMENT - Scientific Status Disclosure */}
                 <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5">
                   <span className="text-[10px] uppercase font-bold font-mono tracking-wider block text-slate-500">
-                    Intensity / Dvorak Assessment
+                    Intensity Assessment
                   </span>
-                  {detectionResult.dvorak_classification ? (
-                    <div className="space-y-1 text-xs">
-                      <div className="flex justify-between items-center">
-                        <span className="text-slate-600">Dvorak Intensity Rating:</span>
-                        <span className="font-bold font-mono text-sky-800">
-                          {detectionResult.dvorak_classification.t_number} ({detectionResult.dvorak_classification.category})
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-slate-600">Est. Maximum Sustained Winds:</span>
-                        <span className="font-bold font-mono text-red-600">
-                          {detectionResult.dvorak_classification.estimated_wind_speed_kmh} km/h ({detectionResult.dvorak_classification.estimated_wind_speed_knots} kt)
-                        </span>
-                      </div>
-                      <div className="flex justify-between items-center">
-                        <span className="text-slate-600">Est. Central MSLP:</span>
-                        <span className="font-bold font-mono text-slate-800">
-                          {detectionResult.dvorak_classification.central_mslp_hpa} hPa
-                        </span>
-                      </div>
-                      <span className="text-[10px] text-slate-400 block pt-0.5">
-                        * Empirical Dvorak regression head; operational bulletins require synoptic telemetry.
-                      </span>
-                    </div>
-                  ) : (
-                    <p className="text-[11px] text-slate-500">
-                      Not available from current image-only model. Operational intensity estimation requires additional validated telemetry.
-                    </p>
-                  )}
+                  <div className="flex items-start gap-1.5">
+                    <span className="text-xs font-semibold text-slate-700 shrink-0">Status:</span>
+                    <span className="text-[11px] font-mono font-semibold text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200 leading-tight">
+                      NOT AVAILABLE FROM CURRENT SINGLE-FRAME VISION MODEL
+                    </span>
+                  </div>
+                  <p className="text-[11px] text-slate-500 leading-relaxed pt-0.5">
+                    Operational cyclone intensity estimation requires temporal satellite observations and additional meteorological observations. The current VAYU vision pipeline focuses on cyclone detection, center localization, morphology classification and visual explainability.
+                  </p>
                 </div>
 
-                {/* 5. Radiometric Indicators */}
-                {detectionResult.radiometric_features && (
-                  <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
-                    <span className="text-[10px] uppercase font-bold font-mono tracking-wider block text-slate-500">
-                      Radiometric Indicators
-                    </span>
-                    <div className="flex justify-between items-center text-[11px]">
-                      <span className="text-slate-600">Min Cloud Top Temp:</span>
-                      <span className="font-mono font-bold text-sky-700">
-                        {detectionResult.radiometric_features.cloud_top_min_temp_c}°C
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center text-[11px]">
-                      <span className="text-slate-600">Spiral Curvature Angle:</span>
-                      <span className="font-mono font-bold text-slate-800">
-                        {detectionResult.radiometric_features.spiral_curvature_deg}° Arc
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center text-[11px]">
-                      <span className="text-slate-600">Convective Cloud Ratio:</span>
-                      <span className="font-mono font-bold text-emerald-700">
-                        {(detectionResult.radiometric_features.convective_cloud_ratio * 100).toFixed(0)}%
-                      </span>
-                    </div>
-                  </div>
-                )}
-
-                {/* 6. Explainability & Inference Latency */}
+                {/* 5. INFERENCE */}
                 <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1 text-xs">
-                  <div className="flex justify-between items-center">
-                    <span className="text-slate-600">Grad-CAM Explainability:</span>
-                    <span className="font-bold text-amber-700 font-mono">
-                      {classificationResult?.gradcam_attention_foci?.length ? 'Available (3 Foci Localized)' : 'Pending'}
-                    </span>
-                  </div>
+                  <span className="text-[10px] uppercase font-bold font-mono tracking-wider block text-slate-500">
+                    Inference Latency
+                  </span>
                   <div className="flex justify-between items-center text-[11px]">
-                    <span className="text-slate-600">Detection Latency:</span>
+                    <span className="text-slate-600">Detection (MobileNetV3-Small):</span>
                     <span className="font-mono font-semibold text-slate-800">
                       {detectionResult.inference_time_ms} ms
                     </span>
                   </div>
                   {classificationResult && (
                     <div className="flex justify-between items-center text-[11px]">
-                      <span className="text-slate-600">Classification Latency:</span>
+                      <span className="text-slate-600">Classification (ResNet18):</span>
                       <span className="font-mono font-semibold text-slate-800">
                         {classificationResult.inference_time_ms} ms
                       </span>

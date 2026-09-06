@@ -1779,7 +1779,7 @@ const Dashboard = () => {
                 <div className="flex items-center gap-2.5">
                   <Layers className="w-4 h-4 text-violet-600" />
                   <div>
-                    <span className="font-semibold text-slate-800 block">ResNet18-Dvorak-Morphology</span>
+                    <span className="font-semibold text-slate-800 block">ResNet18 Morphology Classifier</span>
                     <span className="text-[10px] text-slate-400">4-Class Pattern + Grad-CAM</span>
                   </div>
                 </div>

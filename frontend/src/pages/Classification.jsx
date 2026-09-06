@@ -27,10 +27,10 @@ const SATELLITE_PRESETS = [
 ];
 
 const DEFAULT_SUPPORTED_CLASSES = [
-  { class_id: 'eye_pattern', class_name: 'Eye Pattern (Warm Core)', probability_pct: 0.0, dvorak_range: 'T4.5 – T7.5' },
-  { class_id: 'curved_band', class_name: 'Curved Band Pattern', probability_pct: 0.0, dvorak_range: 'T1.5 – T3.5' },
-  { class_id: 'shear_pattern', class_name: 'Shear Pattern', probability_pct: 0.0, dvorak_range: 'T1.5 – T3.0' },
-  { class_id: 'ambient_calm', class_name: 'Calm Baseline', probability_pct: 0.0, dvorak_range: 'T0.0' }
+  { class_id: 'eye_pattern', class_name: 'Eye Pattern (Warm Core)', probability_pct: 0.0 },
+  { class_id: 'curved_band', class_name: 'Curved Band Pattern', probability_pct: 0.0 },
+  { class_id: 'shear_pattern', class_name: 'Shear Pattern', probability_pct: 0.0 },
+  { class_id: 'ambient_calm', class_name: 'Calm Baseline', probability_pct: 0.0 }
 ];
 
 const Classification = () => {
@@ -120,7 +120,6 @@ const Classification = () => {
   const classesList = classificationResult?.class_probability_distribution || DEFAULT_SUPPORTED_CLASSES;
   const topPattern = classificationResult?.predicted_pattern || 'Awaiting Inference';
   const topConf = classificationResult?.confidence_percentage || 0;
-  const dvorak = classificationResult?.dvorak_classification;
   const gradcamFoci = classificationResult?.gradcam_attention_foci || [];
   const radiometric = classificationResult?.radiometric_indicators;
 
@@ -301,8 +300,8 @@ const Classification = () => {
               </span>
             </div>
             <div className="flex justify-between items-center py-1 border-b border-slate-200">
-              <span className="text-slate-500">Dvorak Intensity Rating:</span>
-              <span className="font-bold font-mono text-sky-800">{dvorak?.t_number || 'T--'}</span>
+              <span className="text-slate-500">Output Nature:</span>
+              <span className="font-bold text-slate-800">Visual Morphology Class</span>
             </div>
             <div className="flex justify-between items-center py-1">
               <span className="text-slate-500">Grad-CAM Attention Foci:</span>
@@ -348,9 +347,6 @@ const Classification = () => {
                       style={{ width: `${Math.min(100, Math.max(2, cat.probability_pct || 0))}%` }} 
                     />
                   </div>
-                  <span className="text-[10px] text-slate-400 font-mono mt-1 block">
-                    Dvorak Range: {cat.dvorak_range}
-                  </span>
                 </div>
               );
             })}
@@ -369,7 +365,7 @@ const Classification = () => {
 
           <div className="mx-5 mb-5 p-4 bg-[#003087] rounded-xl text-white">
             <p className="text-[10px] text-blue-200 mb-0.5 uppercase tracking-wider font-mono">
-              Predicted Dvorak Category
+              Predicted Morphology Class
             </p>
             <h3 className="text-base font-bold mb-1">{topPattern}</h3>
             <div className="flex items-center gap-1.5">
@@ -415,19 +411,17 @@ const Classification = () => {
                 <span className="text-[10px] text-slate-400 block">Deep Convection Index</span>
               </div>
 
-              <div className="space-y-2 pt-1 border-t border-slate-100 text-xs">
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Estimated Wind:</span>
-                  <span className="font-bold text-red-600 font-mono">
-                    {dvorak?.estimated_wind_speed_kmh ? `${dvorak.estimated_wind_speed_kmh} km/h` : 'N/A'}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-500">Estimated MSLP:</span>
-                  <span className="font-bold text-slate-800 font-mono">
-                    {dvorak?.central_mslp_hpa ? `${dvorak.central_mslp_hpa} hPa` : 'N/A'}
-                  </span>
-                </div>
+              {/* Intensity Assessment - Scientific Limitation */}
+              <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1 text-xs">
+                <span className="text-[10px] uppercase font-bold font-mono tracking-wider block text-slate-500">
+                  Intensity Assessment
+                </span>
+                <span className="text-[11px] font-mono font-semibold text-amber-800 bg-amber-50 px-1.5 py-0.5 rounded border border-amber-200 block">
+                  NOT AVAILABLE FROM SINGLE-FRAME MODEL
+                </span>
+                <p className="text-[10px] text-slate-500 leading-tight pt-0.5">
+                  Operational intensity estimation requires temporal satellite observations and synoptic meteorological data.
+                </p>
               </div>
             </div>
           </div>
