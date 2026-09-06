@@ -1,16 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  AlertTriangle, AlertOctagon, Info, Bell, CheckCircle, 
-  Clock, ShieldAlert, FileText, Download, Printer, 
+isimport React, { useState, useEffect } from 'react';
+import {
+  AlertTriangle, AlertOctagon, Info, Bell, CheckCircle,
+  Clock, ShieldAlert, FileText, Printer,
   Send, Radio, Building2, Users, Anchor, X, CheckCheck,
   MapPin, Waves, Wind, Copy, Code, ChevronRight
 } from 'lucide-react';
-import { 
+import {
   MapContainer, TileLayer, Marker, Popup, Circle
 } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useNavigate } from 'react-router-dom';
-import { downloadOfficialBulletinPdf, fetchActiveAlerts, getFormattedLastUpdated } from '../services/api';
+import { fetchActiveAlerts, getFormattedLastUpdated } from '../services/api';
 import DataTypeBadge from '../components/DataTypeBadge';
 import LastUpdatedBadge from '../components/LastUpdatedBadge';
 import DataUnavailableNotice from '../components/DataUnavailableNotice';
@@ -90,8 +90,8 @@ const Alerts = () => {
     setTimeout(() => setBroadcastSent(false), 3000);
   };
 
-  const filtered = filter === 'ALL' 
-    ? alertsList 
+  const filtered = filter === 'ALL'
+    ? alertsList
     : alertsList.filter(a => (a.alert_level || '').includes(filter));
 
   const generateCapXmlString = (alert) => {
@@ -121,7 +121,7 @@ const Alerts = () => {
 
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
-      
+
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
@@ -140,15 +140,7 @@ const Alerts = () => {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          <button
-            onClick={() => downloadOfficialBulletinPdf({ name: 'Severe Cyclonic Storm DANA', basin: 'Bay of Bengal' })}
-            className="btn-primary text-xs py-1.5 px-3.5 shadow-xs gap-1.5"
-          >
-            <Download className="w-3.5 h-3.5" />
-            <span>Download Official Bulletin PDF</span>
-          </button>
-        </div>
+
       </div>
 
       {/* Geospatial Coastal Warning GIS Map */}
@@ -209,10 +201,10 @@ const Alerts = () => {
 
       {/* Main 2-Column Grid */}
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
-        
+
         {/* Left Column: Active Alert Feed (8 Cols) */}
         <div className="xl:col-span-8 space-y-4">
-          
+
           {/* Filter Bar */}
           <div className="flex items-center gap-2">
             <span className="text-xs font-mono text-slate-500">Filter:</span>
@@ -220,11 +212,10 @@ const Alerts = () => {
               <button
                 key={f}
                 onClick={() => setFilter(f)}
-                className={`px-3 py-1 rounded text-xs font-mono font-medium transition-all border ${
-                  filter === f
+                className={`px-3 py-1 rounded text-xs font-mono font-medium transition-all border ${filter === f
                     ? 'bg-slate-900 text-white border-slate-900 font-bold shadow-2xs'
                     : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
-                }`}
+                  }`}
               >
                 {f}
               </button>
@@ -241,97 +232,95 @@ const Alerts = () => {
               />
             ) : (
               filtered.map((alert, idx) => (
-              <div 
-                key={alert.id || idx} 
-                className={`bg-white border rounded-xl p-5 space-y-3.5 shadow-2xs transition-all ${
-                  (alert.alert_level || '').includes('RED') ? 'border-red-200' :
-                  (alert.alert_level || '').includes('ORANGE') ? 'border-orange-200' : 'border-amber-200'
-                }`}
-              >
-                <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className={`badge ${
-                      (alert.alert_level || '').includes('RED') ? 'badge-red' :
-                      (alert.alert_level || '').includes('ORANGE') ? 'badge-orange' : 'badge-amber'
-                    }`}>
-                      {alert.alert_level || 'RED_ALERT'}
-                    </span>
-                    <DataTypeBadge
-                      type={alert.cyclone_name?.includes('DANA') ? 'historical' : 'live'}
-                      label={alert.cyclone_name?.includes('DANA') ? 'HISTORICAL BENCHMARK' : 'LIVE DIRECTIVE'}
-                    />
-                    <span className="text-xs font-mono text-slate-400">{alert.cap_identifier || `CAP-WARN-${alert.id}`}</span>
-                  </div>
-                  <span className="text-xs font-mono text-slate-500">{alert.issued_at || 'Just Now'}</span>
-                </div>
-
-                <h3 className="font-heading font-bold text-sm text-slate-900">
-                  {alert.cyclone_name} — Coastal Warning Directive
-                </h3>
-                <p className="text-xs text-slate-600 leading-relaxed">{alert.evacuation_recommendation}</p>
-
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono bg-slate-50 p-2.5 rounded-lg border border-slate-100">
-                  <div>
-                    <span className="text-[10px] text-slate-400 block uppercase">Wind Gusts</span>
-                    <span className="font-bold text-sky-700">{alert.wind_gust_forecast_kmh} km/h</span>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-slate-400 block uppercase">Storm Surge</span>
-                    <span className="font-bold text-red-600">{alert.surge_height_m}</span>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-slate-400 block uppercase">24h Rainfall</span>
-                    <span className="font-bold text-slate-800">{alert.rainfall_24h_mm} mm</span>
-                  </div>
-                  <div>
-                    <span className="text-[10px] text-slate-400 block uppercase">Target Districts</span>
-                    <span className="font-bold text-slate-800 truncate block">{(alert.affected_districts || []).join(', ')}</span>
-                  </div>
-                </div>
-
-                <div className="flex flex-wrap items-center justify-between pt-1 gap-2 text-xs">
-                  <div className="flex items-center gap-2">
-                    {acknowledged[alert.id] ? (
-                      <span className="text-emerald-600 font-medium flex items-center gap-1">
-                        <CheckCheck className="w-3.5 h-3.5" />
-                        <span>Acknowledged: {acknowledged[alert.id]}</span>
+                <div
+                  key={alert.id || idx}
+                  className={`bg-white border rounded-xl p-5 space-y-3.5 shadow-2xs transition-all ${(alert.alert_level || '').includes('RED') ? 'border-red-200' :
+                      (alert.alert_level || '').includes('ORANGE') ? 'border-orange-200' : 'border-amber-200'
+                    }`}
+                >
+                  <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className={`badge ${(alert.alert_level || '').includes('RED') ? 'badge-red' :
+                          (alert.alert_level || '').includes('ORANGE') ? 'badge-orange' : 'badge-amber'
+                        }`}>
+                        {alert.alert_level || 'RED_ALERT'}
                       </span>
-                    ) : (
+                      <DataTypeBadge
+                        type={alert.cyclone_name?.includes('DANA') ? 'historical' : 'live'}
+                        label={alert.cyclone_name?.includes('DANA') ? 'HISTORICAL BENCHMARK' : 'LIVE DIRECTIVE'}
+                      />
+                      <span className="text-xs font-mono text-slate-400">{alert.cap_identifier || `CAP-WARN-${alert.id}`}</span>
+                    </div>
+                    <span className="text-xs font-mono text-slate-500">{alert.issued_at || 'Just Now'}</span>
+                  </div>
+
+                  <h3 className="font-heading font-bold text-sm text-slate-900">
+                    {alert.cyclone_name} — Coastal Warning Directive
+                  </h3>
+                  <p className="text-xs text-slate-600 leading-relaxed">{alert.evacuation_recommendation}</p>
+
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono bg-slate-50 p-2.5 rounded-lg border border-slate-100">
+                    <div>
+                      <span className="text-[10px] text-slate-400 block uppercase">Wind Gusts</span>
+                      <span className="font-bold text-sky-700">{alert.wind_gust_forecast_kmh} km/h</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-slate-400 block uppercase">Storm Surge</span>
+                      <span className="font-bold text-red-600">{alert.surge_height_m}</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-slate-400 block uppercase">24h Rainfall</span>
+                      <span className="font-bold text-slate-800">{alert.rainfall_24h_mm} mm</span>
+                    </div>
+                    <div>
+                      <span className="text-[10px] text-slate-400 block uppercase">Target Districts</span>
+                      <span className="font-bold text-slate-800 truncate block">{(alert.affected_districts || []).join(', ')}</span>
+                    </div>
+                  </div>
+
+                  <div className="flex flex-wrap items-center justify-between pt-1 gap-2 text-xs">
+                    <div className="flex items-center gap-2">
+                      {acknowledged[alert.id] ? (
+                        <span className="text-emerald-600 font-medium flex items-center gap-1">
+                          <CheckCheck className="w-3.5 h-3.5" />
+                          <span>Acknowledged: {acknowledged[alert.id]}</span>
+                        </span>
+                      ) : (
+                        <button
+                          onClick={() => handleAcknowledge(alert.id)}
+                          className="btn-secondary text-xs py-1 px-3"
+                        >
+                          <CheckCircle className="w-3 h-3" />
+                          <span>Acknowledge Protocol</span>
+                        </button>
+                      )}
+
                       <button
-                        onClick={() => handleAcknowledge(alert.id)}
-                        className="btn-secondary text-xs py-1 px-3"
+                        onClick={() => setSelectedCapAlert(alert)}
+                        className="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-mono text-[11px] flex items-center gap-1"
                       >
-                        <CheckCircle className="w-3 h-3" />
-                        <span>Acknowledge Protocol</span>
+                        <Code className="w-3 h-3" />
+                        <span>CAP v1.2 Payload</span>
                       </button>
-                    )}
+                    </div>
 
                     <button
-                      onClick={() => setSelectedCapAlert(alert)}
-                      className="px-2.5 py-1 rounded bg-slate-100 hover:bg-slate-200 text-slate-700 font-mono text-[11px] flex items-center gap-1"
+                      onClick={() => navigate('/dashboard/track')}
+                      className="text-sky-600 font-semibold hover:underline flex items-center gap-1"
                     >
-                      <Code className="w-3 h-3" />
-                      <span>CAP v1.2 Payload</span>
+                      <span>View 4D Track Visualizer</span>
+                      <ChevronRight className="w-3.5 h-3.5" />
                     </button>
                   </div>
-
-                  <button
-                    onClick={() => navigate('/dashboard/track')}
-                    className="text-sky-600 font-semibold hover:underline flex items-center gap-1"
-                  >
-                    <span>View 4D Track Visualizer</span>
-                    <ChevronRight className="w-3.5 h-3.5" />
-                  </button>
                 </div>
-              </div>
-            )))}
+              )))}
           </div>
 
         </div>
 
         {/* Right Column: Multi-Agency Broadcast & Ingestion Activity (4 Cols) */}
         <div className="xl:col-span-4 space-y-4">
-          
+
           <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-4 shadow-2xs">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
@@ -354,7 +343,7 @@ const Alerts = () => {
             </div>
 
             <div className="pt-2">
-              <button 
+              <button
                 onClick={handleBroadcast}
                 disabled={broadcastSent}
                 className="w-full btn-primary text-xs py-2 justify-center gap-2"
@@ -389,7 +378,7 @@ const Alerts = () => {
 
             <div className="flex justify-between items-center pt-2">
               <span className="text-xs text-slate-500">Standard: OASIS CAP v1.2 / ITU-T X.1303</span>
-              <button 
+              <button
                 onClick={() => {
                   navigator.clipboard.writeText(generateCapXmlString(selectedCapAlert));
                   setCopiedCap(true);
