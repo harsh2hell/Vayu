@@ -24,10 +24,10 @@ export const AuthConfigurationNotice = () => {
 
         <div>
           <h2 className="text-lg font-bold text-slate-900 tracking-tight">
-            Clerk Authentication Required
+            Authentication Required
           </h2>
           <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-            The VAYU Command Dashboard is protected by Clerk Pro authentication (<code className="text-sky-600 font-mono">login.vayusat.live</code>).
+            The VAYU Command Dashboard requires authorized operational credentials.
           </p>
         </div>
 
@@ -82,7 +82,7 @@ const ClerkProtectedRoute = ({ children }) => {
     return (
       <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center space-y-3">
         <div className="w-8 h-8 border-2 border-sky-600 border-t-transparent rounded-full animate-spin" />
-        <p className="text-xs font-mono text-slate-500">Redirecting to login.vayusat.live...</p>
+        <p className="text-xs font-mono text-slate-500">Redirecting to secure login gateway...</p>
       </div>
     );
   }
@@ -98,42 +98,109 @@ export const ProtectedRoute = ({ children }) => {
   return <ClerkProtectedRoute>{children}</ClerkProtectedRoute>;
 };
 
+// Helper functions for user profile resolution
+const getDisplayName = (user) => {
+  if (!user) return '';
+  if (user.fullName && user.fullName.trim()) return user.fullName.trim();
+  const joined = [user.firstName, user.lastName].filter(Boolean).join(' ').trim();
+  if (joined) return joined;
+  if (user.username && user.username.trim()) return user.username.trim();
+  const email = getDisplayEmail(user);
+  if (email && email.includes('@')) {
+    const prefix = email.split('@')[0];
+    return prefix.charAt(0).toUpperCase() + prefix.slice(1);
+  }
+  return 'Authorized Officer';
+};
+
+const getDisplayEmail = (user) => {
+  if (!user) return '';
+  if (user.primaryEmailAddress?.emailAddress) {
+    return user.primaryEmailAddress.emailAddress;
+  }
+  if (user.primaryEmailAddressId && Array.isArray(user.emailAddresses)) {
+    const primary = user.emailAddresses.find((e) => e.id === user.primaryEmailAddressId);
+    if (primary?.emailAddress) return primary.emailAddress;
+  }
+  if (Array.isArray(user.emailAddresses) && user.emailAddresses[0]?.emailAddress) {
+    return user.emailAddresses[0].emailAddress;
+  }
+  if (Array.isArray(user.externalAccounts) && user.externalAccounts[0]?.emailAddress) {
+    return user.externalAccounts[0].emailAddress;
+  }
+  if (user.primaryPhoneNumber?.phoneNumber) {
+    return user.primaryPhoneNumber.phoneNumber;
+  }
+  if (user.username) {
+    return user.username;
+  }
+  return '';
+};
+
+const getInitials = (name) => {
+  if (!name) return 'AO';
+  const parts = name.trim().split(/\s+/).filter(Boolean);
+  if (parts.length >= 2) {
+    return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+  }
+  return name.slice(0, 2).toUpperCase();
+};
+
 const ClerkUserDisplay = () => {
   const { user, isLoaded } = useUser();
 
-  if (!isLoaded || !user) {
+  // Cache resolved user data in localStorage for fast zero-flicker rehydration
+  useEffect(() => {
+    if (user) {
+      const resolvedName = getDisplayName(user);
+      const resolvedEmail = getDisplayEmail(user);
+      if (resolvedName) localStorage.setItem('vayu_user_name', resolvedName);
+      if (resolvedEmail) localStorage.setItem('vayu_user_email', resolvedEmail);
+      if (user.imageUrl) localStorage.setItem('vayu_user_avatar', user.imageUrl);
+    }
+  }, [user]);
+
+  const cachedName = typeof window !== 'undefined' ? localStorage.getItem('vayu_user_name') : null;
+  const cachedEmail = typeof window !== 'undefined' ? localStorage.getItem('vayu_user_email') : null;
+  const cachedAvatar = typeof window !== 'undefined' ? localStorage.getItem('vayu_user_avatar') : null;
+
+  if (!isLoaded && !cachedName) {
     return (
-      <div className="flex items-center gap-3">
-        <div className="w-9 h-9 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 font-bold text-xs shrink-0">
-          <User className="w-4 h-4" />
-        </div>
-        <div className="flex flex-col min-w-0 flex-1">
-          <span className="text-xs font-semibold text-slate-800 truncate">VAYU Officer</span>
-          <span className="text-[10px] text-slate-500 truncate">Authenticated Session</span>
+      <div className="flex items-center gap-2.5 animate-pulse">
+        <div className="w-9 h-9 rounded-full bg-slate-200 border border-slate-300 shrink-0" />
+        <div className="flex flex-col min-w-0 flex-1 space-y-1">
+          <div className="h-3 bg-slate-200 rounded w-20" />
+          <div className="h-2.5 bg-slate-100 rounded w-28" />
         </div>
       </div>
     );
   }
 
-  const name = user.fullName || user.firstName || 'Meteorological Officer';
-  const email = user.primaryEmailAddress?.emailAddress || 'officer@vayusat.live';
+  const name = (user ? getDisplayName(user) : cachedName) || 'Authorized Officer';
+  const email = (user ? getDisplayEmail(user) : cachedEmail) || '';
+  const avatarUrl = user?.imageUrl || cachedAvatar;
+  const initials = getInitials(name);
 
   return (
-    <div className="flex items-center gap-3">
-      {user.imageUrl ? (
+    <div className="flex items-center gap-2.5">
+      {avatarUrl ? (
         <img 
-          src={user.imageUrl} 
+          src={avatarUrl} 
           alt={name} 
-          className="w-9 h-9 rounded-xl object-cover border border-slate-200 shrink-0" 
+          className="w-9 h-9 rounded-full object-cover border border-slate-200 shrink-0" 
         />
       ) : (
-        <div className="w-9 h-9 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 font-bold text-xs shrink-0">
-          <User className="w-4 h-4 text-slate-500" />
+        <div className="w-9 h-9 rounded-full bg-slate-700 text-white font-semibold text-xs flex items-center justify-center shrink-0 shadow-2xs">
+          {initials}
         </div>
       )}
-      <div className="flex flex-col min-w-0 flex-1">
-        <span className="text-xs font-semibold text-slate-800 truncate">{name}</span>
-        <span className="text-[10px] text-slate-500 truncate">{email}</span>
+      <div className="flex flex-col min-w-0 flex-1 text-left">
+        <span className="text-xs font-bold text-slate-900 truncate leading-tight" title={name}>
+          {name}
+        </span>
+        <span className="text-[11px] text-slate-500 truncate leading-tight mt-0.5" title={email}>
+          {email || 'Operational Session'}
+        </span>
       </div>
     </div>
   );
@@ -141,14 +208,33 @@ const ClerkUserDisplay = () => {
 
 export const OfficerAccountDisplay = () => {
   if (!CLERK_PUBLISHABLE_KEY) {
+    const cachedName = typeof window !== 'undefined' ? localStorage.getItem('vayu_user_name') : null;
+    const cachedEmail = typeof window !== 'undefined' ? localStorage.getItem('vayu_user_email') : null;
+    const cachedAvatar = typeof window !== 'undefined' ? localStorage.getItem('vayu_user_avatar') : null;
+    const name = cachedName || 'Authorized Officer';
+    const email = cachedEmail || 'Operational Session';
+    const initials = getInitials(name);
+
     return (
-      <div className="flex items-center gap-3">
-        <div className="w-9 h-9 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 font-bold text-xs shrink-0">
-          <User className="w-4 h-4" />
-        </div>
-        <div className="flex flex-col min-w-0 flex-1">
-          <span className="text-xs font-semibold text-slate-800 truncate">VAYU Officer</span>
-          <span className="text-[10px] text-slate-500 truncate">Operational Session</span>
+      <div className="flex items-center gap-2.5">
+        {cachedAvatar ? (
+          <img 
+            src={cachedAvatar} 
+            alt={name} 
+            className="w-9 h-9 rounded-full object-cover border border-slate-200 shrink-0" 
+          />
+        ) : (
+          <div className="w-9 h-9 rounded-full bg-slate-700 text-white font-semibold text-xs flex items-center justify-center shrink-0 shadow-2xs">
+            {initials}
+          </div>
+        )}
+        <div className="flex flex-col min-w-0 flex-1 text-left">
+          <span className="text-xs font-bold text-slate-900 truncate leading-tight" title={name}>
+            {name}
+          </span>
+          <span className="text-[11px] text-slate-500 truncate leading-tight mt-0.5" title={email}>
+            {email}
+          </span>
         </div>
       </div>
     );
@@ -161,6 +247,11 @@ const ClerkSignOutButton = ({ onSignOutComplete, className, children }) => {
 
   const handleSignOut = async () => {
     try {
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('vayu_user_name');
+        localStorage.removeItem('vayu_user_email');
+        localStorage.removeItem('vayu_user_avatar');
+      }
       if (signOut) {
         await signOut();
       }
@@ -192,6 +283,11 @@ export const SafeSignOutButton = ({ onSignOutComplete, className, children }) =>
       <button
         type="button"
         onClick={() => {
+          if (typeof window !== 'undefined') {
+            localStorage.removeItem('vayu_user_name');
+            localStorage.removeItem('vayu_user_email');
+            localStorage.removeItem('vayu_user_avatar');
+          }
           if (onSignOutComplete) onSignOutComplete();
           else window.location.replace(getAuthUrl());
         }}

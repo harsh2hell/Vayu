@@ -115,7 +115,7 @@ const Login = () => {
         <div className="flex items-center gap-2">
           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-mono bg-white border border-slate-200 text-slate-700 shadow-2xs">
             <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>login.vayusat.live</span>
+            <span>Secure Operations Gateway</span>
           </span>
         </div>
       </header>
@@ -147,7 +147,7 @@ const Login = () => {
           {/* Clean Provenance Note */}
           <div className="text-center pt-2">
             <p className="text-[11px] text-slate-400 font-mono">
-              VAYU AI Meteorological Platform • Clerk Pro Authentication Gateway
+              VAYU AI Meteorological Platform • Authorized Duty Officer Gateway
             </p>
           </div>
 

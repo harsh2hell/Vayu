@@ -156,7 +156,7 @@ const Topbar = () => {
               <div>
                 <h3 className="text-base font-bold text-slate-900">Confirm Logout</h3>
                 <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">
-                  Are you sure you want to end your operational session and return to login.vayusat.live?
+                  Are you sure you want to end your operational session?
                 </p>
               </div>
             </div>
