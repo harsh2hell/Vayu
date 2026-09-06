@@ -5,6 +5,8 @@ import {
   Binary, Zap, ArrowRight, ShieldAlert, FileText, Check
 } from 'lucide-react';
 import { checkBackendHealth, fetchModelBenchmarks } from '../services/api';
+import PageHeader from '../components/PageHeader';
+import StatusBadge from '../components/StatusBadge';
 
 const ModelTraining = () => {
   const [activeTab, setActiveTab] = useState('models'); // 'models', 'schema', 'benchmarks'
@@ -39,49 +41,24 @@ const ModelTraining = () => {
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-12">
       
-      {/* Header */}
-      <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-xs relative overflow-hidden">
-        <div className="absolute -right-16 -top-16 w-64 h-64 bg-sky-100/40 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute -left-16 -bottom-16 w-64 h-64 bg-blue-100/30 rounded-full blur-3xl pointer-events-none" />
-
-        <div className="relative z-10 flex flex-col lg:flex-row lg:items-center justify-between gap-5">
-          <div className="space-y-2">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold border ${
-                isLive 
-                  ? 'bg-emerald-50 text-emerald-700 border-emerald-200/70' 
-                  : 'bg-amber-50 text-amber-700 border-amber-200/70'
-              }`}>
-                <span className={`w-2 h-2 rounded-full ${isLive ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
-                <span>{isLive ? 'PyTorch Production Checkpoints Active' : 'Backend Disconnected'}</span>
-              </span>
-              <span className="inline-flex items-center px-2.5 py-1 rounded-full text-[10px] font-mono font-bold tracking-wider bg-slate-100 text-slate-700 border border-slate-200">
-                ZERO MOCK DATA • VERIFIED PYTORCH ENGINE
-              </span>
-            </div>
-
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-heading font-extrabold text-slate-900 tracking-tight">
-                AI Model Intelligence
-              </h1>
-              <p className="text-xs sm:text-sm text-slate-500 font-normal max-w-2xl mt-1 leading-relaxed">
-                Production AI inference pipeline, deep model architectures, and empirical held-out benchmarks across satellite vision and trajectory forecasting.
-              </p>
-            </div>
-          </div>
-
-          <div className="flex items-center gap-2.5 shrink-0">
-            <button
-              onClick={fetchStatus}
-              disabled={isLoading}
-              className="inline-flex items-center gap-2 px-3.5 py-2 rounded-xl border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 transition-colors text-xs font-semibold shadow-2xs cursor-pointer"
-            >
-              <RefreshCw className={`w-3.5 h-3.5 text-slate-600 ${isLoading ? 'animate-spin' : ''}`} />
-              <span>{isLoading ? 'Checking...' : 'Refresh Telemetry'}</span>
-            </button>
-          </div>
-        </div>
-      </div>
+      {/* Standard Unified Header */}
+      <PageHeader
+        categoryBadge="AI SYSTEM • MODEL INTELLIGENCE"
+        categoryColor="blue"
+        modelBadge={isLive ? "PyTorch Checkpoints Active" : "Backend Disconnected"}
+        title="AI Model Intelligence"
+        subtitle="Production AI inference pipeline, deep model architectures, and empirical held-out benchmarks across satellite vision and trajectory forecasting."
+        actions={
+          <button
+            onClick={fetchStatus}
+            disabled={isLoading}
+            className="btn-secondary text-xs sm:text-sm py-2 px-3.5 gap-1.5 cursor-pointer"
+          >
+            <RefreshCw className={`w-3.5 h-3.5 ${isLoading ? 'animate-spin' : ''}`} />
+            <span>{isLoading ? 'Checking...' : 'Refresh Telemetry'}</span>
+          </button>
+        }
+      />
 
       {/* Production Model Summary Overview KPI Strip */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

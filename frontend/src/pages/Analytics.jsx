@@ -7,6 +7,8 @@ import {
 import { fetchAllCyclones } from '../services/api';
 import DataTypeBadge from '../components/DataTypeBadge';
 import LastUpdatedBadge from '../components/LastUpdatedBadge';
+import PageHeader from '../components/PageHeader';
+import StatusBadge from '../components/StatusBadge';
 
 const Analytics = () => {
   const [cyclones, setCyclones] = useState([]);
@@ -77,32 +79,24 @@ const Analytics = () => {
   return (
     <div className="space-y-6 max-w-[1500px] mx-auto pb-12 font-sans">
       
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-        <div>
-          <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-            <Database className="w-6 h-6 text-[#003087]" />
-            <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
-              Historical Storm Reference & IBTrACS Archive
-            </h1>
-            <DataTypeBadge type="historical" label="NOAA IBTrACS ARCHIVE" />
-          </div>
-          <p className="text-xs sm:text-sm text-slate-500">
-            Official North Indian Ocean tropical cyclone track records and meteorological ground truth database.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2">
+      {/* Standard Unified Header */}
+      <PageHeader
+        categoryBadge="HISTORICAL • IBTrACS ARCHIVE"
+        categoryColor="navy"
+        modelBadge="NOAA / IMD Ground Truth"
+        title="Historical Storm Reference & IBTrACS Archive"
+        subtitle="Official North Indian Ocean tropical cyclone track records and meteorological ground truth database."
+        actions={
           <button 
             onClick={handleExportCsv}
             disabled={filtered.length === 0}
-            className="btn-secondary text-xs py-2 px-3.5 gap-1.5"
+            className="btn-secondary text-xs sm:text-sm py-2 px-3.5 gap-1.5"
           >
             <Download className="w-3.5 h-3.5" />
             <span>Export CSV</span>
           </button>
-        </div>
-      </div>
+        }
+      />
 
       {/* Main Grid: Storm List & Detailed Inspector */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">

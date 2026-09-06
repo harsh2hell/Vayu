@@ -393,7 +393,7 @@ header .header-theme-btn {
   box-shadow: 0 4px 12px -2px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.03);
 }
 
-/* Modern Buttons */
+/* Modern VAYU Unified Buttons */
 .btn-primary {
   display: inline-flex;
   align-items: center;
@@ -403,22 +403,28 @@ header .header-theme-btn {
   font-weight: 600;
   font-size: 0.8125rem;
   border-radius: 0.625rem;
-  padding: 0.55rem 1rem;
-  background-color: #0F172A;
+  padding: 0.55rem 1.125rem;
+  background-color: #003087;
   color: #FFFFFF;
-  border: 1px solid #0F172A;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  border: 1px solid #002B7A;
+  box-shadow: 0 1px 3px 0 rgba(0, 48, 135, 0.2);
   transition: all 0.15s ease-in-out;
   cursor: pointer;
 }
 .btn-primary:hover {
-  background-color: #1E293B;
-  border-color: #1E293B;
-  box-shadow: 0 4px 8px 0 rgba(15, 23, 42, 0.12);
+  background-color: #002266;
+  border-color: #001C52;
+  box-shadow: 0 4px 10px 0 rgba(0, 48, 135, 0.25);
   transform: translateY(-0.5px);
 }
 .btn-primary:active {
   transform: scale(0.98);
+}
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
 }
 
 .btn-secondary {
@@ -432,20 +438,72 @@ header .header-theme-btn {
   border-radius: 0.625rem;
   padding: 0.55rem 1rem;
   background-color: #FFFFFF;
-  color: #334155;
-  border: 1px solid #E2E8F0;
-  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+  color: #0F172A;
+  border: 1px solid #CBD5E1;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.04);
   transition: all 0.15s ease-in-out;
   cursor: pointer;
 }
 .btn-secondary:hover {
   background-color: #F8FAFC;
-  border-color: #CBD5E1;
-  color: #0F172A;
+  border-color: #94A3B8;
+  color: #003087;
   transform: translateY(-0.5px);
 }
 .btn-secondary:active {
   transform: scale(0.98);
+}
+.btn-secondary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  border-radius: 0.625rem;
+  padding: 0.55rem 1rem;
+  background-color: #DC2626;
+  color: #FFFFFF;
+  border: 1px solid #B91C1C;
+  box-shadow: 0 1px 2px 0 rgba(220, 38, 38, 0.2);
+  transition: all 0.15s ease-in-out;
+  cursor: pointer;
+}
+.btn-danger:hover {
+  background-color: #B91C1C;
+  border-color: #991B1B;
+  transform: translateY(-0.5px);
+}
+.btn-danger:active {
+  transform: scale(0.98);
+}
+
+.btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: 0.8125rem;
+  border-radius: 0.625rem;
+  padding: 0.55rem 0.875rem;
+  background-color: transparent;
+  color: #475569;
+  border: 1px solid transparent;
+  transition: all 0.15s ease-in-out;
+  cursor: pointer;
+}
+.btn-ghost:hover {
+  background-color: #F1F5F9;
+  color: #0F172A;
 }
 
 /* Badges */

@@ -8,6 +8,9 @@ import { useNavigate } from 'react-router-dom';
 import { classifyMorphologyPattern } from '../services/api';
 import DataTypeBadge from '../components/DataTypeBadge';
 import LastUpdatedBadge from '../components/LastUpdatedBadge';
+import PageHeader from '../components/PageHeader';
+import StatusBadge from '../components/StatusBadge';
+import InfoCallout from '../components/InfoCallout';
 
 const SATELLITE_PRESETS = [
   {
@@ -126,52 +129,39 @@ const Classification = () => {
   return (
     <div className="space-y-6 max-w-[1400px] mx-auto pb-10">
       
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-        <div>
-          <div className="flex items-center gap-2 flex-wrap">
-            <Layers className="w-6 h-6 text-[#003087]" />
-            <h1 className="text-xl sm:text-2xl font-bold text-slate-900">AI Cyclone Pattern Classification</h1>
-            <span className="badge badge-navy">ResNet18 Morphology + Grad-CAM</span>
-            <DataTypeBadge type="ai" label="REAL AI INFERENCE" size="xs" />
-          </div>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Deep Residual Convolutional Network (ResNet-18) classifying Eye Pattern, Curved Band, Shear Pattern, and Calm Baseline with Autograd Grad-CAM attention.
-          </p>
-          <div className="flex items-center gap-2 mt-2 flex-wrap">
-            <span className="text-[11px] font-mono bg-slate-100 text-slate-600 px-2.5 py-0.5 rounded border border-slate-200">
-              Model: ResNet-18 Phase 3B Checkpoint (11,246,436 Params)
+      {/* Standard Unified Header */}
+      <PageHeader
+        categoryBadge="AI VISION • MORPHOLOGY"
+        categoryColor="blue"
+        modelBadge="ResNet18 (11.25M Params)"
+        title="AI Cyclone Pattern Classification"
+        subtitle="Deep Residual Convolutional Network (ResNet-18) classifying Eye Pattern, Curved Band, Shear Pattern, and Calm Baseline with Autograd Grad-CAM attention."
+        actions={
+          <>
+            <span className="text-[11px] text-amber-800 bg-amber-50 font-mono px-2 py-0.5 rounded border border-amber-200 hidden sm:inline-block">
+              Prototype: 14 training frames across 4 classes
             </span>
-            <span className="text-[11px] text-amber-800 bg-amber-50 px-2.5 py-0.5 rounded border border-amber-200 font-mono">
-              Experimental prototype: 14 training frames across 4 classes
-            </span>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2 flex-wrap">
-          <LastUpdatedBadge source="ResNet18-GradCAM" size="xs" />
-          
-          <label className="btn-secondary text-xs sm:text-sm py-2 px-3 gap-1.5 cursor-pointer">
-            <Upload className="w-3.5 h-3.5" />
-            <span>Upload Frame</span>
-            <input 
-              type="file" 
-              accept="image/png,image/jpeg,image/jpg,image/webp,image/tiff" 
-              onChange={handleFileUpload} 
-              className="hidden" 
-            />
-          </label>
-
-          <button 
-            onClick={handleRunClassification}
-            disabled={isClassifying || !activeImageSrc}
-            className="btn-primary text-xs sm:text-sm py-2 px-4 gap-2 shadow-sm"
-          >
-            <Sparkles className={`w-3.5 h-3.5 text-amber-300 ${isClassifying ? 'animate-spin' : ''}`} />
-            <span>{isClassifying ? 'Classifying ResNet18...' : 'Run Morphological Classifier'}</span>
-          </button>
-        </div>
-      </div>
+            <label className="btn-secondary text-xs sm:text-sm py-2 px-3 gap-1.5 cursor-pointer">
+              <Upload className="w-3.5 h-3.5" />
+              <span>Upload Frame</span>
+              <input 
+                type="file" 
+                accept="image/png,image/jpeg,image/jpg,image/webp,image/tiff" 
+                onChange={handleFileUpload} 
+                className="hidden" 
+              />
+            </label>
+            <button 
+              onClick={handleRunClassification}
+              disabled={isClassifying || !activeImageSrc}
+              className="btn-primary text-xs sm:text-sm py-2 px-4 gap-2 shadow-xs"
+            >
+              <Sparkles className={`w-3.5 h-3.5 ${isClassifying ? 'animate-spin' : ''}`} />
+              <span>{isClassifying ? 'Classifying ResNet18...' : 'Run Morphological Classifier'}</span>
+            </button>
+          </>
+        }
+      />
 
       {/* Frame Selection Bar */}
       <div className="bg-white border border-slate-200 rounded-xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 shadow-2xs">

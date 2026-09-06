@@ -6,8 +6,9 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { detectCycloneFromImage } from '../services/api';
-import DataTypeBadge from '../components/DataTypeBadge';
-import LastUpdatedBadge from '../components/LastUpdatedBadge';
+import PageHeader from '../components/PageHeader';
+import EmptyState from '../components/EmptyState';
+import StatusBadge from '../components/StatusBadge';
 
 const SATELLITE_PRESETS = [
   {
@@ -124,52 +125,39 @@ const Detection = () => {
   return (
     <div className="space-y-6 max-w-[1400px] mx-auto pb-10">
       
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-        <div>
-          <div className="flex items-center gap-2 flex-wrap">
-            <Target className="w-6 h-6 text-[#003087]" />
-            <h1 className="text-xl sm:text-2xl font-bold text-slate-900">AI Deep Learning Detection Lab</h1>
-            <span className="badge badge-navy">MobileNetV3-Small (1.08M Params)</span>
-            <DataTypeBadge type="ai" label="REAL AI INFERENCE" size="xs" />
-          </div>
-          <p className="text-xs sm:text-sm text-slate-500 mt-1">
-            Convolutional neural network for automated tropical cyclogenesis identification & eye center localization.
-          </p>
-          <div className="flex items-center gap-2 mt-2 flex-wrap">
-            <span className="text-[11px] font-mono bg-slate-100 text-slate-600 px-2.5 py-0.5 rounded border border-slate-200">
-              Checkpoint: vayu_detector_mobilenetv3_p3b.pt
-            </span>
-            <span className="text-[11px] text-amber-800 bg-amber-50 font-mono px-2 py-0.5 rounded border border-amber-200">
+      {/* Standard Unified Header */}
+      <PageHeader
+        categoryBadge="AI VISION • DETECTION LAB"
+        categoryColor="blue"
+        modelBadge="MobileNetV3-Small (1.08M Params)"
+        title="AI Deep Learning Detection Lab"
+        subtitle="Convolutional neural network for automated tropical cyclogenesis identification & eye center localization."
+        actions={
+          <>
+            <span className="text-[11px] text-amber-800 bg-amber-50 font-mono px-2 py-0.5 rounded border border-amber-200 hidden sm:inline-block">
               Page-Local Analysis • Isolated from Command Overview
             </span>
-          </div>
-        </div>
-
-        <div className="flex items-center gap-2 flex-wrap">
-          <LastUpdatedBadge source="MobileNetV3 CenterFix" size="xs" />
-          
-          <label className="btn-secondary text-xs sm:text-sm py-2 px-3 gap-1.5 cursor-pointer">
-            <Upload className="w-3.5 h-3.5" />
-            <span>Upload Frame</span>
-            <input 
-              type="file" 
-              accept="image/png,image/jpeg,image/jpg,image/webp,image/tiff" 
-              onChange={handleFileUpload} 
-              className="hidden" 
-            />
-          </label>
-
-          <button 
-            onClick={handleRunDetection}
-            disabled={isDetecting || !activeImageSrc}
-            className="btn-primary text-xs sm:text-sm py-2 px-4 gap-2 shadow-sm"
-          >
-            <Play className={`w-3.5 h-3.5 fill-current ${isDetecting ? 'animate-spin' : ''}`} />
-            <span>{isDetecting ? 'Running MobileNetV3...' : 'Run Detection Inference'}</span>
-          </button>
-        </div>
-      </div>
+            <label className="btn-secondary text-xs sm:text-sm py-2 px-3 gap-1.5 cursor-pointer">
+              <Upload className="w-3.5 h-3.5" />
+              <span>Upload Frame</span>
+              <input 
+                type="file" 
+                accept="image/png,image/jpeg,image/jpg,image/webp,image/tiff" 
+                onChange={handleFileUpload} 
+                className="hidden" 
+              />
+            </label>
+            <button 
+              onClick={handleRunDetection}
+              disabled={isDetecting || !activeImageSrc}
+              className="btn-primary text-xs sm:text-sm py-2 px-4 gap-2 shadow-xs"
+            >
+              <Play className={`w-3.5 h-3.5 fill-current ${isDetecting ? 'animate-spin' : ''}`} />
+              <span>{isDetecting ? 'Running MobileNetV3...' : 'Run Detection Inference'}</span>
+            </button>
+          </>
+        }
+      />
 
       {/* Frame Selection Bar */}
       <div className="bg-white border border-slate-200 rounded-xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 shadow-2xs">
@@ -420,18 +408,21 @@ const Detection = () => {
                 </div>
               </div>
             ) : (
-              <div className="p-8 text-center bg-slate-50 rounded-xl border border-dashed border-slate-300 text-slate-500 space-y-3">
-                <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center mx-auto text-slate-500">
-                  <Target className="w-5 h-5" />
-                </div>
-                <div>
-                  <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                    NO INFERENCE EXECUTED
-                  </h4>
-                  <p className="text-[11px] text-slate-500 mt-1 max-w-xs mx-auto">
-                    This is an input image preview. No neural inference has been executed on this frame.
-                  </p>
-                </div>
+              <EmptyState
+                icon={Target}
+                title="NO INFERENCE EXECUTED"
+                description="This is an input image preview. No neural inference has been executed on this frame."
+                action={
+                  <button 
+                    onClick={handleRunDetection}
+                    disabled={isDetecting || !activeImageSrc}
+                    className="btn-primary text-xs py-2 px-4 gap-2"
+                  >
+                    <Play className="w-3.5 h-3.5 fill-current" />
+                    <span>Run Detection Inference</span>
+                  </button>
+                }
+              >
                 <div className="p-3 bg-white rounded-lg border border-slate-200 text-[11px] text-slate-600 text-left font-mono space-y-1">
                   <div className="text-slate-400 font-bold uppercase text-[10px] mb-1">Inference State Checklist:</div>
                   <div>• Cyclone Detected: <span className="text-amber-700 font-semibold">NOT EVALUATED</span></div>
@@ -440,10 +431,7 @@ const Detection = () => {
                   <div>• Bounding Box: <span className="text-amber-700 font-semibold">NOT COMPUTED</span></div>
                   <div>• Latency: <span className="text-amber-700 font-semibold">NOT MEASURED</span></div>
                 </div>
-                <p className="text-[11px] text-slate-500">
-                  Click <strong className="text-slate-700">Run Detection Inference</strong> above to execute MobileNetV3 dual-head neural network.
-                </p>
-              </div>
+              </EmptyState>
             )}
 
             <div className="pt-2">

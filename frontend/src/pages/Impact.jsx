@@ -11,6 +11,9 @@ import L from 'leaflet';
 import { predictCycloneTrack } from '../services/api';
 import DataTypeBadge from '../components/DataTypeBadge';
 import LastUpdatedBadge from '../components/LastUpdatedBadge';
+import PageHeader from '../components/PageHeader';
+import StatusBadge from '../components/StatusBadge';
+import InfoCallout from '../components/InfoCallout';
 
 const BENCHMARK_STORMS = [
   {
@@ -115,54 +118,42 @@ const Impact = () => {
   return (
     <div className="space-y-6 max-w-7xl mx-auto pb-12 font-sans">
       
-      {/* 1. Header Banner */}
-      <div className="bg-white border border-slate-200/90 rounded-2xl p-5 sm:p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-            <DataTypeBadge type="ai" label="OPERATIONAL IMPACT" />
-            <LastUpdatedBadge source="VAYU Coastal Risk Engine" />
+      {/* Standard Unified Header */}
+      <PageHeader
+        categoryBadge="FORECAST • COASTAL IMPACT"
+        categoryColor="blue"
+        modelBadge="Coastal Risk Engine"
+        title="Impact & Landfall Assessment"
+        subtitle="Physics-grounded landfall corridor prediction, coastal strike probabilities, storm surge heights, and Common Alerting Protocol directives."
+        actions={
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold text-slate-600 hidden sm:inline">Storm:</span>
+            <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200">
+              {BENCHMARK_STORMS.map((storm) => (
+                <button
+                  key={storm.id}
+                  onClick={() => setSelectedStormId(storm.id)}
+                  disabled={isLoading}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                    selectedStormId === storm.id
+                      ? 'bg-[#003087] text-white shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  {storm.name}
+                </button>
+              ))}
+            </div>
           </div>
-          <div className="flex items-center gap-2 mb-1">
-            <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
-              Impact & Landfall Assessment
-            </h1>
-            <span className="badge badge-red">Disaster Operations</span>
-          </div>
-          <p className="text-xs text-slate-500 max-w-2xl leading-relaxed">
-            Physics-grounded landfall corridor prediction, coastal strike probabilities, storm surge heights, and Common Alerting Protocol directives.
-          </p>
-        </div>
+        }
+      />
 
-        <div className="flex items-center gap-2 shrink-0">
-          <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200">
-            {BENCHMARK_STORMS.map((storm) => (
-              <button
-                key={storm.id}
-                onClick={() => setSelectedStormId(storm.id)}
-                disabled={isLoading}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                  selectedStormId === storm.id
-                    ? 'bg-[#003087] text-white shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                {storm.name}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      {/* Scientific Distinction Notice */}
-      <div className="bg-blue-50/70 border border-blue-200 rounded-xl p-3.5 flex items-start gap-3 text-xs text-blue-950">
-        <Info className="w-4 h-4 text-[#003087] shrink-0 mt-0.5" />
-        <div className="space-y-0.5">
-          <span className="font-bold text-blue-900 block">Scientific Operational Protocol:</span>
-          <p className="text-[11px] text-blue-800 leading-relaxed">
-            <strong>MODEL FORECAST</strong> outputs (strike corridor, surge heights, district probabilities) are computed via 2-layer GRU Seq2Seq and 25-pass MC Dropout uncertainty cones. They are displayed alongside <strong>OFFICIAL REFERENCE</strong> best-track historical ground truth for verification.
-          </p>
-        </div>
-      </div>
+      {/* Scientific Operational Protocol */}
+      <InfoCallout
+        title="Scientific Operational Protocol"
+      >
+        <strong>MODEL FORECAST</strong> outputs (strike corridor, surge heights, district probabilities) are computed via 2-layer GRU Seq2Seq and 25-pass MC Dropout uncertainty cones. They are displayed alongside <strong>OFFICIAL REFERENCE</strong> best-track historical ground truth for verification.
+      </InfoCallout>
 
       {/* Error Banner */}
       {errorMsg && (
@@ -182,28 +173,28 @@ const Impact = () => {
         <div className="md:col-span-7 bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div className="flex items-center gap-2">
-              <MapPin className="w-5 h-5 text-red-600" />
+              <MapPin className="w-5 h-5 text-[#003087]" />
               <h3 className="font-bold text-sm text-slate-900">Predicted Landfall Corridor</h3>
             </div>
-            <span className="badge badge-red text-[10px]">AI Model Forecast</span>
+            <span className="badge badge-blue text-[10px]">AI Model Forecast</span>
           </div>
 
-          <div className="bg-red-50/70 border border-red-200 rounded-xl p-4 space-y-2">
+          <div className="bg-blue-50/60 border border-blue-200 rounded-xl p-4 space-y-2">
             <div className="flex justify-between items-center text-xs">
-              <span className="text-red-900 font-bold">Target Strike Sector:</span>
-              <span className="font-bold font-mono text-red-800">
+              <span className="text-slate-900 font-bold">Target Strike Sector:</span>
+              <span className="font-bold font-mono text-[#003087]">
                 {landfall?.target_sector || activeStorm.landfallSector}
               </span>
             </div>
-            <div className="flex justify-between items-center text-[11px] text-red-700">
+            <div className="flex justify-between items-center text-[11px] text-slate-600">
               <span>Forecast Center Coordinates:</span>
-              <span className="font-mono font-medium">
+              <span className="font-mono font-medium text-slate-800">
                 {landfall?.coordinates || `${landfallLat.toFixed(2)}°N, ${landfallLon.toFixed(2)}°E`}
               </span>
             </div>
-            <div className="flex justify-between items-center text-[11px] text-red-700">
+            <div className="flex justify-between items-center text-[11px] text-slate-600">
               <span>Estimated Landfall Window:</span>
-              <span className="font-mono font-bold">
+              <span className="font-mono font-bold text-slate-800">
                 {landfall?.window || '+36h to +48h Forecast Lead'}
               </span>
             </div>

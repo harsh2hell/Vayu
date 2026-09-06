@@ -17,6 +17,9 @@ import { useNavigate } from 'react-router-dom';
 import { predictCycloneTrack } from '../services/api';
 import DataTypeBadge from '../components/DataTypeBadge';
 import LastUpdatedBadge from '../components/LastUpdatedBadge';
+import PageHeader from '../components/PageHeader';
+import StatusBadge from '../components/StatusBadge';
+import InfoCallout from '../components/InfoCallout';
 
 const VERIFIED_STORMS = [
   {
@@ -123,61 +126,43 @@ const Prediction = () => {
   return (
     <div className="space-y-6 max-w-[1600px] mx-auto pb-12 font-sans">
       
-      {/* 1. Header Banner */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2.5 flex-wrap">
-            <div className="w-10 h-10 rounded-xl bg-[#003087] text-white flex items-center justify-center shadow-sm">
-              <BrainCircuit className="w-6 h-6" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
-                  AI Spatiotemporal Trajectory Studio
-                </h1>
-                <span className="badge badge-navy">2-Layer GRU Seq2Seq (41,764 Params)</span>
-                <DataTypeBadge type="ai" label="OPERATIONAL FORECAST" size="xs" />
-              </div>
-              <p className="text-xs sm:text-sm text-slate-500">
-                10-feature kinematic schema • Multi-Horizon 72h Spatiotemporal Trajectory Forecasting with 25-pass MC Dropout
-              </p>
+      {/* Standard Unified Header */}
+      <PageHeader
+        categoryBadge="FORECAST • TRAJECTORY"
+        categoryColor="blue"
+        modelBadge="2-Layer GRU Seq2Seq (41,764 Params)"
+        title="AI Spatiotemporal Trajectory Studio"
+        subtitle="10-feature kinematic schema • Multi-Horizon 72h Spatiotemporal Trajectory Forecasting with 25-pass MC Dropout"
+        actions={
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold text-slate-600 hidden sm:inline">Storm:</span>
+            <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200">
+              {VERIFIED_STORMS.map((storm) => (
+                <button
+                  key={storm.id}
+                  onClick={() => setSelectedStormId(storm.id)}
+                  disabled={isLoading}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                    selectedStormId === storm.id
+                      ? 'bg-[#003087] text-white shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  {storm.name}
+                </button>
+              ))}
             </div>
           </div>
-        </div>
-
-        <div className="flex items-center gap-2 flex-wrap">
-          <LastUpdatedBadge source="2-Layer GRU Seq2Seq" size="xs" />
-          <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200">
-            {VERIFIED_STORMS.map((storm) => (
-              <button
-                key={storm.id}
-                onClick={() => setSelectedStormId(storm.id)}
-                disabled={isLoading}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                  selectedStormId === storm.id
-                    ? 'bg-[#003087] text-white shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                {storm.name}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
+        }
+      />
 
       {/* Trajectory Requirement Disclosure for Uploaded Frames */}
-      <div className="bg-blue-50/60 border border-blue-200 rounded-xl p-3.5 flex items-center justify-between text-xs text-blue-900">
-        <div className="flex items-center gap-2">
-          <Info className="w-4 h-4 text-[#003087] shrink-0" />
-          <span>
-            <strong>Trajectory Kinematics Protocol:</strong> Deep GRU Seq2Seq autoregression requires historical track sequence data (IBTrACS 3-hourly fixes). Arbitrary single-frame uploads execute detection/classification, while trajectory forecasting runs on verified sequence tracks.
-          </span>
-        </div>
-        <span className="font-mono text-[11px] bg-white px-2.5 py-1 rounded border border-blue-200 shrink-0 hidden lg:inline-block">
-          Active: {activeStorm.name}
-        </span>
-      </div>
+      <InfoCallout
+        title="Trajectory Kinematics Protocol"
+        badge={`Active: ${activeStorm.name}`}
+      >
+        Deep GRU Seq2Seq autoregression requires historical track sequence data (IBTrACS 3-hourly fixes). Arbitrary single-frame uploads execute detection/classification, while trajectory forecasting runs on verified sequence tracks.
+      </InfoCallout>
 
       {/* Error Banner */}
       {errorMsg && (

@@ -13,8 +13,10 @@ import {
   classifyMorphologyPattern,
   getFormattedLastUpdated
 } from '../services/api';
-import DataTypeBadge from '../components/DataTypeBadge';
-import LastUpdatedBadge from '../components/LastUpdatedBadge';
+import PageHeader from '../components/PageHeader';
+import EmptyState from '../components/EmptyState';
+import StatusBadge from '../components/StatusBadge';
+import InfoCallout from '../components/InfoCallout';
 
 const SATELLITE_PRESETS = [
   {
@@ -191,67 +193,49 @@ const Satellite = () => {
     <div className="space-y-6 max-w-7xl mx-auto pb-12 font-sans">
       
       {/* 1. Header Banner */}
-      <div className="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200/90 shadow-xs flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-            <DataTypeBadge type="ai" label="REAL AI VISION INGESTION" />
-            <LastUpdatedBadge timestamp={getFormattedLastUpdated()} source="PyTorch AI Gateway" />
-          </div>
-          <div className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-[#003087] text-white flex items-center justify-center shadow-sm">
-              <SatelliteDish className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <h1 className="text-xl font-bold text-slate-900 tracking-tight">
-                  Satellite AI Assessment & Ingestion Lab
-                </h1>
-                <span className="badge badge-navy">MobileNetV3 + ResNet18</span>
-              </div>
-              <p className="text-xs text-slate-500 mt-0.5">
-                Upload any satellite frame (PNG/JPG/WEBP) for genuine neural detection, center localization, morphology & Grad-CAM explainability.
-              </p>
-            </div>
-          </div>
-        </div>
+      <PageHeader
+        categoryBadge="AI COMPUTER VISION"
+        categoryColor="blue"
+        title="Satellite Imagery Studio"
+        subtitle="Ingest multi-spectral NASA GIBS MODIS/VIIRS polar snapshots or upload custom frames for neural detection, center coordinates, and morphology classification."
+        modelBadge="MobileNetV3 + ResNet18"
+        actions={
+          <>
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="btn-secondary text-xs"
+            >
+              <Upload className="w-4 h-4 text-[#003087]" />
+              <span>Upload Frame</span>
+            </button>
+            <input 
+              ref={fileInputRef}
+              type="file" 
+              accept="image/png,image/jpeg,image/jpg,image/webp,image/tiff" 
+              onChange={handleFileSelect} 
+              className="hidden" 
+            />
 
-        <div className="flex items-center gap-2.5 flex-wrap">
-          {/* File Upload Trigger */}
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-semibold shadow-2xs transition-all cursor-pointer"
-          >
-            <Upload className="w-4 h-4 text-[#003087]" />
-            <span>Upload Satellite Frame</span>
-          </button>
-          <input 
-            ref={fileInputRef}
-            type="file" 
-            accept="image/png,image/jpeg,image/jpg,image/webp,image/tiff" 
-            onChange={handleFileSelect} 
-            className="hidden" 
-          />
-
-          {/* Run Real AI Analysis Button */}
-          <button 
-            onClick={handleRunAIAnalysis}
-            disabled={isAnalyzing}
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#003087] hover:bg-[#002266] text-white text-xs font-bold shadow-sm transition-all cursor-pointer disabled:opacity-50"
-          >
-            {isAnalyzing ? (
-              <>
-                <RefreshCw className="w-4 h-4 text-sky-300 animate-spin" />
-                <span>Processing Models...</span>
-              </>
-            ) : (
-              <>
-                <Sparkles className="w-4 h-4 text-amber-300" />
-                <span>Run AI Analysis</span>
-              </>
-            )}
-          </button>
-        </div>
-      </div>
+            <button 
+              onClick={handleRunAIAnalysis}
+              disabled={isAnalyzing}
+              className="btn-primary text-xs font-bold"
+            >
+              {isAnalyzing ? (
+                <>
+                  <RefreshCw className="w-4 h-4 text-sky-300 animate-spin" />
+                  <span>Processing Models...</span>
+                </>
+              ) : (
+                <>
+                  <Sparkles className="w-4 h-4 text-amber-300" />
+                  <span>Run AI Analysis</span>
+                </>
+              )}
+            </button>
+          </>
+        }
+      />
 
       {/* 2. Target Preset Selector or Custom Upload Indicator */}
       <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -680,28 +664,21 @@ const Satellite = () => {
 
               </div>
             ) : (
-              <div className="p-8 text-center bg-slate-50 rounded-xl border border-dashed border-slate-300 text-slate-500 space-y-3">
-                <div className="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center mx-auto text-slate-500">
-                  <Target className="w-5 h-5" />
-                </div>
-                <div>
-                  <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                    NO INFERENCE EXECUTED
-                  </h4>
-                  <p className="text-[11px] text-slate-500 mt-1 max-w-xs mx-auto">
-                    This is an input raster preview. No neural inference has been executed on this frame yet.
-                  </p>
-                </div>
-                <div className="p-3 bg-white rounded-lg border border-slate-200 text-[11px] text-slate-600 text-left font-mono space-y-1">
-                  <div className="text-slate-400 font-bold uppercase text-[10px] mb-1">Pipeline Status:</div>
-                  <div>• MobileNetV3 Detection: <span className="text-amber-700 font-semibold">NOT RUN</span></div>
-                  <div>• ResNet18 Morphology: <span className="text-amber-700 font-semibold">NOT RUN</span></div>
-                  <div>• Autograd Grad-CAM: <span className="text-amber-700 font-semibold">NOT RUN</span></div>
-                </div>
-                <p className="text-[11px] text-slate-500">
-                  Click <strong className="text-slate-700">Run AI Analysis</strong> above to execute the deep learning vision pipeline.
-                </p>
-              </div>
+              <EmptyState
+                icon={Target}
+                title="NO INFERENCE EXECUTED"
+                description="This is an input raster preview. Click 'Run AI Analysis' above to execute MobileNetV3 detection and ResNet18 morphology."
+                action={
+                  <button
+                    onClick={handleRunAIAnalysis}
+                    disabled={isAnalyzing}
+                    className="btn-primary text-xs"
+                  >
+                    <Sparkles className="w-3.5 h-3.5 text-amber-300" />
+                    <span>Run AI Analysis</span>
+                  </button>
+                }
+              />
             )}
 
             {/* Downstream Navigation */}

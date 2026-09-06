@@ -9,133 +9,37 @@ import {
 import { OfficerAccountDisplay, SafeSignOutButton } from './auth/ClerkAuth';
 import { getWebsiteUrl, isProductionDomain } from '../utils/domain';
 
-// Interactive iOS 3D Glass Navigation Item with Tilt, Specular Glare, Bevel Lighting & Blue Bullet
+// Professional VAYU Clean Navigation Item
 const SidebarNavItem = ({ item, isActive, onClick }) => {
-  const btnRef = useRef(null);
-  const glareRef = useRef(null);
-  const isTouchRef = useRef(false);
   const Icon = item.icon;
-
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      isTouchRef.current = window.matchMedia('(hover: none) or (pointer: coarse)').matches;
-    }
-  }, []);
-
-  const handleMouseMove = (e) => {
-    if (isTouchRef.current) return;
-    const btn = btnRef.current;
-    const glare = glareRef.current;
-    if (!btn) return;
-
-    const rect = btn.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const width = rect.width;
-    const height = rect.height;
-    if (width === 0 || height === 0) return;
-
-    const px = (x / width) * 2 - 1;
-    const py = (y / height) * 2 - 1;
-
-    const maxTilt = 8;
-    const rotateX = -py * maxTilt;
-    const rotateY = px * maxTilt;
-
-    btn.style.transform = `perspective(800px) rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg) translateY(-2px) scale3d(1.02, 1.02, 1.02) translateZ(10px)`;
-
-    if (glare) {
-      const gx = ((x / width) * 100).toFixed(1);
-      const gy = ((y / height) * 100).toFixed(1);
-      glare.style.opacity = '1';
-      glare.style.background = isActive
-        ? `radial-gradient(circle at ${gx}% ${gy}%, rgba(255, 255, 255, 0.28) 0%, rgba(255, 255, 255, 0.08) 35%, transparent 70%)`
-        : `radial-gradient(circle at ${gx}% ${gy}%, rgba(255, 255, 255, 0.7) 0%, rgba(255, 255, 255, 0.18) 45%, transparent 75%)`;
-    }
-  };
-
-  const handleMouseEnter = () => {
-    if (isTouchRef.current) return;
-    const btn = btnRef.current;
-    if (btn) {
-      btn.style.transition = 'transform 0.12s ease-out, box-shadow 0.3s ease, border-color 0.3s ease, background 0.3s ease';
-    }
-  };
-
-  const handleMouseLeave = () => {
-    if (isTouchRef.current) return;
-    const btn = btnRef.current;
-    const glare = glareRef.current;
-
-    if (btn) {
-      btn.style.transition = 'transform 0.5s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.5s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.3s ease, background 0.3s ease';
-      btn.style.transform = isActive
-        ? 'perspective(800px) rotateX(0deg) rotateY(0deg) translateY(-0.5px) scale3d(1, 1, 1) translateZ(4px)'
-        : 'perspective(800px) rotateX(0deg) rotateY(0deg) translateY(0px) scale3d(1, 1, 1) translateZ(0px)';
-    }
-
-    if (glare) {
-      glare.style.opacity = '0';
-    }
-  };
 
   return (
     <button
-      ref={btnRef}
       type="button"
       onClick={onClick}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      className={`sidebar-ios-glass-btn w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold cursor-pointer group select-none border shrink-0 ${
+      className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs font-semibold cursor-pointer transition-all duration-150 select-none group ${
         isActive
-          ? 'is-active text-slate-950 font-bold border-sky-200/90'
-          : 'border-transparent text-slate-600 hover:text-slate-950'
+          ? 'bg-blue-50/80 text-[#003087] font-bold border border-blue-200/80 shadow-xs'
+          : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100/70 border border-transparent'
       }`}
     >
-      {/* Specular Glare Layer that follows mouse cursor in 3D */}
-      <div ref={glareRef} className="ios-glass-specular" />
-
-      {/* Top Edge Bevel Optical Reflection Rim */}
-      <div className="ios-glass-bevel" />
-
-      {/* Content with Blue Bullet on Left for Selected Option */}
-      <div className="flex items-center gap-2.5 min-w-0 relative z-10 transition-transform duration-200">
-        {/* Luminous Electric Cyan/Blue Bullet indicator on Selected Option */}
-        {isActive && (
-          <span className="relative flex items-center justify-center shrink-0 w-2.5 h-2.5 -ml-0.5">
-            <span className="absolute w-3.5 h-3.5 rounded-full bg-cyan-400 animate-ping opacity-75" />
-            <span className="relative w-2 h-2 rounded-full bg-cyan-500 shadow-[0_0_8px_#38bdf8,0_0_12px_#0ea5e9] ring-2 ring-cyan-400/80" />
-          </span>
-        )}
-
-        <Icon className={`w-4 h-4 shrink-0 transition-all duration-200 ${
-          isActive 
-            ? 'text-sky-600 drop-shadow-[0_2px_4px_rgba(2,132,199,0.3)]' 
-            : 'text-slate-400 group-hover:text-sky-600 group-hover:scale-110 group-hover:drop-shadow-[0_2px_4px_rgba(2,132,199,0.25)]'
+      <div className="flex items-center gap-2.5 min-w-0">
+        <Icon className={`w-4 h-4 shrink-0 transition-colors ${
+          isActive ? 'text-[#003087]' : 'text-slate-400 group-hover:text-slate-600'
         }`} />
-
-        <span className={`truncate transition-colors duration-200 ${
-          isActive 
-            ? 'font-bold text-slate-950 tracking-wide' 
-            : 'font-semibold text-slate-600 group-hover:text-slate-950 group-hover:font-bold'
-        }`}>
-          {item.label}
-        </span>
+        <span className="truncate tracking-tight">{item.label}</span>
       </div>
 
-      {/* Badge (e.g. "Live") */}
-      {item.badge && (
-        <span 
-          className={`relative z-10 text-[9px] font-bold px-1.5 py-0.5 rounded-full transition-all duration-200 ${
-            isActive 
-              ? 'bg-red-500 text-white shadow-[0_0_8px_rgba(239,68,68,0.4)]' 
-              : 'bg-red-100 text-red-600 group-hover:bg-red-500 group-hover:text-white group-hover:scale-105 group-hover:shadow-[0_2px_8px_rgba(239,68,68,0.4)]'
-          }`}
-        >
-          {item.badge}
-        </span>
-      )}
+      <div className="flex items-center gap-1.5 shrink-0">
+        {item.badge && (
+          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded font-mono bg-red-50 text-red-700 border border-red-200">
+            {item.badge}
+          </span>
+        )}
+        {isActive && (
+          <span className="w-1.5 h-1.5 rounded-full bg-[#003087] shrink-0" />
+        )}
+      </div>
     </button>
   );
 };

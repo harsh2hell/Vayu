@@ -7,6 +7,8 @@ import {
 import { downloadOfficialBulletinPdf } from '../services/api';
 import DataTypeBadge from '../components/DataTypeBadge';
 import LastUpdatedBadge from '../components/LastUpdatedBadge';
+import PageHeader from '../components/PageHeader';
+import StatusBadge from '../components/StatusBadge';
 
 const BENCHMARK_STORMS = [
   {
@@ -86,43 +88,35 @@ const Bulletin = () => {
   return (
     <div className="space-y-6 max-w-5xl mx-auto pb-12 font-sans">
       
-      {/* Header Banner */}
-      <div className="bg-white border border-slate-200/90 rounded-2xl p-5 sm:p-6 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <div className="flex items-center gap-2 mb-1.5 flex-wrap">
-            <DataTypeBadge type="ai" label="OFFICIAL ADVISORY" />
-            <LastUpdatedBadge source="VAYU ReportLab Gateway" />
+      {/* Standard Unified Header */}
+      <PageHeader
+        categoryBadge="REPORTS • OFFICIAL ADVISORY"
+        categoryColor="navy"
+        modelBadge="MoES / IMD Format"
+        title="Official Cyclone Bulletin & Advisory"
+        subtitle="Automated compilation and generation of standardized meteorological cyclone bulletins, danger directives, and high-fidelity PDF advisories."
+        actions={
+          <div className="flex items-center gap-2">
+            <span className="text-xs font-semibold text-slate-600 hidden sm:inline">Storm:</span>
+            <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200">
+              {BENCHMARK_STORMS.map((storm) => (
+                <button
+                  key={storm.id}
+                  onClick={() => setSelectedStormId(storm.id)}
+                  disabled={isGenerating}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                    selectedStormId === storm.id
+                      ? 'bg-[#003087] text-white shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  {storm.name}
+                </button>
+              ))}
+            </div>
           </div>
-          <div className="flex items-center gap-2 mb-1">
-            <h1 className="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">
-              Official Cyclone Bulletin & Advisory
-            </h1>
-            <span className="badge badge-navy">MoES / IMD Format</span>
-          </div>
-          <p className="text-xs text-slate-500 max-w-2xl leading-relaxed">
-            Automated compilation and generation of standardized meteorological cyclone bulletins, danger directives, and high-fidelity PDF advisories.
-          </p>
-        </div>
-
-        <div className="flex items-center gap-2 shrink-0">
-          <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200">
-            {BENCHMARK_STORMS.map((storm) => (
-              <button
-                key={storm.id}
-                onClick={() => setSelectedStormId(storm.id)}
-                disabled={isGenerating}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                  selectedStormId === storm.id
-                    ? 'bg-[#003087] text-white shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                {storm.name}
-              </button>
-            ))}
-          </div>
-        </div>
-      </div>
+        }
+      />
 
       {/* Generation Status Alert Banner */}
       {generationStatus === 'error' && errorMsg && (

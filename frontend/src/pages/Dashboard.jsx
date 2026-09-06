@@ -9,7 +9,9 @@ import {
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { checkBackendHealth } from '../services/api';
-import DataTypeBadge from '../components/DataTypeBadge';
+import PageHeader from '../components/PageHeader';
+import StatusBadge from '../components/StatusBadge';
+import InfoCallout from '../components/InfoCallout';
 
 export function getImdIntensityMeta(windKmh = 85) {
   if (windKmh >= 222) {
@@ -139,55 +141,41 @@ const Dashboard = () => {
     <div className="space-y-6 max-w-[1600px] mx-auto pb-12 font-sans">
 
       {/* 1. Header & Active Benchmark Switcher */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-5 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2.5 flex-wrap">
-            <div className="w-10 h-10 rounded-xl bg-[#003087] text-white flex items-center justify-center shadow-sm">
-              <Compass className="w-6 h-6" />
+      <PageHeader
+        categoryBadge="COMMAND CENTER"
+        categoryColor="navy"
+        title="Command Overview"
+        subtitle="Single executive summary of verified benchmark cases, operational pipeline status, and validated empirical metrics."
+        modelBadge="N=1,148 SYNOPTIC CYCLES"
+        actions={
+          <>
+            <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200">
+              {Object.values(BENCHMARK_CASES).map((storm) => (
+                <button
+                  key={storm.id}
+                  onClick={() => setSelectedCaseId(storm.id)}
+                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                    selectedCaseId === storm.id
+                      ? 'bg-[#003087] text-white shadow-xs'
+                      : 'text-slate-600 hover:text-slate-900'
+                  }`}
+                >
+                  {storm.name}
+                </button>
+              ))}
             </div>
-            <div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
-                  Command Overview
-                </h1>
-                <span className="badge badge-navy">EXECUTIVE COMMAND CENTER</span>
-                <DataTypeBadge type="ground_truth" label="BENCHMARK GROUND TRUTH" size="xs" />
-              </div>
-              <p className="text-xs sm:text-sm text-slate-500">
-                Single executive summary of verified benchmark cases, operational pipeline status, and validated empirical metrics.
-              </p>
-            </div>
-          </div>
-        </div>
 
-        {/* Case Switcher & Refresh */}
-        <div className="flex items-center gap-3 flex-wrap">
-          <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200">
-            {Object.values(BENCHMARK_CASES).map((storm) => (
-              <button
-                key={storm.id}
-                onClick={() => setSelectedCaseId(storm.id)}
-                className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
-                  selectedCaseId === storm.id
-                    ? 'bg-[#003087] text-white shadow-xs'
-                    : 'text-slate-600 hover:text-slate-900'
-                }`}
-              >
-                {storm.name}
-              </button>
-            ))}
-          </div>
-
-          <button
-            onClick={fetchHealth}
-            disabled={isRefreshing}
-            title="Refresh System Health"
-            className="p-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-slate-600 transition-colors"
-          >
-            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-[#003087]' : ''}`} />
-          </button>
-        </div>
-      </div>
+            <button
+              onClick={fetchHealth}
+              disabled={isRefreshing}
+              title="Refresh System Health"
+              className="p-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-slate-600 transition-colors cursor-pointer"
+            >
+              <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-[#003087]' : ''}`} />
+            </button>
+          </>
+        }
+      />
 
       {/* 2. System Status Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -266,11 +254,7 @@ const Dashboard = () => {
                 <div className="flex-1 bg-slate-50 border border-slate-200 rounded-xl p-3 hover:border-blue-300 transition-colors">
                   <div className="flex items-center justify-between mb-1">
                     <span className="text-[10px] font-mono text-slate-400">0{idx + 1}</span>
-                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded font-mono ${
-                      isOnline ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-slate-200 text-slate-500'
-                    }`}>
-                      {isOnline ? 'READY' : 'OFFLINE'}
-                    </span>
+                    <StatusBadge status={isOnline ? 'READY' : 'OFFLINE'} size="xs" />
                   </div>
                   <h4 className="text-xs font-bold text-slate-900">{stage.name}</h4>
                   <p className="text-[11px] text-slate-600 mt-0.5">{stage.role}</p>
