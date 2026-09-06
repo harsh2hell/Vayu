@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PublicNavbar, { applyGlobalFontScale } from '../components/PublicNavbar';
 import IOSGlassCard from '../components/IOSGlassCard';
+import InfoTooltip from '../components/InfoTooltip';
 import { useLiveClock } from '../utils/liveDateTime';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
@@ -222,14 +223,17 @@ export default function CycloneIntelligencePage() {
                 </div>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {[
-                    { label: 'Sustained Wind', value: `${INVEST_92B.wind} km/h`, sub: `Gusts ${INVEST_92B.gusts} km/h`, color: 'text-amber-600 dark:text-amber-400' },
-                    { label: 'Central Pressure', value: `${INVEST_92B.pressure} hPa`, sub: 'Barometric Fix', color: 'text-sky-600 dark:text-sky-400' },
-                    { label: 'SST', value: `${INVEST_92B.sst}°C`, sub: '+0.8°C anomaly', color: 'text-red-500 dark:text-red-400' },
-                    { label: 'Wind Shear', value: `${INVEST_92B.shear} kts`, sub: 'Low — favorable', color: 'text-emerald-600 dark:text-emerald-400' },
+                    { label: 'Sustained Wind', term: 'sustained_wind', value: `${INVEST_92B.wind} km/h`, sub: `Gusts ${INVEST_92B.gusts} km/h`, color: 'text-amber-600 dark:text-amber-400' },
+                    { label: 'Central Pressure', term: 'central_pressure', value: `${INVEST_92B.pressure} hPa`, sub: 'Barometric Fix', color: 'text-sky-600 dark:text-sky-400' },
+                    { label: 'SST', term: 'sst', value: `${INVEST_92B.sst}°C`, sub: '+0.8°C anomaly', color: 'text-red-500 dark:text-red-400' },
+                    { label: 'Wind Shear', term: 'shear', value: `${INVEST_92B.shear} kts`, sub: 'Low — favorable', color: 'text-emerald-600 dark:text-emerald-400' },
                   ].map((m, i) => (
                     <IOSGlassCard key={i} className="p-3.5 rounded-2xl">
                       <div className={`text-xl sm:text-2xl font-heading font-black ${m.color}`}>{m.value}</div>
-                      <div className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 mt-0.5">{m.label}</div>
+                      <div className="flex items-center gap-1 mt-0.5">
+                        <span className="text-[10px] font-semibold text-slate-500 dark:text-slate-400">{m.label}</span>
+                        <InfoTooltip term={m.term} />
+                      </div>
                       <div className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5">{m.sub}</div>
                     </IOSGlassCard>
                   ))}
