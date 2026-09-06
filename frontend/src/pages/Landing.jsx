@@ -148,7 +148,7 @@ const Landing = () => {
   const pipelineStages = [
     { num: '01', title: 'Telemetry Ingestion', desc: 'INSAT-3DR & NOAA multi-spectral radiometric calibration', tech: 'HDF5 / GeoTIFF' },
     { num: '02', title: 'Feature Extraction', desc: 'Deep CNN filters detect eye wall & cloud curvature bands', tech: 'Custom PyTorch CNN' },
-    { num: '03', title: 'Dvorak Intensity', desc: 'Automated T-number estimation and central pressure deficit', tech: 'ResNet18 + Dvorak' },
+    { num: '03', title: 'Morphology Analysis', desc: 'ResNet18 classification of vortex patterns & Grad-CAM explainability', tech: 'ResNet18 + Grad-CAM' },
     { num: '04', title: '72h Spatio-Temporal', desc: 'GRU Seq2Seq forecasting track coordinates & wind speed', tech: 'GRU Seq2Seq' },
     { num: '05', title: 'Disaster Early Warning', desc: 'Dispatches CAP alerts & coastal impact zone maps', tech: 'ITU-T X.1303 Protocol' },
   ];

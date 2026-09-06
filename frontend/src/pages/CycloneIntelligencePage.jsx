@@ -32,7 +32,7 @@ const INVEST_92B = {
   sst: 30.5,
   shear: 8,
   category: 'Low Pressure Area',
-  dvorakCI: 'T1.5 / 35 kts',
+  dvorakCI: 'Observed Ref: T1.5 (Depression)',
 };
 
 const PAST_TRACK = [

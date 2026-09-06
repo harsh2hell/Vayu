@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   User, LogOut, MoreVertical, Shield,
   Activity, Map, Satellite, Crosshair, Layers,
-  Compass, Bell, Database, Gauge, Sparkles
+  Compass, Bell, Database, Gauge, Sparkles, Cpu
 } from 'lucide-react';
 import { OfficerAccountDisplay, SafeSignOutButton } from './auth/ClerkAuth';
 import { getWebsiteUrl, isProductionDomain } from '../utils/domain';
@@ -204,10 +204,10 @@ const Sidebar = () => {
     { path: '/dashboard/detection', label: 'AI Detection', icon: Crosshair },
     { path: '/dashboard/classification', label: 'Classification', icon: Layers },
     { path: '/dashboard/prediction', label: 'Trajectory Studio', icon: Compass },
-    { path: '/dashboard/alerts', label: 'Coastal Warnings', icon: Bell, badge: 'Live' },
+    { path: '/dashboard/alerts', label: 'Coastal Warnings', icon: Bell },
     { path: '/dashboard/analytics', label: 'Storm Archives', icon: Database },
     { path: '/dashboard/performance', label: 'Model Benchmarks', icon: Gauge },
-    { path: '/dashboard/training', label: 'Model Training', icon: Sparkles },
+    { path: '/dashboard/training', label: 'AI Model Intelligence', icon: Cpu },
   ];
 
   const handleLogoutSuccess = () => {
