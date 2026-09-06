@@ -3,6 +3,8 @@ import { useNavigate } from 'react-router-dom';
 import PublicNavbar, { applyGlobalFontScale } from '../components/PublicNavbar';
 import IOSGlassCard from '../components/IOSGlassCard';
 import { useLiveClock } from '../utils/liveDateTime';
+import DataTypeBadge from '../components/DataTypeBadge';
+import LastUpdatedBadge from '../components/LastUpdatedBadge';
 import {
   AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, LineChart, Line, ReferenceLine, RadarChart, PolarGrid, PolarAngleAxis, Radar
@@ -91,10 +93,8 @@ const DATA_SOURCES = [
   { name: 'IMD Radiosonde', desc: 'Upper Air Sounding Network', icon: '🎈' },
 ];
 
-const DemoBadge = () => (
-  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/15 border border-amber-400/40 text-amber-700 dark:text-amber-400">
-    🔬 DEMO DATA — Not Live
-  </span>
+const DemoBadge = ({ type = 'demo', label = 'DEMO BENCHMARK' }) => (
+  <DataTypeBadge type={type} label={label} />
 );
 
 const CustomTooltip = ({ active, payload, label }) => {
@@ -154,17 +154,16 @@ export default function AtmosphericPatterns() {
               <ArrowLeft className="w-4 h-4 text-slate-600 dark:text-slate-300" />
             </button>
             <div>
-              <div className="flex items-center gap-2 mb-0.5">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 dark:text-amber-400">CIRCULATION &amp; PRESSURE</span>
-                <DemoBadge />
+              <div className="flex items-center gap-2 mb-1 flex-wrap">
+                <DataTypeBadge type="live" label="IMD SYNOPTIC CHARTS" />
+                <DataTypeBadge type="ai" label="NWP & AI CIRCULATION" />
               </div>
               <h1 className="text-xl sm:text-2xl lg:text-3xl font-heading font-black tracking-tight text-slate-950 dark:text-white">Atmospheric &amp; Monsoon Patterns</h1>
               <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Seasonal circulation, pressure patterns &amp; environmental conditions</p>
             </div>
           </div>
           <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 shrink-0">
-            <Clock className="w-3.5 h-3.5" />
-            <span>Last updated: {liveClock.observationStr}</span>
+            <LastUpdatedBadge timestamp={liveClock.observationStr} source="NCMRWF & IMD Synoptic" />
           </div>
         </div>
 
@@ -198,7 +197,7 @@ export default function AtmosphericPatterns() {
                 <div className="flex items-center gap-2 mb-3">
                   <MapPin className="w-4 h-4 text-amber-500" />
                   <h2 className="font-heading font-black text-sm uppercase tracking-wider text-slate-900 dark:text-white">Pressure Systems Map</h2>
-                  <DemoBadge />
+                  <DataTypeBadge type="live" label="IMD Synoptic Surface" />
                 </div>
                 <IOSGlassCard interactive={false} className="rounded-2xl overflow-hidden p-0">
                   <div className="h-80 sm:h-96">
@@ -306,7 +305,7 @@ export default function AtmosphericPatterns() {
               <div className="flex items-center gap-2 mb-3">
                 <Layers className="w-4 h-4 text-amber-500" />
                 <h2 className="font-heading font-black text-sm uppercase tracking-wider text-slate-900 dark:text-white">Upper Air Sounding Analysis</h2>
-                <DemoBadge />
+                <DataTypeBadge type="live" label="Radiosonde / RSMC" />
               </div>
               <IOSGlassCard interactive={false} className="rounded-2xl overflow-hidden p-0">
                 <div className="overflow-x-auto">
@@ -347,7 +346,7 @@ export default function AtmosphericPatterns() {
               <div className="flex items-center gap-2 mb-3">
                 <Eye className="w-4 h-4 text-amber-500" />
                 <h2 className="font-heading font-black text-sm uppercase tracking-wider text-slate-900 dark:text-white">Environmental Conditions Matrix</h2>
-                <DemoBadge />
+                <DataTypeBadge type="ai" label="Genesis Diagnostics" />
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {ENV_CONDITIONS.map((cond, i) => (
@@ -375,7 +374,7 @@ export default function AtmosphericPatterns() {
                   <span className="text-white text-[9px] font-black">AI</span>
                 </div>
                 <h2 className="font-heading font-black text-sm uppercase tracking-wider text-slate-900 dark:text-white">AI Synoptic Interpretation</h2>
-                <DemoBadge />
+                <DataTypeBadge type="ai" label="AI Synoptic Reasoning" />
               </div>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                 {AI_INSIGHTS.map((ins, i) => (

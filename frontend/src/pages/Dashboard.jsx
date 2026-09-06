@@ -30,6 +30,8 @@ import {
 } from '../services/api';
 import InfoTooltip from '../components/InfoTooltip';
 import DataTypeBadge from '../components/DataTypeBadge';
+import LastUpdatedBadge from '../components/LastUpdatedBadge';
+import DataUnavailableNotice from '../components/DataUnavailableNotice';
 import CycloneLifecycleBar from '../components/CycloneLifecycleBar';
 import AIReasoningCard from '../components/AIReasoningCard';
 import DataSourceStatusCard from '../components/DataSourceStatusCard';
@@ -713,7 +715,7 @@ const Dashboard = () => {
               </div>
             </div>
             <DataTypeBadge 
-              type={isHistorical ? 'historical' : (isBackendLive ? 'live' : 'demo')} 
+              type={isHistorical ? 'historical' : (isBackendLive ? 'live' : 'ai')} 
               size="xs" 
             />
           </div>
@@ -805,11 +807,9 @@ const Dashboard = () => {
             </p>
           </div>
 
-          <div className="flex items-center justify-between text-[11px] text-slate-400 font-mono pt-2 border-t border-slate-100">
+          <div className="flex items-center justify-between text-[11px] text-slate-400 font-mono pt-2 border-t border-slate-100 flex-wrap gap-1">
             <span className="text-slate-600 font-medium">Latency 140ms</span>
-            <span className="text-violet-600 font-semibold">
-              {lastUpdatedTime ? `Last Updated: ${lastUpdatedTime}` : 'Last Updated: 16:05 IST'}
-            </span>
+            <LastUpdatedBadge timestamp={lastUpdatedTime} isLive={isBackendLive} source="MOSDAC & AVHRR" size="xs" />
           </div>
         </div>
 

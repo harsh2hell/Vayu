@@ -3,6 +3,8 @@ import { RadarChart, PolarGrid, PolarAngleAxis, Radar, ResponsiveContainer, Tool
 import { CheckCircle, ChevronRight, Upload, Sparkles, Crosshair, Eye, Wind, Layers } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { classifyMorphologyPattern } from '../services/api';
+import DataTypeBadge from '../components/DataTypeBadge';
+import LastUpdatedBadge from '../components/LastUpdatedBadge';
 
 const DEFAULT_CLASSES = [
   { class_id: 'cdo_pattern', class_name: 'Central Dense Overcast (CDO)', probability_pct: 68.5, dvorak_range: 'T3.5 – T4.5', color: 'bg-blue-600' },
@@ -61,10 +63,11 @@ const Classification = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
         <div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <Layers className="w-6 h-6 text-[#003087]" />
             <h1 className="text-xl sm:text-2xl font-bold text-slate-900">AI Cyclone Pattern Classification</h1>
             <span className="badge badge-navy">PatternNet-ViT v1.8 (5 Morphological Classes)</span>
+            <DataTypeBadge type={classificationResult ? 'ai' : 'demo'} size="xs" label={classificationResult ? 'LIVE AI PREDICTION' : 'AI MODEL ARCHIVE'} />
           </div>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
             Vision Transformer (ViT) architecture classifying Curved Band, Shear, CDO, Eye, and Embedded Center patterns with Grad-CAM attention.
@@ -72,6 +75,7 @@ const Classification = () => {
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
+          <LastUpdatedBadge source="PatternNet-ViT v1.8" size="xs" />
           <label className="btn-secondary text-xs sm:text-sm py-2 px-3 gap-1.5 cursor-pointer">
             <Upload className="w-3.5 h-3.5" />
             <span>Upload Satellite Frame</span>

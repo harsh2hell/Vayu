@@ -13,7 +13,9 @@ import {
 import L from 'leaflet';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
-import { predictCycloneTrack, downloadOfficialBulletinPdf, fetchNasaGibsLayers } from '../services/api';
+import { predictCycloneTrack, downloadOfficialBulletinPdf, fetchNasaGibsLayers, getFormattedLastUpdated } from '../services/api';
+import DataTypeBadge from '../components/DataTypeBadge';
+import LastUpdatedBadge from '../components/LastUpdatedBadge';
 
 L.Marker.prototype.options.icon = L.icon({ 
   iconUrl: icon, 
@@ -135,6 +137,7 @@ const TrackMap = () => {
   const [shearInput, setShearInput] = useState(12.0);
   const [forecastData, setForecastData] = useState(null);
   const [isLoadingForecast, setIsLoadingForecast] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState(() => getFormattedLastUpdated());
 
   const currentSystem = BASIN_SYSTEMS[selectedBasin];
 
@@ -154,6 +157,7 @@ const TrackMap = () => {
       });
       setForecastData(res);
       setIsLoadingForecast(false);
+      setLastUpdated(getFormattedLastUpdated());
     };
 
     runPrediction();
@@ -205,6 +209,11 @@ const TrackMap = () => {
       {/* Enterprise Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
+          <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+            <DataTypeBadge type="ai" label="AI BiLSTM 72H TRAJECTORY MODEL" />
+            <DataTypeBadge type="historical" label="DANA & BIPARJOY BENCHMARKS" />
+            <LastUpdatedBadge timestamp={lastUpdated} source="AI Inference Engine & IMD RSMC" />
+          </div>
           <div className="flex items-center gap-2 mb-1">
             <h1 className="text-xl sm:text-2xl font-heading font-black text-slate-900 tracking-tight">
               4D Cyclone Trajectory Studio

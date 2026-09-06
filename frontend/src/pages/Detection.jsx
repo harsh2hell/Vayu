@@ -6,6 +6,8 @@ import {
   ArrowRight, Box
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import DataTypeBadge from '../components/DataTypeBadge';
+import LastUpdatedBadge from '../components/LastUpdatedBadge';
 
 const PIPELINE_STAGES = [
   {
@@ -94,6 +96,7 @@ const Detection = () => {
             <Target className="w-6 h-6 text-[#003087]" />
             <h1 className="text-xl sm:text-2xl font-bold text-slate-900">AI Deep Learning Detection Lab</h1>
             <span className="badge badge-navy">CycloneVision-CNN v2.1</span>
+            <DataTypeBadge type="ai" label="AI INFERENCE" size="xs" />
           </div>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">
             End-to-end computer vision pipeline for automated tropical cyclogenesis identification & eye localization
@@ -101,6 +104,7 @@ const Detection = () => {
         </div>
 
         <div className="flex items-center gap-2 flex-wrap">
+          <LastUpdatedBadge source="CycloneVision-CNN v2.1" size="xs" />
           <button 
             onClick={handleRunFullPipeline}
             disabled={isRunningPipeline}
@@ -251,12 +255,15 @@ const Detection = () => {
           
           {/* Classification Confidence Output Card */}
           <div className="card p-5 space-y-4 flex-1">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3 flex-wrap gap-2">
               <div className="flex items-center gap-2">
                 <Target className="w-5 h-5 text-emerald-600" />
                 <h3 className="font-bold text-sm text-slate-900">AI Inference Verdict</h3>
               </div>
-              <span className="badge badge-green">Inference Confirmed</span>
+              <div className="flex items-center gap-1.5">
+                <DataTypeBadge type="ai" size="xs" />
+                <span className="badge badge-green">Inference Confirmed</span>
+              </div>
             </div>
 
             <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-4 space-y-2">

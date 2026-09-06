@@ -10,7 +10,10 @@ import {
 } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { useNavigate } from 'react-router-dom';
-import { downloadOfficialBulletinPdf, fetchActiveAlerts } from '../services/api';
+import { downloadOfficialBulletinPdf, fetchActiveAlerts, getFormattedLastUpdated } from '../services/api';
+import DataTypeBadge from '../components/DataTypeBadge';
+import LastUpdatedBadge from '../components/LastUpdatedBadge';
+import DataUnavailableNotice from '../components/DataUnavailableNotice';
 import L from 'leaflet';
 
 const createSectorIcon = (severity) => L.divIcon({
@@ -62,12 +65,14 @@ const Alerts = () => {
   const [alertsList, setAlertsList] = useState(DEFAULT_ALERTS);
   const [selectedCapAlert, setSelectedCapAlert] = useState(null);
   const [copiedCap, setCopiedCap] = useState(false);
+  const [lastUpdated, setLastUpdated] = useState(() => getFormattedLastUpdated());
 
   useEffect(() => {
     const loadAlerts = async () => {
       const liveAlerts = await fetchActiveAlerts();
       if (liveAlerts && liveAlerts.length > 0) {
         setAlertsList(liveAlerts);
+        setLastUpdated(getFormattedLastUpdated());
       }
     };
     loadAlerts();
@@ -120,6 +125,10 @@ const Alerts = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
+          <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+            <DataTypeBadge type="live" label="IMD RSMC CAP DISPATCH" />
+            <LastUpdatedBadge timestamp={lastUpdated} source="IMD Cyclone Warning Division" />
+          </div>
           <div className="flex items-center gap-2 mb-1">
             <h1 className="text-xl sm:text-2xl font-heading font-black text-slate-900 tracking-tight">
               CAP Early Warning & Disaster Operations Center
@@ -224,7 +233,14 @@ const Alerts = () => {
 
           {/* Alert Cards */}
           <div className="space-y-4">
-            {filtered.map((alert, idx) => (
+            {filtered.length === 0 ? (
+              <DataUnavailableNotice
+                title="No Active Severe Weather Warnings"
+                message="No active Common Alerting Protocol (CAP) emergency directives matching current filters."
+                compact={false}
+              />
+            ) : (
+              filtered.map((alert, idx) => (
               <div 
                 key={alert.id || idx} 
                 className={`bg-white border rounded-xl p-5 space-y-3.5 shadow-2xs transition-all ${
@@ -233,13 +249,17 @@ const Alerts = () => {
                 }`}
               >
                 <div className="flex items-center justify-between border-b border-slate-100 pb-2">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <span className={`badge ${
                       (alert.alert_level || '').includes('RED') ? 'badge-red' :
                       (alert.alert_level || '').includes('ORANGE') ? 'badge-orange' : 'badge-amber'
                     }`}>
                       {alert.alert_level || 'RED_ALERT'}
                     </span>
+                    <DataTypeBadge
+                      type={alert.cyclone_name?.includes('DANA') ? 'historical' : 'live'}
+                      label={alert.cyclone_name?.includes('DANA') ? 'HISTORICAL BENCHMARK' : 'LIVE DIRECTIVE'}
+                    />
                     <span className="text-xs font-mono text-slate-400">{alert.cap_identifier || `CAP-WARN-${alert.id}`}</span>
                   </div>
                   <span className="text-xs font-mono text-slate-500">{alert.issued_at || 'Just Now'}</span>
@@ -304,7 +324,7 @@ const Alerts = () => {
                   </button>
                 </div>
               </div>
-            ))}
+            )))}
           </div>
 
         </div>

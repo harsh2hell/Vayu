@@ -1,5 +1,5 @@
 import React from 'react';
-import { Sparkles, Radio, History, TestTube } from 'lucide-react';
+import { Sparkles, Radio, History, TestTube, AlertTriangle } from 'lucide-react';
 
 /**
  * DataTypeBadge
@@ -8,6 +8,7 @@ import { Sparkles, Radio, History, TestTube } from 'lucide-react';
  * - "AI Prediction" (neural network forecast, BiLSTM, ViT classification)
  * - "Historical Data" (archived recorded cyclone best-track)
  * - "Demo/Sample Data" (calibrated benchmark scenario or when live API is unavailable)
+ * - "Data Unavailable" (when sensor is offline or feed is unmonitored)
  */
 export default function DataTypeBadge({
   type = 'demo',
@@ -17,8 +18,11 @@ export default function DataTypeBadge({
   className = '',
   isHindi = false
 }) {
-  // If requested type is 'live' but backend/feed is not live, downgrade to 'demo'
-  const resolvedType = (type === 'live' && isLiveAvailable === false) ? 'demo' : type;
+  // If requested type is 'live' but backend/feed is not live, downgrade to 'unavailable' or 'demo'
+  let resolvedType = type;
+  if (type === 'live' && isLiveAvailable === false) {
+    resolvedType = 'demo';
+  }
 
   const CONFIGS = {
     live: {
@@ -48,6 +52,13 @@ export default function DataTypeBadge({
       badgeClass: 'bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-800/80',
       icon: TestTube,
       tooltip: isHindi ? 'लाइव एपीआई अनुपलब्ध; कैलिब्रेटेड सिमुलेशन डेटा प्रदर्शित है' : 'Live feed offline; displaying calibrated benchmark scenario'
+    },
+    unavailable: {
+      defaultLabel: isHindi ? 'डेटा वर्तमान में अनुपलब्ध' : 'Data Currently Unavailable',
+      dotClass: 'bg-slate-400',
+      badgeClass: 'bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 border-slate-300 dark:border-slate-700',
+      icon: AlertTriangle,
+      tooltip: isHindi ? 'सेंसर फीड वर्तमान में सक्रिय नहीं है' : 'Sensor stream offline / awaiting satellite pass'
     }
   };
 

@@ -8,6 +8,9 @@ import LanguageWelcomeAnimation from '../components/LanguageWelcomeAnimation';
 import { COASTAL_CITIES_DATA } from '../data/coastalCitiesData';
 import PublicNavbar from '../components/PublicNavbar';
 import IOSGlassCard from '../components/IOSGlassCard';
+import DataTypeBadge from '../components/DataTypeBadge';
+import LastUpdatedBadge from '../components/LastUpdatedBadge';
+import { getFormattedLastUpdated } from '../services/api';
 
 const STATE_OPTIONS = [
   { id: 'ALL', name: 'All States & UTs', nameHindi: 'सभी राज्य व केंद्र शासित प्रदेश' },
@@ -95,6 +98,7 @@ const CityTracker = () => {
   const [selectedState, setSelectedState] = useState('ALL');
   const [activeCategoryFilter, setActiveCategoryFilter] = useState('ALL'); // ALL, HOTSPOT, TRENDING, RED, ORANGE, PORTS
   const [selectedCityId, setSelectedCityId] = useState(null);
+  const [lastUpdated] = useState(() => getFormattedLastUpdated());
 
   // Filter 100+ cities based on search, state, and category
   const filteredCities = useMemo(() => {
@@ -167,6 +171,10 @@ const CityTracker = () => {
           
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
+              <div className="flex items-center gap-2 flex-wrap mb-1.5">
+                <DataTypeBadge type="live" label={isHindi ? "आईएमडी एडब्ल्यूएस स्टेशन नेटवर्क" : "IMD AWS & Coastal Telemetry"} isHindi={isHindi} />
+                <LastUpdatedBadge timestamp={lastUpdated} source={isHindi ? "आईएमडी सतही स्टेशन" : "IMD Surface AWS Grid"} isHindi={isHindi} />
+              </div>
               <h2 className="text-xl sm:text-2xl font-heading font-black text-slate-950 dark:text-white">
                 {isHindi ? 'राष्ट्रीय तटीय निर्देशिका (110+ निगरानी किए गए स्थान)' : 'National Coastal Directory (110+ Monitored Places)'}
               </h2>
@@ -324,7 +332,10 @@ const CityTracker = () => {
                   </div>
 
                   {/* Historical Landmark Cyclone Tag */}
-                  <div className="text-[11px] text-slate-600 dark:text-slate-300">
+                  <div className="text-[11px] text-slate-600 dark:text-slate-300 flex items-center gap-1.5 flex-wrap">
+                    <span className="px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 uppercase tracking-wider">
+                      {isHindi ? 'ऐतिहासिक बेंचमार्क' : 'Historical Benchmark'}
+                    </span>
                     <span className="font-semibold text-slate-500 dark:text-slate-400">{isHindi ? 'चक्रवात रिकॉर्ड: ' : 'Cyclone Record: '}</span>
                     <span>{item.historicalEvent}</span>
                   </div>

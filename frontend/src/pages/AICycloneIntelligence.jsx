@@ -26,6 +26,9 @@ import {
   MODEL_ACCURACY_BENCHMARKS
 } from '../data/sihCycloneData';
 import { detectCycloneFromImage, classifyMorphologyPattern } from '../services/api';
+import DataTypeBadge from '../components/DataTypeBadge';
+import LastUpdatedBadge from '../components/LastUpdatedBadge';
+import DataUnavailableNotice from '../components/DataUnavailableNotice';
 import { useLiveClock } from '../utils/liveDateTime';
 
 const AICycloneIntelligence = () => {
@@ -285,13 +288,15 @@ const AICycloneIntelligence = () => {
             {/* Module Top Bar */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-4">
               <div>
-                <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-2.5 flex-wrap">
                   <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border border-indigo-400/30">
                     MODULE 1: COMPUTER VISION IDENTIFICATION
                   </span>
                   <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">
                     Model: CycloneVision-CNN v2.1
                   </span>
+                  <DataTypeBadge type="ai" size="xs" label="AI INFERENCE" isHindi={isHindi} />
+                  <LastUpdatedBadge source="CycloneVision-CNN v2.1" isHindi={isHindi} size="xs" />
                 </div>
                 <h2 className="text-xl sm:text-2xl font-black font-heading tracking-tight text-slate-950 dark:text-white mt-1">
                   {isHindi ? 'स्वचालित चक्रवात पहचान एवं भंवर केंद्र निर्धारण' : 'Automated Cyclone Identification & Vortex Fixation'}
@@ -652,13 +657,15 @@ const AICycloneIntelligence = () => {
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-4">
               <div>
-                <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-2.5 flex-wrap">
                   <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-blue-500/15 text-blue-700 dark:text-blue-300 border border-blue-400/30">
                     MODULE 2: PATTERN CLASSIFICATION & STAGES
                   </span>
                   <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">
                     Model: PatternNet-ViT v1.8
                   </span>
+                  <DataTypeBadge type="ai" size="xs" label="AI ViT PREDICTION" isHindi={isHindi} />
+                  <LastUpdatedBadge source="PatternNet-ViT v1.8" isHindi={isHindi} size="xs" />
                 </div>
                 <h2 className="text-xl sm:text-2xl font-black font-heading tracking-tight text-slate-950 dark:text-white mt-1">
                   {isHindi ? '5 चक्रवात आकारिकी पैटर्न एवं विकास चरण' : '5 Cyclone Morphological Patterns & Lifecycle Stages'}
@@ -881,13 +888,15 @@ const AICycloneIntelligence = () => {
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-4">
               <div>
-                <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-2.5 flex-wrap">
                   <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-400/30">
                     MODULE 3: MULTI-SOURCE DATA FUSION
                   </span>
                   <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">
                     Constellation Status: 6 Feeds Live
                   </span>
+                  <DataTypeBadge type="live" size="xs" label="LIVE SENSOR STREAMS" isHindi={isHindi} />
+                  <LastUpdatedBadge source="ISRO MOSDAC & INCOIS" isLive={true} isHindi={isHindi} size="xs" />
                 </div>
                 <h2 className="text-xl sm:text-2xl font-black font-heading tracking-tight text-slate-950 dark:text-white mt-1">
                   {isHindi ? 'बहु-स्रोत उपग्रह एवं तटीय रडार एकीकरण' : 'Multi-Source Satellite & Radar Telemetry Fusion'}
@@ -1031,13 +1040,15 @@ const AICycloneIntelligence = () => {
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-4">
               <div>
-                <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-2.5 flex-wrap">
                   <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-500/15 text-purple-700 dark:text-purple-300 border border-purple-400/30">
                     MODULE 4: SPATIOTEMPORAL PREDICTION
                   </span>
                   <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">
                     Model: CycloneForecast-BiLSTM v3.0
                   </span>
+                  <DataTypeBadge type="ai" size="xs" label="AI BiLSTM PREDICTION" isHindi={isHindi} />
+                  <LastUpdatedBadge source="BiLSTM Trajectory Engine" isHindi={isHindi} size="xs" />
                 </div>
                 <h2 className="text-xl sm:text-2xl font-black font-heading tracking-tight text-slate-950 dark:text-white mt-1">
                   {isHindi ? '72-घंटे का एआई प्रक्षेपवक्र एवं तीव्रता पूर्वानुमान' : '72-Hour AI Trajectory & Intensity Prediction Studio'}
@@ -1346,13 +1357,15 @@ const AICycloneIntelligence = () => {
             {/* Header */}
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-4">
               <div>
-                <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-2.5 flex-wrap">
                   <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-400/30">
                     MODULE 5: HISTORICAL VALIDATION & ACCURACY
                   </span>
                   <span className="text-xs text-slate-500 dark:text-slate-400 font-mono">
                     Ground Truth: IMD / RSMC Best Track Archive
                   </span>
+                  <DataTypeBadge type="historical" size="xs" label="GROUND TRUTH ARCHIVE" isHindi={isHindi} />
+                  <LastUpdatedBadge source="IMD & NOAA Best-Track" isHindi={isHindi} size="xs" />
                 </div>
                 <h2 className="text-xl sm:text-2xl font-black font-heading tracking-tight text-slate-950 dark:text-white mt-1">
                   {isHindi ? 'ऐतिहासिक चक्रवात सत्यापन एवं मॉडल सटीकता' : 'Historical Cyclone Ground-Truth Benchmarking'}
