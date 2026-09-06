@@ -184,14 +184,14 @@ const Login = () => {
       {/* 2px National Tricolor Accent at very top */}
       <div className="fixed top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#FF9933] via-slate-300 to-[#138808] z-50 opacity-90" />
 
-      {/* Top-Left: "Back to website" Navigation Button */}
+      {/* Top-Left: "Main Page" Navigation Button */}
       <button
         type="button"
         onClick={() => navigate('/')}
         className="fixed top-5 left-5 sm:top-6 sm:left-8 z-50 inline-flex items-center gap-2 text-xs font-semibold text-slate-700 hover:text-slate-950 bg-white/90 hover:bg-white backdrop-blur-md px-4 py-2 rounded-full border border-slate-200/90 shadow-sm transition-all cursor-pointer group"
       >
         <ArrowLeft className="w-3.5 h-3.5 transition-transform duration-200 group-hover:-translate-x-0.5 text-slate-600 group-hover:text-slate-900" />
-        <span>Back to website</span>
+        <span>Main Page</span>
       </button>
 
       {/* Main Dual-Column Split Card Frame */}
