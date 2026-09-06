@@ -1,10 +1,13 @@
 import React from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import Sidebar from './Sidebar';
 import Topbar from './Topbar';
 import { AnalysisSessionProvider } from '../context/AnalysisSessionContext';
 
 const DashboardLayout = () => {
+  const location = useLocation();
+  const isMapFirst = location.pathname.includes('/earth');
+
   return (
     <AnalysisSessionProvider>
       <div className="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans flex antialiased selection:bg-sky-500 selection:text-white relative overflow-x-hidden">
@@ -16,7 +19,7 @@ const DashboardLayout = () => {
         <div className="flex-1 flex flex-col min-h-screen ml-0 lg:ml-56 transition-all relative z-10">
           <Topbar />
           
-          <main className="flex-1 p-3 sm:p-5 lg:p-8 bg-slate-50/70 pb-12">
+          <main className={isMapFirst ? "flex-1 flex flex-col h-[calc(100vh-3.5rem)] overflow-hidden relative" : "flex-1 p-3 sm:p-5 lg:p-8 bg-slate-50/70 pb-12"}>
             <Outlet />
           </main>
         </div>

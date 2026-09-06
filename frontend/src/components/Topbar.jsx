@@ -31,6 +31,7 @@ const Topbar = () => {
   }, []);
 
   const getPageTitle = () => {
+    if (location.pathname.includes('/earth')) return 'VAYU Earth • Geospatial Intelligence';
     if (location.pathname.includes('/satellite')) return 'Satellite Imagery';
     if (location.pathname.includes('/detection')) return 'Cyclone Detection';
     if (location.pathname.includes('/classification')) return 'Morphology Classification';

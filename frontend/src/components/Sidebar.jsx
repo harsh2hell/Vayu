@@ -2,7 +2,7 @@ import React, { useState, useRef, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   LogOut, MoreVertical, Shield,
-  Activity, Satellite, Crosshair, Layers,
+  Activity, Globe, Satellite, Crosshair, Layers,
   Compass, Database, Cpu,
   MapPin, FileText
 } from 'lucide-react';
@@ -56,6 +56,7 @@ const Sidebar = () => {
       title: 'COMMAND',
       items: [
         { path: toPortalPath('/dashboard'), label: 'Command Overview', icon: Activity, exact: true },
+        { path: toPortalPath('/dashboard/earth'), label: 'VAYU Earth', icon: Globe, badge: 'LIVE' },
       ]
     },
     {

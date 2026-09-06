@@ -22,6 +22,7 @@ import Analytics from './pages/Analytics';
 import ModelTraining from './pages/ModelTraining';
 import Impact from './pages/Impact';
 import Bulletin from './pages/Bulletin';
+import VayuEarth from './pages/VayuEarth';
 import { ProtectedRoute } from './components/auth/ClerkAuth';
 import { isAuthSubdomain, isPortalSubdomain, isProductionDomain, getAuthUrl, getPortalUrl } from './utils/domain';
 
@@ -82,8 +83,10 @@ function App() {
             </ProtectedRoute>
           }
         >
-          {/* 1. COMMAND OVERVIEW */}
+          {/* 1. COMMAND OVERVIEW & GEOSPATIAL EARTH */}
           <Route index element={<Dashboard />} />
+          <Route path="earth" element={<VayuEarth />} />
+          <Route path="vayu-earth" element={<VayuEarth />} />
 
           {/* 2. AI VISION */}
           <Route path="satellite" element={<Satellite />} />
@@ -106,6 +109,8 @@ function App() {
           {/* Seamless backward compatibility for /dashboard prefix on portal subdomain */}
           <Route path="dashboard">
             <Route index element={<Dashboard />} />
+            <Route path="earth" element={<VayuEarth />} />
+            <Route path="vayu-earth" element={<VayuEarth />} />
             <Route path="satellite" element={<Satellite />} />
             <Route path="detection" element={<Detection />} />
             <Route path="classification" element={<Classification />} />
@@ -216,8 +221,10 @@ function App() {
               </ProtectedRoute>
             }
           >
-            {/* 1. COMMAND */}
+            {/* 1. COMMAND & VAYU EARTH */}
             <Route index element={<Dashboard />} />
+            <Route path="earth" element={<VayuEarth />} />
+            <Route path="vayu-earth" element={<VayuEarth />} />
 
             {/* 2. AI VISION */}
             <Route path="satellite" element={<Satellite />} />
@@ -257,6 +264,8 @@ function App() {
             }
           >
             <Route index element={<Dashboard />} />
+            <Route path="earth" element={<VayuEarth />} />
+            <Route path="vayu-earth" element={<VayuEarth />} />
             <Route path="satellite" element={<Satellite />} />
             <Route path="detection" element={<Detection />} />
             <Route path="classification" element={<Classification />} />
