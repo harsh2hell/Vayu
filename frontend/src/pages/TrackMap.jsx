@@ -8,12 +8,12 @@ import {
   Play, Pause, RotateCcw, Compass, MapPin, 
   AlertTriangle, ShieldAlert, Wind, Waves, 
   Radio, Layers, CheckCircle, Clock, Crosshair,
-  Sparkles, Gauge, ArrowRight, Activity, Globe, Download, Sliders, RefreshCw
+  Sparkles, Gauge, ArrowRight, Activity, Globe, Sliders, RefreshCw
 } from 'lucide-react';
 import L from 'leaflet';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
-import { predictCycloneTrack, downloadOfficialBulletinPdf, fetchNasaGibsLayers, getFormattedLastUpdated } from '../services/api';
+import { predictCycloneTrack, fetchNasaGibsLayers, getFormattedLastUpdated } from '../services/api';
 import DataTypeBadge from '../components/DataTypeBadge';
 import LastUpdatedBadge from '../components/LastUpdatedBadge';
 
@@ -212,9 +212,9 @@ const TrackMap = () => {
         </div>
 
         {/* Action Controls & Basin Selector */}
-        <div className="flex items-center gap-2 flex-wrap">
-          <div className="flex items-center bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-xs font-mono">
-            {Object.keys(BASIN_SYSTEMS).map((b) => (
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex bg-slate-100 p-1 rounded-md border border-slate-200 text-xs">
+            {['Bay of Bengal', 'Arabian Sea'].map((b) => (
               <button
                 key={b}
                 onClick={() => { setSelectedBasin(b); setActiveStep(0); setIsPlaying(false); }}
@@ -228,22 +228,6 @@ const TrackMap = () => {
               </button>
             ))}
           </div>
-
-          <button
-            onClick={() => downloadOfficialBulletinPdf({
-              name: currentSystem.name,
-              basin: selectedBasin,
-              lat: currentPoint.lat,
-              lon: currentPoint.lon,
-              windSpeed: currentPoint.wind,
-              pressure: currentPoint.pressure,
-              classification: currentSystem.category
-            })}
-            className="btn-primary text-xs py-1.5 px-3 shadow-xs gap-1.5"
-          >
-            <Download className="w-3.5 h-3.5" />
-            <span>Official IMD Bulletin PDF</span>
-          </button>
         </div>
       </div>
 
