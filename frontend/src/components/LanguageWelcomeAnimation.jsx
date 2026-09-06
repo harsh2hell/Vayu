@@ -39,30 +39,45 @@ const LanguageWelcomeAnimation = ({
 
     setIsFadingOut(false);
 
-    // 1. Immediately switch language behind the solid white screen (at 100ms)
+    // 1. Switch language behind the screen safely
     const timerSwitch = setTimeout(() => {
-      if (onLanguageSwitchRef.current) {
-        onLanguageSwitchRef.current(targetLanguage === 'hi');
+      try {
+        if (onLanguageSwitchRef.current) {
+          onLanguageSwitchRef.current(targetLanguage === 'hi');
+        }
+      } catch (err) {
+        console.warn('Language switch callback error:', err);
       }
-    }, 100);
+    }, 80);
 
-    // 2. Start smooth fade-out (at 750ms for switch, 950ms for first-visit)
-    const fadeDelay = mode === 'first-visit' ? 950 : 750;
+    // 2. Start smooth fade-out (shortened delay to prevent blank screen feeling)
+    const fadeDelay = mode === 'first-visit' ? 650 : 500;
     const timerFade = setTimeout(() => {
       setIsFadingOut(true);
     }, fadeDelay);
 
-    // 3. Complete and unmount (fade duration is 450ms)
+    // 3. Complete and unmount (fade duration is 350ms)
     const timerDone = setTimeout(() => {
-      if (onCompleteRef.current) {
-        onCompleteRef.current();
+      try {
+        if (onCompleteRef.current) {
+          onCompleteRef.current();
+        }
+      } catch (err) {
+        console.warn('Animation complete error:', err);
       }
-    }, fadeDelay + 450);
+    }, fadeDelay + 350);
+
+    // 4. Hard safety fallback: force close after max 1.2s under any circumstance
+    const fallbackTimer = setTimeout(() => {
+      setIsFadingOut(true);
+      if (onCompleteRef.current) onCompleteRef.current();
+    }, 1200);
 
     return () => {
       clearTimeout(timerSwitch);
       clearTimeout(timerFade);
       clearTimeout(timerDone);
+      clearTimeout(fallbackTimer);
     };
   }, [isOpen, mode, targetLanguage]);
 
@@ -71,9 +86,15 @@ const LanguageWelcomeAnimation = ({
   const isHindi = targetLanguage === 'hi';
   const displayText = isHindi ? 'वायु में आपका स्वागत है' : 'Welcome to VAYU';
 
+  const handleImmediateDismiss = () => {
+    setIsFadingOut(true);
+    if (onCompleteRef.current) onCompleteRef.current();
+  };
+
   return (
     <div 
-      className={`fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-white text-black transition-opacity duration-450 ease-out select-none ${
+      onClick={handleImmediateDismiss}
+      className={`fixed inset-0 z-[99999] flex flex-col items-center justify-center bg-white dark:bg-black text-slate-950 dark:text-white transition-opacity duration-350 ease-out select-none cursor-pointer ${
         isFadingOut 
           ? 'opacity-0 pointer-events-none' 
           : 'opacity-100 pointer-events-auto'
