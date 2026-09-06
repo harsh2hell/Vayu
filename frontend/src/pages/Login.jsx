@@ -126,11 +126,11 @@ const Login = () => {
           
           {/* VAYU Identity Header */}
           <div className="text-center space-y-1.5">
-            <div className="inline-flex items-center justify-center h-12 mb-0.5">
+            <div className="inline-flex items-center justify-center h-14 mb-0.5">
               <img 
                 src="/vayu.png" 
                 alt="VAYU Cyclone Intelligence" 
-                className="h-11 w-auto object-contain filter drop-shadow-xs"
+                className="h-13 sm:h-14 w-auto object-contain filter drop-shadow-xs"
               />
             </div>
             <h1 className="text-xl sm:text-2xl font-heading font-extrabold text-slate-900 tracking-tight">
