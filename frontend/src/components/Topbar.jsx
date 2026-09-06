@@ -3,7 +3,7 @@ import {
   Bell, Clock, ChevronRight, ExternalLink, User, LogOut, Shield
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { getWebsiteUrl, isProductionDomain } from '../utils/domain';
+import { getWebsiteUrl, isProductionDomain, toPortalPath } from '../utils/domain';
 import { OfficerAccountDisplay, SafeSignOutButton } from './auth/ClerkAuth';
 
 const Topbar = () => {
@@ -54,7 +54,7 @@ const Topbar = () => {
           {/* Mobile Logo on White Background with Continuous Sheen */}
           <div 
             className="lg:hidden relative overflow-hidden rounded-lg p-0.5 flex items-center shrink-0 cursor-pointer"
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate(toPortalPath('/dashboard'))}
           >
             <img 
               src="/vayu.png" 
@@ -99,7 +99,7 @@ const Topbar = () => {
 
           {/* Alert Bell */}
           <button
-            onClick={() => navigate('/dashboard/alerts')}
+            onClick={() => navigate(toPortalPath('/dashboard/impact'))}
             className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors relative cursor-pointer"
             title="Active Coastal Alerts"
           >

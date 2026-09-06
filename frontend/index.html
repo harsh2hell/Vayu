@@ -2,11 +2,36 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" href="/vayu-icon.png" />
     <link rel="apple-touch-icon" href="/vayu-icon.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>VAYU — India Cyclone & Weather Intelligence</title>
+    <script>
+      // Self-healing recovery from stale deployment chunk mismatch
+      window.addEventListener('error', function(event) {
+        var el = event.target;
+        if (el && el.tagName === 'LINK' && el.rel === 'stylesheet') {
+          console.warn('[VAYU] Primary stylesheet failed to load, activating fallback...', el.href);
+          var fallback = document.getElementById('vayu-fallback-style');
+          if (!fallback) {
+            var link = document.createElement('link');
+            link.id = 'vayu-fallback-style';
+            link.rel = 'stylesheet';
+            link.href = '/assets/style.css?t=' + Date.now();
+            document.head.appendChild(link);
+          }
+          var reloadKey = 'vayu_css_reload_' + (el.href || '').split('/').pop().split('?')[0];
+          if (!sessionStorage.getItem(reloadKey)) {
+            sessionStorage.setItem(reloadKey, '1');
+            setTimeout(function() { window.location.reload(true); }, 500);
+          }
+        }
+      }, true);
+    </script>
     <script>
       (function() {
         try {

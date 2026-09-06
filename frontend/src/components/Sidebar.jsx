@@ -7,7 +7,7 @@ import {
   MapPin, FileText
 } from 'lucide-react';
 import { OfficerAccountDisplay, SafeSignOutButton } from './auth/ClerkAuth';
-import { getWebsiteUrl, isProductionDomain } from '../utils/domain';
+import { getWebsiteUrl, isProductionDomain, toPortalPath, isPortalSubdomain } from '../utils/domain';
 
 // Clean, Professional VAYU Navigation Item (Solid White Dashboard Aesthetic)
 const SidebarNavItem = ({ item, isActive, onClick }) => {
@@ -55,40 +55,40 @@ const Sidebar = () => {
     {
       title: 'COMMAND',
       items: [
-        { path: '/dashboard', label: 'Command Overview', icon: Activity, exact: true },
+        { path: toPortalPath('/dashboard'), label: 'Command Overview', icon: Activity, exact: true },
       ]
     },
     {
       title: 'AI VISION',
       items: [
-        { path: '/dashboard/satellite', label: 'Satellite Imagery', icon: Satellite },
-        { path: '/dashboard/detection', label: 'Cyclone Detection', icon: Crosshair },
-        { path: '/dashboard/classification', label: 'Morphology Classification', icon: Layers },
+        { path: toPortalPath('/dashboard/satellite'), label: 'Satellite Imagery', icon: Satellite },
+        { path: toPortalPath('/dashboard/detection'), label: 'Cyclone Detection', icon: Crosshair },
+        { path: toPortalPath('/dashboard/classification'), label: 'Morphology Classification', icon: Layers },
       ]
     },
     {
       title: 'FORECAST',
       items: [
-        { path: '/dashboard/trajectory', label: 'Trajectory Forecast', icon: Compass },
-        { path: '/dashboard/impact', label: 'Impact & Landfall', icon: MapPin },
+        { path: toPortalPath('/dashboard/trajectory'), label: 'Trajectory Forecast', icon: Compass },
+        { path: toPortalPath('/dashboard/impact'), label: 'Impact & Landfall', icon: MapPin },
       ]
     },
     {
       title: 'HISTORICAL',
       items: [
-        { path: '/dashboard/archives', label: 'Storm Archives', icon: Database },
+        { path: toPortalPath('/dashboard/archives'), label: 'Storm Archives', icon: Database },
       ]
     },
     {
       title: 'AI SYSTEM',
       items: [
-        { path: '/dashboard/models', label: 'Model Intelligence', icon: Cpu },
+        { path: toPortalPath('/dashboard/models'), label: 'Model Intelligence', icon: Cpu },
       ]
     },
     {
       title: 'REPORTS',
       items: [
-        { path: '/dashboard/bulletin', label: 'Official Bulletin', icon: FileText },
+        { path: toPortalPath('/dashboard/bulletin'), label: 'Official Bulletin', icon: FileText },
       ]
     }
   ];
@@ -100,6 +100,19 @@ const Sidebar = () => {
     } else {
       navigate('/');
     }
+  };
+
+  // Check if current route matches nav item path across both subdomain styles (/satellite or /dashboard/satellite)
+  const isItemActive = (itemPath, exact) => {
+    const current = location.pathname.replace(/\/+$/, '') || '/';
+    const target = itemPath.replace(/\/+$/, '') || '/';
+    const normCurrent = current.replace(/^\/dashboard\/?/, '/').replace(/\/+$/, '') || '/';
+    const normTarget = target.replace(/^\/dashboard\/?/, '/').replace(/\/+$/, '') || '/';
+
+    if (exact || normTarget === '/') {
+      return current === target || normCurrent === normTarget;
+    }
+    return current === target || current.startsWith(target + '/') || normCurrent === normTarget || normCurrent.startsWith(normTarget + '/');
   };
 
   // Close account menu when clicking outside
@@ -125,7 +138,7 @@ const Sidebar = () => {
         <div className="h-[84px] px-3.5 flex items-center border-b border-slate-100 shrink-0 bg-white">
           <div 
             className="relative overflow-hidden group rounded-xl p-1 -m-1 flex items-center cursor-pointer"
-            onClick={() => navigate('/dashboard')}
+            onClick={() => navigate(toPortalPath('/dashboard'))}
             title="VAYU Command Center"
           >
             <img 
@@ -133,8 +146,9 @@ const Sidebar = () => {
               alt="VAYU" 
               className="h-[66px] sm:h-[74px] w-auto max-w-[175px] object-contain filter drop-shadow-xs transition-transform duration-300 group-hover:scale-105" 
             />
+            {/* Continuous, Smooth Diagonal Light Sheen Effect */}
             <div 
-              className="animate-vayu-sheen absolute inset-y-0 w-40 bg-gradient-to-r from-transparent via-white/85 to-transparent pointer-events-none" 
+              className="animate-vayu-sheen absolute inset-y-0 w-24 bg-gradient-to-r from-transparent via-white/85 to-transparent pointer-events-none" 
             />
           </div>
         </div>
@@ -147,9 +161,7 @@ const Sidebar = () => {
                 {group.title}
               </div>
               {group.items.map((item) => {
-                const isActive = item.exact 
-                  ? location.pathname === item.path 
-                  : location.pathname.startsWith(item.path);
+                const isActive = isItemActive(item.path, item.exact);
                 return (
                   <SidebarNavItem
                     key={item.path}
