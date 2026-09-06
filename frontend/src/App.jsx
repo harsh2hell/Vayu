@@ -34,7 +34,7 @@ const ProductionLoginRedirect = () => {
 
   return (
     <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center text-xs font-mono">
-      <span>Redirecting to secure login gateway (login.vayusat.live)...</span>
+      <span>Redirecting to secure login gateway...</span>
     </div>
   );
 };
