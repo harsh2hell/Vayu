@@ -1,0 +1,137 @@
+{
+  "health": {
+    "status": "ONLINE",
+    "service": "VAYU Enterprise Deep Learning Gateway",
+    "team": "Chakravat Crew",
+    "problem_statement": "SIH26070",
+    "version": "4.0.0",
+    "models_active": {
+      "detection": "MobileNetV3-Small-CenterFix (Phase 3B, 1,075,431 params)",
+      "classification": "ResNet18-Dvorak-Morphology (Phase 3B, 4 Validated Classes, 11,246,436 params)",
+      "prediction": "CycloneTrajectoryGRU-Seq2Seq (Phase 3D 3-Hourly Spatiotemporal, 41,764 params)",
+      "fusion": "CycloneFusion-Engine v2.5 (Multispectral + Ocean + Shear)"
+    },
+    "database": "SQLite (cyclone_intel.db Active with 9 Tables)",
+    "background_poller": "ACTIVE",
+    "timestamp": 1788707395.6573062
+  },
+  "satellite_ingestion": {
+    "sources_count": 5,
+    "dana_files_verified": true,
+    "biparjoy_files_verified": true,
+    "dana_provenance": "Severe Cyclonic Storm DANA",
+    "biparjoy_provenance": "Extremely Severe Cyclonic Storm BIPARJOY"
+  },
+  "detection": {
+    "dana": {
+      "detected": true,
+      "center": "17.16\u00b0N, 87.39\u00b0E",
+      "confidence": 100.0,
+      "checkpoint": "vayu_detector_mobilenetv3_p3b.pt",
+      "latency_ms": 46.808719635009766
+    },
+    "biparjoy": {
+      "detected": true,
+      "center": "18.92\u00b0N, 67.73\u00b0E",
+      "confidence": 100.0,
+      "checkpoint": "vayu_detector_mobilenetv3_p3b.pt",
+      "latency_ms": 43.74504089355469
+    }
+  },
+  "classification": {
+    "classes_count": 4,
+    "dana": {
+      "pattern": "Eye Pattern",
+      "confidence": 97.8,
+      "gradcam_foci_count": 3,
+      "checkpoint": "vayu_morph_resnet18_p3b.pt",
+      "latency_ms": 84.63120460510254
+    },
+    "biparjoy": {
+      "pattern": "Calm Baseline",
+      "confidence": 99.7,
+      "gradcam_foci_count": 3,
+      "checkpoint": "vayu_morph_resnet18_p3b.pt",
+      "latency_ms": 61.64717674255371
+    }
+  },
+  "trajectory": {
+    "dana": {
+      "initial_fix": {
+        "latitude": 18.3,
+        "longitude": 88.4,
+        "wind_kmh": 92.6,
+        "pressure_hpa": 990.0,
+        "timestamp": "2024-10-23 21:00:00 UTC"
+      },
+      "steps": 7,
+      "lead_hours": [
+        0,
+        6,
+        12,
+        18,
+        24,
+        48,
+        72
+      ],
+      "landfall": "Sundarbans & South 24 Parganas (WB)",
+      "latency_ms": 19.308090209960938
+    },
+    "biparjoy": {
+      "initial_fix": {
+        "latitude": 21.6,
+        "longitude": 66.3,
+        "wind_kmh": 148.2,
+        "pressure_hpa": 966.0,
+        "timestamp": "2023-06-14 00:00:00 UTC"
+      },
+      "steps": 7,
+      "lead_hours": [
+        0,
+        6,
+        12,
+        18,
+        24,
+        48,
+        72
+      ],
+      "landfall": "Jakhau & Kutch (Gujarat)",
+      "latency_ms": 18.17178726196289
+    }
+  },
+  "uncertainty": {
+    "mc_dropout_samples": 25,
+    "spread_km": [
+      0.0,
+      6.9,
+      9.6,
+      24.1,
+      36.8,
+      41.0,
+      36.6
+    ],
+    "uncertainty_label": "MC-Dropout epistemic spread (Directionally useful but not calibrated)",
+    "error_envelope": {
+      "track_mae_6h_km": 68.9,
+      "track_mae_12h_km": 114.9,
+      "track_mae_18h_km": 158.9,
+      "track_mae_24h_km": 197.7,
+      "track_mae_48h_km": 278.7,
+      "track_mae_72h_km": 311.9,
+      "persistence_baseline_72h_km": 397.9,
+      "gru_beats_persistence_72h": true
+    }
+  },
+  "failure_cases": {
+    "insufficient_history": "INSUFFICIENT_HISTORY",
+    "unknown_cyclone": "INSUFFICIENT_HISTORY",
+    "corrupt_image_status": 500,
+    "empty_image_status": 500
+  },
+  "performance": {
+    "avg_detection_ms": 47.14674949645996,
+    "avg_classification_ms": 63.7181282043457,
+    "avg_trajectory_ms": 18.695449829101562,
+    "total_pipeline_ms": 129.56032752990723
+  }
+}
