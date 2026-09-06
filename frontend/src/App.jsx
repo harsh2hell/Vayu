@@ -23,7 +23,7 @@ import ModelTraining from './pages/ModelTraining';
 import Impact from './pages/Impact';
 import Bulletin from './pages/Bulletin';
 import { ProtectedRoute } from './components/auth/ClerkAuth';
-import { isAuthSubdomain, isProductionDomain, getAuthUrl } from './utils/domain';
+import { isAuthSubdomain, isPortalSubdomain, isProductionDomain, getAuthUrl, getPortalUrl } from './utils/domain';
 
 // Redirect helper when accessing /login on production apex domain (vayusat.live)
 const ProductionLoginRedirect = () => {
@@ -39,8 +39,24 @@ const ProductionLoginRedirect = () => {
   );
 };
 
+// Redirect helper when accessing /dashboard on production apex domain (vayusat.live)
+const ProductionPortalRedirect = () => {
+  const location = useLocation();
+  useEffect(() => {
+    const subPath = location.pathname.replace(/^\/dashboard\/?/, '');
+    window.location.href = getPortalUrl(subPath + location.search);
+  }, [location]);
+
+  return (
+    <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center text-xs font-mono">
+      <span>Redirecting to VAYU Operations Portal (portal.vayusat.live)...</span>
+    </div>
+  );
+};
+
 function App() {
   const isAuth = isAuthSubdomain();
+  const isPortal = isPortalSubdomain();
   const isProd = isProductionDomain();
 
   // ROUTE SET 1: When user is on login.vayusat.live
@@ -54,7 +70,76 @@ function App() {
     );
   }
 
-  // ROUTE SET 2: When user is on vayusat.live (or local development)
+  // ROUTE SET 2: When user is on portal.vayusat.live
+  if (isPortal) {
+    return (
+      <Routes>
+        <Route
+          path="/"
+          element={
+            <ProtectedRoute>
+              <DashboardLayout />
+            </ProtectedRoute>
+          }
+        >
+          {/* 1. COMMAND OVERVIEW */}
+          <Route index element={<Dashboard />} />
+
+          {/* 2. AI VISION */}
+          <Route path="satellite" element={<Satellite />} />
+          <Route path="detection" element={<Detection />} />
+          <Route path="classification" element={<Classification />} />
+
+          {/* 3. FORECAST */}
+          <Route path="trajectory" element={<Prediction />} />
+          <Route path="impact" element={<Impact />} />
+
+          {/* 4. HISTORICAL */}
+          <Route path="archives" element={<Analytics />} />
+
+          {/* 5. AI SYSTEM */}
+          <Route path="models" element={<ModelTraining />} />
+
+          {/* 6. REPORTS */}
+          <Route path="bulletin" element={<Bulletin />} />
+
+          {/* Seamless backward compatibility for /dashboard prefix on portal subdomain */}
+          <Route path="dashboard">
+            <Route index element={<Dashboard />} />
+            <Route path="satellite" element={<Satellite />} />
+            <Route path="detection" element={<Detection />} />
+            <Route path="classification" element={<Classification />} />
+            <Route path="trajectory" element={<Prediction />} />
+            <Route path="impact" element={<Impact />} />
+            <Route path="archives" element={<Analytics />} />
+            <Route path="models" element={<ModelTraining />} />
+            <Route path="bulletin" element={<Bulletin />} />
+            <Route path="track" element={<Navigate to="/trajectory" replace />} />
+            <Route path="prediction" element={<Navigate to="/trajectory" replace />} />
+            <Route path="alerts" element={<Navigate to="/impact" replace />} />
+            <Route path="analytics" element={<Navigate to="/archives" replace />} />
+            <Route path="training" element={<Navigate to="/models" replace />} />
+            <Route path="performance" element={<Navigate to="/models" replace />} />
+            <Route path="architecture" element={<Navigate to="/models" replace />} />
+          </Route>
+
+          {/* Operational Route Aliases */}
+          <Route path="track" element={<Navigate to="/trajectory" replace />} />
+          <Route path="prediction" element={<Navigate to="/trajectory" replace />} />
+          <Route path="alerts" element={<Navigate to="/impact" replace />} />
+          <Route path="analytics" element={<Navigate to="/archives" replace />} />
+          <Route path="training" element={<Navigate to="/models" replace />} />
+          <Route path="performance" element={<Navigate to="/models" replace />} />
+          <Route path="architecture" element={<Navigate to="/models" replace />} />
+        </Route>
+
+        {/* Catch-all redirect to portal root */}
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    );
+  }
+
+  // ROUTE SET 3: When user is on vayusat.live (or local development)
   return (
     <Routes>
       {/* Official MoES / IMD Public Cyclone Intelligence Portal */}
@@ -115,46 +200,74 @@ function App() {
         </>
       )}
 
-      {/* Protected Meteorological Command Dashboard (https://vayusat.live/dashboard) */}
-      <Route
-        path="/dashboard"
-        element={
-          <ProtectedRoute>
-            <DashboardLayout />
-          </ProtectedRoute>
-        }
-      >
-        {/* 1. COMMAND */}
-        <Route index element={<Dashboard />} />
+      {/* Meteorological Operations Portal Routing:
+          - On production apex vayusat.live: redirects /dashboard to portal.vayusat.live
+          - On local development: renders protected Command Dashboard under /dashboard & /portal
+      */}
+      {isProd ? (
+        <Route path="/dashboard/*" element={<ProductionPortalRedirect />} />
+      ) : (
+        <>
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <DashboardLayout />
+              </ProtectedRoute>
+            }
+          >
+            {/* 1. COMMAND */}
+            <Route index element={<Dashboard />} />
 
-        {/* 2. AI VISION */}
-        <Route path="satellite" element={<Satellite />} />
-        <Route path="detection" element={<Detection />} />
-        <Route path="classification" element={<Classification />} />
+            {/* 2. AI VISION */}
+            <Route path="satellite" element={<Satellite />} />
+            <Route path="detection" element={<Detection />} />
+            <Route path="classification" element={<Classification />} />
 
-        {/* 3. FORECAST */}
-        <Route path="trajectory" element={<Prediction />} />
-        <Route path="impact" element={<Impact />} />
+            {/* 3. FORECAST */}
+            <Route path="trajectory" element={<Prediction />} />
+            <Route path="impact" element={<Impact />} />
 
-        {/* 4. HISTORICAL */}
-        <Route path="archives" element={<Analytics />} />
+            {/* 4. HISTORICAL */}
+            <Route path="archives" element={<Analytics />} />
 
-        {/* 5. AI SYSTEM */}
-        <Route path="models" element={<ModelTraining />} />
+            {/* 5. AI SYSTEM */}
+            <Route path="models" element={<ModelTraining />} />
 
-        {/* 6. REPORTS */}
-        <Route path="bulletin" element={<Bulletin />} />
+            {/* 6. REPORTS */}
+            <Route path="bulletin" element={<Bulletin />} />
 
-        {/* Backward-Compatible Route Aliases & Redirects */}
-        <Route path="track" element={<Navigate to="/dashboard/trajectory" replace />} />
-        <Route path="prediction" element={<Navigate to="/dashboard/trajectory" replace />} />
-        <Route path="alerts" element={<Navigate to="/dashboard/impact" replace />} />
-        <Route path="analytics" element={<Navigate to="/dashboard/archives" replace />} />
-        <Route path="training" element={<Navigate to="/dashboard/models" replace />} />
-        <Route path="performance" element={<Navigate to="/dashboard/models" replace />} />
-        <Route path="architecture" element={<Navigate to="/dashboard/models" replace />} />
-        <Route path="ai-cyclone" element={<Navigate to="/ai-cyclone" replace />} />
-      </Route>
+            {/* Backward-Compatible Route Aliases & Redirects */}
+            <Route path="track" element={<Navigate to="/dashboard/trajectory" replace />} />
+            <Route path="prediction" element={<Navigate to="/dashboard/trajectory" replace />} />
+            <Route path="alerts" element={<Navigate to="/dashboard/impact" replace />} />
+            <Route path="analytics" element={<Navigate to="/dashboard/archives" replace />} />
+            <Route path="training" element={<Navigate to="/dashboard/models" replace />} />
+            <Route path="performance" element={<Navigate to="/dashboard/models" replace />} />
+            <Route path="architecture" element={<Navigate to="/dashboard/models" replace />} />
+            <Route path="ai-cyclone" element={<Navigate to="/ai-cyclone" replace />} />
+          </Route>
+
+          <Route
+            path="/portal"
+            element={
+              <ProtectedRoute>
+                <DashboardLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<Dashboard />} />
+            <Route path="satellite" element={<Satellite />} />
+            <Route path="detection" element={<Detection />} />
+            <Route path="classification" element={<Classification />} />
+            <Route path="trajectory" element={<Prediction />} />
+            <Route path="impact" element={<Impact />} />
+            <Route path="archives" element={<Analytics />} />
+            <Route path="models" element={<ModelTraining />} />
+            <Route path="bulletin" element={<Bulletin />} />
+          </Route>
+        </>
+      )}
 
       {/* Catch-all redirect to Public Portal */}
       <Route path="*" element={<Navigate to="/" replace />} />
