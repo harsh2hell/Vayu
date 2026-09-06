@@ -448,10 +448,10 @@ const Classification = () => {
 
           <div className="p-4 pt-0">
             <button 
-              onClick={() => navigate('/dashboard/prediction')} 
+              onClick={() => navigate('/dashboard/trajectory')} 
               className="btn-primary w-full text-xs py-2.5 justify-center gap-1.5"
             >
-              <span>Proceed to Trajectory Studio</span>
+              <span>Proceed to Trajectory Forecast</span>
               <ChevronRight className="w-3.5 h-3.5" />
             </button>
           </div>

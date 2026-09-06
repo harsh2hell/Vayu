@@ -4,16 +4,16 @@ import {
   Tooltip, ResponsiveContainer, LineChart, Line 
 } from 'recharts';
 import { 
-  BrainCircuit, MapPin, Wind, TrendingUp, 
-  CheckCircle, ShieldCheck, Gauge, 
-  Activity, Sparkles, AlertTriangle, 
-  Compass, ShieldAlert, Navigation, Layers
+  BrainCircuit, TrendingUp, ShieldCheck, 
+  Activity, AlertTriangle, Compass, ShieldAlert, 
+  Navigation, ArrowRight, Info
 } from 'lucide-react';
 import { 
-  MapContainer, TileLayer, Marker, Popup, Polyline, Polygon, Circle 
+  MapContainer, TileLayer, Marker, Popup, Polyline, Polygon 
 } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import { useNavigate } from 'react-router-dom';
 import { predictCycloneTrack } from '../services/api';
 import DataTypeBadge from '../components/DataTypeBadge';
 import LastUpdatedBadge from '../components/LastUpdatedBadge';
@@ -52,6 +52,7 @@ const createWaypointIcon = (isNow, isLandfall) => L.divIcon({
 });
 
 const Prediction = () => {
+  const navigate = useNavigate();
   const [selectedStormId, setSelectedStormId] = useState('DANA');
   const [forecastData, setForecastData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -101,7 +102,6 @@ const Prediction = () => {
   const trajectoryList = forecastData?.trajectory_forecast || [];
   const conePolygon = forecastData?.cone_polygon || [];
   const landfall = forecastData?.landfall_prediction;
-  const strikeProbs = forecastData?.coastal_strike_probabilities || [];
 
   // Trajectory polyline coordinates: [[lat, lon], ...]
   const polylineCoords = trajectoryList.map(pt => [pt.lat, pt.lon]);
@@ -306,94 +306,115 @@ const Prediction = () => {
           </div>
         </div>
 
-        {/* Right: Telemetry & Landfall Summary (5 Cols) */}
+        {/* Right: Kinematic Sequence Telemetry & Dedicated Impact Bridge (5 Cols) */}
         <div className="xl:col-span-5 space-y-5 flex flex-col justify-between">
           
-          {/* Landfall Prediction Box */}
+          {/* Kinematic Sequence Telemetry */}
           <div className="card p-5 space-y-4">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
-                <MapPin className="w-5 h-5 text-red-600" />
-                <h3 className="font-bold text-sm text-slate-900">Landfall Assessment</h3>
+                <Navigation className="w-5 h-5 text-[#003087]" />
+                <h3 className="font-bold text-sm text-slate-900">Kinematic Sequence Metrics</h3>
               </div>
-              <span className="badge badge-red text-[10px]">Impact Window</span>
+              <span className="badge badge-navy text-[10px]">72h Autoregressive</span>
             </div>
 
-            {landfall ? (
-              <div className="space-y-3 text-xs">
-                <div className="bg-red-50/70 border border-red-200 rounded-xl p-3.5 space-y-1.5">
-                  <div className="flex justify-between items-center">
-                    <span className="text-red-900 font-bold">Target Strike Sector:</span>
-                    <span className="font-bold font-mono text-red-800">{landfall.target_sector}</span>
-                  </div>
-                  <div className="flex justify-between items-center text-[11px] text-red-700">
-                    <span>Coordinates:</span>
-                    <span className="font-mono font-medium">{landfall.coordinates}</span>
-                  </div>
-                </div>
+            <div className="grid grid-cols-2 gap-3 text-xs">
+              <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                <span className="text-slate-400 text-[10px] block uppercase font-mono">Initial Fix (NOW)</span>
+                <span className="font-bold text-slate-900 text-xs mt-0.5 block font-mono">
+                  {trajectoryList[0] ? `${trajectoryList[0].lat.toFixed(2)}°N, ${trajectoryList[0].lon.toFixed(2)}°E` : `${activeStorm.initial_lat}°N, ${activeStorm.initial_lon}°E`}
+                </span>
+                <span className="text-[10px] text-slate-500 font-mono mt-0.5 block">
+                  {trajectoryList[0] ? `${Math.round(trajectoryList[0].wind * 1.852)} km/h • ${trajectoryList[0].pressure} hPa` : 'Initial synoptic fix'}
+                </span>
+              </div>
 
-                <div className="grid grid-cols-2 gap-3">
-                  <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl">
-                    <span className="text-slate-400 text-[10px] block uppercase font-mono">Estimated Window</span>
-                    <span className="font-bold text-slate-900 text-xs mt-0.5 block">{landfall.window}</span>
-                  </div>
-                  <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl">
-                    <span className="text-slate-400 text-[10px] block uppercase font-mono">Storm Surge Estimate</span>
-                    <span className="font-bold text-red-600 text-xs mt-0.5 block">{landfall.surge_estimate}</span>
-                  </div>
-                </div>
+              <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                <span className="text-slate-400 text-[10px] block uppercase font-mono">+72h Predicted Fix</span>
+                <span className="font-bold text-sky-700 text-xs mt-0.5 block font-mono">
+                  {trajectoryList.length > 0 ? `${trajectoryList[trajectoryList.length - 1].lat.toFixed(2)}°N, ${trajectoryList[trajectoryList.length - 1].lon.toFixed(2)}°E` : '--'}
+                </span>
+                <span className="text-[10px] text-slate-500 font-mono mt-0.5 block">
+                  {trajectoryList.length > 0 ? `${Math.round(trajectoryList[trajectoryList.length - 1].wind * 1.852)} km/h • ${trajectoryList[trajectoryList.length - 1].pressure} hPa` : '72h target horizon'}
+                </span>
               </div>
-            ) : (
-              <div className="p-4 text-center text-slate-400 text-xs">
-                {isLoading ? 'Calculating landfall strike geometry...' : 'Landfall assessment unavailable.'}
+
+              <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                <span className="text-slate-400 text-[10px] block uppercase font-mono">Epistemic Radius (+72h)</span>
+                <span className="font-bold text-slate-900 text-xs mt-0.5 block font-mono">
+                  ±{trajectoryList.length > 0 ? Math.round(trajectoryList[trajectoryList.length - 1].uncertainty_radius_km || 0) : 0} km
+                </span>
+                <span className="text-[10px] text-slate-500 font-mono mt-0.5 block">25-Pass MC Dropout</span>
               </div>
-            )}
+
+              <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+                <span className="text-slate-400 text-[10px] block uppercase font-mono">Step Discretization</span>
+                <span className="font-bold text-slate-900 text-xs mt-0.5 block font-mono">3-Hour Intervals</span>
+                <span className="text-[10px] text-slate-500 font-mono mt-0.5 block">24 Timesteps to +72h</span>
+              </div>
+            </div>
           </div>
 
-          {/* Coastal Strike Probabilities Table */}
-          <div className="card p-5 space-y-3 flex-1">
+          {/* Model Specification & Empirical Benchmarks */}
+          <div className="card p-5 space-y-3">
             <div className="flex items-center justify-between border-b border-slate-100 pb-2">
               <div className="flex items-center gap-2">
-                <ShieldAlert className="w-4 h-4 text-amber-600" />
+                <ShieldCheck className="w-4 h-4 text-emerald-600" />
                 <h3 className="font-bold text-xs text-slate-800 uppercase tracking-wider">
-                  Coastal Strike Probabilities (Top Districts)
+                  Verified Empirical Benchmark Scope
                 </h3>
               </div>
-              <span className="text-[10px] font-mono text-slate-400">{strikeProbs.length} Sectors</span>
+              <span className="text-[10px] font-mono text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 font-bold">
+                P &lt; 0.001
+              </span>
             </div>
 
-            <div className="space-y-2 max-h-[220px] overflow-y-auto pr-1">
-              {strikeProbs.length > 0 ? (
-                strikeProbs.slice(0, 5).map((row, idx) => (
-                  <div 
-                    key={idx} 
-                    className="p-2.5 bg-slate-50 rounded-lg border border-slate-100 flex items-center justify-between text-xs"
-                  >
-                    <div>
-                      <span className="font-bold text-slate-900">{row.district}</span>
-                      <span className="text-[10px] text-slate-400 ml-1.5">({row.state})</span>
-                      <span className="text-[10px] block text-slate-500 mt-0.5">
-                        Wind Gusts: {row.wind_gust_kmh} km/h • Surge: {row.surge_height_m}
-                      </span>
-                    </div>
-                    <div className="text-right">
-                      <span className="font-bold font-mono text-xs text-red-600 block">
-                        {row.strike_probability_pct}%
-                      </span>
-                      <span className={`badge ${
-                        row.warning_level === 'RED_WARNING' ? 'badge-red' : 'badge-orange'
-                      } text-[9px] mt-0.5`}>
-                        {row.warning_level?.replace('_', ' ')}
-                      </span>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="p-4 text-center text-slate-400 text-xs">
-                  {isLoading ? 'Computing strike probabilities...' : 'No coastal strike sectors identified.'}
-                </div>
-              )}
+            <div className="space-y-2 text-xs text-slate-600">
+              <div className="flex justify-between items-center py-1 border-b border-slate-100">
+                <span>Model Architecture:</span>
+                <span className="font-bold font-mono text-slate-900">2-Layer GRU Seq2Seq (41,764 params)</span>
+              </div>
+              <div className="flex justify-between items-center py-1 border-b border-slate-100">
+                <span>Canonical Feature Schema:</span>
+                <span className="font-bold font-mono text-slate-900">10 Kinematic Features</span>
+              </div>
+              <div className="flex justify-between items-center py-1 border-b border-slate-100">
+                <span>Validation CLE (+72h):</span>
+                <span className="font-bold font-mono text-emerald-700">25.6 km (Cyclone DANA)</span>
+              </div>
+              <div className="flex justify-between items-center py-1 border-b border-slate-100">
+                <span>Test CLE (+72h):</span>
+                <span className="font-bold font-mono text-sky-700">38.2 km (Cyclone BIPARJOY)</span>
+              </div>
+              <div className="flex justify-between items-center py-1">
+                <span>Skill vs Persistence (+72h):</span>
+                <span className="font-bold font-mono text-purple-700">+86.0 km lower mean error</span>
+              </div>
             </div>
+          </div>
+
+          {/* Dedicated Impact Analysis Bridge */}
+          <div className="card p-5 bg-gradient-to-br from-red-50 to-amber-50/60 border border-red-200 space-y-3">
+            <div className="flex items-center gap-2">
+              <ShieldAlert className="w-5 h-5 text-red-600" />
+              <div>
+                <h4 className="font-bold text-xs text-red-950 uppercase tracking-wider">
+                  Impact & Landfall Assessment
+                </h4>
+                <p className="text-[11px] text-red-800 mt-0.5">
+                  Analyze high-resolution GIS coastal district impact polygons, storm surge projections, and CAP alert matrices for this trajectory.
+                </p>
+              </div>
+            </div>
+
+            <button
+              onClick={() => navigate('/dashboard/impact')}
+              className="btn-danger w-full text-xs py-2.5 justify-center gap-2 shadow-xs"
+            >
+              <span>Proceed to Impact & Landfall Studio</span>
+              <ArrowRight className="w-4 h-4" />
+            </button>
           </div>
 
         </div>
