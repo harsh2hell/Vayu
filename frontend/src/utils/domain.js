@@ -1,5 +1,5 @@
 // Domain & Subdomain routing utilities for vayusat.live
-// Handles vayusat.live (Main Portal & /dashboard), login.vayusat.live (Clerk Authentication), and localhost
+// Handles www.vayusat.live (Main Portal & /dashboard), login.vayusat.live (Clerk Authentication), and localhost
 
 export const getHostname = () => {
   if (typeof window === 'undefined') return '';
@@ -25,7 +25,7 @@ export const isAuthSubdomain = () => {
 export const getWebsiteUrl = (path = '/') => {
   const cleanPath = path.startsWith('/') ? path : `/${path}`;
   if (isProductionDomain()) {
-    return `https://vayusat.live${cleanPath}`;
+    return `https://www.vayusat.live${cleanPath}`;
   }
   return cleanPath;
 };
@@ -33,7 +33,7 @@ export const getWebsiteUrl = (path = '/') => {
 export const getDashboardUrl = (subPath = '') => {
   const cleanPath = subPath ? (subPath.startsWith('/') ? subPath : `/${subPath}`) : '';
   if (isProductionDomain()) {
-    return `https://vayusat.live/dashboard${cleanPath}`;
+    return `https://www.vayusat.live/dashboard${cleanPath}`;
   }
   return `/dashboard${cleanPath}`;
 };

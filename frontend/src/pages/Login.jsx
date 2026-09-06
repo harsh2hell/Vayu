@@ -2,8 +2,6 @@ import React, { useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { 
   SignIn, 
-  SignedIn, 
-  SignedOut, 
   useUser 
 } from '@clerk/clerk-react';
 import { Shield, ArrowLeft } from 'lucide-react';
@@ -48,32 +46,44 @@ const clerkAppearance = {
 const ClerkSignInSection = ({ redirectTarget }) => {
   const { isSignedIn, isLoaded } = useUser();
 
-  // If already authenticated, redirect directly into the dashboard
+  // If already authenticated, redirect smoothly using window.location.replace
   useEffect(() => {
     if (isLoaded && isSignedIn) {
-      window.location.href = redirectTarget;
+      window.location.replace(redirectTarget);
     }
   }, [isLoaded, isSignedIn, redirectTarget]);
 
+  // While checking existing session status, show a clean spinner
+  if (!isLoaded) {
+    return (
+      <div className="flex flex-col items-center justify-center p-12 space-y-3 bg-white border border-slate-200 shadow-xl rounded-2xl w-full max-w-md">
+        <div className="w-8 h-8 border-2 border-sky-600 border-t-transparent rounded-full animate-spin" />
+        <p className="text-xs font-mono text-slate-500">Checking authentication...</p>
+      </div>
+    );
+  }
+
+  // If user is already signed in, show confirmation while redirect completes
+  if (isSignedIn) {
+    return (
+      <div className="p-8 rounded-2xl bg-white border border-slate-200 shadow-xl text-center space-y-3 w-full max-w-md">
+        <div className="w-10 h-10 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center mx-auto">
+          <Shield className="w-5 h-5" />
+        </div>
+        <p className="text-sm font-semibold text-slate-900">Authenticated</p>
+        <p className="text-xs text-slate-500 font-mono">Redirecting to Command Dashboard...</p>
+      </div>
+    );
+  }
+
+  // Not signed in: render Clerk SignIn form
   return (
     <div className="flex justify-center w-full">
-      <SignedIn>
-        <div className="p-8 rounded-2xl bg-white border border-slate-200 shadow-xl text-center space-y-3 w-full max-w-md">
-          <div className="w-10 h-10 rounded-full bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center mx-auto">
-            <Shield className="w-5 h-5" />
-          </div>
-          <p className="text-sm font-semibold text-slate-900">Authenticated</p>
-          <p className="text-xs text-slate-500">Redirecting to Command Dashboard...</p>
-        </div>
-      </SignedIn>
-
-      <SignedOut>
-        <SignIn
-          appearance={clerkAppearance}
-          fallbackRedirectUrl={redirectTarget}
-          signUpUrl={null}
-        />
-      </SignedOut>
+      <SignIn
+        appearance={clerkAppearance}
+        fallbackRedirectUrl={redirectTarget}
+        signUpUrl={null}
+      />
     </div>
   );
 };
@@ -131,7 +141,7 @@ const Login = () => {
             </p>
           </div>
 
-          {/* Official Clerk SignIn Component (Clean White Light Theme) */}
+          {/* Official Clerk SignIn Component */}
           <ClerkSignInSection redirectTarget={redirectTarget} />
 
           {/* Clean Provenance Note */}
