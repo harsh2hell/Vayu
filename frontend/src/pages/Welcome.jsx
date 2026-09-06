@@ -74,10 +74,10 @@ const SERVICES_DATA = [
     teaser: 'Precipitation estimates & 850+ coastal rain gauges',
     teaserHindi: 'डॉपलर वर्षा एवं 850+ तटीय स्वचालित स्टेशन',
     accent: 'sky',
-    gradient: 'from-sky-500/25 via-blue-500/10 to-transparent',
-    borderHover: 'hover:border-sky-400/70 dark:hover:border-sky-400/70',
-    iconBg: 'bg-sky-500/10 dark:bg-sky-500/20 border-sky-300/60 dark:border-sky-500/30 text-sky-600 dark:text-sky-400 group-hover:bg-sky-500 group-hover:text-white dark:group-hover:bg-sky-500 dark:group-hover:text-white backdrop-blur-md',
-    tagClass: 'text-sky-700 dark:text-sky-300 bg-sky-500/10 dark:bg-sky-500/20 border-sky-300/60 dark:border-sky-500/30 backdrop-blur-md',
+    gradient: 'from-cyan-400/20 via-sky-500/5 to-transparent',
+    borderHover: 'hover:border-sky-400/70 dark:hover:border-sky-400/60 hover:shadow-[0_8px_28px_rgba(14,165,233,0.18)]',
+    iconBg: 'bg-sky-500/10 dark:bg-sky-400/15 border-sky-300/60 dark:border-sky-400/30 text-sky-600 dark:text-sky-300 shadow-[0_0_14px_rgba(14,165,233,0.2)] group-hover:scale-105 backdrop-blur-md',
+    tagClass: 'text-sky-800 dark:text-sky-300 bg-sky-500/10 dark:bg-sky-400/15 border-sky-300/60 dark:border-sky-400/30 shadow-[0_0_10px_rgba(14,165,233,0.12)] backdrop-blur-md',
     topBar: 'bg-sky-500',
     icon: CloudRain,
     route: '/rainfall-intelligence',
@@ -102,10 +102,10 @@ const SERVICES_DATA = [
     teaser: 'Seasonal circulation, pressure patterns & environmental conditions',
     teaserHindi: 'मौसमी परिसंचरण, दबाव पैटर्न एवं पर्यावरणीय स्थितियां',
     accent: 'amber',
-    gradient: 'from-amber-500/25 via-yellow-500/10 to-transparent',
-    borderHover: 'hover:border-amber-400/70 dark:hover:border-amber-400/70',
-    iconBg: 'bg-amber-500/10 dark:bg-amber-500/20 border-amber-300/60 dark:border-amber-500/30 text-amber-600 dark:text-amber-400 group-hover:bg-amber-500 group-hover:text-white dark:group-hover:bg-amber-500 dark:group-hover:text-white backdrop-blur-md',
-    tagClass: 'text-amber-700 dark:text-amber-300 bg-amber-500/10 dark:bg-amber-500/20 border-amber-300/60 dark:border-amber-500/30 backdrop-blur-md',
+    gradient: 'from-amber-400/20 via-amber-500/5 to-transparent',
+    borderHover: 'hover:border-amber-400/70 dark:hover:border-amber-400/60 hover:shadow-[0_8px_28px_rgba(245,158,11,0.18)]',
+    iconBg: 'bg-amber-500/10 dark:bg-amber-400/15 border-amber-300/60 dark:border-amber-400/30 text-amber-600 dark:text-amber-300 shadow-[0_0_14px_rgba(245,158,11,0.2)] group-hover:scale-105 backdrop-blur-md',
+    tagClass: 'text-amber-800 dark:text-amber-300 bg-amber-500/10 dark:bg-amber-400/15 border-amber-300/60 dark:border-amber-400/30 shadow-[0_0_10px_rgba(245,158,11,0.12)] backdrop-blur-md',
     topBar: 'bg-amber-500',
     icon: Wind,
     route: '/atmospheric-patterns',
@@ -130,10 +130,10 @@ const SERVICES_DATA = [
     teaser: 'Multi-spectral satellite tracks & storm surge hydrodynamics',
     teaserHindi: 'उपग्रह तूफान ट्रैक, ज्वार एवं लैंडफॉल मैट्रिक्स',
     accent: 'emerald',
-    gradient: 'from-emerald-500/25 via-teal-500/10 to-transparent',
-    borderHover: 'hover:border-emerald-400/70 dark:hover:border-emerald-400/70',
-    iconBg: 'bg-emerald-500/10 dark:bg-emerald-500/20 border-emerald-300/60 dark:border-emerald-500/30 text-emerald-600 dark:text-emerald-400 group-hover:bg-emerald-500 group-hover:text-white dark:group-hover:bg-emerald-500 dark:group-hover:text-white backdrop-blur-md',
-    tagClass: 'text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 dark:bg-emerald-500/20 border-emerald-300/60 dark:border-emerald-500/30 backdrop-blur-md',
+    gradient: 'from-emerald-400/20 via-teal-500/5 to-transparent',
+    borderHover: 'hover:border-emerald-400/70 dark:hover:border-emerald-400/60 hover:shadow-[0_8px_28px_rgba(16,185,129,0.18)]',
+    iconBg: 'bg-emerald-500/10 dark:bg-emerald-400/15 border-emerald-300/60 dark:border-emerald-400/30 text-emerald-600 dark:text-emerald-300 shadow-[0_0_14px_rgba(16,185,129,0.2)] group-hover:scale-105 backdrop-blur-md',
+    tagClass: 'text-emerald-800 dark:text-emerald-300 bg-emerald-500/10 dark:bg-emerald-400/15 border-emerald-300/60 dark:border-emerald-400/30 shadow-[0_0_10px_rgba(16,185,129,0.12)] backdrop-blur-md',
     topBar: 'bg-emerald-500',
     icon: 'cyclone',
     route: '/cyclone-intelligence',
@@ -158,10 +158,10 @@ const SERVICES_DATA = [
     teaser: 'ENSO, IOD, sea surface temperature and other climate factors influencing cyclone formation',
     teaserHindi: 'ईएनएसओ, आईओडी, समुद्री सतह तापमान एवं चक्रवात निर्माण को प्रभावित करने वाले जलवायु कारक',
     accent: 'rose',
-    gradient: 'from-rose-500/25 via-purple-500/10 to-transparent',
-    borderHover: 'hover:border-rose-400/70 dark:hover:border-rose-400/70',
-    iconBg: 'bg-rose-500/10 dark:bg-rose-500/20 border-rose-300/60 dark:border-rose-500/30 text-rose-600 dark:text-rose-400 group-hover:bg-rose-500 group-hover:text-white dark:group-hover:bg-rose-500 dark:group-hover:text-white backdrop-blur-md',
-    tagClass: 'text-rose-700 dark:text-rose-300 bg-rose-500/10 dark:bg-rose-500/20 border-rose-300/60 dark:border-rose-500/30 backdrop-blur-md',
+    gradient: 'from-rose-400/20 via-purple-500/5 to-transparent',
+    borderHover: 'hover:border-rose-400/70 dark:hover:border-rose-400/60 hover:shadow-[0_8px_28px_rgba(244,63,94,0.18)]',
+    iconBg: 'bg-rose-500/10 dark:bg-rose-400/15 border-rose-300/60 dark:border-rose-400/30 text-rose-600 dark:text-rose-300 shadow-[0_0_14px_rgba(244,63,94,0.2)] group-hover:scale-105 backdrop-blur-md',
+    tagClass: 'text-rose-800 dark:text-rose-300 bg-rose-500/10 dark:bg-rose-400/15 border-rose-300/60 dark:border-rose-400/30 shadow-[0_0_10px_rgba(244,63,94,0.12)] backdrop-blur-md',
     topBar: 'bg-rose-500',
     icon: SunMedium,
     route: '/climate-ocean-anomalies',
@@ -1877,9 +1877,9 @@ const Welcome = () => {
                OUR SERVICES SECTION (RAINFALL, MONSOON, CYCLONE, CLIMATE SERVICES)
                ========================================================================= */}
           <div className="pt-2 sm:pt-2.5 relative">
-            {/* Ambient luminous color orbs for glass refraction across services grid */}
-            <div className="pointer-events-none absolute -top-12 left-1/4 w-80 h-80 bg-sky-500/10 dark:bg-sky-500/15 rounded-full blur-3xl" />
-            <div className="pointer-events-none absolute -bottom-12 right-1/4 w-80 h-80 bg-rose-500/10 dark:bg-rose-500/15 rounded-full blur-3xl" />
+            {/* Ambient luminous color orbs - subtle and balanced, without dirty color spill */}
+            <div className="pointer-events-none absolute -top-16 left-12 w-96 h-96 bg-sky-500/10 dark:bg-sky-500/5 rounded-full blur-3xl" />
+            <div className="pointer-events-none absolute -bottom-16 right-12 w-96 h-96 bg-indigo-500/10 dark:bg-indigo-500/5 rounded-full blur-3xl" />
 
             <div className="border-b border-slate-200/80 dark:border-white/10 pb-1.5 mb-3 flex items-center justify-between relative z-10">
               <h2 className="text-xs sm:text-sm font-black tracking-wider uppercase text-slate-950 dark:text-white font-heading flex items-center gap-2">
@@ -1899,11 +1899,11 @@ const Welcome = () => {
                     key={srv.id}
                     onClick={() => navigate(srv.route)}
                     wrapperClassName="h-full"
-                    className={`p-4 sm:p-4.5 rounded-2xl sm:rounded-3xl cursor-pointer group flex flex-col justify-between h-full ${srv.borderHover}`}
+                    className={`p-4 sm:p-4.5 rounded-2xl sm:rounded-3xl cursor-pointer group flex flex-col justify-between h-full dark:!bg-slate-900/85 dark:hover:!bg-slate-900/95 dark:border-white/10 ${srv.borderHover} transition-all duration-300`}
                   >
-                    {/* Ambient colored refraction aura */}
-                    <div className={`absolute -right-10 -top-10 w-44 h-44 rounded-full bg-gradient-to-br ${srv.gradient} blur-2xl pointer-events-none group-hover:scale-125 transition-transform duration-500 opacity-90 group-hover:opacity-100`} />
-                    <div className="pointer-events-none absolute -bottom-10 -left-10 w-32 h-32 rounded-full bg-slate-200/40 dark:bg-white/[0.02] blur-xl" />
+                    {/* Ambient corner jewel glow - crisp and subtle */}
+                    <div className={`absolute -right-8 -top-8 w-36 h-36 rounded-full bg-gradient-to-br ${srv.gradient} blur-xl pointer-events-none opacity-40 group-hover:opacity-90 group-hover:scale-125 transition-all duration-500`} />
+                    <div className="pointer-events-none absolute -bottom-10 -left-10 w-28 h-28 rounded-full bg-slate-200/30 dark:bg-white/[0.015] blur-xl" />
 
                     {/* Top colored accent line on hover */}
                     <div className={`absolute top-0 inset-x-0 h-0.5 ${srv.topBar} opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10`} />
@@ -1920,7 +1920,7 @@ const Welcome = () => {
                       </div>
 
                       {/* Service Title */}
-                      <h3 className="font-heading font-black text-xs sm:text-[13px] uppercase tracking-wide leading-tight text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">
+                      <h3 className="font-heading font-black text-xs sm:text-[13px] uppercase tracking-wide leading-tight text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-300 transition-colors">
                         {isHindi ? srv.titleHindi : srv.title}
                       </h3>
 
@@ -1935,7 +1935,7 @@ const Welcome = () => {
                       <span className="text-[11px] font-bold">
                         {isHindi ? 'विवरण देखें' : 'Explore Service'}
                       </span>
-                      <div className="p-1 rounded-xl bg-white/80 dark:bg-white/10 group-hover:bg-slate-900 group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-slate-950 border border-white/80 dark:border-white/15 backdrop-blur-md shadow-2xs transition-all">
+                      <div className="p-1 rounded-xl bg-white/80 dark:bg-slate-800/80 group-hover:bg-slate-900 group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-slate-950 border border-slate-200/80 dark:border-white/15 backdrop-blur-md shadow-2xs transition-all">
                         <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                       </div>
                     </div>
