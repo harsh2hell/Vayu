@@ -17,6 +17,7 @@ import PageHeader from '../components/PageHeader';
 import EmptyState from '../components/EmptyState';
 import StatusBadge from '../components/StatusBadge';
 import InfoCallout from '../components/InfoCallout';
+import { useAnalysisSession, DEFAULT_PRESETS } from '../context/AnalysisSessionContext';
 
 const SATELLITE_PRESETS = [
   {
@@ -46,24 +47,26 @@ const SATELLITE_PRESETS = [
 const Satellite = () => {
   const navigate = useNavigate();
   const fileInputRef = useRef(null);
+  
+  // Shared Analysis Session Context
+  const {
+    currentInput,
+    detectionResult,
+    classificationResult,
+    setInputFromUpload,
+    setInputFromPreset,
+    setFullPipelineResults
+  } = useAnalysisSession();
 
-  // Selected Preset or Uploaded File
-  const [selectedPreset, setSelectedPreset] = useState(SATELLITE_PRESETS[0]);
-  const [customFile, setCustomFile] = useState(null);
-  const [customImageUrl, setCustomImageUrl] = useState(null);
-  const [imageMetadata, setImageMetadata] = useState({
-    name: SATELLITE_PRESETS[0].name,
-    sizeKb: null,
-    dimensions: '1024 × 768 px',
-    type: 'NASA GIBS Tile Snapshot'
-  });
+  // Active Preset matching session or default
+  const selectedPreset = SATELLITE_PRESETS.find(p => p.id === currentInput?.presetId) || SATELLITE_PRESETS[0];
+  const isCustomUpload = currentInput?.inputType === 'upload';
+  const customFile = isCustomUpload ? currentInput.file : null;
 
   // Real AI Inference State
   const [isAnalyzing, setIsAnalyzing] = useState(false);
-  const [inferenceStatus, setInferenceStatus] = useState('ready'); // 'ready' | 'running' | 'success' | 'error'
+  const [inferenceStatus, setInferenceStatus] = useState(detectionResult ? 'success' : 'ready');
   const [analysisProgressStep, setAnalysisProgressStep] = useState('');
-  const [detectionResult, setDetectionResult] = useState(null);
-  const [classificationResult, setClassificationResult] = useState(null);
   const [analysisError, setAnalysisError] = useState(null);
 
   // Visualization View: 'overlay' | 'original'
@@ -77,44 +80,32 @@ const Satellite = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // Reset previous AI outputs immediately
-    setDetectionResult(null);
-    setClassificationResult(null);
     setAnalysisError(null);
     setInferenceStatus('ready');
 
     const objectUrl = URL.createObjectURL(file);
-    setCustomImageUrl(objectUrl);
-    setCustomFile(file);
 
-    // Read natural image dimensions
+    // Read natural image dimensions and register authoritative session input
     const img = new Image();
     img.onload = () => {
-      setImageMetadata({
-        name: file.name,
-        sizeKb: (file.size / 1024).toFixed(1),
+      setInputFromUpload(file, objectUrl, {
         dimensions: `${img.naturalWidth} × ${img.naturalHeight} px`,
+        sizeKb: (file.size / 1024).toFixed(1),
         type: file.type || 'image/png'
-      });
+      }, 'Bay of Bengal');
     };
     img.src = objectUrl;
   };
 
   // Switch to a verified historical preset
   const handleSelectPreset = (preset) => {
-    setSelectedPreset(preset);
-    setCustomFile(null);
-    setCustomImageUrl(null);
-    setDetectionResult(null);
-    setClassificationResult(null);
     setAnalysisError(null);
     setInferenceStatus('ready');
-
-    setImageMetadata({
+    setInputFromPreset({
+      id: preset.id,
       name: preset.name,
-      sizeKb: null,
-      dimensions: '1024 × 768 px',
-      type: 'NASA GIBS Tile Snapshot'
+      url: preset.image,
+      basin: preset.basin
     });
   };
 
@@ -123,16 +114,14 @@ const Satellite = () => {
     setIsAnalyzing(true);
     setInferenceStatus('running');
     setAnalysisError(null);
-    setDetectionResult(null);
-    setClassificationResult(null);
 
     try {
-      let imageBlob = customFile;
+      let imageBlob = currentInput?.file;
 
       // If analyzing a preset without custom upload, download preset image bytes
-      if (!imageBlob) {
+      if (!imageBlob && currentInput?.imageUrl) {
         setAnalysisProgressStep('SATELLITE: Loading satellite snapshot raster...');
-        const fetchRes = await fetch(selectedPreset.image);
+        const fetchRes = await fetch(currentInput.imageUrl);
         if (!fetchRes.ok) throw new Error('Failed to retrieve preset satellite frame.');
         imageBlob = await fetchRes.blob();
       } else {
@@ -141,26 +130,31 @@ const Satellite = () => {
 
       // 1. Run MobileNetV3-Small Detection
       setAnalysisProgressStep('DETECTION: Running MobileNetV3-Small...');
-      const detRes = await detectCycloneFromImage(imageBlob, selectedPreset?.basin || 'Bay of Bengal');
+      const detRes = await detectCycloneFromImage(imageBlob, currentInput?.basin || 'Bay of Bengal');
       if (!detRes || !detRes.success) {
         throw new Error(detRes?.message || 'MobileNetV3 detection inference failed.');
       }
-      setDetectionResult(detRes);
 
       // If no cyclone detected, do not run downstream morphology
       if (detRes.cyclone_detected === false) {
         setAnalysisProgressStep('DETECTION: Non-cyclonic frame identified.');
+        setFullPipelineResults({ detectionResult: detRes, classificationResult: null });
         setInferenceStatus('success');
         return;
       }
 
       // 2. Run ResNet18 Morphology Classification + Grad-CAM
       setAnalysisProgressStep('CLASSIFICATION: Running ResNet18 Morphology...');
-      const clsRes = await classifyMorphologyPattern(imageBlob, selectedPreset?.basin || 'Bay of Bengal', 12.0);
+      const clsRes = await classifyMorphologyPattern(imageBlob, currentInput?.basin || 'Bay of Bengal', 12.0);
       if (!clsRes || !clsRes.success) {
         throw new Error(clsRes?.message || 'ResNet18 morphological classification failed.');
       }
-      setClassificationResult(clsRes);
+
+      // Save to shared analysis session
+      setFullPipelineResults({
+        detectionResult: detRes,
+        classificationResult: clsRes
+      });
       setInferenceStatus('success');
 
       setAnalysisProgressStep('EXPLAINABILITY: Generating Grad-CAM attention foci...');
@@ -173,7 +167,8 @@ const Satellite = () => {
     }
   };
 
-  const activeImageSource = customImageUrl || selectedPreset.image;
+  const activeImageSource = currentInput?.imageUrl || selectedPreset.image;
+
 
   // Normalized bbox [ymin, xmin, ymax, xmax] mapping to CSS
   const bboxStyle = detectionResult?.bounding_box ? {
@@ -337,70 +332,72 @@ const Satellite = () => {
             </div>
 
             {/* Satellite Frame Canvas */}
-            <div className="relative rounded-xl overflow-hidden border border-slate-200 bg-slate-950 aspect-[4/3] flex items-center justify-center shadow-inner">
-              <img
-                src={activeImageSource}
-                alt={imageMetadata.name}
-                className="w-full h-full object-contain select-none"
-                crossOrigin="anonymous"
-              />
+            <div className="relative rounded-xl overflow-hidden border border-slate-200 bg-slate-950 min-h-[460px] max-h-[580px] flex items-center justify-center shadow-inner">
+              <div className="relative inline-block max-w-full max-h-full">
+                <img
+                  src={activeImageSource}
+                  alt={currentInput?.name || selectedPreset?.name || 'Satellite Observation Frame'}
+                  className="max-h-[560px] max-w-full w-auto h-auto object-contain block select-none"
+                  crossOrigin="anonymous"
+                />
 
-              {/* AI Overlay Layer (Visible only when in 'overlay' mode) */}
-              {visualMode === 'overlay' && detectionResult?.cyclone_detected && (
-                <>
-                  {/* Bounding Box Overlay */}
-                  {showBbox && bboxStyle && (
-                    <div 
-                      className="absolute border-2 border-red-500 bg-red-500/15 rounded transition-all duration-300 pointer-events-none"
-                      style={bboxStyle}
-                    >
-                      <div className="absolute -top-6 left-0 bg-red-600 text-white font-mono text-[9px] font-bold px-2 py-0.5 rounded shadow whitespace-nowrap">
-                        CYCLONE EYE BBOX • MobileNetV3
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Detected Center Fix Pin Marker */}
-                  {showCenterPin && centerStyle && (
-                    <div 
-                      className="absolute -translate-x-1/2 -translate-y-1/2 pointer-events-none transition-all duration-300 z-10"
-                      style={centerStyle}
-                    >
-                      <div className="w-9 h-9 rounded-full border-2 border-amber-300 bg-amber-400/25 animate-ping absolute -top-4.5 -left-4.5" />
-                      <div className="w-6 h-6 rounded-full border-2 border-white bg-red-600 shadow-lg flex items-center justify-center text-white text-[10px] font-bold">
-                        🎯
-                      </div>
-                      <div className="absolute top-4 -left-16 bg-slate-900/90 text-white px-2 py-0.5 rounded text-[9px] font-mono whitespace-nowrap shadow border border-amber-300/40">
-                        {detectionResult.coordinates?.formatted || 'Eye Center'}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* ResNet18 Grad-CAM Attention Foci Overlays */}
-                  {showGradCamFoci && classificationResult?.gradcam_attention_foci?.map((focus, fIdx) => (
-                    <div
-                      key={fIdx}
-                      className="absolute -translate-x-1/2 -translate-y-1/2 pointer-events-none z-10"
-                      style={{
-                        left: `${(focus.x_norm ?? focus.relative_x ?? 0.5) * 100}%`,
-                        top: `${(focus.y_norm ?? focus.relative_y ?? 0.5) * 100}%`
-                      }}
-                    >
+                {/* AI Overlay Layer (Visible only when in 'overlay' mode, tightly bounded to image rect) */}
+                {visualMode === 'overlay' && detectionResult?.cyclone_detected && (
+                  <>
+                    {/* Bounding Box Overlay */}
+                    {showBbox && bboxStyle && (
                       <div 
-                        className="rounded-full border border-amber-400 bg-amber-400/20 animate-pulse"
-                        style={{
-                          width: `${Math.max(28, (focus.activation_intensity ?? focus.intensity_weight ?? 0.7) * 56)}px`,
-                          height: `${Math.max(28, (focus.activation_intensity ?? focus.intensity_weight ?? 0.7) * 56)}px`,
-                          transform: 'translate(-50%, -50%)'
-                        }}
-                      />
-                      <div className="absolute top-2 -left-12 bg-amber-950/90 text-amber-200 border border-amber-400/60 px-1.5 py-0.5 rounded text-[8px] font-mono whitespace-nowrap shadow">
-                        {focus.label || focus.description || `Focus #${fIdx + 1}`} ({(((focus.activation_intensity ?? focus.intensity_weight) || 0.8) * 100).toFixed(0)}%)
+                        className="absolute border-2 border-red-500 bg-red-500/15 rounded transition-all duration-300 pointer-events-none"
+                        style={bboxStyle}
+                      >
+                        <div className="absolute -top-6 left-0 bg-red-600 text-white font-mono text-[9px] font-bold px-2 py-0.5 rounded shadow whitespace-nowrap">
+                          CYCLONE CENTER FIX • MobileNetV3
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                </>
-              )}
+                    )}
+
+                    {/* Detected Center Fix Pin Marker */}
+                    {showCenterPin && centerStyle && (
+                      <div 
+                        className="absolute -translate-x-1/2 -translate-y-1/2 pointer-events-none transition-all duration-300 z-10"
+                        style={centerStyle}
+                      >
+                        <div className="w-9 h-9 rounded-full border-2 border-amber-300 bg-amber-400/25 animate-ping absolute -top-4.5 -left-4.5" />
+                        <div className="w-6 h-6 rounded-full border-2 border-white bg-red-600 shadow-lg flex items-center justify-center text-white text-[10px] font-bold">
+                          🎯
+                        </div>
+                        <div className="absolute top-4 -left-16 bg-slate-900/90 text-white px-2 py-0.5 rounded text-[9px] font-mono whitespace-nowrap shadow border border-amber-300/40">
+                          {detectionResult.coordinates?.formatted ? `Center: ${detectionResult.coordinates.formatted}` : 'Vortex Center'}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* ResNet18 Grad-CAM Attention Foci Overlays */}
+                    {showGradCamFoci && classificationResult?.gradcam_attention_foci?.map((focus, fIdx) => (
+                      <div
+                        key={fIdx}
+                        className="absolute -translate-x-1/2 -translate-y-1/2 pointer-events-none z-10"
+                        style={{
+                          left: `${(focus.x_norm ?? focus.relative_x ?? 0.5) * 100}%`,
+                          top: `${(focus.y_norm ?? focus.relative_y ?? 0.5) * 100}%`
+                        }}
+                      >
+                        <div 
+                          className="rounded-full border border-amber-400 bg-amber-400/20 animate-pulse"
+                          style={{
+                            width: `${Math.max(28, (focus.activation_intensity ?? focus.intensity_weight ?? 0.7) * 56)}px`,
+                            height: `${Math.max(28, (focus.activation_intensity ?? focus.intensity_weight ?? 0.7) * 56)}px`,
+                            transform: 'translate(-50%, -50%)'
+                          }}
+                        />
+                        <div className="absolute top-2 -left-12 bg-amber-950/90 text-amber-200 border border-amber-400/60 px-1.5 py-0.5 rounded text-[8px] font-mono whitespace-nowrap shadow">
+                          {focus.label || focus.description || `Focus #${fIdx + 1}`} ({(((focus.activation_intensity ?? focus.intensity_weight) || 0.8) * 100).toFixed(0)}%)
+                        </div>
+                      </div>
+                    ))}
+                  </>
+                )}
+              </div>
 
               {/* Source & Inference Lifecycle Watermarks */}
               <div className="absolute top-2.5 left-2.5 z-10 flex flex-col gap-1 pointer-events-none">
@@ -411,6 +408,11 @@ const Satellite = () => {
                 }`}>
                   {customFile ? 'USER-UPLOADED IMAGE • IN-SESSION ANALYSIS' : `BENCHMARK FRAME: ${selectedPreset.name}`}
                 </span>
+                {customFile && detectionResult && (
+                  <span className="px-2 py-0.5 rounded text-[9px] font-mono font-medium bg-amber-950/90 text-amber-200 border border-amber-500/40 backdrop-blur-md">
+                    Trained on centered synoptic crops • Regional off-center frames may exhibit localization variance
+                  </span>
+                )}
                 {!detectionResult && (
                   <span className="px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold bg-red-950/90 text-red-300 border border-red-500/50 backdrop-blur-md shadow-sm">
                     INPUT IMAGE PREVIEW ONLY — NO INFERENCE EXECUTED
@@ -432,7 +434,7 @@ const Satellite = () => {
                 </div>
               ) : (
                 <div className="absolute bottom-2.5 left-2.5 right-2.5 z-10 bg-slate-900/75 backdrop-blur-md px-3 py-1.5 rounded-xl text-[10px] font-mono text-slate-400 border border-white/10 flex items-center justify-between">
-                  <span>Input Raster Loaded ({imageMetadata.dimensions})</span>
+                  <span>Input Raster Loaded ({currentInput?.metadata?.dimensions || '1024 × 768 px'})</span>
                   <span className="text-amber-400 font-semibold">NO INFERENCE EXECUTED</span>
                 </div>
               )}
@@ -442,18 +444,18 @@ const Satellite = () => {
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono bg-slate-50 p-2.5 rounded-xl border border-slate-200">
               <div>
                 <span className="text-[10px] text-slate-400 block uppercase">Filename</span>
-                <span className="font-bold text-slate-800 truncate block" title={imageMetadata.name}>
-                  {imageMetadata.name}
+                <span className="font-bold text-slate-800 truncate block" title={currentInput?.name}>
+                  {currentInput?.name || 'Satellite Frame'}
                 </span>
               </div>
               <div>
                 <span className="text-[10px] text-slate-400 block uppercase">Dimensions</span>
-                <span className="font-bold text-slate-800">{imageMetadata.dimensions}</span>
+                <span className="font-bold text-slate-800">{currentInput?.metadata?.dimensions || '1024 × 768 px'}</span>
               </div>
               <div>
                 <span className="text-[10px] text-slate-400 block uppercase">Format / Size</span>
                 <span className="font-bold text-slate-800">
-                  {imageMetadata.sizeKb ? `${imageMetadata.sizeKb} KB` : 'GeoTIFF / PNG'}
+                  {currentInput?.metadata?.sizeKb ? `${currentInput.metadata.sizeKb} KB` : 'GeoTIFF / PNG'}
                 </span>
               </div>
               <div>
@@ -461,6 +463,7 @@ const Satellite = () => {
                 <span className="font-bold text-slate-500">In-Session Only</span>
               </div>
             </div>
+
 
           </div>
 

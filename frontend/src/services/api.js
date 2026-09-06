@@ -368,11 +368,21 @@ export async function detectCycloneFromImage(imageFileOrBlob, basin = 'Bay of Be
       const raw = json.data || json;
       const detected = raw.cyclone_detected ?? raw.detected ?? true;
       const objectness = raw.objectness !== undefined ? raw.objectness : ((raw.confidence_percentage ?? 100.0) / 100.0);
-      const center = raw.center || {
-        lat: raw.coordinates?.latitude ?? 18.3,
-        lon: raw.coordinates?.longitude ?? 88.4,
-        center_x_norm: raw.coordinates?.center_x_norm ?? 0.5,
-        center_y_norm: raw.coordinates?.center_y_norm ?? 0.5
+      const rawBbox = raw.bounding_box;
+      const parsedCx = raw.center?.center_x_norm 
+        ?? raw.coordinates?.center_x_norm 
+        ?? rawBbox?.center_x_norm 
+        ?? (Array.isArray(rawBbox) ? (rawBbox[1] + rawBbox[3]) / 2 : 0.5);
+      const parsedCy = raw.center?.center_y_norm 
+        ?? raw.coordinates?.center_y_norm 
+        ?? rawBbox?.center_y_norm 
+        ?? (Array.isArray(rawBbox) ? (rawBbox[0] + rawBbox[2]) / 2 : 0.5);
+
+      const center = {
+        lat: raw.center?.lat ?? raw.coordinates?.latitude ?? 18.3,
+        lon: raw.center?.lon ?? raw.coordinates?.longitude ?? 88.4,
+        center_x_norm: parseFloat(Number(parsedCx).toFixed(4)),
+        center_y_norm: parseFloat(Number(parsedCy).toFixed(4))
       };
       return { 
         success: true, 

@@ -140,7 +140,15 @@ class CycloneCenterDetector(nn.Module):
                 "latitude": lat,
                 "longitude": lon,
                 "formatted": f"{lat}°N, {lon}°E",
+                "center_x_norm": round(cx, 3),
+                "center_y_norm": round(cy, 3),
                 "basin": basin
+            },
+            "center": {
+                "lat": lat,
+                "lon": lon,
+                "center_x_norm": round(cx, 3),
+                "center_y_norm": round(cy, 3)
             },
             "bounding_box": {
                 "ymin": round(ymin, 3),

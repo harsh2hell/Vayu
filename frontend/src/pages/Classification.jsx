@@ -1,33 +1,18 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Layers, Upload, Sparkles, AlertTriangle, 
   ChevronRight, Info, CheckCircle, ShieldAlert,
-  Flame, Wind, Eye, Compass, Image as ImageIcon
+  Flame, Wind, Eye, Compass, Image as ImageIcon,
+  ArrowLeftRight
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { classifyMorphologyPattern } from '../services/api';
+import { useAnalysisSession } from '../context/AnalysisSessionContext';
 import DataTypeBadge from '../components/DataTypeBadge';
 import LastUpdatedBadge from '../components/LastUpdatedBadge';
 import PageHeader from '../components/PageHeader';
 import StatusBadge from '../components/StatusBadge';
 import InfoCallout from '../components/InfoCallout';
-
-const SATELLITE_PRESETS = [
-  {
-    id: 'dana-2024',
-    name: 'Cyclone DANA (2024)',
-    date: '2024-10-24',
-    basin: 'Bay of Bengal',
-    url: 'https://wvs.earthdata.nasa.gov/api/v1/snapshot?REQUEST=GetSnapshot&LAYERS=VIIRS_SNPP_CorrectedReflectance_TrueColor&BBOX=8,75,23,95&TIME=2024-10-24&WIDTH=1024&HEIGHT=768&FORMAT=image/png'
-  },
-  {
-    id: 'biparjoy-2023',
-    name: 'Cyclone BIPARJOY (2023)',
-    date: '2023-06-12',
-    basin: 'Arabian Sea',
-    url: 'https://wvs.earthdata.nasa.gov/api/v1/snapshot?REQUEST=GetSnapshot&LAYERS=VIIRS_SNPP_CorrectedReflectance_TrueColor&BBOX=12,58,26,76&TIME=2023-06-12&WIDTH=1024&HEIGHT=768&FORMAT=image/png'
-  }
-];
 
 const DEFAULT_SUPPORTED_CLASSES = [
   { class_id: 'eye_pattern', class_name: 'Eye Pattern (Warm Core)', probability_pct: 0.0 },
@@ -38,68 +23,42 @@ const DEFAULT_SUPPORTED_CLASSES = [
 
 const Classification = () => {
   const navigate = useNavigate();
-  const [selectedPreset, setSelectedPreset] = useState(SATELLITE_PRESETS[0]);
-  const [customFile, setCustomFile] = useState(null);
-  const [customPreview, setCustomPreview] = useState(null);
-  const [fileMeta, setFileMeta] = useState(null);
+  const { currentInput, classificationResult, setClassificationResult } = useAnalysisSession();
 
   // Real inference state
   const [isClassifying, setIsClassifying] = useState(false);
-  const [classificationResult, setClassificationResult] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
   const [selectedClassId, setSelectedClassId] = useState(null);
 
-  const activeImageSrc = customPreview || selectedPreset?.url;
-  const activeBasin = customFile ? 'Bay of Bengal' : selectedPreset.basin;
+  useEffect(() => {
+    if (classificationResult?.class_probability_distribution?.length > 0) {
+      setSelectedClassId(classificationResult.class_probability_distribution[0].class_id);
+    }
+  }, [classificationResult]);
 
-  const handleFileUpload = (e) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setCustomFile(file);
-    const objectUrl = URL.createObjectURL(file);
-    setCustomPreview(objectUrl);
-    setClassificationResult(null);
-    setErrorMsg(null);
-
-    const img = new Image();
-    img.onload = () => {
-      setFileMeta({
-        name: file.name,
-        size: `${(file.size / 1024).toFixed(1)} KB`,
-        type: file.type || 'image/png',
-        dimensions: `${img.naturalWidth} × ${img.naturalHeight} px`
-      });
-    };
-    img.src = objectUrl;
-  };
-
-  const handleSelectPreset = (preset) => {
-    setSelectedPreset(preset);
-    setCustomFile(null);
-    setCustomPreview(null);
-    setFileMeta(null);
-    setClassificationResult(null);
-    setErrorMsg(null);
-  };
+  const activeImageSrc = currentInput?.imageUrl;
+  const activeBasin = currentInput?.basin || 'Bay of Bengal';
+  const isCustomUpload = currentInput?.inputType === 'upload';
+  const fileMeta = currentInput?.metadata;
 
   const handleRunClassification = async () => {
+    if (!currentInput) return;
     setIsClassifying(true);
     setErrorMsg(null);
 
     try {
-      let fileToSend = customFile;
+      let fileToSend = currentInput.file;
 
-      if (!fileToSend && selectedPreset) {
+      if (!fileToSend && currentInput.imageUrl) {
         // Fetch preset image bytes directly so real backend model processes actual pixels
-        const response = await fetch(selectedPreset.url);
+        const response = await fetch(currentInput.imageUrl);
         if (!response.ok) throw new Error('Failed to load preset satellite image frame.');
         const blob = await response.blob();
-        fileToSend = new File([blob], `${selectedPreset.id}.png`, { type: 'image/png' });
+        fileToSend = new File([blob], `${currentInput.sessionId}.png`, { type: 'image/png' });
       }
 
       if (!fileToSend) {
-        throw new Error('No satellite frame available. Please upload a frame or choose a preset.');
+        throw new Error('No satellite frame available. Please select or upload a frame in Satellite Studio.');
       }
 
       const res = await classifyMorphologyPattern(fileToSend, activeBasin, 12.0);
@@ -143,59 +102,68 @@ const Classification = () => {
         actions={
           <>
             <span className="text-[11px] text-amber-800 bg-amber-50 font-mono px-2 py-0.5 rounded border border-amber-200 hidden sm:inline-block">
-              Prototype: 14 training frames across 4 classes
+              Page-Local Analysis • Shared Session
             </span>
-            <label className="btn-secondary text-xs sm:text-sm py-2 px-3 gap-1.5 cursor-pointer">
-              <Upload className="w-3.5 h-3.5" />
-              <span>Upload Frame</span>
-              <input 
-                type="file" 
-                accept="image/png,image/jpeg,image/jpg,image/webp,image/tiff" 
-                onChange={handleFileUpload} 
-                className="hidden" 
-              />
-            </label>
+            <button 
+              onClick={() => navigate('/dashboard/satellite')}
+              className="btn-secondary text-xs sm:text-sm py-2 px-3 gap-1.5"
+            >
+              <ArrowLeftRight className="w-3.5 h-3.5" />
+              <span>Change Input</span>
+            </button>
             <button 
               onClick={handleRunClassification}
               disabled={isClassifying || !activeImageSrc}
               className="btn-primary text-xs sm:text-sm py-2 px-4 gap-2 shadow-xs"
             >
               <Sparkles className={`w-3.5 h-3.5 ${isClassifying ? 'animate-spin' : ''}`} />
-              <span>{isClassifying ? 'Classifying ResNet18...' : 'Run Morphological Classifier'}</span>
+              <span>
+                {isClassifying 
+                  ? 'Classifying ResNet18...' 
+                  : classificationResult 
+                    ? 'Re-run Morphology' 
+                    : 'Run Morphology Analysis'}
+              </span>
             </button>
           </>
         }
       />
 
-      {/* Frame Selection Bar */}
+      {/* Frame Selection / Shared Session Bar */}
       <div className="bg-white border border-slate-200 rounded-xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 shadow-2xs">
-        <div className="flex items-center gap-2 text-xs">
-          <span className="font-semibold text-slate-700">Select Input Frame:</span>
-          {SATELLITE_PRESETS.map((p) => (
-            <button
-              key={p.id}
-              onClick={() => handleSelectPreset(p)}
-              className={`px-3 py-1.5 rounded-lg font-medium transition-all text-xs border ${
-                !customFile && selectedPreset?.id === p.id
-                  ? 'bg-[#003087] text-white border-[#003087] shadow-xs'
-                  : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
-              }`}
-            >
-              {p.name}
-            </button>
-          ))}
-          {customFile && (
-            <span className="bg-emerald-50 text-emerald-800 border border-emerald-200 px-3 py-1.5 rounded-lg font-medium text-xs flex items-center gap-1.5">
-              <ImageIcon className="w-3.5 h-3.5 text-emerald-600" />
-              Custom: {customFile.name}
+        <div className="flex flex-wrap items-center gap-2 text-xs">
+          <span className="font-bold text-slate-700 uppercase tracking-wider text-[11px]">
+            Current Analysis Input:
+          </span>
+          {currentInput ? (
+            <span className={`px-3 py-1.5 rounded-lg font-semibold text-xs flex items-center gap-1.5 border ${
+              isCustomUpload 
+                ? 'bg-amber-50 text-amber-900 border-amber-300' 
+                : 'bg-blue-50 text-[#003087] border-blue-200'
+            }`}>
+              <ImageIcon className="w-3.5 h-3.5" />
+              <span>{currentInput.name}</span>
+              <span className="text-[10px] font-normal opacity-80">({currentInput.source})</span>
+            </span>
+          ) : (
+            <span className="bg-slate-100 text-slate-500 px-3 py-1.5 rounded-lg text-xs">
+              No active session
             </span>
           )}
+
+          <button
+            onClick={() => navigate('/dashboard/satellite')}
+            className="text-xs text-[#003087] hover:underline font-semibold flex items-center gap-1 ml-1"
+          >
+            <span>Change Input in Satellite Studio</span>
+            <ChevronRight className="w-3 h-3" />
+          </button>
         </div>
 
         {fileMeta && (
           <div className="text-[11px] font-mono text-slate-500 flex items-center gap-3">
             <span>Dimensions: {fileMeta.dimensions}</span>
-            <span>Size: {fileMeta.size}</span>
+            {fileMeta.sizeKb && <span>Size: {fileMeta.sizeKb} KB</span>}
             <span>Format: {fileMeta.type}</span>
           </div>
         )}
@@ -235,21 +203,21 @@ const Classification = () => {
           
           <div className="bg-slate-950 relative min-h-[380px] max-h-[480px] flex items-center justify-center overflow-hidden">
             {activeImageSrc ? (
-              <div className="relative w-full h-full flex items-center justify-center">
+              <div className="relative inline-block max-w-full max-h-full">
                 <img
                   src={activeImageSrc}
                   alt="Cyclone Pattern View"
-                  className="w-full h-full object-contain filter brightness-95 contrast-110"
+                  className="max-h-[480px] max-w-full w-auto h-auto object-contain block filter brightness-95 contrast-110"
                 />
 
                 {/* Source and Lifecycle Watermarks */}
                 <div className="absolute top-2.5 left-2.5 z-10 flex flex-col gap-1 pointer-events-none">
                   <span className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold border backdrop-blur-md shadow-sm ${
-                    customFile 
+                    isCustomUpload 
                       ? 'bg-amber-950/85 text-amber-300 border-amber-500/50' 
                       : 'bg-slate-900/85 text-sky-300 border-white/20'
                   }`}>
-                    {customFile ? 'USER-UPLOADED IMAGE • IN-SESSION ANALYSIS' : `BENCHMARK FRAME: ${selectedPreset.name}`}
+                    {isCustomUpload ? `USER-UPLOADED IMAGE • ${currentInput?.name}` : `BENCHMARK FRAME: ${currentInput?.name}`}
                   </span>
                   {!classificationResult && (
                     <span className="px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold bg-red-950/90 text-red-300 border border-red-500/50 backdrop-blur-md shadow-sm">
@@ -286,8 +254,15 @@ const Classification = () => {
             ) : (
               <div className="p-10 text-center text-slate-400 space-y-2">
                 <ImageIcon className="w-10 h-10 mx-auto text-slate-600 opacity-60" />
-                <p className="text-xs font-bold text-white uppercase">NO SATELLITE FRAME AVAILABLE</p>
-                <p className="text-[11px] text-slate-400">Please upload a frame or select a preset.</p>
+                <p className="text-xs font-bold text-white uppercase">NO ACTIVE ANALYSIS SESSION</p>
+                <p className="text-[11px] text-slate-400">Please select an official benchmark frame or upload an observation image in Satellite Studio.</p>
+                <button
+                  onClick={() => navigate('/dashboard/satellite')}
+                  className="btn-primary text-xs py-2 px-4 inline-flex items-center gap-2 cursor-pointer mt-2"
+                >
+                  <ImageIcon className="w-4 h-4" />
+                  <span>Open Satellite Imagery Studio</span>
+                </button>
               </div>
             )}
 
