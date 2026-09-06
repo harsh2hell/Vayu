@@ -153,31 +153,31 @@ const AICycloneIntelligence = () => {
       />
 
       {/* 2. SIH PROBLEM STATEMENT & AUTHENTICITY HEADER */}
-      <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-950 text-white border-b border-white/10 py-4 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+      <div className="bg-gradient-to-r from-sky-50 via-indigo-50/70 to-slate-50 dark:from-slate-900 dark:via-indigo-950 dark:to-slate-950 text-slate-900 dark:text-white border-b border-slate-200/80 dark:border-white/10 py-4 px-4 sm:px-6 lg:px-8 relative overflow-hidden transition-colors duration-300">
         {/* Luminous background aura */}
-        <div className="pointer-events-none absolute -top-24 right-10 w-96 h-96 bg-sky-500/15 rounded-full blur-3xl" />
-        <div className="pointer-events-none absolute -bottom-24 left-10 w-96 h-96 bg-indigo-500/15 rounded-full blur-3xl" />
+        <div className="pointer-events-none absolute -top-24 right-10 w-96 h-96 bg-sky-400/15 dark:bg-sky-500/15 rounded-full blur-3xl" />
+        <div className="pointer-events-none absolute -bottom-24 left-10 w-96 h-96 bg-indigo-400/15 dark:bg-indigo-500/15 rounded-full blur-3xl" />
 
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row lg:items-center justify-between gap-4 relative z-10">
           <div className="space-y-1.5">
             <div className="flex items-center gap-2.5 flex-wrap">
-              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-amber-500/20 text-amber-300 border border-amber-400/40">
-                <Sparkles className="w-3 h-3 text-amber-300" />
+              <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black uppercase tracking-wider bg-amber-500/15 dark:bg-amber-500/20 text-amber-800 dark:text-amber-300 border border-amber-500/30 dark:border-amber-400/40">
+                <Sparkles className="w-3 h-3 text-amber-600 dark:text-amber-300" />
                 <span>SIH 2026 AI/ML CYCLONE INTELLIGENCE SYSTEM</span>
               </span>
-              <span className="text-xs text-slate-400 hidden sm:inline">•</span>
-              <span className="text-xs font-semibold text-sky-400">
+              <span className="text-xs text-slate-400 dark:text-slate-500 hidden sm:inline">•</span>
+              <span className="text-xs font-bold text-sky-700 dark:text-sky-400">
                 Team Chakravat Crew (Problem ID: SIH-2026-AI)
               </span>
             </div>
 
-            <h1 className="text-xl sm:text-2xl lg:text-3xl font-heading font-black tracking-tight text-white leading-tight">
+            <h1 className="text-xl sm:text-2xl lg:text-3xl font-heading font-black tracking-tight text-slate-950 dark:text-white leading-tight">
               {isHindi
                 ? 'बहु-स्रोत उपग्रह डेटा आधारित उष्णकटिबंधीय चक्रवात पहचान, वर्गीकरण एवं पूर्वानुमान'
                 : 'AI-Based Tropical Cyclone Identification, Classification & Trajectory Prediction'}
             </h1>
 
-            <p className="text-xs sm:text-sm text-slate-300 max-w-4xl leading-relaxed">
+            <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-4xl leading-relaxed">
               {isHindi
                 ? 'इसरो (INSAT-3D/3DR, ओशनसैट-3) और वैश्विक उपग्रहों के बहु-स्पेक्ट्रल डेटा का उपयोग करके स्वचालित चक्रवात पहचान (MobileNetV3-Small), 4-स्तरीय आकारिकी वर्गीकरण (ResNet18), और 72 घंटे का GRU Seq2Seq प्रक्षेपवक्र पूर्वानुमान।'
                 : 'Operational deep learning framework utilizing multi-source satellite streams (INSAT-3D/3DR, Oceansat-3, GPM) for automated vortex identification (MobileNetV3-Small dual-head), 4-class morphological Dvorak classification (ResNet18 + Grad-CAM), and 72-hour 2-layer GRU Seq2Seq spatiotemporal trajectory prediction.'}
@@ -185,26 +185,26 @@ const AICycloneIntelligence = () => {
           </div>
 
           {/* Provenance Transparency Legend */}
-          <div className="bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl p-3 sm:p-3.5 space-y-2 shrink-0 lg:max-w-xs">
-            <div className="flex items-center justify-between text-[11px] font-bold text-slate-300 border-b border-white/10 pb-1.5">
+          <div className="bg-white/85 dark:bg-black/40 backdrop-blur-xl border border-slate-200/80 dark:border-white/10 rounded-2xl p-3 sm:p-3.5 space-y-2 shrink-0 lg:max-w-xs shadow-[0_4px_20px_rgba(0,0,0,0.04)] dark:shadow-none">
+            <div className="flex items-center justify-between text-[11px] font-bold text-slate-800 dark:text-slate-300 border-b border-slate-200/80 dark:border-white/10 pb-1.5">
               <span>{isHindi ? 'डेटा प्रमाणिकता संकेतक' : 'Data Provenance Legend'}</span>
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
             </div>
             <div className="space-y-1.5 text-[10px]">
               <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
-                <span className="font-semibold text-emerald-300">Live Satellite Telemetry</span>
-                <span className="text-slate-400 text-[9px]">(ISRO MOSDAC)</span>
+                <span className="w-2 h-2 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse shrink-0" />
+                <span className="font-semibold text-emerald-700 dark:text-emerald-300">Live Satellite Telemetry</span>
+                <span className="text-slate-400 dark:text-slate-400 text-[9px]">(ISRO MOSDAC)</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-indigo-400 shrink-0" />
-                <span className="font-semibold text-indigo-300">AI Model Inference</span>
-                <span className="text-slate-400 text-[9px]">(Neural Engine)</span>
+                <span className="w-2 h-2 rounded-full bg-indigo-500 dark:bg-indigo-400 shrink-0" />
+                <span className="font-semibold text-indigo-700 dark:text-indigo-300">AI Model Inference</span>
+                <span className="text-slate-400 dark:text-slate-400 text-[9px]">(Neural Engine)</span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="w-2 h-2 rounded-full bg-amber-400 shrink-0" />
-                <span className="font-semibold text-amber-300">Historical Benchmark</span>
-                <span className="text-slate-400 text-[9px]">(IMD Best-Track)</span>
+                <span className="w-2 h-2 rounded-full bg-amber-500 dark:bg-amber-400 shrink-0" />
+                <span className="font-semibold text-amber-700 dark:text-amber-300">Historical Benchmark</span>
+                <span className="text-slate-400 dark:text-slate-400 text-[9px]">(IMD Best-Track)</span>
               </div>
             </div>
           </div>
@@ -980,50 +980,80 @@ const AICycloneIntelligence = () => {
             </div>
 
             {/* AI Multi-Source Data Fusion Engine Architecture Diagram */}
-            <div className="bg-gradient-to-br from-slate-900 to-indigo-950 text-white rounded-3xl p-6 sm:p-8 shadow-md relative overflow-hidden space-y-6">
-              <div className="text-center max-w-2xl mx-auto space-y-1">
-                <span className="text-[11px] font-black uppercase tracking-wider text-sky-400 block font-mono">
-                  SPATIAL-TEMPORAL TENSOR CONCATENATION
+            <div className="bg-gradient-to-br from-sky-50/90 via-indigo-50/60 to-slate-100/80 dark:from-slate-950 dark:via-slate-900 dark:to-indigo-950 text-slate-900 dark:text-white border border-slate-200/80 dark:border-white/10 rounded-3xl p-6 sm:p-8 shadow-sm dark:shadow-2xl relative overflow-hidden space-y-6 transition-colors duration-300">
+              {/* Background ambient auras */}
+              <div className="pointer-events-none absolute -top-24 right-10 w-80 h-80 bg-sky-400/10 dark:bg-sky-500/10 rounded-full blur-3xl" />
+              <div className="pointer-events-none absolute -bottom-24 left-10 w-80 h-80 bg-indigo-400/10 dark:bg-indigo-500/10 rounded-full blur-3xl" />
+
+              <div className="text-center max-w-2xl mx-auto space-y-1 relative z-10">
+                <span className="text-[11px] font-black uppercase tracking-wider text-sky-600 dark:text-sky-400 block font-mono">
+                  {isHindi ? 'स्थानिक-कालिक टेन्सर संयोजन' : 'SPATIAL–TEMPORAL TENSOR CONCATENATION'}
                 </span>
-                <h3 className="text-lg sm:text-xl font-heading font-black">
-                  AI Multi-Source Data Fusion Architecture
+                <h3 className="text-lg sm:text-xl font-heading font-black text-slate-950 dark:text-white">
+                  {isHindi ? 'एआई बहु-स्रोत डेटा संलयन आर्किटेक्चर' : 'AI Multi–Source Data Fusion Architecture'}
                 </h3>
-                <p className="text-xs text-slate-300">
-                  How multi-spectral, microwave, scatterometer, and radar streams align in space and time.
+                <p className="text-xs text-slate-600 dark:text-slate-300">
+                  {isHindi
+                    ? 'बहु-स्पेक्ट्रल, माइक्रोवेव, स्कैटरोमीटर और रडार स्ट्रीम कैसे समय और स्थान में संरेखित होते हैं।'
+                    : 'How multi-spectral, microwave, scatterometer, and radar streams align in space and time.'}
                 </p>
               </div>
 
               {/* Interactive Pipeline Diagram */}
-              <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
-                <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/15 text-center space-y-1">
-                  <span className="text-[10px] text-sky-300 font-mono uppercase block">Stage 1</span>
-                  <strong className="text-xs sm:text-sm font-bold block">1. Calibrated Ingestion</strong>
-                  <p className="text-[10px] text-slate-300">
-                    Level-1B radiance normalization & geostationary grid re-projection.
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-3 relative z-10">
+                <div className="bg-white/80 dark:bg-slate-900/75 dark:hover:bg-slate-850/80 backdrop-blur-xl rounded-2xl p-4 border border-slate-200/80 dark:border-white/10 text-center space-y-1.5 shadow-xs dark:shadow-[0_4px_20px_rgba(0,0,0,0.35)] transition-all hover:scale-[1.02]">
+                  <span className="text-[10px] text-sky-600 dark:text-sky-400 font-mono uppercase font-bold block tracking-wider">
+                    {isHindi ? 'चरण 1' : 'Stage 1'}
+                  </span>
+                  <strong className="text-xs sm:text-sm font-extrabold block text-slate-900 dark:text-white">
+                    {isHindi ? '1. कैलिब्रेटेड अंतर्ग्रहण' : '1. Calibrated Ingestion'}
+                  </strong>
+                  <p className="text-[10px] text-slate-600 dark:text-slate-300 font-normal leading-relaxed">
+                    {isHindi
+                      ? 'लेवल-1B विकिरण सामान्यीकरण एवं भू-स्थैतिक ग्रिड पुन:-प्रक्षेपण।'
+                      : 'Level-1B radiance normalization & geostationary grid re-projection.'}
                   </p>
                 </div>
 
-                <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/15 text-center space-y-1">
-                  <span className="text-[10px] text-sky-300 font-mono uppercase block">Stage 2</span>
-                  <strong className="text-xs sm:text-sm font-bold block">2. Spatial Alignment</strong>
-                  <p className="text-[10px] text-slate-300">
-                    Bilinear interpolation to unified 224×224 km storm-centered grid.
+                <div className="bg-white/80 dark:bg-slate-900/75 dark:hover:bg-slate-850/80 backdrop-blur-xl rounded-2xl p-4 border border-slate-200/80 dark:border-white/10 text-center space-y-1.5 shadow-xs dark:shadow-[0_4px_20px_rgba(0,0,0,0.35)] transition-all hover:scale-[1.02]">
+                  <span className="text-[10px] text-sky-600 dark:text-sky-400 font-mono uppercase font-bold block tracking-wider">
+                    {isHindi ? 'चरण 2' : 'Stage 2'}
+                  </span>
+                  <strong className="text-xs sm:text-sm font-extrabold block text-slate-900 dark:text-white">
+                    {isHindi ? '2. स्थानिक संरेखण' : '2. Spatial Alignment'}
+                  </strong>
+                  <p className="text-[10px] text-slate-600 dark:text-slate-300 font-normal leading-relaxed">
+                    {isHindi
+                      ? 'एकीकृत 224×224 किमी तूफान-केंद्रित ग्रिड के लिए द्विरेखीय प्रक्षेप।'
+                      : 'Bilinear interpolation to unified 224×224 km storm-centered grid.'}
                   </p>
                 </div>
 
-                <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/15 text-center space-y-1">
-                  <span className="text-[10px] text-sky-300 font-mono uppercase block">Stage 3</span>
-                  <strong className="text-xs sm:text-sm font-bold block">3. Multi-Channel Fusion</strong>
-                  <p className="text-[10px] text-slate-300">
-                    Concatenates IR, WV, scatterometer winds & radar into 6-channel tensor.
+                <div className="bg-white/80 dark:bg-slate-900/75 dark:hover:bg-slate-850/80 backdrop-blur-xl rounded-2xl p-4 border border-slate-200/80 dark:border-white/10 text-center space-y-1.5 shadow-xs dark:shadow-[0_4px_20px_rgba(0,0,0,0.35)] transition-all hover:scale-[1.02]">
+                  <span className="text-[10px] text-sky-600 dark:text-sky-400 font-mono uppercase font-bold block tracking-wider">
+                    {isHindi ? 'चरण 3' : 'Stage 3'}
+                  </span>
+                  <strong className="text-xs sm:text-sm font-extrabold block text-slate-900 dark:text-white">
+                    {isHindi ? '3. बहु-चैनल संलयन' : '3. Multi-Channel Fusion'}
+                  </strong>
+                  <p className="text-[10px] text-slate-600 dark:text-slate-300 font-normal leading-relaxed">
+                    {isHindi
+                      ? 'IR, जलवाष्प, स्कैटरोमीटर पवन एवं रडार को 6-चैनल टेन्सर में जोड़ना।'
+                      : 'Concatenates IR, WV, scatterometer winds & radar into 6-channel tensor.'}
                   </p>
                 </div>
 
-                <div className="bg-emerald-500/20 backdrop-blur-md rounded-2xl p-4 border border-emerald-400/40 text-center space-y-1">
-                  <span className="text-[10px] text-emerald-300 font-mono uppercase block">Stage 4</span>
-                  <strong className="text-xs sm:text-sm font-bold block text-emerald-200">4. Neural Inference</strong>
-                  <p className="text-[10px] text-slate-300">
-                    Warm model inference executed across MobileNetV3, ResNet18, and GRU in ~95-178ms (Cold start: ~1.5s).
+                <div className="bg-white/80 dark:bg-slate-900/75 dark:hover:bg-slate-850/80 backdrop-blur-xl rounded-2xl p-4 border border-slate-200/80 dark:border-white/10 text-center space-y-1.5 shadow-xs dark:shadow-[0_4px_20px_rgba(0,0,0,0.35)] transition-all hover:scale-[1.02]">
+                  <span className="text-[10px] text-sky-600 dark:text-sky-400 font-mono uppercase font-bold block tracking-wider">
+                    {isHindi ? 'चरण 4' : 'Stage 4'}
+                  </span>
+                  <strong className="text-xs sm:text-sm font-extrabold block text-slate-900 dark:text-white">
+                    {isHindi ? '4. न्यूरल इनफेरेंस' : '4. Neural Inference'}
+                  </strong>
+                  <p className="text-[10px] text-slate-600 dark:text-slate-300 font-normal leading-relaxed">
+                    {isHindi
+                      ? 'MobileNetV3, ResNet18 एवं GRU पर ~95-178ms में वार्म मॉडल इनफेरेंस।'
+                      : 'Warm model inference executed across MobileNetV3, ResNet18, and GRU in ~95-178ms (Cold start: ~1.5s).'}
                   </p>
                 </div>
               </div>
