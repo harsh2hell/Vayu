@@ -488,7 +488,7 @@ const StateWeather = () => {
   }, [stateInfo, searchQuery, selectedFilter]);
 
   return (
-    <div className="min-h-screen bg-[#fafbfc] dark:bg-black text-slate-900 dark:text-slate-100 font-sans antialiased flex flex-col transition-colors duration-500 overflow-x-hidden w-full max-w-full">
+    <div className="min-h-screen bg-[#fafbfc] dark:bg-black text-slate-900 dark:text-slate-100 font-sans antialiased flex flex-col transition-colors duration-500 w-full max-w-full">
       
       {/* =========================================================================
            TOP NAVIGATION BAR (ALWAYS AT TOP)

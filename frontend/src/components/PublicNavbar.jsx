@@ -254,7 +254,7 @@ const PublicNavbar = ({
   ];
 
   return (
-    <header className={`sticky top-0 z-[1000] w-full transition-all duration-300 header-glass-bar relative ${
+    <header className={`sticky top-0 z-[1000] w-full transition-all duration-300 header-glass-bar ${
       isScrolled ? 'is-scrolled' : ''
     }`}>
       {/* Specular Glossy Light Sheen across top half of glass header */}
