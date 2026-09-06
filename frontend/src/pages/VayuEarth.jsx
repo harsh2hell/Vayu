@@ -1,151 +1,170 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { 
-  MapContainer, 
-  TileLayer, 
-  useMap, 
-  useMapEvents 
-} from 'react-leaflet';
+import React, { useState, useRef, useCallback } from 'react';
+import { MapContainer, TileLayer, useMap, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import { 
-  Globe, 
-  RotateCcw, 
-  Plus, 
-  Minus, 
-  Layers, 
-  Compass, 
-  Info, 
-  Eye, 
-  Sliders, 
-  ShieldCheck, 
-  Activity,
-  Maximize2
+import {
+  Globe2,
+  RotateCcw,
+  Plus,
+  Minus,
+  Layers,
+  Compass,
+  Sliders,
+  Satellite,
+  Map,
+  X,
 } from 'lucide-react';
 
-// Operational default coordinates: Central Bay of Bengal / North Indian Ocean
-const BASIN_DEFAULT_CENTER = [16.0, 82.0];
-const BASIN_DEFAULT_ZOOM = 4.8;
+// ─── Default camera ────────────────────────────────────────────────────────────
+// Zoom 3 gives a wide Indian-Ocean-centred view while still showing the whole
+// Eastern hemisphere. User can freely zoom / pan anywhere on Earth from here.
+const DEFAULT_CENTER = [15.0, 80.0];
+const DEFAULT_ZOOM   = 3;
+const MIN_ZOOM       = 1;   // Full-globe view (whole Earth on screen)
+const MAX_ZOOM       = 18;  // Street-level detail
 
-// NASA GIBS WMTS Remote Web Mercator (EPSG:3857) Tile Endpoint
-// Near Real-Time (NRT) True Color Corrected Reflectance from VIIRS (Suomi NPP)
-const NASA_GIBS_VIIRS_URL = 
-  'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_SNPP_CorrectedReflectance_TrueColor/default/default/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg';
+// ─── Tile Sources ──────────────────────────────────────────────────────────────
+// All free / public-domain services — no API key required.
 
-// Standard high-resolution geographic base tile underlay (Esri / CartoDB)
-const BASEMAP_TILE_URL = 
-  'https://server.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}';
+const TILES_DARK_BASE = {
+  url: 'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png',
+  attribution:
+    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> ' +
+    'contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
+  subdomains: 'abcd',
+  maxZoom: 20,
+};
 
-const BASEMAP_LABELS_URL = 
-  'https://services.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Reference/MapServer/tile/{z}/{y}/{x}';
+const TILES_ESRI_SAT = {
+  url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+  attribution:
+    'Imagery &copy; Esri, Maxar, Earthstar Geographics, and the GIS User Community',
+  maxZoom: 18,
+};
 
-const SATELLITE_ATTRIBUTION = 'Satellite imagery: NASA GIBS / NASA Earthdata';
-const BASEMAP_ATTRIBUTION = 'Esri, GEBCO, NOAA, National Geographic, Garmin, HERE, Geonames.org';
+const TILES_NASA_GIBS = {
+  url:
+    'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/' +
+    'VIIRS_SNPP_CorrectedReflectance_TrueColor/default/default/' +
+    'GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg',
+  attribution:
+    'Satellite (NRT): <a href="https://earthdata.nasa.gov/eosdis/science-system-description/eosdis-components/gibs">NASA GIBS</a> / VIIRS Suomi NPP',
+  maxNativeZoom: 9,
+  maxZoom: MAX_ZOOM,
+};
 
-/**
- * Controller subcomponent handling programmatic camera control and telemetry updates.
- */
-const MapController = ({ center, zoom, onCoordinatesChange, onZoomChange }) => {
+const TILES_LABELS = {
+  url: 'https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png',
+  attribution: '',
+  subdomains: 'abcd',
+  maxZoom: 20,
+};
+
+// ─── MapController ─────────────────────────────────────────────────────────────
+const MapController = ({ onCoordsChange, onZoomChange, onMapReady }) => {
   const map = useMap();
 
-  useEffect(() => {
-    if (center && Array.isArray(center) && center.length === 2) {
-      map.setView(center, zoom ?? map.getZoom(), { animate: true, duration: 0.6 });
-    }
-  }, [center, zoom, map]);
+  React.useEffect(() => {
+    if (map && onMapReady) onMapReady(map);
+  }, [map, onMapReady]);
 
   useMapEvents({
-    mousemove: (e) => {
-      if (onCoordinatesChange) {
-        onCoordinatesChange({ lat: e.latlng.lat, lon: e.latlng.lng });
-      }
-    },
-    zoomend: () => {
-      if (onZoomChange) {
-        onZoomChange(map.getZoom());
-      }
-    }
+    mousemove: (e) =>
+      onCoordsChange?.({ lat: e.latlng.lat, lon: e.latlng.lng }),
+    zoomend: () => onZoomChange?.(map.getZoom()),
   });
 
   return null;
 };
 
+// ─── LayerRow helper ─────────────────────────────────────────────────────────
+const LayerRow = ({ id, label, badge, checked, onChange }) => (
+  <div className="flex items-center justify-between p-2 rounded-xl bg-slate-800/60 border border-slate-700/50">
+    <div className="flex items-center gap-2">
+      <input
+        type="checkbox"
+        id={id}
+        checked={checked}
+        onChange={onChange}
+        className="rounded accent-sky-500 cursor-pointer w-3.5 h-3.5"
+      />
+      <label
+        htmlFor={id}
+        className="text-xs font-medium text-slate-200 cursor-pointer select-none"
+      >
+        {label}
+      </label>
+    </div>
+    {badge && (
+      <span className="text-[9px] font-mono bg-sky-500/10 text-sky-400 px-1.5 py-0.5 rounded border border-sky-500/20">
+        {badge}
+      </span>
+    )}
+  </div>
+);
+
+// ─── VayuEarth ─────────────────────────────────────────────────────────────────
 const VayuEarth = () => {
   const mapRef = useRef(null);
-  const [coords, setCoords] = useState({ lat: BASIN_DEFAULT_CENTER[0], lon: BASIN_DEFAULT_CENTER[1] });
-  const [currentZoom, setCurrentZoom] = useState(BASIN_DEFAULT_ZOOM);
-  const [isLayerPanelOpen, setIsLayerPanelOpen] = useState(false);
-  const [satelliteOpacity, setSatelliteOpacity] = useState(0.95);
 
-  // Modular Layer Registry Architecture for future capability additions
-  const [layerState, setLayerState] = useState({
-    baseMap: true,
-    satellite: true,
-    stormTracks: false,      // Slot: Multi-storm historical & synoptic tracks
-    cycloneFix: false,       // Slot: Current active cyclone center & eye fix
-    aiForecast: false,       // Slot: VAYU AI GRU 72h track forecast
-    uncertaintyCone: false,  // Slot: Monte Carlo 25-pass dropout probability cone
-    impactLandfall: false,   // Slot: Coastal hazard & strike radius matrix
-  });
+  const [coords, setCoords]           = useState({ lat: DEFAULT_CENTER[0], lon: DEFAULT_CENTER[1] });
+  const [currentZoom, setCurrentZoom] = useState(DEFAULT_ZOOM);
+  const [layerPanelOpen, setLayerPanelOpen] = useState(false);
+  const [baseMode, setBaseMode]       = useState('dark');
+  const [nasaGibsOn,  setNasaGibsOn]  = useState(true);
+  const [labelsOn,    setLabelsOn]     = useState(true);
+  const [nasaOpacity, setNasaOpacity]  = useState(0.88);
 
-  const handleResetHome = useCallback(() => {
-    if (mapRef.current) {
-      mapRef.current.setView(BASIN_DEFAULT_CENTER, BASIN_DEFAULT_ZOOM, { animate: true, duration: 0.8 });
-    }
+  const handleMapReady = useCallback((map) => { mapRef.current = map; }, []);
+  const resetView = useCallback(() => {
+    mapRef.current?.setView(DEFAULT_CENTER, DEFAULT_ZOOM, { animate: true, duration: 1.0 });
   }, []);
+  const zoomIn  = useCallback(() => mapRef.current?.zoomIn(),  []);
+  const zoomOut = useCallback(() => mapRef.current?.zoomOut(), []);
 
-  const handleZoomIn = useCallback(() => {
-    if (mapRef.current) {
-      mapRef.current.zoomIn();
-    }
-  }, []);
-
-  const handleZoomOut = useCallback(() => {
-    if (mapRef.current) {
-      mapRef.current.zoomOut();
-    }
-  }, []);
-
-  const toggleLayer = (layerKey) => {
-    setLayerState((prev) => ({
-      ...prev,
-      [layerKey]: !prev[layerKey]
-    }));
-  };
+  const latStr = `${Math.abs(coords.lat).toFixed(4)}°${coords.lat >= 0 ? 'N' : 'S'}`;
+  const lonStr = `${Math.abs(coords.lon).toFixed(4)}°${coords.lon >= 0 ? 'E' : 'W'}`;
+  const attributionText = baseMode === 'satellite' ? 'Esri World Imagery' : 'CartoDB / OpenStreetMap';
 
   return (
-    <div className="relative w-full h-full flex-1 flex flex-col bg-slate-950 select-none overflow-hidden font-sans">
-      
-      {/* Top Floating Operational HUD Bar */}
-      <div className="absolute top-3 left-3 right-3 z-[1000] flex items-center justify-between pointer-events-none gap-2">
-        
-        {/* Left Console Title & Basin Status */}
-        <div className="bg-slate-900/90 backdrop-blur-md px-3 py-2 rounded-xl border border-slate-700/80 shadow-lg flex items-center gap-2.5 pointer-events-auto text-white">
-          <div className="w-7 h-7 rounded-lg bg-sky-500/10 border border-sky-500/30 flex items-center justify-center text-sky-400">
-            <Globe className="w-4 h-4 animate-spin-slow" />
+    <div
+      className="relative w-full h-full flex flex-col bg-slate-950 select-none overflow-hidden"
+      style={{ fontFamily: 'system-ui, sans-serif' }}
+    >
+      {/* ── TOP HUD ── */}
+      <div className="absolute top-3 left-3 right-3 z-[1000] flex items-center justify-between gap-2 pointer-events-none">
+
+        <div className="bg-slate-900/90 backdrop-blur-md px-3 py-2 rounded-xl border border-slate-700/80 shadow-lg flex items-center gap-2.5 pointer-events-auto">
+          <div className="w-7 h-7 rounded-lg bg-sky-500/10 border border-sky-500/30 flex items-center justify-center">
+            <Globe2 className="w-4 h-4 text-sky-400" style={{ animation: 'vayu-spin 14s linear infinite' }} />
           </div>
           <div>
             <div className="flex items-center gap-1.5">
-              <span className="text-xs font-bold tracking-tight text-white">VAYU Earth</span>
-              <span className="text-[9px] font-mono uppercase bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-500/30 font-semibold">
-                NRT Live
-              </span>
+              <span className="text-xs font-bold text-white tracking-tight">VAYU Earth</span>
+              <span className="text-[9px] font-mono uppercase bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-500/30 font-semibold">LIVE</span>
             </div>
-            <div className="text-[10px] text-slate-400 font-mono flex items-center gap-1 mt-0.5">
-              <span>North Indian Ocean • Bay of Bengal & Arabian Sea</span>
-            </div>
+            <div className="text-[10px] text-slate-400 font-mono mt-0.5">Global Satellite Intelligence Explorer</div>
           </div>
         </div>
 
-        {/* Right Tools: Layers Toggle & Quick Action */}
         <div className="flex items-center gap-2 pointer-events-auto">
-          <button
-            type="button"
-            onClick={() => setIsLayerPanelOpen((prev) => !prev)}
-            className={`px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 backdrop-blur-md border shadow-lg transition-all cursor-pointer ${
-              isLayerPanelOpen
-                ? 'bg-sky-600 text-white border-sky-500'
-                : 'bg-slate-900/90 text-slate-200 border-slate-700/80 hover:bg-slate-800'
-            }`}
-            title="Layer Registry & Opacity Controls"
+          <div className="flex bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-xl overflow-hidden shadow-lg">
+            <button type="button" onClick={() => setBaseMode('dark')} title="Dark vector base map"
+              className={`px-3 py-2 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${baseMode === 'dark' ? 'bg-sky-600 text-white' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/80'}`}
+            >
+              <Map className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Map</span>
+            </button>
+            <div className="w-px bg-slate-700/80" />
+            <button type="button" onClick={() => setBaseMode('satellite')} title="Esri World Imagery satellite base"
+              className={`px-3 py-2 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${baseMode === 'satellite' ? 'bg-sky-600 text-white' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/80'}`}
+            >
+              <Satellite className="w-3.5 h-3.5" />
+              <span className="hidden sm:inline">Satellite</span>
+            </button>
+          </div>
+
+          <button type="button" onClick={() => setLayerPanelOpen((v) => !v)} title="Layer registry"
+            className={`px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 backdrop-blur-md border shadow-lg transition-all cursor-pointer ${layerPanelOpen ? 'bg-sky-600 text-white border-sky-500' : 'bg-slate-900/90 text-slate-300 border-slate-700/80 hover:bg-slate-800/80'}`}
           >
             <Layers className="w-3.5 h-3.5" />
             <span className="hidden sm:inline">Layers</span>
@@ -153,252 +172,122 @@ const VayuEarth = () => {
         </div>
       </div>
 
-      {/* Primary Interactive Map-First Canvas */}
+      {/* ── MAP CANVAS ── */}
       <div className="flex-1 w-full h-full relative">
         <MapContainer
-          center={BASIN_DEFAULT_CENTER}
-          zoom={BASIN_DEFAULT_ZOOM}
-          minZoom={3}
-          maxZoom={9} // Level 9 aligns with NASA GIBS GoogleMapsCompatible resolution limit
+          center={DEFAULT_CENTER}
+          zoom={DEFAULT_ZOOM}
+          minZoom={MIN_ZOOM}
+          maxZoom={MAX_ZOOM}
           zoomControl={false}
           attributionControl={false}
-          ref={(instance) => {
-            mapRef.current = instance;
-          }}
-          className="w-full h-full z-0"
-          style={{ width: '100%', height: '100%', backgroundColor: '#020617' }}
+          scrollWheelZoom={true}
+          doubleClickZoom={true}
+          dragging={true}
+          touchZoom={true}
+          className="w-full h-full"
+          style={{ width: '100%', height: '100%', background: '#020617' }}
         >
-          <MapController
-            center={BASIN_DEFAULT_CENTER}
-            zoom={BASIN_DEFAULT_ZOOM}
-            onCoordinatesChange={setCoords}
-            onZoomChange={setCurrentZoom}
-          />
+          <MapController onCoordsChange={setCoords} onZoomChange={setCurrentZoom} onMapReady={handleMapReady} />
 
-          {/* 1. BASE MAP LAYER */}
-          {layerState.baseMap && (
-            <TileLayer
-              url={BASEMAP_TILE_URL}
-              attribution={BASEMAP_ATTRIBUTION}
-              maxZoom={9}
-              minZoom={3}
-              tileSize={256}
-            />
+          {/* Base layer */}
+          {baseMode === 'dark' && (
+            <TileLayer key="dark-base" url={TILES_DARK_BASE.url} attribution={TILES_DARK_BASE.attribution} subdomains={TILES_DARK_BASE.subdomains} maxZoom={TILES_DARK_BASE.maxZoom} />
+          )}
+          {baseMode === 'satellite' && (
+            <TileLayer key="esri-sat" url={TILES_ESRI_SAT.url} attribution={TILES_ESRI_SAT.attribution} maxZoom={TILES_ESRI_SAT.maxZoom} />
           )}
 
-          {/* 2. REMOTE NASA GIBS SATELLITE TILES (EPSG:3857 WMTS) */}
-          {layerState.satellite && (
-            <TileLayer
-              url={NASA_GIBS_VIIRS_URL}
-              attribution={SATELLITE_ATTRIBUTION}
-              opacity={satelliteOpacity}
-              maxNativeZoom={9}
-              maxZoom={9}
-              minZoom={3}
-              tileSize={256}
-              noWrap={false}
-            />
+          {/* NASA GIBS NRT overlay */}
+          {nasaGibsOn && (
+            <TileLayer key="nasa-gibs" url={TILES_NASA_GIBS.url} attribution={TILES_NASA_GIBS.attribution} opacity={nasaOpacity} maxNativeZoom={TILES_NASA_GIBS.maxNativeZoom} maxZoom={TILES_NASA_GIBS.maxZoom} tileSize={256} />
           )}
 
-          {/* 3. REFERENCE BOUNDARIES & COASTAL LABELS */}
-          {layerState.baseMap && (
-            <TileLayer
-              url={BASEMAP_LABELS_URL}
-              maxZoom={9}
-              minZoom={3}
-              tileSize={256}
-              opacity={0.85}
-            />
+          {/* Labels overlay */}
+          {labelsOn && (
+            <TileLayer key="labels" url={TILES_LABELS.url} attribution={TILES_LABELS.attribution} subdomains={TILES_LABELS.subdomains} maxZoom={TILES_LABELS.maxZoom} />
           )}
-
-          {/* ARCHITECTURE LAYER SLOTS (Planned for upcoming stages) */}
-          {/* Slot: STORM TRACKS */}
-          {layerState.stormTracks && null}
-
-          {/* Slot: CURRENT CYCLONE FIX */}
-          {layerState.cycloneFix && null}
-
-          {/* Slot: VAYU AI FORECAST */}
-          {layerState.aiForecast && null}
-
-          {/* Slot: MODEL UNCERTAINTY */}
-          {layerState.uncertaintyCone && null}
-
-          {/* Slot: IMPACT / LANDFALL */}
-          {layerState.impactLandfall && null}
         </MapContainer>
       </div>
 
-      {/* Floating Operational Map Controls (+, -, Home) */}
+      {/* ── RIGHT CONTROLS ── */}
       <div className="absolute top-20 right-3 z-[1000] flex flex-col gap-1.5 pointer-events-auto">
-        {/* Reset to Operational Basin View */}
-        <button
-          type="button"
-          onClick={handleResetHome}
-          className="w-9 h-9 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-700/80 shadow-xl flex items-center justify-center transition cursor-pointer backdrop-blur-md"
-          title="Reset to Indian Ocean Basin View"
-        >
-          <RotateCcw className="w-4 h-4 text-sky-400" />
-        </button>
-
-        {/* Zoom In */}
-        <button
-          type="button"
-          onClick={handleZoomIn}
-          className="w-9 h-9 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-700/80 shadow-xl flex items-center justify-center transition cursor-pointer font-bold backdrop-blur-md"
-          title="Zoom In"
-        >
-          <Plus className="w-4 h-4" />
-        </button>
-
-        {/* Zoom Out */}
-        <button
-          type="button"
-          onClick={handleZoomOut}
-          className="w-9 h-9 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-200 hover:text-white border border-slate-700/80 shadow-xl flex items-center justify-center transition cursor-pointer font-bold backdrop-blur-md"
-          title="Zoom Out"
-        >
-          <Minus className="w-4 h-4" />
-        </button>
+        <button type="button" onClick={resetView} title="Reset to Indian Ocean view"
+          className="w-9 h-9 rounded-xl bg-slate-900/90 hover:bg-sky-700 text-sky-400 hover:text-white border border-slate-700/80 shadow-xl flex items-center justify-center transition-all cursor-pointer backdrop-blur-md"
+        ><RotateCcw className="w-4 h-4" /></button>
+        <div className="h-px bg-slate-700/60 mx-1" />
+        <button type="button" onClick={zoomIn} title="Zoom in"
+          className="w-9 h-9 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700/80 shadow-xl flex items-center justify-center transition-all cursor-pointer backdrop-blur-md"
+        ><Plus className="w-4 h-4" /></button>
+        <button type="button" onClick={zoomOut} title="Zoom out"
+          className="w-9 h-9 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700/80 shadow-xl flex items-center justify-center transition-all cursor-pointer backdrop-blur-md"
+        ><Minus className="w-4 h-4" /></button>
       </div>
 
-      {/* Bottom Telemetry HUD Bar & Official Attribution */}
-      <div className="absolute bottom-3 left-3 right-3 z-[1000] flex flex-wrap items-center justify-between gap-2 pointer-events-none">
-        
-        {/* Telemetry / Cursor Coordinates Badge */}
-        <div className="bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700/80 shadow-lg text-[11px] font-mono text-slate-300 flex items-center gap-2.5 pointer-events-auto">
+      {/* ── BOTTOM HUD ── */}
+      <div className="absolute bottom-3 left-3 right-3 z-[1000] flex flex-wrap items-end justify-between gap-2 pointer-events-none">
+        <div className="bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700/80 shadow-lg font-mono text-[11px] text-slate-300 flex items-center gap-2.5 pointer-events-auto">
           <div className="flex items-center gap-1 text-sky-400 font-semibold">
             <Compass className="w-3.5 h-3.5" />
-            <span>GEO-FIX:</span>
+            <span>GEO</span>
           </div>
-          <span>
-            {coords.lat >= 0 ? `${coords.lat.toFixed(2)}° N` : `${Math.abs(coords.lat).toFixed(2)}° S`},{' '}
-            {coords.lon >= 0 ? `${coords.lon.toFixed(2)}° E` : `${Math.abs(coords.lon).toFixed(2)}° W`}
-          </span>
+          <span className="tabular-nums">{latStr}  {lonStr}</span>
           <span className="text-slate-600">|</span>
-          <span className="text-slate-400">Zoom {typeof currentZoom === 'number' ? currentZoom.toFixed(1) : currentZoom}</span>
+          <span className="text-slate-400 tabular-nums">Z{typeof currentZoom === 'number' ? currentZoom.toFixed(1) : currentZoom}</span>
         </div>
-
-        {/* Official Public Satellite Data Attribution */}
-        <div className="bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700/80 shadow-lg text-[10px] text-slate-400 flex items-center gap-1.5 pointer-events-auto">
+        <div className="bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700/80 shadow-lg text-[10px] text-slate-500 flex items-center gap-1.5 pointer-events-auto">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
-          <span>{SATELLITE_ATTRIBUTION}</span>
+          <span>{attributionText}{nasaGibsOn ? ' + NASA GIBS VIIRS NRT' : ''}</span>
         </div>
       </div>
 
-      {/* Operational Layer Management Drawer (Collapsible) */}
-      {isLayerPanelOpen && (
-        <div className="absolute top-16 right-3 w-72 max-w-[calc(100vw-1.5rem)] bg-slate-900/95 backdrop-blur-md border border-slate-700 rounded-2xl shadow-2xl p-3.5 z-[1001] pointer-events-auto space-y-3 animate-in fade-in slide-in-from-top-2 duration-150 text-white">
-          
-          <div className="flex items-center justify-between border-b border-slate-800 pb-2">
+      {/* ── LAYER PANEL ── */}
+      {layerPanelOpen && (
+        <div className="absolute top-16 right-3 w-72 max-w-[calc(100vw-1.5rem)] bg-slate-900/97 backdrop-blur-xl border border-slate-700/80 rounded-2xl shadow-2xl p-4 z-[1001] pointer-events-auto space-y-3 text-white">
+          <div className="flex items-center justify-between pb-2 border-b border-slate-800">
             <div className="flex items-center gap-1.5 text-xs font-bold text-slate-200">
               <Sliders className="w-3.5 h-3.5 text-sky-400" />
               <span>Layer Registry</span>
             </div>
-            <button
-              type="button"
-              onClick={() => setIsLayerPanelOpen(false)}
-              className="text-slate-400 hover:text-white text-xs p-1"
-            >
-              ✕
+            <button type="button" onClick={() => setLayerPanelOpen(false)} className="text-slate-500 hover:text-white transition p-1 rounded-lg hover:bg-slate-800 cursor-pointer">
+              <X className="w-3.5 h-3.5" />
             </button>
           </div>
 
-          {/* Active Observation Layers */}
           <div className="space-y-2">
-            <div className="text-[10px] font-mono text-slate-400 uppercase tracking-wider font-bold">
-              Observation Layers
-            </div>
-
-            {/* NASA GIBS Satellite Toggle */}
-            <div className="flex items-center justify-between p-2 rounded-xl bg-slate-800/60 border border-slate-700/60">
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="layer-satellite"
-                  checked={layerState.satellite}
-                  onChange={() => toggleLayer('satellite')}
-                  className="rounded accent-sky-500 cursor-pointer"
-                />
-                <label htmlFor="layer-satellite" className="text-xs font-medium text-slate-200 cursor-pointer">
-                  NASA GIBS VIIRS
-                </label>
-              </div>
-              <span className="text-[9px] font-mono text-sky-400 bg-sky-500/10 px-1.5 py-0.5 rounded border border-sky-500/20">
-                NRT TrueColor
-              </span>
-            </div>
-
-            {/* Satellite Opacity Slider */}
-            {layerState.satellite && (
-              <div className="px-2 pt-1 pb-2 space-y-1">
+            <p className="text-[10px] font-mono text-slate-500 uppercase tracking-wider font-bold">Observation</p>
+            <LayerRow id="layer-gibs" label="NASA GIBS VIIRS (NRT)" badge="Satellite NRT" checked={nasaGibsOn} onChange={() => setNasaGibsOn((v) => !v)} />
+            {nasaGibsOn && (
+              <div className="px-2 pb-1 space-y-1">
                 <div className="flex justify-between text-[10px] font-mono text-slate-400">
-                  <span>Opacity</span>
-                  <span>{Math.round(satelliteOpacity * 100)}%</span>
+                  <span>Opacity</span><span>{Math.round(nasaOpacity * 100)}%</span>
                 </div>
-                <input
-                  type="range"
-                  min="0.2"
-                  max="1.0"
-                  step="0.05"
-                  value={satelliteOpacity}
-                  onChange={(e) => setSatelliteOpacity(parseFloat(e.target.value))}
-                  className="w-full accent-sky-500 h-1.5 bg-slate-700 rounded-lg cursor-pointer"
+                <input type="range" min="0.1" max="1.0" step="0.05" value={nasaOpacity}
+                  onChange={(e) => setNasaOpacity(parseFloat(e.target.value))}
+                  className="w-full accent-sky-500 h-1.5 rounded-lg cursor-pointer"
                 />
               </div>
             )}
-
-            {/* Base Map Toggle */}
-            <div className="flex items-center justify-between p-2 rounded-xl bg-slate-800/60 border border-slate-700/60">
-              <div className="flex items-center gap-2">
-                <input
-                  type="checkbox"
-                  id="layer-basemap"
-                  checked={layerState.baseMap}
-                  onChange={() => toggleLayer('baseMap')}
-                  className="rounded accent-sky-500 cursor-pointer"
-                />
-                <label htmlFor="layer-basemap" className="text-xs font-medium text-slate-200 cursor-pointer">
-                  Ocean Bathymetry & Coast
-                </label>
-              </div>
-              <span className="text-[9px] font-mono text-slate-400">Base</span>
-            </div>
+            <LayerRow id="layer-labels" label="Geographic Labels & Borders" badge="OSM" checked={labelsOn} onChange={() => setLabelsOn((v) => !v)} />
           </div>
 
-          {/* AI Cyclone Intelligence Layer Architecture (Prepared Slots) */}
           <div className="space-y-1.5 pt-1 border-t border-slate-800">
-            <div className="text-[10px] font-mono text-slate-400 uppercase tracking-wider font-bold">
-              AI Forecast Integration
-            </div>
-            
-            {[
-              { id: 'stormTracks', label: 'Synoptic Storm Tracks' },
-              { id: 'cycloneFix', label: 'Vortex Eye Fix (MobileNetV3)' },
-              { id: 'aiForecast', label: 'GRU 72h Track Forecast' },
-              { id: 'uncertaintyCone', label: 'MC Dropout Probability Cone' },
-              { id: 'impactLandfall', label: 'Impact & Surge Hazard Zone' }
-            ].map((slot) => (
-              <div 
-                key={slot.id}
-                className="flex items-center justify-between p-2 rounded-xl bg-slate-800/30 border border-slate-800 text-slate-400"
-              >
-                <span className="text-xs font-medium">{slot.label}</span>
-                <span className="text-[9px] font-mono text-slate-500 bg-slate-800 px-1.5 py-0.5 rounded">
-                  STANDBY
-                </span>
+            <p className="text-[10px] font-mono text-slate-500 uppercase tracking-wider font-bold">AI Intelligence (Upcoming)</p>
+            {['Synoptic Storm Tracks', 'Vortex Eye Fix (MobileNetV3)', 'GRU 72h Track Forecast', 'MC Dropout Probability Cone', 'Impact & Surge Hazard Zone'].map((label) => (
+              <div key={label} className="flex items-center justify-between p-2 rounded-xl bg-slate-800/30 border border-slate-800">
+                <span className="text-xs text-slate-500">{label}</span>
+                <span className="text-[9px] font-mono bg-slate-800 px-1.5 py-0.5 rounded text-slate-600">STANDBY</span>
               </div>
             ))}
           </div>
 
-          {/* Attribution Note */}
-          <div className="pt-2 border-t border-slate-800 text-[10px] text-slate-500 leading-relaxed font-mono">
-            VAYU Earth • Remote Tiled Satellite Intelligence System
+          <div className="pt-2 border-t border-slate-800 text-[10px] text-slate-600 font-mono">
+            VAYU Earth • Global Satellite Intelligence Explorer
           </div>
-
         </div>
       )}
 
+      <style>{`@keyframes vayu-spin { to { transform: rotate(360deg); } }`}</style>
     </div>
   );
 };
