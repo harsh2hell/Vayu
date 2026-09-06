@@ -2471,7 +2471,68 @@ export const getCityForecast = (cityId) => {
   }
   
   if (!foundCity) {
-    foundCity = CITY_FORECAST_DATA.kolkata;
+    const formattedName = normalized ? normalized.charAt(0).toUpperCase() + normalized.slice(1) : 'Kolkata';
+    foundCity = {
+      id: normalized || 'kolkata',
+      name: formattedName,
+      nameHindi: formattedName,
+      state: 'National Meteorological Grid',
+      stateHindi: 'राष्ट्रीय मौसम ग्रिड',
+      region: `${formattedName} Telemetry Station`,
+      regionHindi: `${formattedName} टेलीमेट्री स्टेशन`,
+      coordinates: '22.5726° N, 88.3639° E',
+      stationCode: `IND-${(normalized || 'KOLKATA').toUpperCase().slice(0, 4)}-${Math.floor(1000 + Math.random() * 9000)}`,
+      updatedAt: 'Connecting to AWS Feed...',
+      updatedAtHindi: 'एडब्ल्यूएस फीड से कनेक्ट हो रहा है...',
+      temp: 26.0,
+      feelsLike: 28.0,
+      tempMin: 22.0,
+      tempMax: 30.0,
+      condition: 'Updating Telemetry...',
+      conditionHindi: 'टेलीमेट्री अपडेट हो रही है...',
+      icon: 'cloudy',
+      emoji: '⛅',
+      aqi: {
+        value: 75,
+        category: 'Satisfactory',
+        categoryHindi: 'संतोषजनक',
+        statusColor: 'sky',
+        pm25: '25.0 µg/m³',
+        pm10: '45.0 µg/m³',
+        so2: '8.0 µg/m³',
+        no2: '15.0 µg/m³',
+        co: '300.0 µg/m³',
+        o3: '50.0 µg/m³',
+        advisory: 'Fetching live telemetry from observation station.',
+        advisoryHindi: 'अवलोकन स्टेशन से लाइव टेलीमेट्री प्राप्त की जा रही है।'
+      },
+      precipitation: {
+        chance: 20,
+        rate: '0.0 mm/hr',
+        rainfall: '0.0 mm',
+        past24h: '0.0 mm',
+        expected24h: '0.0 mm',
+        type: 'Updating...',
+        typeHindi: 'अपडेट हो रहा है...'
+      },
+      wind: {
+        speed: '12 km/h',
+        speedKmh: 12,
+        direction: 'Westerly',
+        directionHindi: 'पश्चिमी',
+        bearing: 270,
+        gusts: '18 km/h',
+        beaufortScale: 'Force 3 - Gentle Breeze'
+      },
+      humidity: 75,
+      pressure: '1012 hPa',
+      visibility: '6.0 km',
+      uvIndex: 5,
+      uvCategory: 'Moderate',
+      dewPoint: '20.0 °C',
+      cloudCover: '45 %',
+      forecast7Days: []
+    };
   }
 
   return enrichCityData(foundCity);

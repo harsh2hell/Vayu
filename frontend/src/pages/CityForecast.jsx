@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useMemo } from 'react';
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import { useParams, useNavigate, useLocation, Link } from 'react-router-dom';
 import {
   ArrowLeft,
   Sun,
@@ -31,7 +31,8 @@ import {
   Sunrise,
   Sunset,
   Moon,
-  CloudMoon
+  CloudMoon,
+  Loader2
 } from 'lucide-react';
 import PublicNavbar from '../components/PublicNavbar';
 import IOSGlassCard from '../components/IOSGlassCard';
@@ -40,6 +41,7 @@ import LastUpdatedBadge from '../components/LastUpdatedBadge';
 import { CITY_FORECAST_DATA, getCityForecast, getCityAstronomy } from '../data/cityForecastData';
 import { COASTAL_CITIES_DATA } from '../data/coastalCitiesData';
 import { useLiveClock } from '../utils/liveDateTime';
+import { fetchGlobalLocationWeather, searchOnlineLocations } from '../services/weatherService';
 
 // Helper to render lucide icon based on condition string
 const renderWeatherIcon = (iconName, className = "w-6 h-6") => {
@@ -89,22 +91,17 @@ const renderHourlyWeatherIcon = (icon) => {
 };
 
 // Generate dynamic, city-specific 48-hour forecast with tailored 2-hour interval cadence and true astronomical events
-const generate48HourForecast = (city, isHindi) => {
+const generate48HourForecast = (city, isHindi, currentTime = new Date()) => {
   if (!city) return [];
 
   const profile = getCityAstronomy(city);
   const baseTemp = Number(city.temp) || 28;
-  const day1 = city.forecast7Days?.[0] || {};
-  const day2 = city.forecast7Days?.[1] || {};
-  const tMin1 = Number(day1.tempMin) || Math.round(baseTemp - 3.5);
-  const tMax1 = Number(day1.tempMax) || Math.round(baseTemp + 3.8);
-  const tMin2 = Number(day2.tempMin) || Math.round(baseTemp - 3.2);
-  const tMax2 = Number(day2.tempMax) || Math.round(baseTemp + 4.0);
-  const pChance1 = day1.precipChance !== undefined ? day1.precipChance : (city.precipitation?.chance || 40);
-  const pChance2 = day2.precipChance !== undefined ? day2.precipChance : (city.precipitation?.chance || 40);
+  const forecastDays = Array.isArray(city.forecast7Days) ? city.forecast7Days : [];
+  const day0 = forecastDays[0] || {};
+  const pChance0 = day0.precipChance !== undefined ? day0.precipChance : (city.precipitation?.chance || 40);
   const condition = (city.condition || '').toLowerCase();
 
-  const now = new Date();
+  const now = currentTime instanceof Date ? currentTime : new Date(currentTime);
   const rawPoints = [];
 
   const M_EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
@@ -116,21 +113,21 @@ const generate48HourForecast = (city, isHindi) => {
 
   let nowIcon = 'cloud';
   let nowCondLabel = isHindi ? 'बादल' : 'Cloudy';
-  const isRainyCity = condition.includes('rain') || condition.includes('storm') || condition.includes('squall') || pChance1 >= 50;
+  const isRainyCity = condition.includes('rain') || condition.includes('storm') || condition.includes('squall') || pChance0 >= 50;
 
   const nowH = now.getHours();
   const nowMinOfDay = nowH * 60 + now.getMinutes();
   const isNowNight = nowMinOfDay < profile.sunriseMin || nowMinOfDay >= profile.sunsetMin;
 
-  if (isRainyCity && pChance1 >= 40) {
-    if (condition.includes('thunder') || pChance1 >= 75) {
+  if (isRainyCity && pChance0 >= 40) {
+    if (condition.includes('thunder') || pChance0 >= 75) {
       nowIcon = 'thunderstorm';
       nowCondLabel = isHindi ? 'तूफान व बारिश' : 'Thunderstorm';
     } else {
       nowIcon = isNowNight ? 'night-rain' : 'rain';
       nowCondLabel = isHindi ? 'बारिश' : 'Rain';
     }
-  } else if (isRainyCity && pChance1 >= 20) {
+  } else if (isRainyCity && pChance0 >= 20) {
     nowIcon = isNowNight ? 'night-rain' : 'rain';
     nowCondLabel = isHindi ? 'बौछारें' : 'Showers';
   } else if (condition.includes('fog') || condition.includes('haze') || condition.includes('dust')) {
@@ -146,13 +143,14 @@ const generate48HourForecast = (city, isHindi) => {
 
   rawPoints.push({
     type: 'hour',
+    key: 'hour-now',
     date: new Date(now),
     offsetH: 0,
     timeLabel: isHindi ? 'अभी' : 'Now',
     temp: Math.round(baseTemp),
     icon: nowIcon,
     condLabel: nowCondLabel,
-    rainProb: pChance1 >= 20 ? pChance1 : 0,
+    rainProb: pChance0 >= 20 ? pChance0 : 0,
     isNow: true,
     isMidnight: false,
     isDay2: false,
@@ -170,15 +168,31 @@ const generate48HourForecast = (city, isHindi) => {
   }
 
   const endTime = now.getTime() + 48 * 3600000;
+  const nowDayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
 
   // Generate 2-hour interval timepoints following this city's station cadence
   while (currentSlotDate.getTime() <= endTime) {
     const d = new Date(currentSlotDate);
     const offsetH = Math.round((d.getTime() - now.getTime()) / 3600000);
-    const isDay2 = offsetH >= 24;
-    const tMin = isDay2 ? tMin2 : tMin1;
-    const tMax = isDay2 ? tMax2 : tMax1;
-    const baseRain = isDay2 ? pChance2 : pChance1;
+    const slotDayStart = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
+    const dayOffsetDays = Math.max(0, Math.round((slotDayStart - nowDayStart) / 86400000));
+
+    // Continuously index the appropriate future day entry from existing forecast7Days data
+    const dayIdx = forecastDays.length > 0 ? Math.min(dayOffsetDays, forecastDays.length - 1) : 0;
+    const targetDay = forecastDays[dayIdx] || {};
+
+    const tMin = Number(targetDay.tempMin) !== undefined && !isNaN(Number(targetDay.tempMin))
+      ? Number(targetDay.tempMin)
+      : Math.round(baseTemp - (dayOffsetDays >= 1 ? 3.2 : 3.5));
+    const tMax = Number(targetDay.tempMax) !== undefined && !isNaN(Number(targetDay.tempMax))
+      ? Number(targetDay.tempMax)
+      : Math.round(baseTemp + (dayOffsetDays >= 1 ? 4.0 : 3.8));
+    const baseRain = targetDay.precipChance !== undefined && !isNaN(Number(targetDay.precipChance))
+      ? Number(targetDay.precipChance)
+      : (city.precipitation?.chance !== undefined ? city.precipitation.chance : 40);
+    const dayCond = (targetDay.condition || city.condition || '').toLowerCase();
+    const isTargetRainyCity = dayCond.includes('rain') || dayCond.includes('storm') || dayCond.includes('squall') || baseRain >= 50;
+
     const h = d.getHours();
 
     // Diurnal temperature curve tailored to the city's peak heat hour and coastal moderating spread
@@ -198,21 +212,21 @@ const generate48HourForecast = (city, isHindi) => {
     let icon = 'cloud';
     let condLabel = isHindi ? 'बादल' : 'Cloudy';
 
-    if (isRainyCity && rainProb >= 40) {
-      if (condition.includes('thunder') || rainProb >= 75) {
+    if (isTargetRainyCity && rainProb >= 40) {
+      if (dayCond.includes('thunder') || rainProb >= 75) {
         icon = 'thunderstorm';
         condLabel = isHindi ? 'तूफान व बारिश' : 'Thunderstorm';
       } else {
         icon = isNight ? 'night-rain' : 'rain';
         condLabel = isHindi ? 'बारिश' : 'Rain';
       }
-    } else if (isRainyCity && rainProb >= 20) {
+    } else if (isTargetRainyCity && rainProb >= 20) {
       icon = isNight ? 'night-rain' : 'rain';
       condLabel = isHindi ? 'बौछारें' : 'Showers';
-    } else if (condition.includes('fog') || condition.includes('haze') || condition.includes('dust')) {
+    } else if (dayCond.includes('fog') || dayCond.includes('haze') || dayCond.includes('dust')) {
       icon = 'fog';
       condLabel = isHindi ? 'धुंध' : 'Haze & Fog';
-    } else if (condition.includes('sun') || condition.includes('clear')) {
+    } else if (dayCond.includes('sun') || dayCond.includes('clear')) {
       icon = isNight ? 'clear-night' : 'sun';
       condLabel = isNight ? (isHindi ? 'साफ रात' : 'Clear Night') : (isHindi ? 'धूप' : 'Sunny');
     } else {
@@ -229,6 +243,7 @@ const generate48HourForecast = (city, isHindi) => {
 
     rawPoints.push({
       type: 'hour',
+      key: `hour-${d.getTime()}`,
       date: d,
       offsetH,
       timeLabel,
@@ -238,7 +253,7 @@ const generate48HourForecast = (city, isHindi) => {
       rainProb: rainProb >= 20 ? rainProb : 0,
       isNow: false,
       isMidnight: h === 0,
-      isDay2,
+      isDay2: dayOffsetDays >= 1,
       dateLabel: slotDateStr
     });
 
@@ -246,7 +261,7 @@ const generate48HourForecast = (city, isHindi) => {
   }
 
   // Insert geographically accurate Sunrise and Sunset events for this specific city
-  for (let dayOffset = 0; dayOffset <= 2; dayOffset++) {
+  for (let dayOffset = 0; dayOffset <= 3; dayOffset++) {
     const sunriseD = new Date(
       now.getFullYear(),
       now.getMonth(),
@@ -258,6 +273,7 @@ const generate48HourForecast = (city, isHindi) => {
     if (sunriseD.getTime() > now.getTime() && sunriseD.getTime() <= endTime) {
       rawPoints.push({
         type: 'event',
+        key: `event-sunrise-${sunriseD.getTime()}`,
         date: sunriseD,
         timeLabel: isHindi ? profile.sunriseHi : profile.sunrise,
         label: isHindi ? 'सूर्योदय' : 'Sunrise',
@@ -278,6 +294,7 @@ const generate48HourForecast = (city, isHindi) => {
     if (sunsetD.getTime() > now.getTime() && sunsetD.getTime() <= endTime) {
       rawPoints.push({
         type: 'event',
+        key: `event-sunset-${sunsetD.getTime()}`,
         date: sunsetD,
         timeLabel: isHindi ? profile.sunsetHi : profile.sunset,
         label: isHindi ? 'सूर्यास्त' : 'Sunset',
@@ -291,7 +308,18 @@ const generate48HourForecast = (city, isHindi) => {
   // Sort strictly chronologically so events and hourly slots flow seamlessly
   rawPoints.sort((a, b) => a.date.getTime() - b.date.getTime());
 
-  return rawPoints;
+  // Prevent duplicate time slots and guarantee uniqueness
+  const uniquePoints = [];
+  const seenKeys = new Set();
+  for (const pt of rawPoints) {
+    const dedupeKey = pt.key || (pt.isNow ? 'hour-now' : `${pt.type}-${pt.date.getTime()}`);
+    if (!seenKeys.has(dedupeKey)) {
+      seenKeys.add(dedupeKey);
+      uniquePoints.push(pt);
+    }
+  }
+
+  return uniquePoints;
 };
 
 // Summary text generator for 48-hour forecast with city-specific astronomy and cadence
@@ -389,30 +417,114 @@ const CityForecast = () => {
     }
   };
 
-  // Fetch city forecast dataset
-  const cityData = useMemo(() => {
-    return getCityForecast(cityId);
-  }, [cityId]);
+  const locationState = useLocation();
+
+  // Initial base city data to prevent layout shift
+  const initialBase = useMemo(() => {
+    const passedLoc = locationState?.state?.location;
+    return getCityForecast(passedLoc?.id || cityId);
+  }, [cityId, locationState?.state?.location]);
+
+  // Live dynamically fetched weather & air-quality telemetry state
+  const [liveCityData, setLiveCityData] = useState(initialBase);
+  const [isLoadingLive, setIsLoadingLive] = useState(false);
 
   // Active selected day for detailed hourly view (defaults to Day 0: Today)
   const [selectedDayIdx, setSelectedDayIdx] = useState(0);
 
+  // Reset selected day index when cityId changes
+  useEffect(() => {
+    setSelectedDayIdx(0);
+  }, [cityId]);
+
+  // Dynamically load real-world meteorological & air quality telemetry for any selected location
+  useEffect(() => {
+    let isCancelled = false;
+    const loadLiveData = async () => {
+      setIsLoadingLive(true);
+      try {
+        const passedLoc = locationState?.state?.location;
+        const target = passedLoc || cityId;
+        const realData = await fetchGlobalLocationWeather(target);
+        if (!isCancelled && realData) {
+          setLiveCityData(realData);
+        }
+      } catch (err) {
+        console.error('Failed to load global live telemetry:', err);
+      } finally {
+        if (!isCancelled) {
+          setIsLoadingLive(false);
+        }
+      }
+    };
+
+    loadLiveData();
+
+    return () => {
+      isCancelled = true;
+    };
+  }, [cityId, locationState?.state?.location]);
+
+  const cityData = liveCityData || initialBase;
+
   // Selected day object
-  const activeDay = cityData.forecast7Days[selectedDayIdx] || cityData.forecast7Days[0];
+  const activeDay = (cityData.forecast7Days && cityData.forecast7Days[selectedDayIdx]) || 
+                    (cityData.forecast7Days && cityData.forecast7Days[0]) || 
+                    cityData;
 
   // Search Location Modal states
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchCategory, setSearchCategory] = useState('ALL');
   const [selectedIndex, setSelectedIndex] = useState(0);
+  const [onlineSearchResults, setOnlineSearchResults] = useState([]);
+  const [isSearchingOnline, setIsSearchingOnline] = useState(false);
   const searchInputRef = React.useRef(null);
   const searchModalRef = React.useRef(null);
 
+  // Dynamic online geocoding for any global or Indian location
+  useEffect(() => {
+    if (!searchQuery || searchQuery.trim().length < 2) {
+      setOnlineSearchResults([]);
+      setIsSearchingOnline(false);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setIsSearchingOnline(true);
+      try {
+        const res = await searchOnlineLocations(searchQuery);
+        setOnlineSearchResults(res || []);
+      } catch (e) {
+        console.error('Error during online geocoding search:', e);
+      } finally {
+        setIsSearchingOnline(false);
+      }
+    }, 280);
+
+    return () => clearTimeout(timer);
+  }, [searchQuery]);
+
   // 48-Hour Hourly Weather Forecast Strip State & Ref
   const hourlyScrollRef = React.useRef(null);
-  const hourly48Data = useMemo(() => generate48HourForecast(cityData, isHindi), [cityData, isHindi]);
+  const hourly48Data = useMemo(() => generate48HourForecast(cityData, isHindi, liveClock.now), [cityData, isHindi, liveClock.now]);
   const hourly48Summary = useMemo(() => get48HourSummary(cityData, isHindi), [cityData, isHindi]);
   const cityAstronomy = useMemo(() => getCityAstronomy(cityData), [cityData]);
+
+  // Smooth scroll compensation when an expired slot drops off the left, preventing visual jumps
+  const firstFutureSlotKey = hourly48Data.find(item => !item.isNow)?.key;
+  const prevFirstFutureKeyRef = React.useRef(firstFutureSlotKey);
+
+  React.useEffect(() => {
+    if (prevFirstFutureKeyRef.current && prevFirstFutureKeyRef.current !== firstFutureSlotKey) {
+      if (hourlyScrollRef.current && hourlyScrollRef.current.scrollLeft > 20) {
+        const sampleCard = hourlyScrollRef.current.children[1];
+        const cardWidth = sampleCard ? sampleCard.offsetWidth + 12 : 88;
+        hourlyScrollRef.current.scrollLeft = Math.max(0, hourlyScrollRef.current.scrollLeft - cardWidth);
+      }
+    }
+    prevFirstFutureKeyRef.current = firstFutureSlotKey;
+  }, [firstFutureSlotKey]);
 
   const handleScrollHourly = (dir) => {
     if (hourlyScrollRef.current) {
@@ -549,7 +661,7 @@ const CityForecast = () => {
       return base.slice(0, 24);
     }
 
-    return base
+    const localMatches = base
       .filter((item) => {
         const nameMatch = item.name.toLowerCase().includes(q);
         const nameHiMatch = (item.nameHindi || '').toLowerCase().includes(q);
@@ -565,7 +677,16 @@ const CityForecast = () => {
         if (!aStarts && bStarts) return 1;
         return 0;
       });
-  }, [allSearchableLocations, searchQuery, searchCategory]);
+
+    // Merge online global geocoding results
+    if ((searchCategory === 'ALL' || searchCategory === 'CITIES') && onlineSearchResults.length > 0) {
+      const localNames = new Set(localMatches.map(l => l.name.toLowerCase()));
+      const uniqueOnline = onlineSearchResults.filter(o => !localNames.has(o.name.toLowerCase()));
+      return [...localMatches, ...uniqueOnline];
+    }
+
+    return localMatches;
+  }, [allSearchableLocations, searchQuery, searchCategory, onlineSearchResults]);
 
   // Lock background scroll and auto-focus input when modal opens
   useEffect(() => {
@@ -618,7 +739,7 @@ const CityForecast = () => {
   const handleSelectLocation = (location) => {
     setIsSearchModalOpen(false);
     setSearchQuery('');
-    navigate(`/forecast/${location.id}`);
+    navigate(`/forecast/${location.id}`, { state: { location } });
   };
 
   return (
@@ -926,20 +1047,36 @@ const CityForecast = () => {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-2 text-xs py-1 text-slate-600 dark:text-slate-300 border-t border-slate-100 dark:border-slate-800/80">
-                  <div>
+                <div className="grid grid-cols-3 gap-1.5 text-xs py-2 text-slate-600 dark:text-slate-300 border-t border-slate-100 dark:border-slate-800/80">
+                  <div className="bg-slate-50/80 dark:bg-slate-900/40 p-1.5 rounded-lg">
                     <span className="text-[10px] text-slate-400 block font-bold">PM2.5</span>
-                    <strong className="text-slate-800 dark:text-slate-200">{activeDay.aqi.pm25}</strong>
+                    <strong className="text-slate-800 dark:text-slate-200 text-[11px] truncate block">{activeDay.aqi?.pm25 || 'N/A'}</strong>
                   </div>
-                  <div>
+                  <div className="bg-slate-50/80 dark:bg-slate-900/40 p-1.5 rounded-lg">
                     <span className="text-[10px] text-slate-400 block font-bold">PM10</span>
-                    <strong className="text-slate-800 dark:text-slate-200">{activeDay.aqi.pm10}</strong>
+                    <strong className="text-slate-800 dark:text-slate-200 text-[11px] truncate block">{activeDay.aqi?.pm10 || 'N/A'}</strong>
+                  </div>
+                  <div className="bg-slate-50/80 dark:bg-slate-900/40 p-1.5 rounded-lg">
+                    <span className="text-[10px] text-slate-400 block font-bold">SO₂</span>
+                    <strong className="text-slate-800 dark:text-slate-200 text-[11px] truncate block">{activeDay.aqi?.so2 || 'N/A'}</strong>
+                  </div>
+                  <div className="bg-slate-50/80 dark:bg-slate-900/40 p-1.5 rounded-lg">
+                    <span className="text-[10px] text-slate-400 block font-bold">NO₂</span>
+                    <strong className="text-slate-800 dark:text-slate-200 text-[11px] truncate block">{activeDay.aqi?.no2 || 'N/A'}</strong>
+                  </div>
+                  <div className="bg-slate-50/80 dark:bg-slate-900/40 p-1.5 rounded-lg">
+                    <span className="text-[10px] text-slate-400 block font-bold">CO</span>
+                    <strong className="text-slate-800 dark:text-slate-200 text-[11px] truncate block">{activeDay.aqi?.co || 'N/A'}</strong>
+                  </div>
+                  <div className="bg-slate-50/80 dark:bg-slate-900/40 p-1.5 rounded-lg">
+                    <span className="text-[10px] text-slate-400 block font-bold">O₃</span>
+                    <strong className="text-slate-800 dark:text-slate-200 text-[11px] truncate block">{activeDay.aqi?.o3 || 'N/A'}</strong>
                   </div>
                 </div>
               </div>
 
               <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug mt-3 bg-slate-50 dark:bg-white/[0.02] p-2 rounded-xl border border-slate-100 dark:border-white/5">
-                {isHindi ? activeDay.aqi.advisoryHindi : activeDay.aqi.advisory}
+                {isHindi ? (activeDay.aqi?.advisoryHindi || activeDay.aqi?.advisory) : activeDay.aqi?.advisory}
               </p>
             </IOSGlassCard>
 
@@ -1011,37 +1148,41 @@ const CityForecast = () => {
                     </span>
                   </div>
                   <span className="text-xs px-2.5 py-0.5 rounded-full bg-cyan-500/15 text-cyan-700 dark:text-cyan-300 font-bold border border-cyan-500/25">
-                    {activeDay.precipitation.chance}%
+                    {activeDay.precipitation?.chance ?? 0}%
                   </span>
                 </div>
 
                 <div className="flex items-baseline gap-2 mb-2">
                   <span className="text-3xl sm:text-4xl font-black text-slate-950 dark:text-white">
-                    {activeDay.precipitation.rate}
+                    {activeDay.precipitation?.rate || '0.0 mm/hr'}
                   </span>
-                  <span className="text-xs text-slate-400 font-semibold">{isHindi ? 'वर्षा दर' : 'Current Rate'}</span>
+                  <span className="text-xs text-slate-400 font-semibold">{isHindi ? 'वर्तमान वर्षा दर' : 'Current Rate'}</span>
                 </div>
 
                 {/* Rain probability bar */}
                 <div className="w-full bg-slate-200 dark:bg-slate-800 rounded-full h-2 mb-3 overflow-hidden">
                   <div
                     className="h-full rounded-full bg-cyan-500 transition-all duration-500"
-                    style={{ width: `${activeDay.precipitation.chance}%` }}
+                    style={{ width: `${activeDay.precipitation?.chance ?? 0}%` }}
                   />
                 </div>
 
                 <div className="space-y-1.5 text-xs text-slate-600 dark:text-slate-300 border-t border-slate-100 dark:border-slate-800/80 pt-2">
                   <div className="flex justify-between items-center">
                     <span>{isHindi ? 'वर्षा प्रकार:' : 'Type:'}</span>
-                    <strong className="text-slate-800 dark:text-slate-200">{isHindi ? activeDay.precipitation.typeHindi : activeDay.precipitation.type}</strong>
+                    <strong className="text-slate-800 dark:text-slate-200">{isHindi ? (activeDay.precipitation?.typeHindi || activeDay.precipitation?.type) : activeDay.precipitation?.type}</strong>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span>{isHindi ? 'वर्षा मात्रा:' : 'Rainfall:'}</span>
+                    <strong className="text-slate-800 dark:text-slate-200">{activeDay.precipitation?.rainfall || activeDay.rainfall || '0.0 mm'}</strong>
                   </div>
                   <div className="flex justify-between items-center">
                     <span>{isHindi ? 'बीते 24 घंटे:' : 'Past 24h:'}</span>
-                    <strong className="text-cyan-600 dark:text-cyan-400">{activeDay.precipitation.past24h}</strong>
+                    <strong className="text-cyan-600 dark:text-cyan-400">{activeDay.precipitation?.past24h || '0.0 mm'}</strong>
                   </div>
                   <div className="flex justify-between items-center">
                     <span>{isHindi ? 'आगामी 24 घंटे:' : 'Next 24h Outlook:'}</span>
-                    <strong className="text-slate-800 dark:text-slate-200">{activeDay.precipitation.expected24h}</strong>
+                    <strong className="text-slate-800 dark:text-slate-200">{activeDay.precipitation?.expected24h || '0.0 mm'}</strong>
                   </div>
                 </div>
               </div>
@@ -1190,9 +1331,9 @@ const CityForecast = () => {
               ref={hourlyScrollRef}
               className="flex items-center gap-2 sm:gap-3 overflow-x-auto no-scrollbar scroll-smooth py-2 px-1"
             >
-              {hourly48Data.map((item, idx) => (
+              {hourly48Data.map((item) => (
                 <div
-                  key={`${item.timeLabel}-${idx}`}
+                  key={item.key || (item.isNow ? 'hour-now' : `${item.type}-${item.date?.getTime()}`)}
                   className={`min-w-[68px] sm:min-w-[76px] h-[116px] flex flex-col items-center justify-between py-2 px-1.5 rounded-2xl transition-all duration-150 shrink-0 ${
                     item.isNow
                       ? 'bg-sky-500/15 dark:bg-sky-500/20 border border-sky-400/50 dark:border-sky-400/40 shadow-xs ring-1 ring-sky-400/20'
@@ -1407,9 +1548,14 @@ const CityForecast = () => {
                   setSearchQuery(e.target.value);
                   setSelectedIndex(0);
                 }}
-                placeholder={isHindi ? 'शहर या राज्य खोजें...' : 'Search city or state...'}
+                placeholder={isHindi ? 'भारत या विश्व का कोई भी शहर खोजें (उदा. देहरादून, शिमला, दिल्ली)...' : 'Search any city, coastal port, or state (e.g. Dehradun, Shimla, Delhi)...'}
                 className="w-full bg-transparent text-sm sm:text-base font-semibold text-slate-900 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 outline-none"
               />
+              {isSearchingOnline && (
+                <div className="flex items-center text-sky-500 animate-spin shrink-0">
+                  <Loader2 className="w-4 h-4" />
+                </div>
+              )}
               {searchQuery && (
                 <button
                   type="button"
