@@ -286,63 +286,74 @@ const Login = ({ initialMode }) => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col lg:flex-row relative overflow-hidden font-sans">
+    <div className="min-h-screen bg-white flex items-center justify-center p-4 sm:p-6 lg:p-10 font-sans relative">
       {/* 2px National Tricolor Stripe */}
       <div className="fixed top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#FF9933] via-slate-300 to-[#138808] z-50" />
 
-      {/* ═══════════ LEFT PANEL — Auth Form ═══════════ */}
-      <div className="relative z-10 w-full lg:w-[480px] xl:w-[520px] min-h-screen flex flex-col bg-white border-r border-slate-100">
-        {/* Back navigation */}
-        <header className="px-6 pt-5 pb-3 flex items-center justify-between">
-          <a
-            href={getWebsiteUrl()}
-            className="inline-flex items-center gap-2 text-xs font-medium text-slate-500 hover:text-slate-800 transition-colors cursor-pointer group"
-          >
-            <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
-            <span>Back to Public Atlas</span>
-          </a>
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono bg-slate-50 border border-slate-150 text-slate-500">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-            Secure
-          </span>
-        </header>
+      {/* ═══════════ MAIN CONTAINER — Elevated Card ═══════════ */}
+      <div
+        className="w-full max-w-5xl bg-white rounded-2xl overflow-hidden flex flex-col lg:flex-row"
+        style={{
+          boxShadow: '0 1px 3px 0 rgba(0,0,0,0.06), 0 4px 16px -2px rgba(0,0,0,0.06), 0 12px 40px -4px rgba(0,0,0,0.04)',
+          border: '1px solid rgba(226,232,240,0.7)',
+          minHeight: 'min(640px, calc(100vh - 80px))',
+          maxHeight: 'calc(100vh - 80px)',
+        }}
+      >
+        {/* ═══════════ LEFT SECTION — Auth Form ═══════════ */}
+        <div className="relative z-10 w-full lg:w-[440px] xl:w-[460px] flex flex-col bg-white">
+          {/* Back navigation */}
+          <header className="px-6 pt-5 pb-2 flex items-center justify-between shrink-0">
+            <a
+              href={getWebsiteUrl()}
+              className="inline-flex items-center gap-2 text-xs font-medium text-slate-500 hover:text-slate-800 transition-colors cursor-pointer group"
+            >
+              <ArrowLeft className="w-3.5 h-3.5 group-hover:-translate-x-0.5 transition-transform" />
+              <span>Back to Public Atlas</span>
+            </a>
+            <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono bg-slate-50 border border-slate-200/80 text-slate-500">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+              Secure
+            </span>
+          </header>
 
-        {/* Main form area — centered */}
-        <main className="flex-1 flex flex-col items-center justify-center px-6 sm:px-10 lg:px-12">
-          <div className="w-full max-w-sm space-y-5">
-            {/* Logo & Title */}
-            <div className="text-center space-y-3 mb-3">
-              <div className="inline-flex items-center justify-center h-20 mb-1">
-                <img
-                  src="/vayu.png"
-                  alt="VAYU Cyclone Intelligence"
-                  className="h-16 sm:h-20 w-auto object-contain drop-shadow-sm"
-                />
+          {/* Main form area — centered */}
+          <main className="flex-1 flex flex-col items-center justify-center px-6 sm:px-10 lg:px-10 overflow-y-auto">
+            <div className="w-full max-w-sm space-y-4">
+              {/* Logo & Title */}
+              <div className="text-center space-y-2 mb-2">
+                <div className="inline-flex items-center justify-center h-18 mb-1">
+                  <img
+                    src="/vayu.png"
+                    alt="VAYU Cyclone Intelligence"
+                    className="h-14 sm:h-16 w-auto object-contain drop-shadow-sm"
+                  />
+                </div>
+                <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight font-heading">
+                  {isSignUp ? 'Create Account' : 'Portal Login'}
+                </h1>
+                <p className="text-[11px] text-slate-400 font-mono">
+                  Authorized access to storm intelligence systems
+                </p>
               </div>
-              <h1 className="text-2xl font-extrabold text-slate-900 tracking-tight font-heading">
-                {isSignUp ? 'Create Account' : 'Portal Login'}
-              </h1>
-              <p className="text-xs text-slate-400 font-mono">
-                Authorized access to storm intelligence systems
-              </p>
+
+              {/* Clerk form */}
+              <ClerkAuthSection redirectTarget={redirectTarget} isSignUp={isSignUp} />
             </div>
+          </main>
 
-            {/* Clerk form */}
-            <ClerkAuthSection redirectTarget={redirectTarget} isSignUp={isSignUp} />
-          </div>
-        </main>
+          {/* Footer */}
+          <footer className="px-6 py-3 text-center shrink-0">
+            <p className="text-[10px] text-slate-400 font-mono">
+              VAYU AI Meteorological Platform • vayusat.live
+            </p>
+          </footer>
+        </div>
 
-        {/* Footer */}
-        <footer className="px-6 py-4 text-center">
-          <p className="text-[10px] text-slate-400 font-mono">
-            VAYU AI Meteorological Platform • vayusat.live
-          </p>
-        </footer>
-      </div>
-
-      {/* ═══════════ RIGHT PANEL — Atmospheric Visual ═══════════ */}
-      <div className="hidden lg:block flex-1 relative">
-        <AtmosphericBackground />
+        {/* ═══════════ RIGHT SECTION — Atmospheric Visual ═══════════ */}
+        <div className="hidden lg:block flex-1 relative">
+          <AtmosphericBackground />
+        </div>
       </div>
 
       {/* ═══════════ CSS KEYFRAMES ═══════════ */}
