@@ -184,11 +184,11 @@ const Dashboard = () => {
       {/* 2. System Status Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Backend Gateway */}
-        <div className="card p-4 flex items-center gap-3.5 border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-2xl shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-all">
-          <div className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 border ${
+        <div className="vayu-glass-3d-card-interactive p-4.5 flex items-center gap-3.5 rounded-2xl cursor-default">
+          <div className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 border shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_2px_6px_rgba(0,0,0,0.04)] ${
             isOnline 
-              ? 'bg-emerald-50/80 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/80' 
-              : 'bg-rose-50/80 text-rose-700 border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800/80'
+              ? 'bg-emerald-50/90 text-emerald-700 border-emerald-200 dark:bg-emerald-950/70 dark:text-emerald-300 dark:border-emerald-800/80' 
+              : 'bg-rose-50/90 text-rose-700 border-rose-200 dark:bg-rose-950/70 dark:text-rose-300 dark:border-rose-800/80'
           }`}>
             <Activity className="w-5 h-5" />
           </div>
@@ -203,8 +203,8 @@ const Dashboard = () => {
         </div>
 
         {/* AI Checkpoints */}
-        <div className="card p-4 flex items-center gap-3.5 border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-2xl shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-all">
-          <div className="w-11 h-11 rounded-2xl bg-blue-50/80 text-[#003087] dark:bg-blue-950/60 dark:text-blue-300 border border-blue-200 dark:border-blue-800/80 flex items-center justify-center shrink-0">
+        <div className="vayu-glass-3d-card-interactive p-4.5 flex items-center gap-3.5 rounded-2xl cursor-default">
+          <div className="w-11 h-11 rounded-2xl bg-blue-50/90 text-[#003087] dark:bg-blue-950/70 dark:text-blue-300 border border-blue-200 dark:border-blue-800/80 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_2px_6px_rgba(0,0,0,0.04)] flex items-center justify-center shrink-0">
             <Cpu className="w-5 h-5" />
           </div>
           <div className="min-w-0">
@@ -215,8 +215,8 @@ const Dashboard = () => {
         </div>
 
         {/* Satellite Service */}
-        <div className="card p-4 flex items-center gap-3.5 border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-2xl shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-all">
-          <div className="w-11 h-11 rounded-2xl bg-sky-50/80 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300 border border-sky-200 dark:border-sky-800/80 flex items-center justify-center shrink-0">
+        <div className="vayu-glass-3d-card-interactive p-4.5 flex items-center gap-3.5 rounded-2xl cursor-default">
+          <div className="w-11 h-11 rounded-2xl bg-sky-50/90 text-sky-700 dark:bg-sky-950/70 dark:text-sky-300 border border-sky-200 dark:border-sky-800/80 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_2px_6px_rgba(0,0,0,0.04)] flex items-center justify-center shrink-0">
             <Satellite className="w-5 h-5" />
           </div>
           <div className="min-w-0">
@@ -227,8 +227,8 @@ const Dashboard = () => {
         </div>
 
         {/* Telemetry Database */}
-        <div className="card p-4 flex items-center gap-3.5 border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-2xl shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-all">
-          <div className="w-11 h-11 rounded-2xl bg-purple-50/80 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300 border border-purple-200 dark:border-purple-800/80 flex items-center justify-center shrink-0">
+        <div className="vayu-glass-3d-card-interactive p-4.5 flex items-center gap-3.5 rounded-2xl cursor-default">
+          <div className="w-11 h-11 rounded-2xl bg-purple-50/90 text-purple-700 dark:bg-purple-950/70 dark:text-purple-300 border border-purple-200 dark:border-purple-800/80 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_2px_6px_rgba(0,0,0,0.04)] flex items-center justify-center shrink-0">
             <Database className="w-5 h-5" />
           </div>
           <div className="min-w-0">
@@ -240,10 +240,10 @@ const Dashboard = () => {
       </div>
 
       {/* 3. 8-Stage Real AI Pipeline Orchestration Tracker */}
-      <div className="card overflow-hidden border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs rounded-2xl">
-        <div className="p-4 px-5 border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between gap-4">
+      <div className="vayu-glass-3d-card overflow-hidden rounded-3xl">
+        <div className="p-4 px-5 border-b border-white/70 dark:border-slate-800/80 bg-white/40 dark:bg-slate-900/40 backdrop-blur-xs flex items-center justify-between gap-4">
           <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-[#003087] dark:text-blue-400 border border-blue-200/60 dark:border-blue-800/60 flex items-center justify-center shrink-0">
+            <div className="w-7 h-7 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-[#003087] dark:text-blue-400 border border-blue-200/60 dark:border-blue-800/60 shadow-2xs flex items-center justify-center shrink-0">
               <Layers className="w-4 h-4" />
             </div>
             <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
@@ -256,11 +256,11 @@ const Dashboard = () => {
           </div>
         </div>
 
-        <div className="p-4 overflow-x-auto">
+        <div className="p-4.5 overflow-x-auto">
           <div className="flex items-center gap-2.5 min-w-[960px]">
             {PIPELINE_STAGES.map((stage, idx) => (
               <React.Fragment key={stage.id}>
-                <div className="flex-1 min-w-[130px] bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/90 dark:border-slate-700/80 rounded-xl p-3.5 hover:border-[#003087] dark:hover:border-sky-500 hover:shadow-sm transition-all group">
+                <div className="vayu-glass-3d-step flex-1 min-w-[130px] rounded-2xl p-3.5 group cursor-default">
                   <div className="flex items-center justify-between mb-1.5">
                     <span className="text-[11px] font-bold font-mono text-slate-500 dark:text-slate-400">0{idx + 1}</span>
                     <StatusBadge status={isOnline ? 'READY' : 'OFFLINE'} size="xs" />
@@ -390,23 +390,23 @@ const Dashboard = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {/* Satellite Analysis */}
-          <div className="card p-5 border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-2xl shadow-xs hover:border-blue-300 hover:shadow-md transition-all flex flex-col justify-between group">
-            <div className="space-y-2">
-              <div className="w-10 h-10 rounded-xl bg-sky-50 text-sky-700 border border-sky-200 flex items-center justify-center">
+          <div className="vayu-glass-3d-card-interactive p-5.5 rounded-3xl flex flex-col justify-between group">
+            <div className="space-y-2.5">
+              <div className="w-11 h-11 rounded-2xl bg-sky-50 text-sky-700 border border-sky-200 dark:bg-sky-950/70 dark:text-sky-300 dark:border-sky-800 flex items-center justify-center shrink-0 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_2px_6px_rgba(0,0,0,0.04)]">
                 <Satellite className="w-5 h-5" />
               </div>
-              <h3 className="text-sm font-bold text-slate-900 group-hover:text-[#003087] transition-colors">
+              <h3 className="text-sm font-black text-slate-900 dark:text-white group-hover:text-[#003087] dark:group-hover:text-sky-300 transition-colors tracking-tight">
                 Satellite Imagery Studio
               </h3>
-              <p className="text-xs text-slate-600">
+              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                 NASA GIBS MODIS/VIIRS multi-spectral ingestion, custom image upload, and integrated single-frame AI vision assessment.
               </p>
             </div>
-            <div className="pt-4 mt-2 border-t border-slate-100 flex items-center justify-between">
-              <span className="text-[10px] font-mono text-slate-400">/dashboard/satellite</span>
+            <div className="pt-4 mt-3 border-t border-slate-200/60 dark:border-slate-800/80 flex items-center justify-between">
+              <span className="text-[10px] font-mono font-semibold text-slate-400 dark:text-slate-500">/dashboard/satellite</span>
               <button
                 onClick={() => navigate('/dashboard/satellite')}
-                className="btn-secondary text-xs py-1.5 px-3 group-hover:bg-[#003087] group-hover:text-white transition-colors"
+                className="btn-secondary text-xs py-1.5 px-3.5 rounded-xl backdrop-blur-md bg-white/90 dark:bg-slate-800/90 hover:bg-[#003087] hover:text-white border border-slate-200/90 dark:border-slate-700 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_2px_5px_rgba(0,0,0,0.04)] group-hover:bg-[#003087] group-hover:text-white transition-all cursor-pointer font-bold"
               >
                 Open Satellite Analysis
               </button>
@@ -414,23 +414,23 @@ const Dashboard = () => {
           </div>
 
           {/* Cyclone Detection */}
-          <div className="card p-5 hover:border-blue-300 hover:shadow-md transition-all flex flex-col justify-between group">
-            <div className="space-y-2">
-              <div className="w-10 h-10 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center">
+          <div className="vayu-glass-3d-card-interactive p-5.5 rounded-3xl flex flex-col justify-between group">
+            <div className="space-y-2.5">
+              <div className="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/70 dark:text-emerald-300 dark:border-emerald-800 flex items-center justify-center shrink-0 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_2px_6px_rgba(0,0,0,0.04)]">
                 <Compass className="w-5 h-5" />
               </div>
-              <h3 className="text-sm font-bold text-slate-900 group-hover:text-[#003087] transition-colors">
+              <h3 className="text-sm font-black text-slate-900 dark:text-white group-hover:text-[#003087] dark:group-hover:text-sky-300 transition-colors tracking-tight">
                 Cyclone Detection & Center Localization
               </h3>
-              <p className="text-xs text-slate-600">
+              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                 MobileNetV3-Small deep detector (1,075,431 params) executing objectness scoring, bounding box, and center coordinate fixes.
               </p>
             </div>
-            <div className="pt-4 mt-2 border-t border-slate-100 flex items-center justify-between">
-              <span className="text-[10px] font-mono text-slate-400">/dashboard/detection</span>
+            <div className="pt-4 mt-3 border-t border-slate-200/60 dark:border-slate-800/80 flex items-center justify-between">
+              <span className="text-[10px] font-mono font-semibold text-slate-400 dark:text-slate-500">/dashboard/detection</span>
               <button
                 onClick={() => navigate('/dashboard/detection')}
-                className="btn-secondary text-xs py-1.5 px-3 group-hover:bg-[#003087] group-hover:text-white transition-colors"
+                className="btn-secondary text-xs py-1.5 px-3.5 rounded-xl backdrop-blur-md bg-white/90 dark:bg-slate-800/90 hover:bg-[#003087] hover:text-white border border-slate-200/90 dark:border-slate-700 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_2px_5px_rgba(0,0,0,0.04)] group-hover:bg-[#003087] group-hover:text-white transition-all cursor-pointer font-bold"
               >
                 Open Detection
               </button>
@@ -438,23 +438,23 @@ const Dashboard = () => {
           </div>
 
           {/* Morphology Classification */}
-          <div className="card p-5 hover:border-blue-300 hover:shadow-md transition-all flex flex-col justify-between group">
-            <div className="space-y-2">
-              <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-700 border border-purple-200 flex items-center justify-center">
+          <div className="vayu-glass-3d-card-interactive p-5.5 rounded-3xl flex flex-col justify-between group">
+            <div className="space-y-2.5">
+              <div className="w-11 h-11 rounded-2xl bg-purple-50 text-purple-700 border border-purple-200 dark:bg-purple-950/70 dark:text-purple-300 dark:border-purple-800 flex items-center justify-center shrink-0 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_2px_6px_rgba(0,0,0,0.04)]">
                 <Eye className="w-5 h-5" />
               </div>
-              <h3 className="text-sm font-bold text-slate-900 group-hover:text-[#003087] transition-colors">
+              <h3 className="text-sm font-black text-slate-900 dark:text-white group-hover:text-[#003087] dark:group-hover:text-sky-300 transition-colors tracking-tight">
                 Morphology Classification & Grad-CAM
               </h3>
-              <p className="text-xs text-slate-600">
+              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                 ResNet18 morphological pattern classifier (11,246,436 params) with Layer-4 Grad-CAM spatial visual explanations.
               </p>
             </div>
-            <div className="pt-4 mt-2 border-t border-slate-100 flex items-center justify-between">
-              <span className="text-[10px] font-mono text-slate-400">/dashboard/classification</span>
+            <div className="pt-4 mt-3 border-t border-slate-200/60 dark:border-slate-800/80 flex items-center justify-between">
+              <span className="text-[10px] font-mono font-semibold text-slate-400 dark:text-slate-500">/dashboard/classification</span>
               <button
                 onClick={() => navigate('/dashboard/classification')}
-                className="btn-secondary text-xs py-1.5 px-3 group-hover:bg-[#003087] group-hover:text-white transition-colors"
+                className="btn-secondary text-xs py-1.5 px-3.5 rounded-xl backdrop-blur-md bg-white/90 dark:bg-slate-800/90 hover:bg-[#003087] hover:text-white border border-slate-200/90 dark:border-slate-700 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_2px_5px_rgba(0,0,0,0.04)] group-hover:bg-[#003087] group-hover:text-white transition-all cursor-pointer font-bold"
               >
                 Open Morphology
               </button>
@@ -462,23 +462,23 @@ const Dashboard = () => {
           </div>
 
           {/* Trajectory Forecast */}
-          <div className="card p-5 hover:border-blue-300 hover:shadow-md transition-all flex flex-col justify-between group">
-            <div className="space-y-2">
-              <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#003087] border border-blue-200 flex items-center justify-center">
+          <div className="vayu-glass-3d-card-interactive p-5.5 rounded-3xl flex flex-col justify-between group">
+            <div className="space-y-2.5">
+              <div className="w-11 h-11 rounded-2xl bg-blue-50 text-[#003087] border border-blue-200 dark:bg-blue-950/70 dark:text-blue-300 dark:border-blue-800 flex items-center justify-center shrink-0 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_2px_6px_rgba(0,0,0,0.04)]">
                 <BrainCircuit className="w-5 h-5" />
               </div>
-              <h3 className="text-sm font-bold text-slate-900 group-hover:text-[#003087] transition-colors">
+              <h3 className="text-sm font-black text-slate-900 dark:text-white group-hover:text-[#003087] dark:group-hover:text-sky-300 transition-colors tracking-tight">
                 Trajectory Forecast (72h Horizon)
               </h3>
-              <p className="text-xs text-slate-600">
+              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                 2-Layer GRU Seq2Seq temporal model (41,764 params) autoregressively predicting +6h to +72h track with 25-pass MC Dropout cone.
               </p>
             </div>
-            <div className="pt-4 mt-2 border-t border-slate-100 flex items-center justify-between">
-              <span className="text-[10px] font-mono text-slate-400">/dashboard/trajectory</span>
+            <div className="pt-4 mt-3 border-t border-slate-200/60 dark:border-slate-800/80 flex items-center justify-between">
+              <span className="text-[10px] font-mono font-semibold text-slate-400 dark:text-slate-500">/dashboard/trajectory</span>
               <button
                 onClick={() => navigate('/dashboard/trajectory')}
-                className="btn-secondary text-xs py-1.5 px-3 group-hover:bg-[#003087] group-hover:text-white transition-colors"
+                className="btn-secondary text-xs py-1.5 px-3.5 rounded-xl backdrop-blur-md bg-white/90 dark:bg-slate-800/90 hover:bg-[#003087] hover:text-white border border-slate-200/90 dark:border-slate-700 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_2px_5px_rgba(0,0,0,0.04)] group-hover:bg-[#003087] group-hover:text-white transition-all cursor-pointer font-bold"
               >
                 Open Trajectory
               </button>
@@ -486,23 +486,23 @@ const Dashboard = () => {
           </div>
 
           {/* Impact & Landfall */}
-          <div className="card p-5 hover:border-blue-300 hover:shadow-md transition-all flex flex-col justify-between group">
-            <div className="space-y-2">
-              <div className="w-10 h-10 rounded-xl bg-red-50 text-red-700 border border-red-200 flex items-center justify-center">
+          <div className="vayu-glass-3d-card-interactive p-5.5 rounded-3xl flex flex-col justify-between group">
+            <div className="space-y-2.5">
+              <div className="w-11 h-11 rounded-2xl bg-red-50 text-red-700 border border-red-200 dark:bg-red-950/70 dark:text-red-300 dark:border-red-800 flex items-center justify-center shrink-0 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_2px_6px_rgba(0,0,0,0.04)]">
                 <ShieldAlert className="w-5 h-5" />
               </div>
-              <h3 className="text-sm font-bold text-slate-900 group-hover:text-[#003087] transition-colors">
+              <h3 className="text-sm font-black text-slate-900 dark:text-white group-hover:text-[#003087] dark:group-hover:text-sky-300 transition-colors tracking-tight">
                 Impact & Landfall Assessment
               </h3>
-              <p className="text-xs text-slate-600">
+              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                 High-resolution GIS impact analysis with 60km/120km hazard radii, storm surge estimates, and coastal district strike matrix.
               </p>
             </div>
-            <div className="pt-4 mt-2 border-t border-slate-100 flex items-center justify-between">
-              <span className="text-[10px] font-mono text-slate-400">/dashboard/impact</span>
+            <div className="pt-4 mt-3 border-t border-slate-200/60 dark:border-slate-800/80 flex items-center justify-between">
+              <span className="text-[10px] font-mono font-semibold text-slate-400 dark:text-slate-500">/dashboard/impact</span>
               <button
                 onClick={() => navigate('/dashboard/impact')}
-                className="btn-secondary text-xs py-1.5 px-3 group-hover:bg-[#003087] group-hover:text-white transition-colors"
+                className="btn-secondary text-xs py-1.5 px-3.5 rounded-xl backdrop-blur-md bg-white/90 dark:bg-slate-800/90 hover:bg-[#003087] hover:text-white border border-slate-200/90 dark:border-slate-700 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_2px_5px_rgba(0,0,0,0.04)] group-hover:bg-[#003087] group-hover:text-white transition-all cursor-pointer font-bold"
               >
                 Open Impact
               </button>
@@ -510,23 +510,23 @@ const Dashboard = () => {
           </div>
 
           {/* Official Bulletin */}
-          <div className="card p-5 hover:border-blue-300 hover:shadow-md transition-all flex flex-col justify-between group">
-            <div className="space-y-2">
-              <div className="w-10 h-10 rounded-xl bg-amber-50 text-amber-700 border border-amber-200 flex items-center justify-center">
+          <div className="vayu-glass-3d-card-interactive p-5.5 rounded-3xl flex flex-col justify-between group">
+            <div className="space-y-2.5">
+              <div className="w-11 h-11 rounded-2xl bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/70 dark:text-amber-300 dark:border-amber-800 flex items-center justify-center shrink-0 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_2px_6px_rgba(0,0,0,0.04)]">
                 <FileText className="w-5 h-5" />
               </div>
-              <h3 className="text-sm font-bold text-slate-900 group-hover:text-[#003087] transition-colors">
+              <h3 className="text-sm font-black text-slate-900 dark:text-white group-hover:text-[#003087] dark:group-hover:text-sky-300 transition-colors tracking-tight">
                 Official Advisory Bulletin (PDF)
               </h3>
-              <p className="text-xs text-slate-600">
+              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
                 Automated generation of official IMD-standard synoptic advisory bulletin PDFs via ReportLab backend compilation.
               </p>
             </div>
-            <div className="pt-4 mt-2 border-t border-slate-100 flex items-center justify-between">
-              <span className="text-[10px] font-mono text-slate-400">/dashboard/bulletin</span>
+            <div className="pt-4 mt-3 border-t border-slate-200/60 dark:border-slate-800/80 flex items-center justify-between">
+              <span className="text-[10px] font-mono font-semibold text-slate-400 dark:text-slate-500">/dashboard/bulletin</span>
               <button
                 onClick={() => navigate('/dashboard/bulletin')}
-                className="btn-secondary text-xs py-1.5 px-3 group-hover:bg-[#003087] group-hover:text-white transition-colors"
+                className="btn-secondary text-xs py-1.5 px-3.5 rounded-xl backdrop-blur-md bg-white/90 dark:bg-slate-800/90 hover:bg-[#003087] hover:text-white border border-slate-200/90 dark:border-slate-700 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_2px_5px_rgba(0,0,0,0.04)] group-hover:bg-[#003087] group-hover:text-white transition-all cursor-pointer font-bold"
               >
                 Generate Bulletin
               </button>

@@ -1263,3 +1263,113 @@ header .header-theme-btn {
   width: 100% !important;
 }
 
+/* =========================================================================
+   VAYU 3D Crystal Glass Dashboard Card System
+   Distinct from transparent header: Solid crystal surface, 3D specular rim,
+   tactile inner bevel, and smooth ambient elevation.
+   ========================================================================= */
+.vayu-glass-3d-card {
+  position: relative;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0.78) 100%);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 
+    inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 1),
+    inset 0 -1.5px 2px 0 rgba(0, 48, 135, 0.03),
+    0 4px 18px -2px rgba(15, 23, 42, 0.05),
+    0 1px 3px 0 rgba(15, 23, 42, 0.03);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.dark .vayu-glass-3d-card {
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.88) 0%, rgba(15, 23, 42, 0.70) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 
+    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.15),
+    inset 0 -1.5px 2px 0 rgba(0, 0, 0, 0.4),
+    0 8px 24px -2px rgba(0, 0, 0, 0.5),
+    0 2px 6px 0 rgba(0, 0, 0, 0.4);
+}
+
+.vayu-glass-3d-card-interactive {
+  position: relative;
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.92) 0%, rgba(255, 255, 255, 0.78) 100%);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 
+    inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 1),
+    inset 0 -1.5px 2px 0 rgba(0, 48, 135, 0.03),
+    0 6px 20px -3px rgba(15, 23, 42, 0.05),
+    0 1px 4px 0 rgba(15, 23, 42, 0.03);
+  transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.32s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.25s ease,
+              background 0.25s ease;
+}
+
+.dark .vayu-glass-3d-card-interactive {
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.88) 0%, rgba(15, 23, 42, 0.70) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 
+    inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.15),
+    inset 0 -1.5px 2px 0 rgba(0, 0, 0, 0.4),
+    0 8px 24px -2px rgba(0, 0, 0, 0.5);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .vayu-glass-3d-card-interactive:hover {
+    transform: translateY(-4px) scale3d(1.01, 1.01, 1.01);
+    border-color: rgba(56, 189, 248, 0.5);
+    box-shadow: 
+      inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 1),
+      inset 0 -1px 2px 0 rgba(2, 132, 199, 0.08),
+      0 18px 36px -8px rgba(0, 48, 135, 0.12),
+      0 6px 14px -3px rgba(0, 48, 135, 0.06);
+  }
+
+  .dark .vayu-glass-3d-card-interactive:hover {
+    transform: translateY(-4px) scale3d(1.01, 1.01, 1.01);
+    border-color: rgba(56, 189, 248, 0.4);
+    box-shadow: 
+      inset 0 1.5px 1px 0 rgba(255, 255, 255, 0.25),
+      0 22px 48px -8px rgba(0, 0, 0, 0.85),
+      0 0 24px 2px rgba(56, 189, 248, 0.15);
+  }
+}
+
+/* 3D Micro Glass Tag for pipeline stages */
+.vayu-glass-3d-step {
+  background: linear-gradient(145deg, rgba(255, 255, 255, 0.94) 0%, rgba(248, 250, 252, 0.82) 100%);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.95);
+  box-shadow: 
+    inset 0 1.2px 1.2px 0 rgba(255, 255, 255, 1),
+    inset 0 -1px 1.5px 0 rgba(0, 0, 0, 0.02),
+    0 3px 12px -2px rgba(15, 23, 42, 0.04);
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 0.2s ease;
+}
+
+.dark .vayu-glass-3d-step {
+  background: linear-gradient(145deg, rgba(30, 41, 59, 0.75) 0%, rgba(15, 23, 42, 0.65) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.12),
+    0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .vayu-glass-3d-step:hover {
+    transform: translateY(-2.5px);
+    border-color: rgba(56, 189, 248, 0.5);
+    box-shadow: 
+      inset 0 1.2px 1.2px 0 rgba(255, 255, 255, 1),
+      0 10px 20px -4px rgba(0, 48, 135, 0.12);
+  }
+}
+
+
