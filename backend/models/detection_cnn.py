@@ -1,9 +1,9 @@
 import time
 import os
 import hashlib
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 from ..ml_engine.models.center_detector import load_center_detector_model
-from ..ml_engine.preprocessor import haversine_distance_km
+from ..ml_engine.geolocation import haversine_distance_km
 from ..database.db_manager import db
 
 class CycloneVisionCNN:
@@ -17,15 +17,25 @@ class CycloneVisionCNN:
         self.model = load_center_detector_model()
         self.input_shape = [1, 3, 224, 224]
 
-    def predict(self, image_bytes: bytes, basin: str = "Bay of Bengal") -> Dict[str, Any]:
+    def predict(
+        self, 
+        image_bytes: bytes, 
+        bbox_geo: Optional[List[float]] = None,
+        basin: str = "Bay of Bengal"
+    ) -> Dict[str, Any]:
         """
         Executes deep convolutional inference on satellite image bytes:
-        - Vortex localization & Eye coordinates
+        - Vortex localization (Normalized image-space center coordinates [0, 1])
+        - Geographic fix ONLY if verified geospatial scene extent (bbox_geo) is supplied
         - Bounding box regression (Normalized ymin, xmin, ymax, xmax)
         - Radiometric intensity estimates (Vmax, MSLP)
         - Rejection of ambient non-cyclone images
         """
-        raw_pred = self.model.predict_frame(image_bytes=image_bytes, basin=basin)
+        raw_pred = self.model.predict_frame(
+            image_bytes=image_bytes, 
+            bbox_geo=bbox_geo, 
+            basin=basin
+        )
         
         # Calculate Dvorak CI proxy from estimated intensity
         vmax_kts = raw_pred["estimated_intensity"]["vmax_knots"]
@@ -52,12 +62,17 @@ class CycloneVisionCNN:
             "architecture": "MobileNetV3-Small + Dual-Head BBox & Intensity Regressor",
             "cyclone_detected": raw_pred["cyclone_detected"],
             "confidence_percentage": raw_pred["confidence_percentage"],
-            "coordinates": raw_pred["coordinates"],
+            "is_georeferenced": raw_pred.get("is_georeferenced", False),
+            "geo_fix_status": raw_pred.get("geo_fix_status", "UNAVAILABLE_NO_EXTENT"),
+            "geo_fix_message": raw_pred.get("geo_fix_message", "Uploaded image has no verified geospatial extent."),
+            "coordinates": raw_pred.get("coordinates"),
             "center": raw_pred.get("center", {
-                "lat": raw_pred["coordinates"]["latitude"],
-                "lon": raw_pred["coordinates"]["longitude"],
                 "center_x_norm": raw_pred["bounding_box"]["center_x_norm"],
-                "center_y_norm": raw_pred["bounding_box"]["center_y_norm"]
+                "center_y_norm": raw_pred["bounding_box"]["center_y_norm"],
+                "is_georeferenced": False,
+                "lat": None,
+                "lon": None,
+                "formatted": None
             }),
             "dvorak_classification": {
                 "t_number": f"T{ci}",
@@ -84,14 +99,16 @@ class CycloneVisionCNN:
 
         # Persist to database
         try:
+            detected_lat = raw_pred["coordinates"]["latitude"] if raw_pred.get("coordinates") else None
+            detected_lon = raw_pred["coordinates"]["longitude"] if raw_pred.get("coordinates") else None
             db.log_inference_run({
                 "model_name": "CycloneVisionCNN",
                 "model_version": self.model_version,
                 "inference_type": "DETECTION",
                 "basin": basin,
                 "input_source": "SATELLITE_IMAGE_UPLOAD",
-                "detected_lat": raw_pred["coordinates"]["latitude"],
-                "detected_lon": raw_pred["coordinates"]["longitude"],
+                "detected_lat": detected_lat,
+                "detected_lon": detected_lon,
                 "confidence": raw_pred["confidence_percentage"],
                 "dvorak_t": f"T{ci}",
                 "dvorak_ci": ci,
@@ -101,7 +118,8 @@ class CycloneVisionCNN:
                 "execution_time_ms": raw_pred["inference_time_ms"],
                 "metadata": {
                     "bounding_box": raw_pred["bounding_box"],
-                    "model_meta": raw_pred["_model_meta"]
+                    "model_meta": raw_pred["_model_meta"],
+                    "is_georeferenced": raw_pred.get("is_georeferenced", False)
                 }
             })
         except Exception as e:

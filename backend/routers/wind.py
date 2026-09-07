@@ -28,6 +28,7 @@ Wind direction conventions used throughout this module
 import math
 import time
 import json
+import os
 import urllib.request
 from datetime import datetime, timezone
 from typing import Dict, Any, List, Optional, Tuple
@@ -36,24 +37,27 @@ from fastapi import APIRouter, HTTPException
 router = APIRouter(prefix="/api/v1/wind", tags=["Global Wind Field"])
 
 # ─── Grid configuration ────────────────────────────────────────────────────────
-# 5° global grid — coarse but sufficient for particle visualisation;
-# leaflet-velocity bilinearly interpolates between grid points at render time.
-GRID_RES_DEG: float = 5.0
-LA1: float = 90.0     # Starting latitude  (top)
-LO1: float = -180.0   # Starting longitude (left)
-NX: int = 73          # Longitudes: -180, -175, ..., 180
-NY: int = 37          # Latitudes: 90, 85, ..., -90
-DX: float = 5.0       # Longitude step (east)
-DY: float = 5.0       # Latitude step  (south)
+# 12° global grid (16 lat × 31 lon = 496 points) — strictly adheres to Open-Meteo's
+# 600 weighted calls/minute rate limit while providing dense, smooth vector coverage;
+# leaflet-velocity bilinearly interpolates across the canvas at render time.
+GRID_RES_DEG: float = 12.0
+LA1: float = 90.0     # Starting latitude  (top/North)
+LO1: float = -180.0   # Starting longitude (left/West)
+NX: int = 31          # Longitudes: -180, -168, ..., 180 (step 12)
+NY: int = 16          # Latitudes: 90, 78, ..., -90 (step 12)
+DX: float = 12.0      # Longitude step (eastward)
+DY: float = 12.0      # Latitude step  (southward)
 
-# ─── In-memory cache ──────────────────────────────────────────────────────────
+# ─── In-memory & Persistent Disk Cache ─────────────────────────────────────────
 _WIND_CACHE: Optional[Dict[str, Any]] = None
 _CACHE_TTL_SECONDS: int = 3600  # 1 GFS forecast step (runs 4×/day)
+_DATA_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "data"))
+DISK_CACHE_PATH = os.path.join(_DATA_DIR, "wind_cache.json")
 
 # ─── Open-Meteo constants ─────────────────────────────────────────────────────
 _OPEN_METEO_BASE = "https://api.open-meteo.com/v1/forecast"
-_BATCH_SIZE = 100   # conservative; Open-Meteo free tier supports multi-location
-_USER_AGENT = "VAYU-Earth/4.0 (SIH2026 Wind Field; contact@vayusat.live)"
+_BATCH_SIZE = 248   # 496 / 2 = 248 points per batch; safely within 600/min quota
+_USER_AGENT = "VAYU-Earth/4.0 (SIH2026 Meteorological Wind Field; contact@vayusat.live)"
 
 
 # ==============================================================================
@@ -205,18 +209,14 @@ def _nearest_hour_index(times: List[str]) -> int:
 
 
 def _fetch_batch(
-    lats: List[float], lons: List[float]
+    lats: List[float], lons: List[float], retries: int = 2, delay_sec: float = 1.5
 ) -> List[Dict[str, Optional[float]]]:
     """
     Fetch wind_u_component_10m and wind_v_component_10m from Open-Meteo for a
-    batch of (lat, lon) pairs.
+    batch of (lat, lon) pairs using SI units (m/s).
 
     Open-Meteo multi-location format:
-      GET /v1/forecast?latitude=l1,l2,...&longitude=o1,o2,...&hourly=...
-
-    When multiple coordinates are passed, the response is a JSON array.
-    When a single coordinate is passed, the response is a JSON object.
-    Both cases are normalised to a list.
+      GET /v1/forecast?latitude=l1,l2,...&longitude=o1,o2,...&hourly=...&wind_speed_unit=ms
 
     Parameters
     ----------
@@ -224,28 +224,44 @@ def _fetch_batch(
         Latitude values for this batch.
     lons : List[float]
         Longitude values for this batch.
+    retries : int
+        Number of retry attempts on transient network or 429 errors.
+    delay_sec : float
+        Delay before retrying.
 
     Returns
     -------
     List[Dict]
         One dict per input point: {"u": float|None, "v": float|None, "time": str|None}
     """
-    lat_str = ",".join(f"{lat:.4f}" for lat in lats)
-    lon_str = ",".join(f"{lon:.4f}" for lon in lons)
+    lat_str = ",".join(f"{lat:.2f}" for lat in lats)
+    lon_str = ",".join(f"{lon:.2f}" for lon in lons)
 
     url = (
         f"{_OPEN_METEO_BASE}"
         f"?latitude={lat_str}"
         f"&longitude={lon_str}"
         f"&hourly=wind_u_component_10m,wind_v_component_10m"
-        f"&models=gfs_seamless"   # GFS global — full ocean + land coverage
+        f"&models=gfs_seamless"   # NOAA GFS global forecast
+        f"&wind_speed_unit=ms"     # SI units (m/s)
         f"&forecast_days=1"
         f"&timezone=UTC"
     )
 
-    req = urllib.request.Request(url, headers={"User-Agent": _USER_AGENT})
-    with urllib.request.urlopen(req, timeout=20) as resp:
-        raw = json.loads(resp.read().decode("utf-8"))
+    last_exc = None
+    raw = None
+    for attempt in range(retries + 1):
+        try:
+            req = urllib.request.Request(url, headers={"User-Agent": _USER_AGENT})
+            with urllib.request.urlopen(req, timeout=25) as resp:
+                raw = json.loads(resp.read().decode("utf-8"))
+            break
+        except Exception as exc:
+            last_exc = exc
+            if attempt < retries:
+                time.sleep(delay_sec * (attempt + 1))
+            else:
+                raise last_exc
 
     # Normalise to list
     if isinstance(raw, dict):
@@ -275,16 +291,17 @@ def _fetch_batch(
 
 def fetch_global_wind_field() -> Dict[str, Any]:
     """
-    Fetch U/V wind components at 10 m height for the full global 5° grid.
+    Fetch U/V wind components at 10 m height for the global 12° grid (496 points).
 
     Strategy
     --------
-    1. Build the ordered grid (2,701 points).
-    2. Batch into groups of _BATCH_SIZE (100).
-    3. For each batch, call Open-Meteo and pick the nearest hour.
-    4. Validate every U and V value; replace invalid values with 0.0 (calm).
-    5. Assemble into leaflet-velocity JSON format (two arrays: U and V).
-    6. Return payload dict with metadata.
+    1. Build the ordered grid (496 points).
+    2. Batch into groups of _BATCH_SIZE (248 points: 2 batches total).
+    3. Call Open-Meteo with 1s pause between batches to respect rate limits.
+    4. Validate every U and V value in SI units (m/s).
+    5. Assemble into leaflet-velocity JSON format.
+    6. Persist to disk cache (wind_cache.json).
+    7. Return payload dict with metadata.
 
     Returns
     -------
@@ -293,7 +310,7 @@ def fetch_global_wind_field() -> Dict[str, Any]:
         'meta'           — dict with source, units, timestamp, validity info
     """
     grid = build_global_grid()
-    total = len(grid)  # NX × NY = 73 × 37 = 2,701
+    total = len(grid)  # NX × NY = 31 × 16 = 496
 
     u_array: List[float] = [0.0] * total
     v_array: List[float] = [0.0] * total
@@ -301,7 +318,11 @@ def fetch_global_wind_field() -> Dict[str, Any]:
     valid_count = 0
     invalid_count = 0
 
-    for batch_start in range(0, total, _BATCH_SIZE):
+    batch_ranges = list(range(0, total, _BATCH_SIZE))
+    for b_idx, batch_start in enumerate(batch_ranges):
+        if b_idx > 0:
+            time.sleep(1.0)  # Gentle spacing between batches
+
         batch_idxs = list(range(batch_start, min(batch_start + _BATCH_SIZE, total)))
         batch_lats = [grid[i][0] for i in batch_idxs]
         batch_lons = [grid[i][1] for i in batch_idxs]
@@ -320,29 +341,30 @@ def fetch_global_wind_field() -> Dict[str, Any]:
                 try:
                     u_val = validate_wind_value(res["u"], "U", lat, lon)
                     v_val = validate_wind_value(res["v"], "V", lat, lon)
-                    u_array[grid_idx] = round(u_val, 3)
-                    v_array[grid_idx] = round(v_val, 3)
+                    u_array[grid_idx] = round(u_val, 2)
+                    v_array[grid_idx] = round(v_val, 2)
                     valid_count += 1
 
                     if ref_time is None and res.get("time"):
                         ref_time = res["time"]
 
                 except ValueError:
-                    # Invalid value — substitute calm wind (0, 0), flag it
                     u_array[grid_idx] = 0.0
                     v_array[grid_idx] = 0.0
                     invalid_count += 1
 
-        except Exception:
-            # Entire batch unavailable — fill with calm, continue
+        except Exception as exc:
             for grid_idx in batch_idxs:
                 u_array[grid_idx] = 0.0
                 v_array[grid_idx] = 0.0
             invalid_count += len(batch_idxs)
 
+    # If all points failed, raise exception so caller can fall back to disk cache
+    if valid_count == 0:
+        raise RuntimeError("Failed to retrieve any valid meteorological wind vectors from upstream provider.")
+
     # Build the ref_time ISO-8601 string for the leaflet-velocity header
     if ref_time:
-        # Open-Meteo returns "2026-09-07T12:00" — append Z for UTC
         ref_time_iso = ref_time + "Z" if not ref_time.endswith("Z") else ref_time
     else:
         ref_time_iso = datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:00:00Z")
@@ -357,21 +379,20 @@ def fetch_global_wind_field() -> Dict[str, Any]:
         "nx": NX,
         "ny": NY,
         "refTime": ref_time_iso,
-        # Custom metadata fields (leaflet-velocity ignores unknown keys)
         "source": "NOAA GFS via Open-Meteo",
-        "model": "GFS",
-        "units": "km/h",
+        "model": "GFS Seamless",
+        "units": "m/s",
         "level": "10m AGL",
     }
 
     velocity_data = [
-        {"header": {**_base_header, "parameterNumber": 2}, "data": u_array},  # UGRD
-        {"header": {**_base_header, "parameterNumber": 3}, "data": v_array},  # VGRD
+        {"header": {**_base_header, "parameterNumber": 2}, "data": u_array},  # UGRD (eastward)
+        {"header": {**_base_header, "parameterNumber": 3}, "data": v_array},  # VGRD (northward)
     ]
 
     meta = {
         "source": "NOAA GFS via Open-Meteo",
-        "model": "GFS",
+        "model": "GFS Seamless",
         "resolution_deg": GRID_RES_DEG,
         "nx": NX,
         "ny": NY,
@@ -379,10 +400,12 @@ def fetch_global_wind_field() -> Dict[str, Any]:
         "valid_points": valid_count,
         "invalid_points": invalid_count,
         "ref_time_utc": ref_time_iso,
-        "u_units": "km/h",
-        "v_units": "km/h",
+        "units": "m/s",
+        "u_units": "m/s",
+        "v_units": "m/s",
         "level": "10m AGL",
-        "type": "Forecast",
+        "type": "Model Forecast",
+        "status": "operational",
         "attribution": "NOAA GFS model data provided by Open-Meteo (CC BY 4.0). "
                        "https://open-meteo.com/",
         "fetched_at_utc": datetime.now(timezone.utc).isoformat() + "Z",
@@ -393,7 +416,17 @@ def fetch_global_wind_field() -> Dict[str, Any]:
         ),
     }
 
-    return {"velocity_data": velocity_data, "meta": meta}
+    payload = {"velocity_data": velocity_data, "meta": meta}
+
+    # Persist to disk cache
+    try:
+        os.makedirs(_DATA_DIR, exist_ok=True)
+        with open(DISK_CACHE_PATH, "w", encoding="utf-8") as f:
+            json.dump({"payload": payload, "cached_at": time.time()}, f)
+    except Exception:
+        pass
+
+    return payload
 
 
 # ==============================================================================
@@ -403,26 +436,63 @@ def fetch_global_wind_field() -> Dict[str, Any]:
 def _get_cached_or_fetch() -> Dict[str, Any]:
     """
     Return cached wind payload if fresh; otherwise fetch a new one.
-    Thread-safety note: this is a simple module-level dict — adequate for
-    single-worker FastAPI deployments (Uvicorn default). For multi-worker
-    deployments, replace with Redis or a shared file cache.
+    Implements two-tier caching:
+      1. Memory cache (TTL: 3600 seconds)
+      2. Persistent disk cache (wind_cache.json)
+      3. Graceful fallback to disk cache if upstream network fails.
     """
     global _WIND_CACHE
 
     now = time.time()
+    # 1. Fresh in-memory cache
     if (
         _WIND_CACHE is not None
         and (now - _WIND_CACHE["cached_at"]) < _CACHE_TTL_SECONDS
     ):
         return _WIND_CACHE
 
-    payload = fetch_global_wind_field()
-    _WIND_CACHE = {
-        "payload": payload,
-        "cached_at": now,
-        "expires_at": now + _CACHE_TTL_SECONDS,
-    }
-    return _WIND_CACHE
+    # 2. Fresh disk cache
+    if os.path.exists(DISK_CACHE_PATH):
+        try:
+            with open(DISK_CACHE_PATH, "r", encoding="utf-8") as f:
+                disk_data = json.load(f)
+            cached_at = disk_data.get("cached_at", 0)
+            if (now - cached_at) < _CACHE_TTL_SECONDS and "payload" in disk_data:
+                _WIND_CACHE = {
+                    "payload": disk_data["payload"],
+                    "cached_at": cached_at,
+                    "expires_at": cached_at + _CACHE_TTL_SECONDS,
+                }
+                return _WIND_CACHE
+        except Exception:
+            pass
+
+    # 3. Fetch fresh from upstream
+    try:
+        payload = fetch_global_wind_field()
+        _WIND_CACHE = {
+            "payload": payload,
+            "cached_at": now,
+            "expires_at": now + _CACHE_TTL_SECONDS,
+        }
+        return _WIND_CACHE
+    except Exception as exc:
+        # 4. Fallback to existing disk cache (even if older) rather than failing
+        if os.path.exists(DISK_CACHE_PATH):
+            try:
+                with open(DISK_CACHE_PATH, "r", encoding="utf-8") as f:
+                    disk_data = json.load(f)
+                if "payload" in disk_data:
+                    disk_data["payload"]["meta"]["status"] = "cached_fallback"
+                    _WIND_CACHE = {
+                        "payload": disk_data["payload"],
+                        "cached_at": disk_data.get("cached_at", now - 3600),
+                        "expires_at": now + 300,  # Retry in 5 mins
+                    }
+                    return _WIND_CACHE
+            except Exception:
+                pass
+        raise exc
 
 
 # ==============================================================================

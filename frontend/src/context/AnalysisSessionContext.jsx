@@ -1,12 +1,14 @@
 import React, { createContext, useContext, useState, useCallback, useMemo } from 'react';
 
-// Default Verified Benchmark Presets
+// Default Verified Benchmark Presets with explicit NASA GIBS scene extents [min_lat, min_lon, max_lat, max_lon]
 export const DEFAULT_PRESETS = [
   {
     id: 'dana-2024',
     name: 'Cyclone DANA (2024)',
     date: '2024-10-24',
     basin: 'Bay of Bengal',
+    bbox_geo: [8.0, 75.0, 23.0, 95.0],
+    ground_truth_center: { lat: 18.2, lon: 88.0, name: 'IMD Best Track Fix' },
     url: 'https://wvs.earthdata.nasa.gov/api/v1/snapshot?REQUEST=GetSnapshot&LAYERS=VIIRS_SNPP_CorrectedReflectance_TrueColor&BBOX=8,75,23,95&TIME=2024-10-24&WIDTH=1024&HEIGHT=768&FORMAT=image/png'
   },
   {
@@ -14,6 +16,8 @@ export const DEFAULT_PRESETS = [
     name: 'Cyclone BIPARJOY (2023)',
     date: '2023-06-12',
     basin: 'Arabian Sea',
+    bbox_geo: [12.0, 58.0, 26.0, 76.0],
+    ground_truth_center: { lat: 21.9, lon: 66.3, name: 'IMD Best Track Fix' },
     url: 'https://wvs.earthdata.nasa.gov/api/v1/snapshot?REQUEST=GetSnapshot&LAYERS=VIIRS_SNPP_CorrectedReflectance_TrueColor&BBOX=12,58,26,76&TIME=2023-06-12&WIDTH=1024&HEIGHT=768&FORMAT=image/png'
   }
 ];
@@ -34,6 +38,9 @@ export const AnalysisSessionProvider = ({ children }) => {
       file: null,
       imageUrl: defaultPreset.url,
       basin: defaultPreset.basin,
+      bbox_geo: defaultPreset.bbox_geo,
+      is_georeferenced: true,
+      ground_truth_center: defaultPreset.ground_truth_center,
       metadata: {
         dimensions: '1024 × 768 px',
         sizeKb: null,
@@ -64,6 +71,10 @@ export const AnalysisSessionProvider = ({ children }) => {
       file: file,
       imageUrl: objectUrl,
       basin: basin,
+      // Generic upload has NO verified geospatial bounding box / CRS metadata
+      bbox_geo: null,
+      is_georeferenced: false,
+      ground_truth_center: null,
       metadata: {
         dimensions: metadata.dimensions || 'Image Frame',
         sizeKb: metadata.sizeKb || (file.size / 1024).toFixed(1),
@@ -94,6 +105,9 @@ export const AnalysisSessionProvider = ({ children }) => {
       file: null,
       imageUrl: preset.url || preset.image,
       basin: preset.basin || 'Bay of Bengal',
+      bbox_geo: preset.bbox_geo || null,
+      is_georeferenced: !!preset.bbox_geo,
+      ground_truth_center: preset.ground_truth_center || null,
       metadata: {
         dimensions: '1024 × 768 px',
         sizeKb: null,

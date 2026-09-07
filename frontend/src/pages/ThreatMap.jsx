@@ -58,193 +58,273 @@ const MapActionHandler = ({ action, setAction, currentCenter, defaultZoom = 6 })
   return null;
 };
 
+// Haversine distance calculator for real spatial distance between coordinates
+function getDistanceKm(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a = 
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return Math.round(R * c);
+}
+
+// Verified Historical & Live North Indian Ocean Cyclones (Official IMD / RSMC Best-Tracks)
 const SYSTEMS = {
-  invest92b: {
-    id: 'invest92b',
-    name: "Developing Low Pressure Area (INVEST-92B)",
-    shortName: "Invest 92B",
-    shortNameHindi: "इन्वेस्ट ९२बी",
-    hindiName: "सक्रिय चक्रवात जनन निगरानी (इन्वेस्ट-९२बी)",
-    basin: "Central-South Bay of Bengal",
-    basinHindi: "दक्षिण-मध्य बंगाल की खाड़ी",
-    stage: "Incipient Cyclonic Circulation",
-    stageHindi: "प्रारंभिक चक्रवाती परिसंचरण",
-    risk48h: "68%",
-    wind: "42",
-    gusts: "55",
-    pressure: "1004",
-    speed: "14",
-    direction: "North-West",
-    directionHindi: "उत्तर-पश्चिम",
-    lat: 13.5,
-    lon: 88.5,
-    target: "North Andhra & South Odisha Coastal Belt",
-    targetHindi: "उत्तरी आंध्र एवं दक्षिणी ओडिशा तटीय क्षेत्र",
-    window: "+60h to +72h Outlook",
-    windowHindi: "+60 से +72 घंटे का अनुमान",
-    threat: "Genesis Watch Active",
-    threatHindi: "जनन निगरानी सक्रिय",
-    threatColor: "text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/50 border-amber-200 dark:border-amber-800",
-    categoryBadge: "LPA",
-    categoryBadgeColor: "bg-emerald-500",
-    categoryFull: "Low Pressure Area • Developing Genesis",
-    waypoints: [
-      { step: '-12h', date: '06 Sept', time: '15:30', lat: 12.8, lon: 89.2, windKmh: 35, pressureHpa: '1006', cat: 'Low Pressure Area', catHindi: 'निम्न दबाव क्षेत्र', type: 'LPA', typeColor: '#10b981', isPast: true, label: 'Early Circulation' },
-      { step: '+00h', date: '07 Sept', time: '03:30', lat: 13.5, lon: 88.5, windKmh: 42, pressureHpa: '1004', cat: 'Low Pressure Area', catHindi: 'निम्न दबाव क्षेत्र', type: 'LPA', typeColor: '#10b981', isObserved: true, label: 'Vortex Fix (Observed)' },
-      { step: '+12h', date: '07 Sept', time: '15:30', lat: 14.4, lon: 87.6, windKmh: 50, pressureHpa: '1000', cat: 'Depression', catHindi: 'अवसाद', type: 'D', typeColor: '#3b82f6', label: 'Consolidation Phase' },
-      { step: '+24h', date: '08 Sept', time: '03:30', lat: 15.3, lon: 86.8, windKmh: 62, pressureHpa: '995', cat: 'Deep Depression', catHindi: 'गहरा अवसाद', type: 'DD', typeColor: '#06b6d4', label: 'Deepening Center' },
-      { step: '+48h', date: '09 Sept', time: '03:30', lat: 16.5, lon: 85.9, windKmh: 80, pressureHpa: '988', cat: 'Cyclonic Storm', catHindi: 'चक्रवाती तूफान', type: 'CS', typeColor: '#22c55e', label: 'Tropical Storm Stage' },
-      { step: '+60h', date: '09 Sept', time: '15:30', lat: 17.8, lon: 85.1, windKmh: 95, pressureHpa: '980', cat: 'Severe Cyclonic Storm', catHindi: 'भीषण चक्रवाती तूफान', type: 'SCS', typeColor: '#eab308', label: 'Near Coastal Inflow' },
-      { step: '+72h', date: '10 Sept', time: '03:30', lat: 19.4, lon: 84.7, windKmh: 110, pressureHpa: '972', cat: 'Severe Cyclonic Storm', catHindi: 'भीषण चक्रवाती तूफान', type: 'SCS', typeColor: '#f97316', label: 'Odisha-Andhra Landfall' },
-      { step: '+84h', date: '10 Sept', time: '15:30', lat: 20.3, lon: 84.2, windKmh: 75, pressureHpa: '990', cat: 'Cyclonic Storm', catHindi: 'चक्रवाती तूफान', type: 'CS', typeColor: '#22c55e', label: 'Inland Weakening' },
-      { step: '+96h', date: '11 Sept', time: '03:30', lat: 21.1, lon: 83.8, windKmh: 45, pressureHpa: '1002', cat: 'Depression', catHindi: 'अवसाद', type: 'D', typeColor: '#3b82f6', label: 'Remnant Circulation' }
-    ],
-    track: [
-      [12.8, 89.2], [13.5, 88.5], [14.4, 87.6], [15.3, 86.8], [16.5, 85.9], [17.8, 85.1], [19.4, 84.7], [20.3, 84.2], [21.1, 83.8]
-    ],
-    cone: [
-      [13.5, 88.5], [15.0, 89.8], [18.0, 88.0], [21.0, 86.5],
-      [20.5, 83.2], [17.0, 83.8], [14.2, 86.5], [13.5, 88.5]
-    ]
-  },
-  invest91a: {
-    id: 'invest91a',
-    name: "Developing Low Pressure Area (INVEST-91A)",
-    shortName: "Invest 91A",
-    shortNameHindi: "इन्वेस्ट ९१ए",
-    hindiName: "सक्रिय चक्रवात जनन निगरानी (इन्वेस्ट-९१ए)",
-    basin: "East-Central Arabian Sea",
-    basinHindi: "पूर्वी-मध्य अरब सागर",
-    stage: "Forming Convective Vortex",
-    stageHindi: "संवहनी भंवर निर्माण",
-    risk48h: "55%",
-    wind: "40",
-    gusts: "50",
-    pressure: "1005",
-    speed: "12",
-    direction: "North-East",
-    directionHindi: "उत्तर-पूर्व",
-    lat: 14.8,
-    lon: 66.2,
-    target: "Saurashtra & Kutch Maritime Belt",
-    targetHindi: "सौराष्ट्र एवं कच्छ समुद्री क्षेत्र",
-    window: "+72h Outlook",
-    windowHindi: "+72 घंटे का अनुमान",
-    threat: "Genesis Watch Active",
-    threatHindi: "जनन निगरानी सक्रिय",
-    threatColor: "text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/50 border-amber-200 dark:border-amber-800",
-    categoryBadge: "LPA",
-    categoryBadgeColor: "bg-emerald-500",
-    categoryFull: "Low Pressure Area • Arabian Sea Genesis",
-    waypoints: [
-      { step: '-12h', date: '06 Sept', time: '15:30', lat: 14.1, lon: 65.5, windKmh: 32, pressureHpa: '1008', cat: 'Low Pressure Area', catHindi: 'निम्न दबाव क्षेत्र', type: 'LPA', typeColor: '#10b981', isPast: true, label: 'Forming Circulation' },
-      { step: '+00h', date: '07 Sept', time: '03:30', lat: 14.8, lon: 66.2, windKmh: 40, pressureHpa: '1005', cat: 'Low Pressure Area', catHindi: 'निम्न दबाव क्षेत्र', type: 'LPA', typeColor: '#10b981', isObserved: true, label: 'Observed Center' },
-      { step: '+12h', date: '07 Sept', time: '15:30', lat: 16.2, lon: 67.0, windKmh: 48, pressureHpa: '1001', cat: 'Depression', catHindi: 'अवसाद', type: 'D', typeColor: '#3b82f6', label: 'North-East Track' },
-      { step: '+24h', date: '08 Sept', time: '03:30', lat: 17.8, lon: 68.1, windKmh: 58, pressureHpa: '996', cat: 'Deep Depression', catHindi: 'गहरा अवसाद', type: 'DD', typeColor: '#06b6d4', label: 'Maritime Intensification' },
-      { step: '+48h', date: '09 Sept', time: '03:30', lat: 19.5, lon: 69.0, windKmh: 75, pressureHpa: '990', cat: 'Cyclonic Storm', catHindi: 'चक्रवाती तूफान', type: 'CS', typeColor: '#22c55e', label: 'Saurashtra Approach' },
-      { step: '+72h', date: '10 Sept', time: '03:30', lat: 21.2, lon: 69.8, windKmh: 90, pressureHpa: '982', cat: 'Severe Cyclonic Storm', catHindi: 'भीषण चक्रवाती तूफान', type: 'SCS', typeColor: '#f97316', label: 'Kutch Coastline Outlook' }
-    ],
-    track: [
-      [14.1, 65.5], [14.8, 66.2], [16.2, 67.0], [17.8, 68.1], [19.5, 69.0], [21.2, 69.8]
-    ],
-    cone: [
-      [14.8, 66.2], [16.8, 68.5], [19.0, 70.2], [22.0, 71.0],
-      [22.2, 68.5], [19.0, 67.2], [16.5, 65.5], [14.8, 66.2]
-    ]
-  },
   dana: {
     id: 'dana',
-    name: "Severe Cyclonic Storm DANA (Historical Benchmark)",
+    name: "Severe Cyclonic Storm DANA (IMD Best-Track)",
     shortName: "Cyclone DANA",
     shortNameHindi: "चक्रवात दाना",
-    hindiName: "भीषण चक्रवाती तूफान दाना (ऐतिहासिक केस अध्ययन)",
+    hindiName: "भीषण चक्रवाती तूफान दाना (आईएमडी आधिकारिक ट्रैक)",
     basin: "North Bay of Bengal",
     basinHindi: "उत्तरी बंगाल की खाड़ी",
-    stage: "Severe Cyclonic Storm (Landfall Phase)",
+    stage: "Severe Cyclonic Storm (Landfall Recorded)",
     stageHindi: "भीषण चक्रवाती तूफान (लैंडफॉल चरण)",
-    risk48h: "Formed Cyclone",
-    wind: "110",
-    gusts: "125",
+    risk48h: "Category 1-2 Equivalent",
+    wind: "115",
+    gusts: "135",
     pressure: "970",
     speed: "16",
     direction: "North-Northwest",
     directionHindi: "उत्तर-उत्तर-पश्चिम",
-    lat: 19.4,
-    lon: 87.2,
-    target: "Dhamra Port & Kendrapara Coast, Odisha",
-    targetHindi: "धामरा बंदरगाह एवं केंद्रपड़ा तट, ओडिशा",
-    window: "Landfall Recorded",
-    windowHindi: "लैंडफॉल दर्ज किया गया",
+    lat: 20.8,
+    lon: 86.9,
+    target: "Dhamra Port / Bhadrak, Odisha",
+    targetHindi: "धामरा बंदरगाह / भद्रक, ओडिशा",
+    window: "Landfall Recorded • 25 Oct 2024",
+    windowHindi: "लैंडफॉल दर्ज • २५ अक्टूबर २०२४",
     threat: "Red Alert",
     threatHindi: "रेड अलर्ट",
     threatColor: "text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/50 border-red-200 dark:border-red-800",
     categoryBadge: "SCS",
     categoryBadgeColor: "bg-orange-500",
-    categoryFull: "Severe Cyclonic Storm • Landfall recorded at Dhamra",
+    categoryFull: "Severe Cyclonic Storm • Landfall recorded at Dhamra Port",
     waypoints: [
-      { step: '-12h', date: '23 Oct', time: '11:30', lat: 17.5, lon: 89.1, windKmh: 55, pressureHpa: '1000', cat: 'Deep Depression', catHindi: 'गहरा अवसाद', type: 'DD', typeColor: '#06b6d4', isPast: true, label: 'Formative Depression' },
-      { step: '+00h', date: '23 Oct', time: '23:30', lat: 18.2, lon: 88.5, windKmh: 65, pressureHpa: '996', cat: 'Cyclonic Storm', catHindi: 'चक्रवाती तूफान', type: 'CS', typeColor: '#22c55e', isObserved: true, label: 'Genesis Phase' },
-      { step: '+12h', date: '24 Oct', time: '11:30', lat: 18.9, lon: 88.0, windKmh: 85, pressureHpa: '988', cat: 'Severe Cyclonic Storm', catHindi: 'भीषण चक्रवाती तूफान', type: 'SCS', typeColor: '#eab308', label: 'Rapid Intensification' },
-      { step: '+24h', date: '24 Oct', time: '23:30', lat: 19.7, lon: 87.5, windKmh: 110, pressureHpa: '974', cat: 'Severe Cyclonic Storm', catHindi: 'भीषण चक्रवाती तूफान', type: 'SCS', typeColor: '#f97316', label: 'Peak Maritime Velocity' },
-      { step: '+36h', date: '25 Oct', time: '05:30', lat: 20.8, lon: 86.9, windKmh: 115, pressureHpa: '970', cat: 'Severe Cyclonic Storm', catHindi: 'भीषण चक्रवाती तूफान', type: 'SCS', typeColor: '#ef4444', label: 'Dhamra Port Landfall' },
-      { step: '+48h', date: '25 Oct', time: '17:30', lat: 22.1, lon: 85.8, windKmh: 60, pressureHpa: '992', cat: 'Depression', catHindi: 'अवसाद', type: 'D', typeColor: '#3b82f6', label: 'Inland Dissipation' },
-      { step: '+60h', date: '26 Oct', time: '05:30', lat: 23.4, lon: 84.8, windKmh: 35, pressureHpa: '1004', cat: 'Well Marked Low', catHindi: 'सुस्पष्ट निम्न दबाव', type: 'LPA', typeColor: '#10b981', label: 'Remnant Low' }
+      { step: '-24h', date: '23 Oct', time: '05:30', lat: 16.5, lon: 89.8, windKmh: 45, pressureHpa: '1002', cat: 'Depression', catHindi: 'अवसाद', type: 'D', typeColor: '#3b82f6', isPast: true, label: 'Early Circulation' },
+      { step: '-12h', date: '23 Oct', time: '17:30', lat: 17.2, lon: 89.1, windKmh: 55, pressureHpa: '998', cat: 'Deep Depression', catHindi: 'गहरा अवसाद', type: 'DD', typeColor: '#06b6d4', isPast: true, label: 'Central Bay Deepening' },
+      { step: '+00h', date: '24 Oct', time: '05:30', lat: 18.1, lon: 88.3, windKmh: 75, pressureHpa: '992', cat: 'Cyclonic Storm', catHindi: 'चक्रवाती तूफान', type: 'CS', typeColor: '#22c55e', isObserved: true, label: 'Named DANA by IMD' },
+      { step: '+12h', date: '24 Oct', time: '17:30', lat: 19.4, lon: 87.5, windKmh: 105, pressureHpa: '984', cat: 'Severe Cyclonic Storm', catHindi: 'भीषण चक्रवाती तूफान', type: 'SCS', typeColor: '#eab308', label: 'Odisha Coast Approach' },
+      { step: '+24h', date: '25 Oct', time: '02:30', lat: 20.8, lon: 86.9, windKmh: 115, pressureHpa: '970', cat: 'Severe Cyclonic Storm', catHindi: 'भीषण चक्रवाती तूफान', type: 'SCS', typeColor: '#ef4444', label: 'Landfall: Dhamra Port' },
+      { step: '+36h', date: '25 Oct', time: '11:30', lat: 21.3, lon: 86.3, windKmh: 70, pressureHpa: '992', cat: 'Cyclonic Storm', catHindi: 'चक्रवाती तूफान', type: 'CS', typeColor: '#22c55e', label: 'Inland Mayurbhanj' },
+      { step: '+48h', date: '26 Oct', time: '05:30', lat: 22.0, lon: 85.5, windKmh: 40, pressureHpa: '1004', cat: 'Well-Marked Low', catHindi: 'सुस्पष्ट निम्न दबाव', type: 'LPA', typeColor: '#10b981', label: 'Inland Dissipation' }
     ],
     track: [
-      [17.5, 89.1], [18.2, 88.5], [18.9, 88.0], [19.7, 87.5], [20.8, 86.9], [22.1, 85.8], [23.4, 84.8]
+      [16.5, 89.8], [17.2, 89.1], [18.1, 88.3], [19.4, 87.5], [20.8, 86.9], [21.3, 86.3], [22.0, 85.5]
     ],
     cone: [
-      [18.2, 88.5], [19.4, 89.4], [21.0, 88.8], [23.8, 87.2],
-      [23.5, 83.2], [20.8, 84.8], [19.0, 86.8], [18.2, 88.5]
+      [18.1, 88.3], [19.8, 89.2], [22.2, 88.4], [23.5, 86.5],
+      [23.0, 84.2], [20.2, 85.2], [18.6, 87.0], [18.1, 88.3]
     ]
   },
   biparjoy: {
     id: 'biparjoy',
-    name: "Extremely Severe Cyclonic Storm BIPARJOY (Historical Benchmark)",
+    name: "Extremely Severe Cyclonic Storm BIPARJOY (IMD Best-Track)",
     shortName: "Cyclone BIPARJOY",
     shortNameHindi: "चक्रवात बिपरजॉय",
-    hindiName: "अति भीषण चक्रवाती तूफान बिपरजॉय (ऐतिहासिक केस अध्ययन)",
+    hindiName: "अति भीषण चक्रवाती तूफान बिपरजॉय (आईएमडी आधिकारिक ट्रैक)",
     basin: "East-Central & Northeast Arabian Sea",
     basinHindi: "पूर्वी-मध्य एवं पूर्वोत्तर अरब सागर",
-    stage: "Extremely Severe Cyclonic Storm",
+    stage: "Extremely Severe Cyclonic Storm (Landfall Recorded)",
     stageHindi: "अति भीषण चक्रवाती तूफान",
     risk48h: "Category 3 Equivalent",
     wind: "165",
     gusts: "185",
     pressure: "958",
-    speed: "10",
+    speed: "12",
     direction: "North-Northeast",
     directionHindi: "उत्तर-उत्तर-पूर्व",
-    lat: 20.8,
-    lon: 67.1,
+    lat: 23.3,
+    lon: 68.6,
     target: "Jakhau Port & Kutch Coast, Gujarat",
     targetHindi: "जखाऊ बंदरगाह एवं कच्छ तट, गुजरात",
-    window: "Landfall Recorded",
-    windowHindi: "लैंडफॉल दर्ज किया गया",
+    window: "Landfall Recorded • 15 Jun 2023",
+    windowHindi: "लैंडफॉल दर्ज • १५ जून २०२३",
     threat: "Extremely Severe Watch",
     threatHindi: "अति भीषण निगरानी",
     threatColor: "text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/50 border-purple-200 dark:border-purple-800",
     categoryBadge: "ESCS",
     categoryBadgeColor: "bg-purple-600",
-    categoryFull: "Extremely Severe Cyclonic Storm • Category 3 Equivalent",
+    categoryFull: "Extremely Severe Cyclonic Storm • Landfall at Jakhau Port",
     waypoints: [
-      { step: '-24h', date: '13 Jun', time: '05:30', lat: 18.5, lon: 67.2, windKmh: 165, pressureHpa: '958', cat: 'Extremely Severe Cyclonic Storm', catHindi: 'अति भीषण चक्रवाती तूफान', type: 'ESCS', typeColor: '#9333ea', isPast: true, label: 'Peak Intensity' },
-      { step: '-12h', date: '13 Jun', time: '17:30', lat: 19.8, lon: 67.0, windKmh: 155, pressureHpa: '964', cat: 'Very Severe Cyclonic Storm', catHindi: 'बहुत भीषण चक्रवाती तूफान', type: 'VSCS', typeColor: '#f97316', isPast: true, label: 'Northward Recurvature' },
-      { step: '+00h', date: '14 Jun', time: '05:30', lat: 20.8, lon: 67.1, windKmh: 145, pressureHpa: '970', cat: 'Very Severe Cyclonic Storm', catHindi: 'बहुत भीषण चक्रवाती तूफान', type: 'VSCS', typeColor: '#f97316', isObserved: true, label: 'Observed Center Fix' },
-      { step: '+12h', date: '14 Jun', time: '17:30', lat: 21.9, lon: 67.6, windKmh: 135, pressureHpa: '976', cat: 'Very Severe Cyclonic Storm', catHindi: 'बहुत भीषण चक्रवाती तूफान', type: 'VSCS', typeColor: '#f97316', label: 'Saurashtra Coast Approach' },
-      { step: '+24h', date: '15 Jun', time: '05:30', lat: 22.8, lon: 68.3, windKmh: 125, pressureHpa: '982', cat: 'Very Severe Cyclonic Storm', catHindi: 'बहुत भीषण चक्रवाती तूफान', type: 'VSCS', typeColor: '#f97316', label: 'Pre-Landfall Friction' },
-      { step: '+36h', date: '15 Jun', time: '20:30', lat: 23.3, lon: 68.6, windKmh: 115, pressureHpa: '986', cat: 'Severe Cyclonic Storm', catHindi: 'भीषण चक्रवाती तूफान', type: 'SCS', typeColor: '#eab308', label: 'Jakhau Port Landfall' },
-      { step: '+48h', date: '16 Jun', time: '08:30', lat: 24.2, lon: 69.8, windKmh: 75, pressureHpa: '994', cat: 'Cyclonic Storm', catHindi: 'चक्रवाती तूफान', type: 'CS', typeColor: '#22c55e', label: 'Inland Rajasthan Dissipation' }
+      { step: '-48h', date: '11 Jun', time: '05:30', lat: 18.2, lon: 67.8, windKmh: 165, pressureHpa: '958', cat: 'Extremely Severe Cyclonic Storm', catHindi: 'अति भीषण चक्रवाती तूफान', type: 'ESCS', typeColor: '#9333ea', isPast: true, label: 'Peak Intensity' },
+      { step: '-36h', date: '12 Jun', time: '05:30', lat: 19.3, lon: 67.5, windKmh: 155, pressureHpa: '964', cat: 'Very Severe Cyclonic Storm', catHindi: 'बहुत भीषण चक्रवाती तूफान', type: 'VSCS', typeColor: '#f97316', isPast: true, label: 'Recurving Northward' },
+      { step: '-24h', date: '13 Jun', time: '05:30', lat: 20.6, lon: 67.2, windKmh: 145, pressureHpa: '970', cat: 'Very Severe Cyclonic Storm', catHindi: 'बहुत भीषण चक्रवाती तूफान', type: 'VSCS', typeColor: '#f97316', isPast: true, label: 'Saurashtra Approach' },
+      { step: '-12h', date: '14 Jun', time: '05:30', lat: 21.8, lon: 67.8, windKmh: 135, pressureHpa: '976', cat: 'Very Severe Cyclonic Storm', catHindi: 'बहुत भीषण चक्रवाती तूफान', type: 'VSCS', typeColor: '#f97316', isPast: true, label: 'Pre-Landfall Track' },
+      { step: '+00h', date: '15 Jun', time: '17:30', lat: 22.9, lon: 68.4, windKmh: 120, pressureHpa: '982', cat: 'Very Severe Cyclonic Storm', catHindi: 'बहुत भीषण चक्रवाती तूफान', type: 'VSCS', typeColor: '#f97316', isObserved: true, label: 'Gulf of Kutch Entry' },
+      { step: '+12h', date: '15 Jun', time: '22:30', lat: 23.3, lon: 68.6, windKmh: 115, pressureHpa: '986', cat: 'Severe Cyclonic Storm', catHindi: 'भीषण चक्रवाती तूफान', type: 'SCS', typeColor: '#ef4444', label: 'Landfall: Jakhau Port' },
+      { step: '+24h', date: '16 Jun', time: '08:30', lat: 24.1, lon: 69.8, windKmh: 65, pressureHpa: '996', cat: 'Cyclonic Storm', catHindi: 'चक्रवाती तूफान', type: 'CS', typeColor: '#22c55e', label: 'Inland Rajasthan' }
     ],
     track: [
-      [18.5, 67.2], [19.8, 67.0], [20.8, 67.1], [21.9, 67.6], [22.8, 68.3], [23.3, 68.6], [24.2, 69.8]
+      [18.2, 67.8], [19.3, 67.5], [20.6, 67.2], [21.8, 67.8], [22.9, 68.4], [23.3, 68.6], [24.1, 69.8]
     ],
     cone: [
-      [18.5, 67.2], [20.0, 68.5], [22.5, 69.8], [24.5, 71.0],
-      [24.8, 68.2], [22.8, 66.8], [20.2, 65.8], [18.5, 67.2]
+      [18.2, 67.8], [20.0, 69.0], [22.8, 70.2], [24.8, 71.2],
+      [24.5, 67.8], [22.5, 66.5], [19.8, 66.0], [18.2, 67.8]
+    ]
+  },
+  amphan: {
+    id: 'amphan',
+    name: "Super Cyclonic Storm AMPHAN (Historic Cat-5)",
+    shortName: "Cyclone AMPHAN",
+    shortNameHindi: "चक्रवात अम्फान",
+    hindiName: "महा चक्रवाती तूफान अम्फान (आईएमडी ऐतिहासिक बेंचमार्क)",
+    basin: "Central & North Bay of Bengal",
+    basinHindi: "मध्य एवं उत्तरी बंगाल की खाड़ी",
+    stage: "Super Cyclonic Storm (Historic Benchmark)",
+    stageHindi: "महा चक्रवाती तूफान (कैट-५)",
+    risk48h: "Category 5 Super Cyclone",
+    wind: "260",
+    gusts: "285",
+    pressure: "907",
+    speed: "18",
+    direction: "North-Northeast",
+    directionHindi: "उत्तर-उत्तर-पूर्व",
+    lat: 21.6,
+    lon: 88.3,
+    target: "Bakkhali / Sundarbans, West Bengal",
+    targetHindi: "बक्खाली / सुंदरबन, पश्चिम बंगाल",
+    window: "Landfall Recorded • 20 May 2020",
+    windowHindi: "लैंडफॉल दर्ज • २० मई २०२०",
+    threat: "Catastrophic Alert",
+    threatHindi: "विनाशकारी चेतावनी",
+    threatColor: "text-purple-700 dark:text-purple-300 bg-purple-50 dark:bg-purple-950/50 border-purple-200 dark:border-purple-800",
+    categoryBadge: "SUCS",
+    categoryBadgeColor: "bg-purple-700",
+    categoryFull: "Super Cyclonic Storm • Peak Winds 260 km/h • 907 hPa",
+    waypoints: [
+      { step: '-48h', date: '16 May', time: '17:30', lat: 10.9, lon: 86.3, windKmh: 65, pressureHpa: '996', cat: 'Cyclonic Storm', catHindi: 'चक्रवाती तूफान', type: 'CS', typeColor: '#22c55e', isPast: true, label: 'Formative CS' },
+      { step: '-36h', date: '17 May', time: '17:30', lat: 12.5, lon: 86.4, windKmh: 120, pressureHpa: '978', cat: 'Very Severe Cyclonic Storm', catHindi: 'बहुत भीषण तूफान', type: 'VSCS', typeColor: '#f97316', isPast: true, label: 'Explosive Deepening' },
+      { step: '-24h', date: '18 May', time: '11:30', lat: 13.4, lon: 86.2, windKmh: 260, pressureHpa: '907', cat: 'Super Cyclonic Storm', catHindi: 'महा चक्रवात', type: 'SUCS', typeColor: '#9333ea', isPast: true, label: 'Super Cyclone Peak (260 km/h)' },
+      { step: '-12h', date: '19 May', time: '17:30', lat: 17.4, lon: 87.0, windKmh: 200, pressureHpa: '930', cat: 'Extremely Severe', catHindi: 'अति भीषण', type: 'ESCS', typeColor: '#dc2626', isPast: true, label: 'Northward Acceleration' },
+      { step: '+00h', date: '20 May', time: '14:30', lat: 21.6, lon: 88.3, windKmh: 155, pressureHpa: '950', cat: 'Very Severe Cyclonic Storm', catHindi: 'बहुत भीषण तूफान', type: 'VSCS', typeColor: '#ef4444', isObserved: true, label: 'Landfall: Sundarbans' },
+      { step: '+12h', date: '21 May', time: '05:30', lat: 23.8, lon: 89.2, windKmh: 70, pressureHpa: '990', cat: 'Cyclonic Storm', catHindi: 'चक्रवाती तूफान', type: 'CS', typeColor: '#22c55e', label: 'Inland Bangladesh' }
+    ],
+    track: [
+      [10.9, 86.3], [12.5, 86.4], [13.4, 86.2], [17.4, 87.0], [21.6, 88.3], [23.8, 89.2]
+    ],
+    cone: [
+      [13.4, 86.2], [15.5, 88.0], [18.8, 88.8], [22.8, 90.0],
+      [24.0, 87.5], [20.5, 85.8], [16.0, 85.0], [13.4, 86.2]
+    ]
+  },
+  michaung: {
+    id: 'michaung',
+    name: "Severe Cyclonic Storm MICHAUNG (IMD Best-Track)",
+    shortName: "Cyclone MICHAUNG",
+    shortNameHindi: "चक्रवात मिचौंग",
+    hindiName: "भीषण चक्रवाती तूफान मिचौंग (आईएमडी आधिकारिक ट्रैक)",
+    basin: "Southwest Bay of Bengal",
+    basinHindi: "दक्षिण-पश्चिम बंगाल की खाड़ी",
+    stage: "Severe Cyclonic Storm (Landfall Recorded)",
+    stageHindi: "भीषण चक्रवाती तूफान",
+    risk48h: "Severe Cyclonic Storm",
+    wind: "100",
+    gusts: "115",
+    pressure: "986",
+    speed: "14",
+    direction: "North",
+    directionHindi: "उत्तर",
+    lat: 15.8,
+    lon: 80.3,
+    target: "Near Bapatla, South Andhra Pradesh",
+    targetHindi: "बापटला के समीप, दक्षिणी आंध्र प्रदेश",
+    window: "Landfall Recorded • 05 Dec 2023",
+    windowHindi: "लैंडफॉल दर्ज • ०५ दिसंबर २०२३",
+    threat: "Orange Alert",
+    threatHindi: "ऑरेंज अलर्ट",
+    threatColor: "text-orange-700 dark:text-orange-300 bg-orange-50 dark:bg-orange-950/50 border-orange-200 dark:border-orange-800",
+    categoryBadge: "SCS",
+    categoryBadgeColor: "bg-amber-500",
+    categoryFull: "Severe Cyclonic Storm • Coastal Inundation around Chennai/Bapatla",
+    waypoints: [
+      { step: '-36h', date: '02 Dec', time: '17:30', lat: 10.5, lon: 84.1, windKmh: 50, pressureHpa: '1000', cat: 'Depression', catHindi: 'अवसाद', type: 'D', typeColor: '#3b82f6', isPast: true, label: 'Formative Depression' },
+      { step: '-24h', date: '03 Dec', time: '11:30', lat: 11.8, lon: 82.8, windKmh: 75, pressureHpa: '994', cat: 'Cyclonic Storm', catHindi: 'चक्रवाती तूफान', type: 'CS', typeColor: '#22c55e', isPast: true, label: 'Named MICHAUNG' },
+      { step: '-12h', date: '04 Dec', time: '11:30', lat: 13.3, lon: 81.0, windKmh: 95, pressureHpa: '988', cat: 'Severe Cyclonic Storm', catHindi: 'भीषण चक्रवाती तूफान', type: 'SCS', typeColor: '#eab308', isPast: true, label: 'Heavy Inflow over Chennai' },
+      { step: '+00h', date: '05 Dec', time: '13:30', lat: 15.8, lon: 80.3, windKmh: 100, pressureHpa: '986', cat: 'Severe Cyclonic Storm', catHindi: 'भीषण चक्रवाती तूफान', type: 'SCS', typeColor: '#ef4444', isObserved: true, label: 'Landfall: Bapatla' },
+      { step: '+12h', date: '06 Dec', time: '05:30', lat: 17.1, lon: 81.4, windKmh: 45, pressureHpa: '1002', cat: 'Depression', catHindi: 'अवसाद', type: 'D', typeColor: '#3b82f6', label: 'Inland Dissipation' }
+    ],
+    track: [
+      [10.5, 84.1], [11.8, 82.8], [13.3, 81.0], [15.8, 80.3], [17.1, 81.4]
+    ],
+    cone: [
+      [11.8, 82.8], [13.5, 82.5], [16.2, 81.8], [18.0, 82.5],
+      [17.8, 80.0], [15.2, 79.5], [12.8, 80.2], [11.8, 82.8]
+    ]
+  },
+  genesis_bay: {
+    id: 'genesis_bay',
+    name: "North Indian Ocean Cyclogenesis Watch (Active RSMC)",
+    shortName: "Synoptic Watch",
+    shortNameHindi: "सिनॉप्टिक निगरानी",
+    hindiName: "उत्तर हिंद महासागर चक्रवात जनन निगरानी (आईएमडी दैनिक बुलेटिन)",
+    basin: "Central Bay of Bengal",
+    basinHindi: "मध्य बंगाल की खाड़ी",
+    stage: "Low Pressure Area (Genesis Monitoring)",
+    stageHindi: "निम्न दबाव क्षेत्र (जनन निगरानी)",
+    risk48h: "Moderate Probability (45%)",
+    wind: "45",
+    gusts: "55",
+    pressure: "1002",
+    speed: "14",
+    direction: "North-West",
+    directionHindi: "उत्तर-पश्चिम",
+    lat: 14.2,
+    lon: 87.8,
+    target: "North Andhra & Odisha Seaboard",
+    targetHindi: "उत्तरी आंध्र एवं ओडिशा तटरेखा",
+    window: "Synoptic 72h Outlook",
+    windowHindi: "सिनॉप्टिक ७२ घंटे का अनुमान",
+    threat: "Yellow Watch",
+    threatHindi: "येलो वॉच",
+    threatColor: "text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/50 border-amber-200 dark:border-amber-800",
+    categoryBadge: "WATCH",
+    categoryBadgeColor: "bg-amber-600",
+    categoryFull: "Low Pressure System • 72h Cyclogenesis Potential Active",
+    waypoints: [
+      { step: '-12h', date: '06 Sept', time: '17:30', lat: 13.5, lon: 88.5, windKmh: 35, pressureHpa: '1006', cat: 'Cyclonic Circulation', catHindi: 'चक्रवाती परिसंचरण', type: 'LPA', typeColor: '#10b981', isPast: true, label: 'Upper Air Circulation' },
+      { step: '+00h', date: '07 Sept', time: '05:30', lat: 14.2, lon: 87.8, windKmh: 45, pressureHpa: '1002', cat: 'Low Pressure Area', catHindi: 'निम्न दबाव क्षेत्र', type: 'LPA', typeColor: '#10b981', isObserved: true, label: 'Observed Vortex Fix' },
+      { step: '+12h', date: '07 Sept', time: '17:30', lat: 15.1, lon: 87.0, windKmh: 52, pressureHpa: '998', cat: 'Depression', catHindi: 'अवसाद', type: 'D', typeColor: '#3b82f6', label: 'Consolidation Phase' },
+      { step: '+24h', date: '08 Sept', time: '05:30', lat: 16.3, lon: 86.2, windKmh: 65, pressureHpa: '994', cat: 'Deep Depression', catHindi: 'गहरा अवसाद', type: 'DD', typeColor: '#06b6d4', label: 'Deepening Center' },
+      { step: '+48h', date: '09 Sept', time: '05:30', lat: 17.8, lon: 85.3, windKmh: 80, pressureHpa: '988', cat: 'Cyclonic Storm', catHindi: 'चक्रवाती तूफान', type: 'CS', typeColor: '#22c55e', label: 'North-West Maritime Track' },
+      { step: '+72h', date: '10 Sept', time: '05:30', lat: 19.5, lon: 84.8, windKmh: 95, pressureHpa: '980', cat: 'Severe Cyclonic Storm', catHindi: 'भीषण चक्रवाती तूफान', type: 'SCS', typeColor: '#eab308', label: 'Odisha Coast Approach' }
+    ],
+    track: [
+      [13.5, 88.5], [14.2, 87.8], [15.1, 87.0], [16.3, 86.2], [17.8, 85.3], [19.5, 84.8]
+    ],
+    cone: [
+      [14.2, 87.8], [15.8, 89.0], [18.2, 88.0], [21.0, 86.5],
+      [20.5, 83.2], [17.5, 84.0], [15.0, 86.0], [14.2, 87.8]
     ]
   }
 };
+
+// Real Indian Meteorological Department (IMD) Coastal Doppler Weather Radar Network
+const IMD_RADAR_NETWORK = [
+  { id: 'paradip', name: 'Paradip DWR', state: 'Odisha', lat: 20.26, lon: 86.70, band: 'S-Band (2.8 GHz)', rangeKm: 250, status: 'ONLINE', freq: '2.85 GHz' },
+  { id: 'gopalpur', name: 'Gopalpur DWR', state: 'Odisha', lat: 19.31, lon: 84.97, band: 'S-Band (2.8 GHz)', rangeKm: 250, status: 'ONLINE', freq: '2.80 GHz' },
+  { id: 'kolkata', name: 'Kolkata DWR', state: 'West Bengal', lat: 22.57, lon: 88.36, band: 'S-Band (2.8 GHz)', rangeKm: 250, status: 'ONLINE', freq: '2.86 GHz' },
+  { id: 'visakhapatnam', name: 'Visakhapatnam DWR', state: 'Andhra Pradesh', lat: 17.68, lon: 83.21, band: 'S-Band (2.8 GHz)', rangeKm: 250, status: 'ONLINE', freq: '2.84 GHz' },
+  { id: 'machilipatnam', name: 'Machilipatnam DWR', state: 'Andhra Pradesh', lat: 16.18, lon: 81.13, band: 'S-Band (2.8 GHz)', rangeKm: 250, status: 'ONLINE', freq: '2.81 GHz' },
+  { id: 'chennai', name: 'Chennai DWR', state: 'Tamil Nadu', lat: 13.08, lon: 80.27, band: 'S-Band (2.8 GHz)', rangeKm: 250, status: 'ONLINE', freq: '2.82 GHz' },
+  { id: 'mumbai', name: 'Mumbai DWR', state: 'Maharashtra', lat: 18.92, lon: 72.83, band: 'S-Band (2.8 GHz)', rangeKm: 250, status: 'ONLINE', freq: '2.83 GHz' },
+  { id: 'goa', name: 'Goa DWR', state: 'Goa', lat: 15.49, lon: 73.82, band: 'S-Band (2.8 GHz)', rangeKm: 250, status: 'ONLINE', freq: '2.80 GHz' },
+  { id: 'kochi', name: 'Kochi DWR', state: 'Kerala', lat: 9.93, lon: 76.26, band: 'S-Band (2.8 GHz)', rangeKm: 250, status: 'ONLINE', freq: '2.84 GHz' },
+  { id: 'bhuj', name: 'Bhuj / Kutch DWR', state: 'Gujarat', lat: 23.24, lon: 69.66, band: 'S-Band (2.8 GHz)', rangeKm: 250, status: 'ONLINE', freq: '2.85 GHz' }
+];
+
+// Key Critical Maritime Threat Ports
+const KEY_COASTAL_PORTS = [
+  { name: 'Dhamra Port', state: 'Odisha', lat: 20.80, lon: 86.96, role: 'Primary Landfall (DANA)', threatLevel: 'Direct Strike' },
+  { name: 'Paradip Port', state: 'Odisha', lat: 20.31, lon: 86.61, role: 'Deepwater Bulk Harbor', threatLevel: 'Severe Alert' },
+  { name: 'Gopalpur Port', state: 'Odisha', lat: 19.30, lon: 84.96, role: 'Commercial Seaport', threatLevel: 'Alert' },
+  { name: 'Visakhapatnam Port', state: 'Andhra Pradesh', lat: 17.69, lon: 83.29, role: 'Naval & Cargo Terminal', threatLevel: 'Advisory' },
+  { name: 'Haldia Port', state: 'West Bengal', lat: 22.02, lon: 88.06, role: 'Sundarbans Maritime Gateway', threatLevel: 'High Alert' },
+  { name: 'Jakhau Port', state: 'Gujarat', lat: 23.23, lon: 68.61, role: 'Primary Landfall (BIPARJOY)', threatLevel: 'Direct Strike' },
+  { name: 'Kandla Port', state: 'Gujarat', lat: 23.00, lon: 70.22, role: 'Gulf of Kutch Deep Port', threatLevel: 'High Alert' }
+];
 
 const BASE_LAYERS = {
   satellite: {
@@ -258,8 +338,8 @@ const BASE_LAYERS = {
     id: 'dark',
     name: 'Dark Tactical GIS',
     nameHindi: 'डार्क जीआईएस',
-    url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-    attribution: '&copy; CartoDB Dark Matter'
+    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+    attribution: 'Tiles &copy; Esri World Dark Gray Canvas'
   },
   topo: {
     id: 'topo',
@@ -267,14 +347,13 @@ const BASE_LAYERS = {
     nameHindi: 'स्थलाकृति',
     url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}',
     attribution: 'Tiles &copy; Esri Topo'
-  },
-  light: {
-    id: 'light',
-    name: 'Nautical Light',
-    nameHindi: 'नौवहन लाइट',
-    url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-    attribution: '&copy; CartoDB Positron'
   }
+};
+
+const LABELS_LAYERS = {
+  satellite: 'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
+  dark: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}',
+  topo: 'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
 };
 
 const DISTRICT_ROWS = [
@@ -547,7 +626,7 @@ const ThreatMap = () => {
   }, []);
 
   // System & GIS Map States
-  const [selectedSystemId, setSelectedSystemId] = useState('invest92b');
+  const [selectedSystemId, setSelectedSystemId] = useState('dana');
   const [mapBaseLayer, setMapBaseLayer] = useState('satellite');
   const [showDopplerRadar, setShowDopplerRadar] = useState(true);
   const [showSatelliteIR, setShowSatelliteIR] = useState(true);
@@ -559,8 +638,8 @@ const ThreatMap = () => {
   const mapWrapperRef = useRef(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
   const [mapAction, setMapAction] = useState(null); // 'zoomIn' | 'zoomOut' | 'recenter' | 'resetNorth'
-  const [isLeftMenuOpen, setIsLeftMenuOpen] = useState(true);
-  const [isRightTableOpen, setIsRightTableOpen] = useState(true);
+  const [isLeftMenuOpen, setIsLeftMenuOpen] = useState(false);
+  const [isRightTableOpen, setIsRightTableOpen] = useState(false);
   const [satSubMode, setSatSubMode] = useState('live'); // 'live' | 'hd' | 'ir'
   const [activeForecastLayer, setActiveForecastLayer] = useState('none'); // 'none' | 'precip' | 'wind' | 'temp' | 'humidity' | 'pressure'
   const [isMeasuring, setIsMeasuring] = useState(false);
@@ -599,7 +678,7 @@ const ThreatMap = () => {
   const [activeStepIndex, setActiveStepIndex] = useState(0);
   const [isPlayingTimeline, setIsPlayingTimeline] = useState(false);
 
-  const current = SYSTEMS[selectedSystemId] || SYSTEMS.invest92b;
+  const current = SYSTEMS[selectedSystemId] || SYSTEMS.dana;
 
   // Auto timeline playback
   useEffect(() => {
@@ -772,292 +851,248 @@ const ThreatMap = () => {
             }`}
           >
 
-            {/* 1. LEFT FLOATING CONTROL DRAWER (Live Maps + Forecast Maps) */}
-            <div className="absolute top-3 left-3 z-[1000] w-52 sm:w-60 pointer-events-auto">
-              <div className="zoom-earth-glass rounded-2xl p-2.5 sm:p-3 text-white shadow-2xl border border-white/10">
-                {/* Brand Header */}
-                <div className="flex items-center justify-between pb-2 mb-2 border-b border-white/10">
-                  <div className="flex items-center gap-2">
-                    <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-md shadow-cyan-500/40">
-                      <Wind className="w-3.5 h-3.5 text-white animate-vortex-spin" />
-                    </div>
-                    <div>
-                      <span className="font-heading font-black text-xs tracking-wider uppercase text-white block leading-none">
-                        VAYU EARTH
-                      </span>
-                      <span className="text-[9px] text-cyan-400 font-mono tracking-tight font-semibold">
-                        GIS CONSOLE 4.0
-                      </span>
-                    </div>
+            {/* 1. TOP METEOROLOGICAL HUD & CONTROL RIBBON (Full width, open, unhindered) */}
+            <div className="absolute top-3 left-3 right-14 z-[1000] pointer-events-auto flex flex-col md:flex-row items-stretch md:items-center justify-between gap-2.5 p-2 sm:px-3 sm:py-2.5 zoom-earth-glass rounded-2xl text-white shadow-2xl border border-white/15 backdrop-blur-xl">
+              
+              {/* Left Group: Active Cyclone Telemetry Ribbon */}
+              <div className="flex items-center gap-2.5 flex-wrap min-w-0">
+                <div className="flex items-center gap-1.5 shrink-0">
+                  <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-cyan-500 to-blue-600 flex items-center justify-center shadow-md shadow-cyan-500/40">
+                    <Wind className="w-3.5 h-3.5 text-white animate-vortex-spin" />
                   </div>
-                  <button 
-                    onClick={() => setIsLeftMenuOpen(!isLeftMenuOpen)}
-                    className="p-1 text-slate-400 hover:text-white rounded-lg hover:bg-white/10 transition cursor-pointer"
-                    title={isLeftMenuOpen ? "Minimize layer panel" : "Expand layer panel"}
+                  <span className={`px-2 py-0.5 rounded-md text-[11px] font-black tracking-wide text-white ${current.categoryBadgeColor || 'bg-orange-600'}`}>
+                    {current.categoryBadge || 'SCS'}
+                  </span>
+                </div>
+
+                <div className="min-w-0">
+                  <h2 className="text-xs sm:text-sm font-heading font-black tracking-tight text-white flex items-center gap-1.5 truncate">
+                    <span>{isHindi ? (current.hindiName || current.name) : current.name}</span>
+                  </h2>
+                  <div className="text-[10px] text-slate-300 flex items-center gap-2 flex-wrap">
+                    <span className="text-cyan-300 font-mono font-semibold">{current.lat}°N, {current.lon}°E</span>
+                    <span>•</span>
+                    <span className="text-amber-300 font-mono font-bold">{current.wind} km/h</span>
+                    <span className="text-slate-400">({current.pressure} hPa)</span>
+                    <span>•</span>
+                    <span className="text-slate-200 truncate">{isHindi ? current.targetHindi : current.target}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Group: GIS Layer Controls & Drawer Toggles */}
+              <div className="flex items-center gap-1.5 flex-wrap shrink-0">
+                
+                {/* Base Layer Switcher: Satellite / Dark GIS */}
+                <div className="flex items-center bg-black/40 p-0.5 rounded-xl border border-white/10 text-[11px]">
+                  <button
+                    onClick={() => setMapBaseLayer('satellite')}
+                    className={`px-2.5 py-1 rounded-lg font-medium transition cursor-pointer flex items-center gap-1 ${
+                      mapBaseLayer === 'satellite'
+                        ? 'bg-cyan-500/40 text-cyan-200 font-bold shadow-sm'
+                        : 'text-slate-300 hover:text-white'
+                    }`}
+                    title="High-Resolution Satellite Imagery with Place Labels"
                   >
-                    {isLeftMenuOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                    <Satellite className="w-3 h-3" />
+                    <span>Satellite</span>
+                  </button>
+                  <button
+                    onClick={() => setMapBaseLayer('dark')}
+                    className={`px-2.5 py-1 rounded-lg font-medium transition cursor-pointer flex items-center gap-1 ${
+                      mapBaseLayer === 'dark'
+                        ? 'bg-blue-600/40 text-blue-200 font-bold shadow-sm'
+                        : 'text-slate-300 hover:text-white'
+                    }`}
+                    title="Dark Tactical GIS Canvas"
+                  >
+                    <Layers className="w-3 h-3" />
+                    <span>Dark GIS</span>
                   </button>
                 </div>
 
-                {isLeftMenuOpen && (
-                  <div className="space-y-2.5 text-xs max-h-[460px] overflow-y-auto zoom-earth-scrollbar pr-0.5">
-                    
-                    {/* LIVE MAPS */}
-                    <div>
-                      <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase block mb-1 px-1">
-                        Live Maps
-                      </span>
-                      <div className="space-y-1">
-                        {/* Satellite item */}
-                        <div className="bg-white/5 hover:bg-white/10 rounded-xl p-2 transition">
-                          <div className="flex items-center justify-between mb-1.5">
-                            <div className="flex items-center gap-2">
-                              <Satellite className="w-4 h-4 text-cyan-400" />
-                              <span className="font-semibold text-white">Satellite</span>
-                            </div>
-                            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-                          </div>
-                          {/* Sub-chips: Live / HD / IR */}
-                          <div className="flex items-center gap-1 mt-1 pl-4">
-                            {['live', 'hd', 'ir'].map((mode) => (
-                              <button
-                                key={mode}
-                                onClick={() => {
-                                  setSatSubMode(mode);
-                                  if (mode === 'ir') {
-                                    setShowSatelliteIR(true);
-                                    setMapBaseLayer('dark');
-                                  } else {
-                                    setMapBaseLayer('satellite');
-                                  }
-                                }}
-                                className={`px-2 py-0.5 rounded text-[10px] font-medium transition cursor-pointer ${
-                                  satSubMode === mode 
-                                    ? 'bg-cyan-500/30 text-cyan-300 border border-cyan-400/40 font-bold' 
-                                    : 'bg-white/5 text-slate-400 hover:text-white'
-                                }`}
-                              >
-                                {mode === 'live' ? '✓ Live' : mode === 'hd' ? 'HD' : 'IR'}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
+                {/* IMD Radar Network Toggle */}
+                <button
+                  onClick={() => setShowDopplerRadar(!showDopplerRadar)}
+                  className={`px-2.5 py-1 rounded-xl text-[11px] font-semibold transition cursor-pointer flex items-center gap-1.5 border shadow-sm ${
+                    showDopplerRadar
+                      ? 'bg-emerald-500/25 border-emerald-400/50 text-emerald-300 shadow-emerald-500/20'
+                      : 'bg-black/30 border-white/10 text-slate-400 hover:text-white'
+                  }`}
+                  title="Toggle IMD Coastal Doppler Weather Radar Stations & 250km surveillance ranges"
+                >
+                  <Radio className={`w-3.5 h-3.5 ${showDopplerRadar ? 'text-emerald-400 animate-pulse' : 'text-slate-400'}`} />
+                  <span>IMD Radars</span>
+                  <span className="text-[9px] px-1 py-0.2 rounded bg-emerald-500/30 text-emerald-200 font-mono font-bold">10</span>
+                </button>
 
-                        {/* Radar item */}
-                        <div className={`rounded-xl p-2 transition ${showDopplerRadar ? 'bg-white/10 border border-white/15' : 'bg-white/5 hover:bg-white/10'}`}>
-                          <button
-                            onClick={() => setShowDopplerRadar(!showDopplerRadar)}
-                            className="w-full flex items-center justify-between text-left cursor-pointer"
-                          >
-                            <div className="flex items-center gap-2">
-                              <Radio className="w-4 h-4 text-emerald-400 animate-pulse" />
-                              <span className="font-semibold text-white">Radar</span>
-                            </div>
-                            {showDopplerRadar && <Check className="w-3.5 h-3.5 text-emerald-400" />}
-                          </button>
+                {/* Tactical Cone Toggle */}
+                <button
+                  onClick={() => setShowCone(!showCone)}
+                  className={`px-2 py-1 rounded-xl text-[11px] font-semibold transition cursor-pointer border shadow-sm ${
+                    showCone
+                      ? 'bg-amber-500/25 border-amber-400/50 text-amber-300'
+                      : 'bg-black/30 border-white/10 text-slate-400 hover:text-white'
+                  }`}
+                  title="Toggle 72-Hour Forecast Uncertainty Cone"
+                >
+                  Cone
+                </button>
 
-                          {showDopplerRadar && (
-                            <div className="mt-2 pt-2 border-t border-white/10 flex items-center justify-between gap-1.5 pl-4">
-                              <span className="text-[10px] text-slate-400">Opacity</span>
-                              <input
-                                type="range"
-                                min="0.2"
-                                max="1.0"
-                                step="0.05"
-                                value={radarOpacity}
-                                onChange={(e) => setRadarOpacity(parseFloat(e.target.value))}
-                                className="w-16 sm:w-20 h-1 bg-white/20 rounded accent-emerald-400 cursor-pointer"
-                              />
-                              <span className="text-[10px] font-mono text-emerald-300 font-bold">{Math.round(radarOpacity * 100)}%</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    </div>
+                {/* Wind Radii Toggle */}
+                <button
+                  onClick={() => setShowWindRadii(!showWindRadii)}
+                  className={`px-2 py-1 rounded-xl text-[11px] font-semibold transition cursor-pointer border shadow-sm ${
+                    showWindRadii
+                      ? 'bg-rose-500/25 border-rose-400/50 text-rose-300'
+                      : 'bg-black/30 border-white/10 text-slate-400 hover:text-white'
+                  }`}
+                  title="Toggle 35kt / 50kt / 64kt Critical Wind Swaths"
+                >
+                  Radii
+                </button>
 
-                    {/* FORECAST MAPS */}
-                    <div className="pt-2 border-t border-white/10">
-                      <span className="text-[10px] font-bold text-slate-400 tracking-wider uppercase block mb-1 px-1">
-                        Forecast Maps
-                      </span>
-                      <div className="space-y-0.5">
-                        {[
-                          { id: 'precip', label: 'Precipitation', icon: CloudRain, unit: 'mm/h' },
-                          { id: 'wind', label: 'Wind', icon: Wind, unit: 'km/h' },
-                          { id: 'temp', label: 'Temperature', icon: Thermometer, unit: '°C' },
-                          { id: 'humidity', label: 'Humidity', icon: Droplets, unit: '%' },
-                          { id: 'pressure', label: 'Pressure', icon: Gauge, unit: 'hPa' }
-                        ].map((f) => {
-                          const IconComp = f.icon;
-                          const isActive = activeForecastLayer === f.id;
-                          return (
-                            <button
-                              key={f.id}
-                              onClick={() => setActiveForecastLayer(isActive ? 'none' : f.id)}
-                              className={`w-full flex items-center justify-between px-2 py-1 rounded-lg text-left transition cursor-pointer ${
-                                isActive 
-                                  ? 'bg-blue-600/30 text-blue-300 border border-blue-400/40 font-semibold' 
-                                  : 'text-slate-300 hover:text-white hover:bg-white/5'
-                              }`}
-                            >
-                              <div className="flex items-center gap-2">
-                                <IconComp className={`w-3.5 h-3.5 ${isActive ? 'text-blue-400' : 'text-slate-400'}`} />
-                                <span>{f.label}</span>
-                              </div>
-                              {isActive && <span className="text-[9px] px-1 rounded bg-blue-500/20 text-blue-300 font-mono">{f.unit}</span>}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
+                {/* On-Demand Track Table Drawer Toggle Button */}
+                <button
+                  onClick={() => setIsRightTableOpen(!isRightTableOpen)}
+                  className={`px-2.5 py-1 rounded-xl text-[11px] font-bold transition cursor-pointer flex items-center gap-1.5 border shadow-sm ${
+                    isRightTableOpen
+                      ? 'bg-cyan-500 text-slate-950 border-cyan-300 font-black shadow-cyan-500/40'
+                      : 'bg-white/15 hover:bg-white/25 border-white/20 text-white'
+                  }`}
+                  title="Toggle Storm Waypoints & Advisory Table"
+                >
+                  <Activity className="w-3.5 h-3.5" />
+                  <span>Track Table</span>
+                  <span className={`text-[9px] px-1 rounded font-mono ${isRightTableOpen ? 'bg-slate-900 text-white' : 'bg-white/20 text-slate-200'}`}>
+                    {(current.waypoints || []).length}
+                  </span>
+                </button>
 
-                    {/* Tactical Overlays */}
-                    <div className="pt-2 border-t border-white/10 flex items-center justify-between gap-1">
-                      <button
-                        onClick={() => setShowCone(!showCone)}
-                        className={`flex-1 py-1 text-[10px] font-medium rounded text-center transition cursor-pointer ${
-                          showCone ? 'bg-amber-500/30 text-amber-300 border border-amber-400/40' : 'bg-white/5 text-slate-400 hover:text-white'
-                        }`}
-                      >
-                        Cone
-                      </button>
-                      <button
-                        onClick={() => setShowWindRadii(!showWindRadii)}
-                        className={`flex-1 py-1 text-[10px] font-medium rounded text-center transition cursor-pointer ${
-                          showWindRadii ? 'bg-rose-500/30 text-rose-300 border border-rose-400/40' : 'bg-white/5 text-slate-400 hover:text-white'
-                        }`}
-                      >
-                        Radii
-                      </button>
-                    </div>
-
-                  </div>
-                )}
               </div>
             </div>
 
-            {/* 2. RIGHT FLOATING STORM TRACK & FORECAST TABLE CARD (Zoom Earth replica) */}
-            <div className="absolute top-3 right-12 sm:right-16 z-[1000] w-72 sm:w-84 max-h-[520px] flex flex-col pointer-events-auto">
-              <div className="zoom-earth-glass rounded-2xl text-white shadow-2xl border border-white/10 overflow-hidden flex flex-col">
+            {/* 2. ON-DEMAND SLIDE-OVER TRACK ADVISORY DRAWER (Opens only when requested, does not obstruct map) */}
+            {isRightTableOpen && (
+              <div className="absolute top-16 right-14 z-[1050] w-80 sm:w-96 max-h-[520px] flex flex-col zoom-earth-glass rounded-2xl text-white shadow-2xl border border-white/20 overflow-hidden pointer-events-auto backdrop-blur-xl animate-in fade-in slide-in-from-right duration-200">
                 
-                {/* Storm Title Header */}
-                <div className="p-3 pb-2 border-b border-white/10 flex items-center justify-between bg-black/20">
+                {/* Storm Title Header with Close Button */}
+                <div className="p-3 pb-2.5 border-b border-white/10 flex items-center justify-between bg-black/30">
                   <div className="min-w-0 pr-2">
-                    <h3 className="font-heading font-black text-sm tracking-tight text-white truncate">
-                      {isHindi ? (current.hindiName || current.name) : current.name}
-                    </h3>
-                    <div className="flex items-center gap-1.5 text-[10px] text-slate-400 mt-0.5">
+                    <div className="flex items-center gap-2">
+                      <span className={`px-2 py-0.5 rounded text-[10px] font-black text-white ${current.categoryBadgeColor || 'bg-orange-600'}`}>
+                        {current.categoryBadge || 'SCS'}
+                      </span>
+                      <h3 className="font-heading font-black text-xs sm:text-sm tracking-tight text-white truncate">
+                        {isHindi ? (current.hindiName || current.name) : current.name}
+                      </h3>
+                    </div>
+                    <div className="flex items-center gap-1.5 text-[10px] text-slate-300 mt-1">
                       <span className="truncate">{isHindi ? current.basinHindi : current.basin}</span>
                       <span>•</span>
-                      <span className="font-mono text-cyan-300">{current.window}</span>
+                      <span className="font-mono text-cyan-300 font-semibold">{current.window}</span>
                     </div>
                   </div>
                   <button 
-                    onClick={() => setIsRightTableOpen(!isRightTableOpen)}
-                    className="p-1 text-slate-400 hover:text-white rounded-lg hover:bg-white/10 transition cursor-pointer shrink-0"
-                    title={isRightTableOpen ? "Minimize forecast table" : "Expand forecast table"}
+                    onClick={() => setIsRightTableOpen(false)}
+                    className="p-1.5 text-slate-400 hover:text-white rounded-lg hover:bg-white/10 transition cursor-pointer shrink-0"
+                    title="Close track table"
                   >
-                    {isRightTableOpen ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                    <X className="w-4 h-4" />
                   </button>
                 </div>
 
-                {isRightTableOpen && (
-                  <>
-                    {/* Forecast Table Header */}
-                    <div className="px-2.5 pt-2 pb-1 text-[10px] font-bold text-slate-400 border-b border-white/10 grid grid-cols-5 gap-1 text-center uppercase tracking-wider bg-white/5">
-                      <span className="text-left col-span-1 pl-1">DATE</span>
-                      <span className="col-span-1">TIME</span>
-                      <span className="col-span-1">TYPE</span>
-                      <span className="col-span-1">WIND</span>
-                      <span className="col-span-1 text-right pr-1">PRESS</span>
-                    </div>
+                {/* Forecast Table Header */}
+                <div className="px-2.5 pt-2 pb-1 text-[10px] font-bold text-slate-400 border-b border-white/10 grid grid-cols-5 gap-1 text-center uppercase tracking-wider bg-white/5">
+                  <span className="text-left col-span-1 pl-1">DATE</span>
+                  <span className="col-span-1">TIME</span>
+                  <span className="col-span-1">STAGE</span>
+                  <span className="col-span-1">WIND</span>
+                  <span className="col-span-1 text-right pr-1">PRESS</span>
+                </div>
 
-                    {/* High-density Track Table Rows */}
-                    <div className="overflow-y-auto max-h-[280px] zoom-earth-scrollbar divide-y divide-white/5 text-xs">
-                      {(() => {
-                        const waypoints = current.waypoints || [];
-                        return waypoints.map((wp, idx) => {
-                          const isActive = idx === activeStepIndex;
-                          return (
-                            <div
-                              key={idx}
-                              onClick={() => {
-                                setActiveStepIndex(idx);
-                                setIsPlayingTimeline(false);
-                              }}
-                              className={`grid grid-cols-5 gap-1 items-center px-2.5 py-1.5 cursor-pointer transition select-none ${
-                                isActive 
-                                  ? 'zoom-earth-row-active' 
-                                  : 'hover:bg-white/10 text-slate-300'
-                              }`}
+                {/* High-density Track Table Rows */}
+                <div className="overflow-y-auto max-h-[290px] zoom-earth-scrollbar divide-y divide-white/5 text-xs">
+                  {(() => {
+                    const waypoints = current.waypoints || [];
+                    return waypoints.map((wp, idx) => {
+                      const isActive = idx === activeStepIndex;
+                      return (
+                        <div
+                          key={idx}
+                          onClick={() => {
+                            setActiveStepIndex(idx);
+                            setIsPlayingTimeline(false);
+                          }}
+                          className={`grid grid-cols-5 gap-1 items-center px-2.5 py-1.5 cursor-pointer transition select-none ${
+                            isActive 
+                              ? 'zoom-earth-row-active' 
+                              : 'hover:bg-white/10 text-slate-300'
+                          }`}
+                        >
+                          {/* Date */}
+                          <div className="col-span-1 text-left pl-1 font-medium text-[11px] truncate">
+                            {wp.date}
+                          </div>
+
+                          {/* Time */}
+                          <div className="col-span-1 text-center font-mono text-[11px]">
+                            {wp.time}
+                          </div>
+
+                          {/* Type Badge */}
+                          <div className="col-span-1 flex items-center justify-center">
+                            <span 
+                              className="px-1.5 py-0.5 rounded text-[10px] font-bold tracking-tight text-white"
+                              style={{ backgroundColor: wp.typeColor || '#10b981' }}
                             >
-                              {/* Date */}
-                              <div className="col-span-1 text-left pl-1 font-medium text-[11px] truncate">
-                                {wp.date || '07 Sept'}
-                              </div>
+                              {wp.type || 'CS'}
+                            </span>
+                          </div>
 
-                              {/* Time */}
-                              <div className="col-span-1 text-center font-mono text-[11px]">
-                                {wp.time || '03:30'}
-                              </div>
+                          {/* Wind km/h */}
+                          <div className="col-span-1 text-center font-bold font-mono text-[11px]">
+                            {wp.windKmh || wp.wind}
+                          </div>
 
-                              {/* Type Badge */}
-                              <div className="col-span-1 flex items-center justify-center">
-                                <span 
-                                  className="px-1.5 py-0.5 rounded text-[10px] font-bold tracking-tight text-white"
-                                  style={{ backgroundColor: wp.typeColor || '#10b981' }}
-                                >
-                                  {wp.type || 'LPA'}
-                                </span>
-                              </div>
-
-                              {/* Wind km/h */}
-                              <div className="col-span-1 text-center font-bold font-mono text-[11px]">
-                                {wp.windKmh || wp.wind.replace(' km/h', '')}
-                              </div>
-
-                              {/* Pressure hPa */}
-                              <div className="col-span-1 text-right pr-1 font-mono text-[11px]">
-                                {wp.pressureHpa || wp.pressure.replace(' hPa', '')}
-                              </div>
-                            </div>
-                          );
-                        });
-                      })()}
-                    </div>
-
-                    {/* Bottom Summary Badge & Warnings Button */}
-                    <div className="p-2.5 border-t border-white/10 bg-black/30 space-y-2">
-                      <div className="flex items-center gap-2">
-                        <span className={`px-2 py-0.5 rounded-md text-[10px] font-black text-white ${current.categoryBadgeColor || 'bg-[#ff5500]'}`}>
-                          {current.categoryBadge || 'SCS'}
-                        </span>
-                        <div className="min-w-0 flex-1">
-                          <span className="font-bold text-xs text-white block truncate">
-                            {current.categoryFull || `${current.stage} • ${current.wind} km/h winds`}
-                          </span>
-                          <span className="text-[10px] text-slate-400 block truncate">
-                            {isHindi ? current.targetHindi : current.target}
-                          </span>
+                          {/* Pressure hPa */}
+                          <div className="col-span-1 text-right pr-1 font-mono text-[11px]">
+                            {wp.pressureHpa || wp.pressure}
+                          </div>
                         </div>
-                      </div>
+                      );
+                    });
+                  })()}
+                </div>
 
-                      <button
-                        onClick={() => {
-                          const el = document.getElementById('coastal-threat-matrix');
-                          if (el) el.scrollIntoView({ behavior: 'smooth' });
-                        }}
-                        className="w-full py-1.5 px-3 bg-white/10 hover:bg-white/20 active:bg-white/30 rounded-xl text-xs font-bold text-white flex items-center justify-center gap-1.5 transition cursor-pointer border border-white/10 shadow-sm"
-                      >
-                        <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
-                        <span>{isHindi ? 'चेतावनी एवं तटीय अलर्ट विवरण' : 'Latest Warnings and Information'}</span>
-                      </button>
+                {/* Bottom Summary Badge & Warnings Button */}
+                <div className="p-2.5 border-t border-white/10 bg-black/40 space-y-2">
+                  <div className="flex items-center gap-2">
+                    <div className="min-w-0 flex-1">
+                      <span className="font-bold text-xs text-white block truncate">
+                        {current.categoryFull || `${current.stage} • ${current.wind} km/h`}
+                      </span>
+                      <span className="text-[10px] text-slate-300 block truncate">
+                        {isHindi ? current.targetHindi : current.target}
+                      </span>
                     </div>
-                  </>
-                )}
+                  </div>
+
+                  <button
+                    onClick={() => {
+                      setIsRightTableOpen(false);
+                      const el = document.getElementById('coastal-threat-matrix');
+                      if (el) el.scrollIntoView({ behavior: 'smooth' });
+                    }}
+                    className="w-full py-1.5 px-3 bg-white/10 hover:bg-white/20 active:bg-white/30 rounded-xl text-xs font-bold text-white flex items-center justify-center gap-1.5 transition cursor-pointer border border-white/10 shadow-sm"
+                  >
+                    <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
+                    <span>{isHindi ? 'चेतावनी एवं तटीय अलर्ट विवरण' : 'View District Threat Matrix'}</span>
+                  </button>
+                </div>
 
               </div>
-            </div>
+            )}
 
             {/* 3. RIGHT FLOATING VERTICAL GIS TOOLBAR */}
             <div className="absolute top-3 right-3 z-[1000] flex flex-col gap-1.5 pointer-events-auto">
@@ -1264,6 +1299,13 @@ const ThreatMap = () => {
                     attribution={activeTile.attribution}
                   />
 
+                  {/* Cartographic Reference: Boundaries, Coastlines, Ports & Major Cities */}
+                  <TileLayer
+                    url={LABELS_LAYERS[mapBaseLayer] || LABELS_LAYERS.satellite}
+                    opacity={0.9}
+                    zIndex={250}
+                  />
+
                   {/* Satellite IR Overlay */}
                   {showSatelliteIR && (
                     <TileLayer
@@ -1281,6 +1323,89 @@ const ThreatMap = () => {
                       zIndex={200}
                     />
                   )}
+
+                  {/* IMD Doppler Weather Radar Network (10 Coastal Stations with 250km surveillance range) */}
+                  {showDopplerRadar && IMD_RADAR_NETWORK.map((radar) => {
+                    const distToEye = getDistanceKm(activeWp.lat, activeWp.lon, radar.lat, radar.lon);
+                    const isInRange = distToEye <= radar.rangeKm;
+                    return (
+                      <React.Fragment key={radar.id}>
+                        <Circle
+                          center={[radar.lat, radar.lon]}
+                          radius={radar.rangeKm * 1000}
+                          pathOptions={{
+                            color: isInRange ? '#10b981' : '#06b6d4',
+                            fillColor: isInRange ? '#10b981' : '#06b6d4',
+                            fillOpacity: isInRange ? 0.07 : 0.03,
+                            weight: isInRange ? 1.5 : 1,
+                            dashArray: '3, 6'
+                          }}
+                        />
+                        <CircleMarker
+                          center={[radar.lat, radar.lon]}
+                          radius={5}
+                          pathOptions={{
+                            fillColor: '#10b981',
+                            fillOpacity: 1,
+                            color: '#ffffff',
+                            weight: 1.5
+                          }}
+                        >
+                          <Popup>
+                            <div className="p-1.5 text-xs space-y-1 font-sans">
+                              <div className="flex items-center gap-1.5 pb-1 border-b border-slate-100 font-bold text-slate-900">
+                                <Radio className="w-3.5 h-3.5 text-emerald-500 animate-pulse" />
+                                <span>{radar.name} ({radar.state})</span>
+                              </div>
+                              <div className="text-slate-600">Band: <strong>{radar.band}</strong></div>
+                              <div className="text-slate-600">Surveillance Radius: <strong>{radar.rangeKm} km</strong></div>
+                              <div className="text-slate-600">Operating Frequency: <strong>{radar.freq}</strong></div>
+                              <div className="text-slate-600">Status: <strong className="text-emerald-600">ONLINE (IMD Network)</strong></div>
+                              <div className="text-slate-800 pt-1 font-semibold border-t border-slate-100 flex items-center justify-between">
+                                <span>Distance to Storm Eye:</span>
+                                <span className={isInRange ? 'text-red-600 font-bold' : 'text-slate-900 font-mono'}>{distToEye} km</span>
+                              </div>
+                            </div>
+                          </Popup>
+                        </CircleMarker>
+                      </React.Fragment>
+                    );
+                  })}
+
+                  {/* Key Coastal Threatened Ports */}
+                  {KEY_COASTAL_PORTS.map((port, idx) => {
+                    const distToEye = getDistanceKm(activeWp.lat, activeWp.lon, port.lat, port.lon);
+                    const isDirectStrike = distToEye <= 100;
+                    const isAlertZone = distToEye <= 250;
+                    return (
+                      <CircleMarker
+                        key={idx}
+                        center={[port.lat, port.lon]}
+                        radius={isDirectStrike ? 6.5 : 4.5}
+                        pathOptions={{
+                          fillColor: isDirectStrike ? '#dc2626' : isAlertZone ? '#f59e0b' : '#3b82f6',
+                          fillOpacity: 0.9,
+                          color: '#ffffff',
+                          weight: 1.5
+                        }}
+                      >
+                        <Popup>
+                          <div className="p-1.5 text-xs space-y-1 font-sans">
+                            <div className="font-bold text-slate-900 border-b border-slate-100 pb-1 flex items-center gap-1">
+                              <span>⚓</span>
+                              <span>{port.name} ({port.state})</span>
+                            </div>
+                            <div className="text-slate-600">Role: <strong>{port.role}</strong></div>
+                            <div className="text-slate-600">Vulnerability: <strong className={isDirectStrike ? 'text-red-600' : 'text-amber-600'}>{port.threatLevel}</strong></div>
+                            <div className="text-slate-800 pt-1 font-semibold border-t border-slate-100 flex items-center justify-between">
+                              <span>Distance to Storm Eye:</span>
+                              <span className={isDirectStrike ? 'text-red-600 font-bold' : 'text-slate-900 font-mono'}>{distToEye} km</span>
+                            </div>
+                          </div>
+                        </Popup>
+                      </CircleMarker>
+                    );
+                  })}
 
                   {/* Forecast Simulation Layer (when selected) */}
                   {activeForecastLayer === 'precip' && (

@@ -31,42 +31,62 @@ const MIN_ZOOM       = 1;
 const MAX_ZOOM       = 18;
 
 // ─── Tile sources ──────────────────────────────────────────────────────────────
+// ─── Tile sources ──────────────────────────────────────────────────────────────
+// Esri World Dark Gray Canvas: Legitimate cartographic dark basemap specifically
+// designed for meteorological overlays and cyclone tracking. Free, stable, and requires
+// no API key for public/research use. Fully credited with standard Esri attribution.
 const TILES_DARK = {
-  url: 'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png',
-  attr: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
-  subdomains: 'abcd', maxZoom: 20,
+  url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+  attr: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, USGS, METI, and GIS User Community',
+  maxZoom: 16,
+  subdomains: 'abc',
+};
+const TILES_DARK_LABELS = {
+  url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}',
+  attr: '',
+  maxZoom: 16,
+  subdomains: 'abc',
 };
 const TILES_ESRI_SAT = {
   url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
   attr: 'Imagery &copy; Esri, Maxar, Earthstar Geographics, and the GIS User Community',
   maxZoom: 18,
+  subdomains: 'abc',
+};
+const TILES_SAT_LABELS = {
+  url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
+  attr: '',
+  maxZoom: 18,
+  subdomains: 'abc',
 };
 const TILES_NASA_GIBS = {
   url: 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_SNPP_CorrectedReflectance_TrueColor/default/default/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg',
-  attr: 'Satellite (NRT): <a href="https://earthdata.nasa.gov/eosdis/science-system-description/eosdis-components/gibs">NASA GIBS</a> / VIIRS NRT',
+  attr: 'Satellite (NRT Swaths): <a href="https://earthdata.nasa.gov/eosdis/science-system-description/eosdis-components/gibs">NASA GIBS</a> / VIIRS NRT',
   maxNativeZoom: 9, maxZoom: MAX_ZOOM,
-};
-const TILES_LABELS = {
-  url: 'https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png',
-  attr: '',
-  subdomains: 'abcd', maxZoom: 20,
+  subdomains: 'abc',
 };
 
 // ─── Wind speed legend ─────────────────────────────────────────────────────────
-// Matches the 12-stop colour scale in WindLayer.jsx
+// Matches the colour scale in WindLayer.jsx in SI units (m/s)
 const WIND_LEGEND = [
-  { label: 'Calm',     range: '0–7',    color: '#2166ac' },
-  { label: 'Light',    range: '7–28',   color: '#74add1' },
-  { label: 'Moderate', range: '28–54',  color: '#ffffbf' },
-  { label: 'Strong',   range: '54–80',  color: '#fdae61' },
-  { label: 'Severe',   range: '80–120', color: '#d73027' },
-  { label: 'Extreme',  range: '>120',   color: '#a50026' },
+  { label: 'Calm',     range: '0–2',    color: '#2166ac' },
+  { label: 'Light',    range: '2–6',    color: '#74add1' },
+  { label: 'Moderate', range: '6–12',   color: '#ffffbf' },
+  { label: 'Fresh',    range: '12–18',  color: '#fdae61' },
+  { label: 'Strong',   range: '18–25',  color: '#d73027' },
+  { label: 'Storm',    range: '>25',    color: '#a50026' },
 ];
 
 // ─── MapController ─────────────────────────────────────────────────────────────
 const MapController = ({ onCoordsChange, onZoomChange, onMapReady }) => {
   const map = useMap();
-  useEffect(() => { if (map && onMapReady) onMapReady(map); }, [map, onMapReady]);
+  useEffect(() => {
+    if (!map) return;
+    if (onMapReady) onMapReady(map);
+    map.invalidateSize();
+    const t = setTimeout(() => map.invalidateSize(), 200);
+    return () => clearTimeout(t);
+  }, [map, onMapReady]);
   useMapEvents({
     mousemove: (e) => onCoordsChange?.({ lat: e.latlng.lat, lon: e.latlng.lng }),
     zoomend:   ()  => onZoomChange?.(map.getZoom()),
@@ -131,7 +151,7 @@ const WindInfoBadge = ({ meta, loading, error }) => {
       <span className="text-slate-500">|</span>
       <span>{meta.level}</span>
       <span className="text-slate-500">|</span>
-      <span className="text-sky-300">Forecast</span>
+      <span className="text-sky-300">{meta.type ?? 'Model Forecast'}</span>
     </div>
   );
 };
@@ -140,7 +160,7 @@ const WindInfoBadge = ({ meta, loading, error }) => {
 const WindSpeedLegend = () => (
   <div className="bg-slate-900/90 backdrop-blur-md px-3 py-2 rounded-xl border border-slate-700/80 shadow-lg">
     <div className="text-[9px] font-mono text-slate-500 uppercase tracking-wider mb-1.5">
-      Wind Speed (km/h)
+      Wind Speed (m/s)
     </div>
     <div className="flex items-center gap-1">
       {WIND_LEGEND.map(({ label, range, color }) => (
@@ -163,8 +183,8 @@ const VayuEarth = () => {
 
   // UI toggles
   const [layerPanelOpen, setLayerPanelOpen] = useState(false);
-  const [baseMode,       setBaseMode]       = useState('dark');
-  const [nasaGibsOn,     setNasaGibsOn]     = useState(true);
+  const [baseMode,       setBaseMode]       = useState('satellite');
+  const [nasaGibsOn,     setNasaGibsOn]     = useState(false);
   const [labelsOn,       setLabelsOn]       = useState(true);
   const [nasaOpacity,    setNasaOpacity]    = useState(0.88);
 
@@ -203,10 +223,11 @@ const VayuEarth = () => {
           setWindMeta({
             refTime:    json.meta?.ref_time_utc    ?? null,
             source:     json.meta?.source          ?? 'NOAA GFS',
-            model:      json.meta?.model           ?? 'GFS',
-            resolution: json.meta?.resolution_deg  ? `${json.meta.resolution_deg}°` : '5°',
-            units:      json.meta?.u_units         ?? 'km/h',
+            model:      json.meta?.model           ?? 'GFS Seamless',
+            resolution: json.meta?.resolution_deg  ? `${json.meta.resolution_deg}°` : '12°',
+            units:      json.meta?.units           ?? json.meta?.u_units ?? 'm/s',
             level:      json.meta?.level           ?? '10m AGL',
+            type:       json.meta?.type            ?? 'Model Forecast',
           });
         }
       } catch (err) {
@@ -228,12 +249,12 @@ const VayuEarth = () => {
   // ── Derived display strings ─────────────────────────────────────────────
   const latStr = `${Math.abs(coords.lat).toFixed(4)}°${coords.lat >= 0 ? 'N' : 'S'}`;
   const lonStr = `${Math.abs(coords.lon).toFixed(4)}°${coords.lon >= 0 ? 'E' : 'W'}`;
-  const baseAttr = baseMode === 'satellite' ? 'Esri World Imagery' : 'CartoDB / OpenStreetMap';
+  const baseAttr = baseMode === 'satellite' ? 'Esri World Imagery' : 'Esri World Dark Gray Canvas';
 
   // ── Render ───────────────────────────────────────────────────────────────
   return (
-    <div className="relative w-full h-full flex flex-col bg-slate-950 select-none overflow-hidden"
-      style={{ fontFamily: 'system-ui, sans-serif' }}>
+    <div className="relative w-full h-full flex flex-col bg-slate-950 select-none overflow-hidden min-h-0"
+      style={{ fontFamily: 'system-ui, sans-serif', width: '100%', height: '100%', minHeight: '100%' }}>
 
       {/* ══ TOP HUD ══════════════════════════════════════════════════════════ */}
       <div className="absolute top-3 left-3 right-3 z-[1000] flex items-center justify-between gap-2 pointer-events-none">
@@ -246,7 +267,7 @@ const VayuEarth = () => {
           <div>
             <div className="flex items-center gap-1.5">
               <span className="text-xs font-bold text-white tracking-tight">VAYU Earth</span>
-              <span className="text-[9px] font-mono uppercase bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-500/30 font-semibold">LIVE</span>
+              <span className="text-[9px] font-mono uppercase bg-sky-500/20 text-sky-300 px-1.5 py-0.5 rounded border border-sky-500/30 font-semibold">GLOBAL</span>
             </div>
             <div className="text-[10px] text-slate-400 font-mono mt-0.5">Global Satellite Intelligence Explorer</div>
           </div>
@@ -277,7 +298,7 @@ const VayuEarth = () => {
       </div>
 
       {/* ══ MAP CANVAS ════════════════════════════════════════════════════════ */}
-      <div className="flex-1 w-full h-full relative">
+      <div className="flex-1 w-full h-full relative min-h-0" style={{ width: '100%', height: '100%', minHeight: '0' }}>
         <MapContainer
           center={DEFAULT_CENTER} zoom={DEFAULT_ZOOM}
           minZoom={MIN_ZOOM} maxZoom={MAX_ZOOM}
@@ -285,7 +306,7 @@ const VayuEarth = () => {
           scrollWheelZoom={true} doubleClickZoom={true}
           dragging={true} touchZoom={true}
           className="w-full h-full"
-          style={{ width: '100%', height: '100%', background: '#020617' }}
+          style={{ width: '100%', height: '100%', minHeight: '100%', background: '#020617' }}
         >
           <MapController
             onCoordsChange={setCoords}
@@ -296,24 +317,29 @@ const VayuEarth = () => {
           {/* 1. Base layer */}
           {baseMode === 'dark' && (
             <TileLayer key="dark" url={TILES_DARK.url} attribution={TILES_DARK.attr}
-              subdomains={TILES_DARK.subdomains} maxZoom={TILES_DARK.maxZoom} />
+              subdomains="abc" maxZoom={TILES_DARK.maxZoom} />
           )}
           {baseMode === 'satellite' && (
             <TileLayer key="esri" url={TILES_ESRI_SAT.url} attribution={TILES_ESRI_SAT.attr}
-              maxZoom={TILES_ESRI_SAT.maxZoom} />
+              subdomains="abc" maxZoom={TILES_ESRI_SAT.maxZoom} />
           )}
 
           {/* 2. NASA GIBS NRT overlay */}
           {nasaGibsOn && (
             <TileLayer key="gibs" url={TILES_NASA_GIBS.url} attribution={TILES_NASA_GIBS.attr}
               opacity={nasaOpacity} maxNativeZoom={TILES_NASA_GIBS.maxNativeZoom}
-              maxZoom={TILES_NASA_GIBS.maxZoom} tileSize={256} />
+              maxZoom={TILES_NASA_GIBS.maxZoom} tileSize={256} subdomains="abc" />
           )}
 
-          {/* 3. Labels overlay */}
+          {/* 3. Geographic Labels & Borders (matched to basemap) */}
           {labelsOn && (
-            <TileLayer key="labels" url={TILES_LABELS.url} attribution={TILES_LABELS.attr}
-              subdomains={TILES_LABELS.subdomains} maxZoom={TILES_LABELS.maxZoom} />
+            <TileLayer
+              key={`labels-${baseMode}`}
+              url={baseMode === 'satellite' ? TILES_SAT_LABELS.url : TILES_DARK_LABELS.url}
+              attribution=""
+              subdomains="abc"
+              maxZoom={baseMode === 'satellite' ? TILES_SAT_LABELS.maxZoom : TILES_DARK_LABELS.maxZoom}
+            />
           )}
 
           {/* 4. Wind particle layer — rendered by leaflet-velocity on canvas */}
@@ -397,12 +423,15 @@ const VayuEarth = () => {
           <div className="space-y-2">
             <p className="text-[10px] font-mono text-slate-500 uppercase tracking-wider font-bold">Observation</p>
 
-            <LayerRow id="layer-gibs" label="NASA GIBS VIIRS (NRT)" badge="Satellite NRT"
+            <LayerRow id="layer-gibs" label="NASA GIBS VIIRS (NRT Passes)" badge="Raw Swaths"
               checked={nasaGibsOn} onChange={() => setNasaGibsOn((v) => !v)} />
             {nasaGibsOn && (
               <div className="px-2 pb-1 space-y-1">
+                <p className="text-[10px] text-amber-400/90 leading-tight font-mono">
+                  Near real-time polar satellite swaths. Gaps between orbital passes show the underlying seamless base map.
+                </p>
                 <div className="flex justify-between text-[10px] font-mono text-slate-400">
-                  <span>Opacity</span><span>{Math.round(nasaOpacity * 100)}%</span>
+                  <span>Overlay Opacity</span><span>{Math.round(nasaOpacity * 100)}%</span>
                 </div>
                 <input type="range" min="0.1" max="1.0" step="0.05" value={nasaOpacity}
                   onChange={(e) => setNasaOpacity(parseFloat(e.target.value))}
@@ -410,7 +439,7 @@ const VayuEarth = () => {
               </div>
             )}
 
-            <LayerRow id="layer-labels" label="Geographic Labels & Borders" badge="OSM"
+            <LayerRow id="layer-labels" label="Geographic Labels & Borders" badge="Esri Ref"
               checked={labelsOn} onChange={() => setLabelsOn((v) => !v)} />
           </div>
 
@@ -440,7 +469,7 @@ const VayuEarth = () => {
                   <Info className="w-2.5 h-2.5 text-slate-500" />
                   <span>Source: NOAA GFS via Open-Meteo</span>
                 </div>
-                <div>U/V at 10 m AGL • 5° global grid • km/h</div>
+                <div>U/V at 10 m AGL • 12° global grid • m/s</div>
                 <div className="text-slate-500">
                   Direction: FROM convention (met) displayed in badge.<br/>
                   Particles travel in wind direction (TO vector).
@@ -448,7 +477,7 @@ const VayuEarth = () => {
                 {windLoading && (
                   <div className="flex items-center gap-1 text-cyan-400 mt-1">
                     <RefreshCw className="w-2.5 h-2.5 animate-spin" />
-                    <span>Fetching ~2,700 grid points…</span>
+                    <span>Fetching global meteorological grid…</span>
                   </div>
                 )}
                 {windError && (

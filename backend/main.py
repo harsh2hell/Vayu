@@ -173,9 +173,20 @@ def health_check():
 
 # Backwards compatible alias routes for existing UI components
 @app.post("/api/detect")
-async def legacy_detect(file: UploadFile = File(...), basin: str = Form("Bay of Bengal")):
+async def legacy_detect(
+    file: UploadFile = File(...), 
+    basin: str = Form("Bay of Bengal"),
+    bbox_geo: Optional[str] = Form(None)
+):
     image_bytes = await file.read()
-    result = cyclone_vision_model.predict(image_bytes, basin=basin)
+    parsed_bbox = None
+    if bbox_geo:
+        try:
+            import json
+            parsed_bbox = json.loads(bbox_geo) if "[" in bbox_geo else [float(x.strip()) for x in bbox_geo.split(",")]
+        except Exception:
+            parsed_bbox = None
+    result = cyclone_vision_model.predict(image_bytes, bbox_geo=parsed_bbox, basin=basin)
     return {"success": True, "filename": file.filename, "data": result}
 
 @app.post("/api/classify")

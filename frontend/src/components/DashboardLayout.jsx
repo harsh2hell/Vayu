@@ -19,7 +19,10 @@ const DashboardLayout = () => {
         <div className="flex flex-col min-h-screen ml-0 lg:ml-56 w-full lg:w-[calc(100%-14rem)] min-w-0 transition-all relative z-10">
           <Topbar />
           
-          <main className={isMapFirst ? "flex-1 flex flex-col h-[calc(100vh-3.5rem)] overflow-hidden relative" : "flex-1 p-3 sm:p-5 lg:p-8 bg-slate-50/70 pb-12 min-w-0"}>
+          <main 
+            style={isMapFirst ? { height: 'calc(100vh - 3.5rem)', minHeight: 'calc(100vh - 3.5rem)', width: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative', background: '#020617' } : undefined}
+            className={isMapFirst ? "flex-1 flex flex-col overflow-hidden relative bg-slate-950 min-h-0" : "flex-1 p-3 sm:p-5 lg:p-8 bg-slate-50/70 pb-12 min-w-0"}
+          >
             <Outlet />
           </main>
         </div>

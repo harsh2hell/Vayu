@@ -34,38 +34,41 @@ import { useEffect, useRef } from 'react';
 import { useMap } from 'react-leaflet';
 import L from 'leaflet';
 
+// Ensure L is globally bound for leaflet plugins in Vite bundle
+if (typeof window !== 'undefined') {
+  window.L = L;
+}
+
 // Import leaflet-velocity as a side-effect; it extends L.velocityLayer
-// The CSS is minimal (only hides the default display panel we override)
 import 'leaflet-velocity/dist/leaflet-velocity.min.css';
 import 'leaflet-velocity';
 
 // ─── Particle colour scale ─────────────────────────────────────────────────────
-// 12-stop spectrum: calm (cool blue) → strong (red/magenta)
-// Mapped against maxVelocity in km/h via leaflet-velocity interpolation.
+// 12-stop spectrum mapped across 0 to 35 m/s (calm blue -> moderate green/yellow -> storm red/magenta)
 const WIND_COLOR_SCALE = [
-  '#1a3e6c',  //  0–7  km/h  calm
-  '#2166ac',  //  7–14
-  '#4393c3',  // 14–21
-  '#74add1',  // 21–28
-  '#abd9e9',  // 28–36
-  '#e0f3f8',  // 36–43
-  '#ffffbf',  // 43–54
-  '#fee090',  // 54–65
-  '#fdae61',  // 65–80
-  '#f46d43',  // 80–100
-  '#d73027',  // 100–120
-  '#a50026',  // >120  km/h  extreme
+  '#1a3e6c',  // 0–2   m/s (calm)
+  '#2166ac',  // 2–4   m/s
+  '#4393c3',  // 4–6   m/s (light breeze)
+  '#74add1',  // 6–9   m/s
+  '#abd9e9',  // 9–12  m/s (moderate breeze)
+  '#e0f3f8',  // 12–15 m/s
+  '#ffffbf',  // 15–18 m/s (fresh breeze)
+  '#fee090',  // 18–21 m/s
+  '#fdae61',  // 21–25 m/s (strong breeze)
+  '#f46d43',  // 25–28 m/s
+  '#d73027',  // 28–32 m/s (near gale / gale)
+  '#a50026',  // >32   m/s (storm / cyclone force)
 ];
 
-// ─── Particle options ──────────────────────────────────────────────────────────
+// ─── Particle options (Calibrated for SI m/s units) ─────────────────────────────
 const VELOCITY_OPTIONS = {
-  displayValues: false,     // We render our own HUD badge; suppress plugin's overlay
-  maxVelocity: 120,         // km/h — top of colour scale
-  velocityScale: 0.0045,    // particle speed multiplier (visual, not wind speed)
-  particleAge: 80,          // frames a particle lives before reset
-  lineWidth: 1.2,           // canvas line width for particle trails
-  particleMultiplier: 0.0035, // density (lower = fewer particles)
-  frameRate: 20,            // target FPS for animation loop
+  displayValues: false,      // We render our own HUD badge; suppress plugin's overlay
+  maxVelocity: 35.0,         // m/s — top of meteorological colour scale
+  velocityScale: 0.008,      // particle speed multiplier for m/s vectors
+  particleAge: 90,           // frames a particle lives before respawning
+  lineWidth: 1.4,            // canvas line width for clear vector flow lines
+  particleMultiplier: 0.0035, // particle density across map viewport
+  frameRate: 24,             // target FPS for smooth meteorological flow
   colorScale: WIND_COLOR_SCALE,
 };
 
@@ -77,24 +80,34 @@ const WindLayer = ({ windData, enabled = true, onMeta }) => {
   useEffect(() => {
     // Remove any existing wind layer first
     if (layerRef.current) {
-      try { map.removeLayer(layerRef.current); } catch (_) { /* already gone */ }
+      try {
+        if (map.hasLayer(layerRef.current)) {
+          map.removeLayer(layerRef.current);
+        }
+      } catch (_) { /* already gone */ }
       layerRef.current = null;
     }
 
-    // Do not mount if disabled or no data
-    if (!enabled || !windData || windData.length < 2) return;
+    // Do not mount if disabled or invalid data
+    if (!enabled || !windData || !Array.isArray(windData) || windData.length < 2) return;
 
     // Verify the data structure expected by leaflet-velocity
     const uLayer = windData.find((d) => d?.header?.parameterNumber === 2);
     const vLayer = windData.find((d) => d?.header?.parameterNumber === 3);
-    if (!uLayer || !vLayer || !uLayer.data || !vLayer.data) {
-      console.warn('[WindLayer] Invalid velocity data format — U or V layer missing.');
+    if (!uLayer || !vLayer || !Array.isArray(uLayer.data) || !Array.isArray(vLayer.data)) {
+      console.warn('[WindLayer] Invalid velocity data format — U or V layer missing or empty.');
+      return;
+    }
+
+    // Check if L.velocityLayer exists
+    const velocityLayerFactory = L.velocityLayer || window.L?.velocityLayer;
+    if (typeof velocityLayerFactory !== 'function') {
+      console.error('[WindLayer] L.velocityLayer is not available in Leaflet context.');
       return;
     }
 
     try {
-      // L.velocityLayer is added to the global L object by the import above
-      layerRef.current = L.velocityLayer({
+      layerRef.current = velocityLayerFactory({
         data: windData,
         ...VELOCITY_OPTIONS,
       });
@@ -107,10 +120,11 @@ const WindLayer = ({ windData, enabled = true, onMeta }) => {
         onMeta({
           refTime:    header.refTime    ?? null,
           source:     header.source     ?? 'NOAA GFS',
-          model:      header.model      ?? 'GFS',
-          resolution: header.dx != null ? `${header.dx}°` : '5°',
-          units:      header.units      ?? 'km/h',
+          model:      header.model      ?? 'GFS Seamless',
+          resolution: header.dx != null ? `${header.dx}°` : '12°',
+          units:      header.units      ?? 'm/s',
           level:      header.level      ?? '10m AGL',
+          type:       'Model Forecast',
         });
       }
     } catch (err) {
@@ -119,13 +133,17 @@ const WindLayer = ({ windData, enabled = true, onMeta }) => {
 
     return () => {
       if (layerRef.current) {
-        try { map.removeLayer(layerRef.current); } catch (_) { /* already gone */ }
+        try {
+          if (map && map.hasLayer(layerRef.current)) {
+            map.removeLayer(layerRef.current);
+          }
+        } catch (_) { /* already gone */ }
         layerRef.current = null;
       }
     };
-  }, [map, windData, enabled]);   // re-create whenever data or enabled state changes
+  }, [map, windData, enabled]);
 
-  return null; // No DOM output — the canvas is managed by leaflet-velocity
+  return null; // Canvas managed directly by leaflet-velocity
 };
 
 export default WindLayer;

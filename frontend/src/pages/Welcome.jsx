@@ -687,8 +687,8 @@ const BASE_LAYERS = {
     id: 'dark',
     name: 'Dark Tactical GIS',
     nameHindi: 'डार्क जीआईएस',
-    url: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-    attribution: '&copy; CartoDB Dark Matter'
+    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+    attribution: 'Tiles &copy; Esri World Dark Gray Canvas'
   },
   topo: {
     id: 'topo',
@@ -701,8 +701,8 @@ const BASE_LAYERS = {
     id: 'light',
     name: 'Nautical Light',
     nameHindi: 'नौवहन लाइट',
-    url: 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
-    attribution: '&copy; CartoDB Positron'
+    url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+    attribution: 'Tiles &copy; Esri World Light Gray Canvas'
   }
 };
 

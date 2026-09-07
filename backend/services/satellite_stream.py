@@ -55,24 +55,31 @@ class SatelliteStreamProcessor:
         vision_result = cyclone_vision_model.predict(image_bytes, basin=basin)
         
         # 2. Extract detected eye fix and intensity
-        coords = vision_result.get("coordinates", {})
+        coords = vision_result.get("coordinates")
         dvorak = vision_result.get("dvorak_classification", {})
         
-        lat = coords.get("latitude", 15.4)
-        lon = coords.get("longitude", 87.8)
+        lat = coords.get("latitude") if coords else None
+        lon = coords.get("longitude") if coords else None
         wind = dvorak.get("estimated_wind_speed_kmh", 85.0)
         mslp = dvorak.get("central_mslp_hpa", 980.0)
 
-        # 3. Chain into CycloneForecast-LSTM Trajectory Engine
-        forecast_result = cyclone_forecast_engine.predict_trajectory(
-            current_lat=lat,
-            current_lon=lon,
-            current_wind=wind,
-            current_mslp=mslp,
-            sst=29.5,
-            vertical_shear_knots=12.0,
-            basin=basin
-        )
+        # 3. Chain into CycloneForecast-LSTM Trajectory Engine (only if georeferenced)
+        if lat is not None and lon is not None:
+            forecast_result = cyclone_forecast_engine.predict_trajectory(
+                current_lat=lat,
+                current_lon=lon,
+                current_wind=wind,
+                current_mslp=mslp,
+                sst=29.5,
+                vertical_shear_knots=12.0,
+                basin=basin
+            )
+        else:
+            forecast_result = {
+                "success": False,
+                "forecast_status": "GEOGRAPHIC_COORDINATES_UNAVAILABLE",
+                "message": "Trajectory forecast requires verified geographic coordinates."
+            }
 
         processing_time = round((time.time() - start_time) * 1000, 1)
 
@@ -103,23 +110,27 @@ class SatelliteStreamProcessor:
 
         if image_bytes and len(image_bytes) > 50:
             vision_result = cyclone_vision_model.predict(image_bytes, basin=basin)
-            det_coords = vision_result.get("coordinates", {})
+            det_coords = vision_result.get("coordinates")
             det_dvorak = vision_result.get("dvorak_classification", {})
             
-            lat = override_lat if override_lat is not None else det_coords.get("latitude", 15.4)
-            lon = override_lon if override_lon is not None else det_coords.get("longitude", 87.8)
+            lat = override_lat if override_lat is not None else (det_coords.get("latitude") if det_coords else None)
+            lon = override_lon if override_lon is not None else (det_coords.get("longitude") if det_coords else None)
             wind = override_wind if override_wind is not None else det_dvorak.get("estimated_wind_speed_kmh", 85.0)
             mslp = override_mslp if override_mslp is not None else det_dvorak.get("central_mslp_hpa", 980.0)
         else:
-            lat = override_lat if override_lat is not None else 15.4
-            lon = override_lon if override_lon is not None else 87.8
+            lat = override_lat
+            lon = override_lon
             wind = override_wind if override_wind is not None else 85.0
             mslp = override_mslp if override_mslp is not None else 980.0
+            coords_obj = None
+            if lat is not None and lon is not None:
+                coords_obj = { "latitude": lat, "longitude": lon, "formatted": f"{lat}°N, {lon}°E", "basin": basin }
             vision_result = {
                 "model_version": "CycloneVision-CNN v2.1",
                 "cyclone_detected": True,
                 "confidence_percentage": 94.8,
-                "coordinates": { "latitude": lat, "longitude": lon, "formatted": f"{lat}°N, {lon}°E", "basin": basin },
+                "is_georeferenced": coords_obj is not None,
+                "coordinates": coords_obj,
                 "dvorak_classification": {
                     "t_number": "T3.5",
                     "ci_number": 3.5,
@@ -129,15 +140,22 @@ class SatelliteStreamProcessor:
                 }
             }
 
-        forecast_result = cyclone_forecast_engine.predict_trajectory(
-            current_lat=lat,
-            current_lon=lon,
-            current_wind=wind,
-            current_mslp=mslp,
-            sst=sst,
-            vertical_shear_knots=shear,
-            basin=basin
-        )
+        if lat is not None and lon is not None:
+            forecast_result = cyclone_forecast_engine.predict_trajectory(
+                current_lat=lat,
+                current_lon=lon,
+                current_wind=wind,
+                current_mslp=mslp,
+                sst=sst,
+                vertical_shear_knots=shear,
+                basin=basin
+            )
+        else:
+            forecast_result = {
+                "success": False,
+                "forecast_status": "GEOGRAPHIC_COORDINATES_UNAVAILABLE",
+                "message": "Trajectory forecast requires verified geographic coordinates."
+            }
 
         processing_time = round((time.time() - start_time) * 1000, 1)
 
