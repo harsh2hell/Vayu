@@ -10,16 +10,16 @@ const DashboardLayout = () => {
 
   return (
     <AnalysisSessionProvider>
-      <div className="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans flex antialiased selection:bg-sky-500 selection:text-white relative overflow-x-hidden">
+      <div className="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans antialiased selection:bg-sky-500 selection:text-white relative">
         
-        {/* Left Column: Fixed White Sidebar */}
+        {/* Left Column: Fixed White Sidebar (width 14rem / 56) */}
         <Sidebar />
         
-        {/* Main Content Area (offset by left column width on desktop) */}
-        <div className="flex-1 flex flex-col min-h-screen ml-0 lg:ml-56 transition-all relative z-10">
+        {/* Main Content Area (strictly constrained to remaining screen width) */}
+        <div className="flex flex-col min-h-screen ml-0 lg:ml-56 w-full lg:w-[calc(100%-14rem)] min-w-0 transition-all relative z-10">
           <Topbar />
           
-          <main className={isMapFirst ? "flex-1 flex flex-col h-[calc(100vh-3.5rem)] overflow-hidden relative" : "flex-1 p-3 sm:p-5 lg:p-8 bg-slate-50/70 pb-12"}>
+          <main className={isMapFirst ? "flex-1 flex flex-col h-[calc(100vh-3.5rem)] overflow-hidden relative" : "flex-1 p-3 sm:p-5 lg:p-8 bg-slate-50/70 pb-12 min-w-0"}>
             <Outlet />
           </main>
         </div>

@@ -138,7 +138,7 @@ const Dashboard = () => {
   const isOnline = systemHealth.status === 'ONLINE';
 
   return (
-    <div className="space-y-6 max-w-[1600px] mx-auto pb-12 font-sans">
+    <div className="space-y-6 max-w-[1600px] w-full min-w-0 mx-auto pb-12 font-sans">
 
       {/* 1. Header & Active Benchmark Switcher */}
       <PageHeader
@@ -184,88 +184,95 @@ const Dashboard = () => {
       {/* 2. System Status Row */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {/* Backend Gateway */}
-        <div className="card p-4 flex items-center gap-3">
-          <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${
-            isOnline ? 'bg-emerald-50 text-emerald-600 border border-emerald-200' : 'bg-red-50 text-red-600 border border-red-200'
+        <div className="card p-4 flex items-center gap-3.5 border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-2xl shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-all">
+          <div className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 border ${
+            isOnline 
+              ? 'bg-emerald-50/80 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800/80' 
+              : 'bg-rose-50/80 text-rose-700 border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800/80'
           }`}>
             <Activity className="w-5 h-5" />
           </div>
           <div className="min-w-0">
-            <span className="text-[10px] uppercase font-mono text-slate-400 block tracking-wider">FastAPI Gateway</span>
-            <span className="text-sm font-bold text-slate-900 flex items-center gap-1.5">
+            <span className="text-[10px] uppercase font-bold tracking-wider font-mono text-slate-500 dark:text-slate-400 block">FastAPI Gateway</span>
+            <span className="text-sm font-black text-slate-950 dark:text-white flex items-center gap-2 tracking-tight">
               {isOnline ? 'ONLINE' : 'UNAVAILABLE'}
-              <span className={`w-2 h-2 rounded-full ${isOnline ? 'bg-emerald-500' : 'bg-red-500'}`} />
+              <span className={`w-2 h-2 rounded-full shrink-0 ${isOnline ? 'bg-emerald-500 shadow-xs shadow-emerald-500/50' : 'bg-red-500 shadow-xs shadow-red-500/50'}`} />
             </span>
-            <span className="text-[11px] text-slate-500 font-mono block truncate">v4.0.0 • Port 8000</span>
+            <span className="text-[11px] font-semibold font-mono text-slate-600 dark:text-slate-300 block truncate mt-0.5">v4.0.0 • Port 8000</span>
           </div>
         </div>
 
         {/* AI Checkpoints */}
-        <div className="card p-4 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-blue-50 text-[#003087] border border-blue-200 flex items-center justify-center shrink-0">
+        <div className="card p-4 flex items-center gap-3.5 border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-2xl shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-all">
+          <div className="w-11 h-11 rounded-2xl bg-blue-50/80 text-[#003087] dark:bg-blue-950/60 dark:text-blue-300 border border-blue-200 dark:border-blue-800/80 flex items-center justify-center shrink-0">
             <Cpu className="w-5 h-5" />
           </div>
           <div className="min-w-0">
-            <span className="text-[10px] uppercase font-mono text-slate-400 block tracking-wider">Model Checkpoints</span>
-            <span className="text-sm font-bold text-slate-900 block">3 Neural Models Active</span>
-            <span className="text-[11px] text-slate-500 font-mono block truncate">PyTorch 2.0 • CPU/MPS</span>
+            <span className="text-[10px] uppercase font-bold tracking-wider font-mono text-slate-500 dark:text-slate-400 block">Model Checkpoints</span>
+            <span className="text-sm font-black text-slate-950 dark:text-white block tracking-tight">3 Neural Models Active</span>
+            <span className="text-[11px] font-semibold font-mono text-slate-600 dark:text-slate-300 block truncate mt-0.5">PyTorch 2.0 • CPU/MPS</span>
           </div>
         </div>
 
         {/* Satellite Service */}
-        <div className="card p-4 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-sky-50 text-sky-700 border border-sky-200 flex items-center justify-center shrink-0">
+        <div className="card p-4 flex items-center gap-3.5 border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-2xl shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-all">
+          <div className="w-11 h-11 rounded-2xl bg-sky-50/80 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300 border border-sky-200 dark:border-sky-800/80 flex items-center justify-center shrink-0">
             <Satellite className="w-5 h-5" />
           </div>
           <div className="min-w-0">
-            <span className="text-[10px] uppercase font-mono text-slate-400 block tracking-wider">Satellite Feed</span>
-            <span className="text-sm font-bold text-slate-900 block">NASA GIBS / EOSDIS</span>
-            <span className="text-[11px] text-slate-500 font-mono block truncate">MODIS & VIIRS Tiles</span>
+            <span className="text-[10px] uppercase font-bold tracking-wider font-mono text-slate-500 dark:text-slate-400 block">Satellite Feed</span>
+            <span className="text-sm font-black text-slate-950 dark:text-white block tracking-tight">NASA GIBS / EOSDIS</span>
+            <span className="text-[11px] font-semibold font-mono text-slate-600 dark:text-slate-300 block truncate mt-0.5">MODIS & VIIRS Tiles</span>
           </div>
         </div>
 
         {/* Telemetry Database */}
-        <div className="card p-4 flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-purple-50 text-purple-700 border border-purple-200 flex items-center justify-center shrink-0">
+        <div className="card p-4 flex items-center gap-3.5 border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-2xl shadow-xs hover:border-slate-300 dark:hover:border-slate-700 transition-all">
+          <div className="w-11 h-11 rounded-2xl bg-purple-50/80 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300 border border-purple-200 dark:border-purple-800/80 flex items-center justify-center shrink-0">
             <Database className="w-5 h-5" />
           </div>
           <div className="min-w-0">
-            <span className="text-[10px] uppercase font-mono text-slate-400 block tracking-wider">Historical Database</span>
-            <span className="text-sm font-bold text-slate-900 block">SQLite (9 Tables)</span>
-            <span className="text-[11px] text-slate-500 font-mono block truncate">1,148 Synoptic Cycles</span>
+            <span className="text-[10px] uppercase font-bold tracking-wider font-mono text-slate-500 dark:text-slate-400 block">Historical Database</span>
+            <span className="text-sm font-black text-slate-950 dark:text-white block tracking-tight">SQLite (9 Tables)</span>
+            <span className="text-[11px] font-semibold font-mono text-slate-600 dark:text-slate-300 block truncate mt-0.5">1,148 Synoptic Cycles</span>
           </div>
         </div>
       </div>
 
       {/* 3. 8-Stage Real AI Pipeline Orchestration Tracker */}
-      <div className="card overflow-hidden">
-        <div className="card-header bg-white flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Layers className="w-4 h-4 text-[#003087]" />
-            <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+      <div className="card overflow-hidden border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs rounded-2xl">
+        <div className="p-4 px-5 border-b border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2.5">
+            <div className="w-7 h-7 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-[#003087] dark:text-blue-400 border border-blue-200/60 dark:border-blue-800/60 flex items-center justify-center shrink-0">
+              <Layers className="w-4 h-4" />
+            </div>
+            <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
               8-Stage Operational AI Vision & Forecasting Pipeline
             </h3>
           </div>
-          <span className="text-xs text-slate-400 font-mono">
-            Status: {isOnline ? 'READY' : 'UNAVAILABLE'}
-          </span>
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="text-xs font-mono font-medium text-slate-500 dark:text-slate-400">Status:</span>
+            <StatusBadge status={isOnline ? 'READY' : 'UNAVAILABLE'} size="xs" />
+          </div>
         </div>
 
         <div className="p-4 overflow-x-auto">
-          <div className="flex items-center gap-2 min-w-[960px]">
+          <div className="flex items-center gap-2.5 min-w-[960px]">
             {PIPELINE_STAGES.map((stage, idx) => (
               <React.Fragment key={stage.id}>
-                <div className="flex-1 bg-slate-50 border border-slate-200 rounded-xl p-3 hover:border-blue-300 transition-colors">
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-[10px] font-mono text-slate-400">0{idx + 1}</span>
+                <div className="flex-1 min-w-[130px] bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/90 dark:border-slate-700/80 rounded-xl p-3.5 hover:border-[#003087] dark:hover:border-sky-500 hover:shadow-sm transition-all group">
+                  <div className="flex items-center justify-between mb-1.5">
+                    <span className="text-[11px] font-bold font-mono text-slate-500 dark:text-slate-400">0{idx + 1}</span>
                     <StatusBadge status={isOnline ? 'READY' : 'OFFLINE'} size="xs" />
                   </div>
-                  <h4 className="text-xs font-bold text-slate-900">{stage.name}</h4>
-                  <p className="text-[11px] text-slate-600 mt-0.5">{stage.role}</p>
-                  <p className="text-[10px] text-slate-400 font-mono mt-1 truncate">{stage.model}</p>
+                  <h4 className="text-xs font-black text-slate-950 dark:text-white tracking-tight group-hover:text-[#003087] dark:group-hover:text-sky-300 transition-colors">{stage.name}</h4>
+                  <p className="text-[11px] font-medium text-slate-700 dark:text-slate-300 mt-1 leading-snug">{stage.role}</p>
+                  <div className="mt-2 pt-1.5 border-t border-slate-200/60 dark:border-slate-700/60">
+                    <span className="text-[10px] font-mono font-semibold text-slate-500 dark:text-slate-400 block truncate" title={stage.model}>{stage.model}</span>
+                  </div>
                 </div>
                 {idx < PIPELINE_STAGES.length - 1 && (
-                  <ArrowRight className="w-4 h-4 text-slate-300 shrink-0" />
+                  <ArrowRight className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
                 )}
               </React.Fragment>
             ))}
@@ -274,44 +281,44 @@ const Dashboard = () => {
       </div>
 
       {/* 4. Empirical Benchmark Cards (Verified Metrics) */}
-      <div>
-        <div className="flex items-center justify-between mb-3">
+      <div className="w-full min-w-0">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 mb-3">
           <div className="flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-emerald-600" />
+            <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
             <h2 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
               Empirical Benchmark Performance (N=1,148 Synoptic Cycles)
             </h2>
           </div>
-          <span className="text-[11px] text-slate-400 font-mono">Held-Out Test Partition Verification</span>
+          <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono font-semibold">Held-Out Test Partition Verification</span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="card p-4 border-l-4 border-l-emerald-500">
-            <span className="text-[10px] uppercase font-mono text-slate-400 block tracking-wider">MobileNetV3 Objectness</span>
-            <div className="text-2xl font-extrabold text-slate-900 mt-1">100%</div>
-            <p className="text-xs text-slate-600 mt-1">Detection accuracy on held-out cyclone satellite frames.</p>
-            <span className="text-[10px] text-emerald-700 font-mono mt-2 block font-semibold">1,075,431 Parameters</span>
+          <div className="card p-4.5 border-l-4 border-l-emerald-500 border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-2xl shadow-xs">
+            <span className="text-[10px] uppercase font-bold font-mono tracking-wider text-slate-500 dark:text-slate-400 block">MobileNetV3 Objectness</span>
+            <div className="text-2xl font-black text-slate-950 dark:text-white mt-1 tracking-tight">100%</div>
+            <p className="text-xs text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">Detection accuracy on held-out cyclone satellite frames.</p>
+            <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-mono mt-2.5 block font-semibold">1,075,431 Parameters</span>
           </div>
 
-          <div className="card p-4 border-l-4 border-l-sky-500">
-            <span className="text-[10px] uppercase font-mono text-slate-400 block tracking-wider">Validation CLE (72h)</span>
-            <div className="text-2xl font-extrabold text-sky-700 mt-1">25.6 km</div>
-            <p className="text-xs text-slate-600 mt-1">Mean Center Location Error at +72h horizon on validation set.</p>
-            <span className="text-[10px] text-sky-700 font-mono mt-2 block font-semibold">Cyclone DANA (2024)</span>
+          <div className="card p-4.5 border-l-4 border-l-sky-500 border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-2xl shadow-xs">
+            <span className="text-[10px] uppercase font-bold font-mono tracking-wider text-slate-500 dark:text-slate-400 block">Validation CLE (72h)</span>
+            <div className="text-2xl font-black text-sky-700 dark:text-sky-400 mt-1 tracking-tight">25.6 km</div>
+            <p className="text-xs text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">Mean Center Location Error at +72h horizon on validation set.</p>
+            <span className="text-[10px] text-sky-700 dark:text-sky-400 font-mono mt-2.5 block font-semibold">Cyclone DANA (2024)</span>
           </div>
 
-          <div className="card p-4 border-l-4 border-l-blue-600">
-            <span className="text-[10px] uppercase font-mono text-slate-400 block tracking-wider">Test CLE (72h)</span>
-            <div className="text-2xl font-extrabold text-[#003087] mt-1">38.2 km</div>
-            <p className="text-xs text-slate-600 mt-1">Generalization Center Location Error across cross-basin test tracks.</p>
-            <span className="text-[10px] text-[#003087] font-mono mt-2 block font-semibold">Cyclone BIPARJOY (2023)</span>
+          <div className="card p-4.5 border-l-4 border-l-[#003087] border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-2xl shadow-xs">
+            <span className="text-[10px] uppercase font-bold font-mono tracking-wider text-slate-500 dark:text-slate-400 block">Test CLE (72h)</span>
+            <div className="text-2xl font-black text-[#003087] dark:text-blue-400 mt-1 tracking-tight">38.2 km</div>
+            <p className="text-xs text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">Generalization Center Location Error across cross-basin test tracks.</p>
+            <span className="text-[10px] text-[#003087] dark:text-blue-400 font-mono mt-2.5 block font-semibold">Cyclone BIPARJOY (2023)</span>
           </div>
 
-          <div className="card p-4 border-l-4 border-l-purple-500">
-            <span className="text-[10px] uppercase font-mono text-slate-400 block tracking-wider">+72h vs Persistence</span>
-            <div className="text-2xl font-extrabold text-purple-700 mt-1">+86.0 km</div>
-            <p className="text-xs text-slate-600 mt-1">Lower mean track error at +72h compared to operational persistence.</p>
-            <span className="text-[10px] text-purple-700 font-mono mt-2 block font-semibold">Statistically Significant (p &lt; 0.001)</span>
+          <div className="card p-4.5 border-l-4 border-l-purple-500 border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-2xl shadow-xs">
+            <span className="text-[10px] uppercase font-bold font-mono tracking-wider text-slate-500 dark:text-slate-400 block">+72h vs Persistence</span>
+            <div className="text-2xl font-black text-purple-700 dark:text-purple-400 mt-1 tracking-tight">+86.0 km</div>
+            <p className="text-xs text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">Lower mean track error at +72h compared to operational persistence.</p>
+            <span className="text-[10px] text-purple-700 dark:text-purple-400 font-mono mt-2.5 block font-semibold">Statistically Significant (p &lt; 0.001)</span>
           </div>
         </div>
       </div>
@@ -370,20 +377,20 @@ const Dashboard = () => {
       </div>
 
       {/* 6. Operational Navigation Launch Matrix */}
-      <div>
-        <div className="flex items-center justify-between mb-3">
+      <div className="w-full min-w-0">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 mb-3">
           <div className="flex items-center gap-2">
-            <ArrowRight className="w-4 h-4 text-[#003087]" />
+            <ArrowRight className="w-4 h-4 text-[#003087] shrink-0" />
             <h2 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
               Operational Subsystems & Dedicated Analysis Studios
             </h2>
           </div>
-          <span className="text-[11px] text-slate-400 font-mono">Select a dedicated workspace</span>
+          <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono font-semibold">Select a dedicated workspace</span>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {/* Satellite Analysis */}
-          <div className="card p-5 hover:border-blue-300 hover:shadow-md transition-all flex flex-col justify-between group">
+          <div className="card p-5 border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-2xl shadow-xs hover:border-blue-300 hover:shadow-md transition-all flex flex-col justify-between group">
             <div className="space-y-2">
               <div className="w-10 h-10 rounded-xl bg-sky-50 text-sky-700 border border-sky-200 flex items-center justify-center">
                 <Satellite className="w-5 h-5" />
