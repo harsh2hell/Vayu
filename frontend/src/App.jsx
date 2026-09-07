@@ -172,10 +172,10 @@ function App() {
       <Route path="/gis-radar" element={<ThreatMap />} />
       <Route path="/threat-matrix" element={<ThreatMap />} />
 
-      {/* 3D Live Earth Interactive Simulation Console */}
-      <Route path="/live-map" element={<VayuEarth />} />
-      <Route path="/live-earth" element={<VayuEarth />} />
-      <Route path="/3d-earth" element={<VayuEarth />} />
+      {/* 3D Live Earth Interactive Simulation Console — needs explicit height anchor */}
+      <Route path="/live-map"   element={<div style={{ width:'100%', height:'100dvh' }}><VayuEarth /></div>} />
+      <Route path="/live-earth" element={<div style={{ width:'100%', height:'100dvh' }}><VayuEarth /></div>} />
+      <Route path="/3d-earth"   element={<div style={{ width:'100%', height:'100dvh' }}><VayuEarth /></div>} />
 
       {/* Unified Safety & Updates (IMD Bulletins & NDMA Safety Protocol) */}
       <Route path="/safety-updates" element={<SafetyUpdates />} />
