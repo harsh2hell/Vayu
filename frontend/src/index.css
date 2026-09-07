@@ -1173,17 +1173,17 @@ header .header-theme-btn {
   display: none !important;
 }
 
-/* Ensure Sign in header aligns flush with Email address or username label */
+/* Center Sign in header title */
 .cl-header {
-  text-align: left !important;
-  align-items: flex-start !important;
+  text-align: center !important;
+  align-items: center !important;
   width: 100% !important;
   margin-bottom: 0.85rem !important;
   padding-left: 0 !important;
 }
 
 .cl-headerTitle {
-  text-align: left !important;
+  text-align: center !important;
   font-size: 1.35rem !important;
   font-weight: 700 !important;
   color: #0f172a !important;
