@@ -12,20 +12,58 @@ export const WeatherStatusAnimation = ({
   icon = '',
   size = 'md', // 'sm' | 'md' | 'lg'
   isNight = false,
-  className = ''
+  className = '',
+  hasRain = null // boolean | number | null (explicit override for whether rain is currently falling)
 }) => {
   const condLower = (condition || '').toLowerCase();
   const iconLower = (icon || '').toLowerCase();
 
+  // Determine if rain is explicitly absent
+  const isRainExempt = hasRain === false || 
+                       (typeof hasRain === 'number' && hasRain <= 0.05) ||
+                       condLower.includes('no rain') || 
+                       condLower.includes('dry') || 
+                       condLower.includes('without rain') ||
+                       condLower.includes('thunder risk') ||
+                       condLower.includes('thunder potential');
+
   // Determine weather category
-  const isThunderstorm = condLower.includes('thunder') || condLower.includes('storm') || condLower.includes('squall') || iconLower.includes('thunder');
+  // Thunderstorm strictly requires thunder/lightning or explicit thunderstorm icon.
+  // Must NOT trigger on generic marine/wind conditions like "storm surge", "storm inflow", "dust storm", "squall", etc.
+  const isThunderstorm = (
+    iconLower.includes('thunder') ||
+    condLower.includes('thunder') ||
+    condLower.includes('lightning') ||
+    (condLower.includes('storm') && 
+     !condLower.includes('storm surge') && 
+     !condLower.includes('storm inflow') && 
+     !condLower.includes('dust') && 
+     !condLower.includes('sand') && 
+     !condLower.includes('gale') && 
+     !condLower.includes('wind') &&
+     !condLower.includes('swell'))
+  );
+
   const isHail = isThunderstorm && condLower.includes('hail');
-  const isRain = !isThunderstorm && (condLower.includes('rain') || condLower.includes('drizzle') || condLower.includes('shower') || iconLower.includes('rain'));
+
+  // Rain category: requires rain keywords/icon and must NOT be rain-exempt
+  const isRain = !isRainExempt && !isThunderstorm && (
+    condLower.includes('rain') || 
+    condLower.includes('drizzle') || 
+    condLower.includes('shower') || 
+    iconLower.includes('rain')
+  );
+
   const isSnow = condLower.includes('snow') || condLower.includes('sleet') || condLower.includes('ice');
-  const isFog = condLower.includes('fog') || condLower.includes('haze') || condLower.includes('mist') || condLower.includes('dust') || iconLower.includes('fog');
-  const isPartlyCloudy = !isThunderstorm && !isRain && !isSnow && !isFog && (condLower.includes('partly') || condLower.includes('scattered') || condLower.includes('mainly') || condLower.includes('sun'));
-  const isCloudy = !isThunderstorm && !isRain && !isSnow && !isFog && (condLower.includes('cloud') || condLower.includes('overcast') || iconLower.includes('cloud'));
-  const isClear = !isThunderstorm && !isRain && !isSnow && !isFog && !isCloudy;
+  const isFog = condLower.includes('fog') || condLower.includes('haze') || condLower.includes('mist') || condLower.includes('dust') || condLower.includes('smoke') || iconLower.includes('fog');
+  const isPartlyCloudy = !isThunderstorm && !isRain && !isSnow && !isFog && (
+    condLower.includes('partly') || condLower.includes('scattered') || condLower.includes('mainly') || condLower.includes('sun')
+  );
+  const isCloudy = !isThunderstorm && !isRain && !isSnow && !isFog && (
+    condLower.includes('cloud') || condLower.includes('overcast') || iconLower.includes('cloud') || 
+    condLower.includes('squall') || condLower.includes('surge') || condLower.includes('gale') || condLower.includes('wind')
+  );
+  const isClear = !isThunderstorm && !isRain && !isSnow && !isFog && !isCloudy && !isPartlyCloudy;
 
   // Sizing definitions
   const dimensions = {
@@ -143,37 +181,39 @@ export const WeatherStatusAnimation = ({
             className="anim-lightning"
           />
 
-          {/* Animated Falling Rain Droplets */}
-          <g>
-            <line
-              x1="20" y1="41" x2="18" y2="47"
-              stroke="#38bdf8"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              style={{ animation: 'weather-rain-drop 1.1s cubic-bezier(0.4, 0, 0.6, 1) infinite', animationDelay: '0.1s' }}
-            />
-            <line
-              x1="26" y1="42" x2="24" y2="48"
-              stroke="#0284c7"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              style={{ animation: 'weather-rain-drop 1.1s cubic-bezier(0.4, 0, 0.6, 1) infinite', animationDelay: '0.45s' }}
-            />
-            <line
-              x1="40" y1="41" x2="38" y2="47"
-              stroke="#38bdf8"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              style={{ animation: 'weather-rain-drop 1.1s cubic-bezier(0.4, 0, 0.6, 1) infinite', animationDelay: '0.25s' }}
-            />
-            <line
-              x1="46" y1="43" x2="44" y2="49"
-              stroke="#0284c7"
-              strokeWidth="1.8"
-              strokeLinecap="round"
-              style={{ animation: 'weather-rain-drop 1.1s cubic-bezier(0.4, 0, 0.6, 1) infinite', animationDelay: '0.65s' }}
-            />
-          </g>
+          {/* Animated Falling Rain Droplets (Only when rain is present) */}
+          {!isRainExempt && (
+            <g>
+              <line
+                x1="20" y1="41" x2="18" y2="47"
+                stroke="#38bdf8"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                style={{ animation: 'weather-rain-drop 1.1s cubic-bezier(0.4, 0, 0.6, 1) infinite', animationDelay: '0.1s' }}
+              />
+              <line
+                x1="26" y1="42" x2="24" y2="48"
+                stroke="#0284c7"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                style={{ animation: 'weather-rain-drop 1.1s cubic-bezier(0.4, 0, 0.6, 1) infinite', animationDelay: '0.45s' }}
+              />
+              <line
+                x1="40" y1="41" x2="38" y2="47"
+                stroke="#38bdf8"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                style={{ animation: 'weather-rain-drop 1.1s cubic-bezier(0.4, 0, 0.6, 1) infinite', animationDelay: '0.25s' }}
+              />
+              <line
+                x1="46" y1="43" x2="44" y2="49"
+                stroke="#0284c7"
+                strokeWidth="1.8"
+                strokeLinecap="round"
+                style={{ animation: 'weather-rain-drop 1.1s cubic-bezier(0.4, 0, 0.6, 1) infinite', animationDelay: '0.65s' }}
+              />
+            </g>
+          )}
 
           {/* Hailstones for Hailstorm Conditions */}
           {isHail && (

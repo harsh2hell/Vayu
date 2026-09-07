@@ -112,34 +112,29 @@ const generate48HourForecast = (city, isHindi, currentTime = new Date()) => {
   const nowDayNum = String(now.getDate()).padStart(2, '0');
   const nowDateStr = isHindi ? `${nowDayNum} ${M_HI[now.getMonth()]}` : `${nowDayNum} ${M_EN[now.getMonth()]}`;
 
+  // Current real-time point ("Now" / "अभी") - strictly grounded in live observation
+  const cityIcon = (city.icon || '').toLowerCase();
+  const hasLivePrecip = parseFloat(city.precipitation?.rainfall || '0') > 0 || parseFloat(city.precipitation?.rate || '0') > 0;
+
   let nowIcon = 'cloud';
-  let nowCondLabel = isHindi ? 'बादल' : 'Cloudy';
-  const isRainyCity = condition.includes('rain') || condition.includes('storm') || condition.includes('squall') || pChance0 >= 50;
+  let nowCondLabel = isHindi ? (city.conditionHindi || 'बादल') : (city.condition || 'Cloudy');
 
   const nowH = now.getHours();
   const nowMinOfDay = nowH * 60 + now.getMinutes();
   const isNowNight = nowMinOfDay < profile.sunriseMin || nowMinOfDay >= profile.sunsetMin;
 
-  if (isRainyCity && pChance0 >= 40) {
-    if (condition.includes('thunder') || pChance0 >= 75) {
-      nowIcon = 'thunderstorm';
-      nowCondLabel = isHindi ? 'तूफान व बारिश' : 'Thunderstorm';
-    } else {
-      nowIcon = isNowNight ? 'night-rain' : 'rain';
-      nowCondLabel = isHindi ? 'बारिश' : 'Rain';
-    }
-  } else if (isRainyCity && pChance0 >= 20) {
+  if (cityIcon.includes('thunder') && hasLivePrecip) {
+    nowIcon = 'thunderstorm';
+  } else if (cityIcon.includes('rain') && hasLivePrecip) {
     nowIcon = isNowNight ? 'night-rain' : 'rain';
-    nowCondLabel = isHindi ? 'बौछारें' : 'Showers';
-  } else if (condition.includes('fog') || condition.includes('haze') || condition.includes('dust')) {
-    nowIcon = 'fog';
-    nowCondLabel = isHindi ? 'धुंध' : 'Haze & Fog';
-  } else if (condition.includes('sun') || condition.includes('clear')) {
+  } else if (cityIcon.includes('sun') || condition.includes('clear') || condition.includes('sun')) {
     nowIcon = isNowNight ? 'clear-night' : 'sun';
-    nowCondLabel = isNowNight ? (isHindi ? 'साफ रात' : 'Clear Night') : (isHindi ? 'धूप' : 'Sunny');
+  } else if (cityIcon.includes('fog') || condition.includes('fog') || condition.includes('haze') || condition.includes('mist')) {
+    nowIcon = 'fog';
+  } else if (cityIcon.includes('cloud') || condition.includes('cloud')) {
+    nowIcon = isNowNight ? 'cloud-night' : 'cloud-sun';
   } else {
     nowIcon = isNowNight ? 'cloud-night' : 'cloud-sun';
-    nowCondLabel = isHindi ? 'आंशिक बादल' : 'Partly Cloudy';
   }
 
   rawPoints.push({
@@ -213,14 +208,12 @@ const generate48HourForecast = (city, isHindi, currentTime = new Date()) => {
     let icon = 'cloud';
     let condLabel = isHindi ? 'बादल' : 'Cloudy';
 
-    if (isTargetRainyCity && rainProb >= 40) {
-      if (dayCond.includes('thunder') || rainProb >= 75) {
-        icon = 'thunderstorm';
-        condLabel = isHindi ? 'तूफान व बारिश' : 'Thunderstorm';
-      } else {
-        icon = isNight ? 'night-rain' : 'rain';
-        condLabel = isHindi ? 'बारिश' : 'Rain';
-      }
+    if (dayCond.includes('thunder') && rainProb >= 50) {
+      icon = 'thunderstorm';
+      condLabel = isHindi ? 'तूफान व बारिश' : 'Thunderstorm';
+    } else if (isTargetRainyCity && rainProb >= 40) {
+      icon = isNight ? 'night-rain' : 'rain';
+      condLabel = isHindi ? 'बारिश' : 'Rain';
     } else if (isTargetRainyCity && rainProb >= 20) {
       icon = isNight ? 'night-rain' : 'rain';
       condLabel = isHindi ? 'बौछारें' : 'Showers';
@@ -333,7 +326,8 @@ const get48HourSummary = (city, isHindi) => {
   const sSet = isHindi ? profile.sunsetHi : profile.sunset;
 
   let weatherDesc = '';
-  if (precip >= 75 || cond.includes('thunder') || cond.includes('storm')) {
+  const isActualThunder = cond.includes('thunder') || (cond.includes('storm') && !cond.includes('storm surge') && !cond.includes('storm inflow') && !cond.includes('dust') && !cond.includes('sand') && !cond.includes('gale'));
+  if (isActualThunder && precip >= 50) {
     weatherDesc = isHindi
       ? 'अगले 48 घंटों में गरज-चमक के साथ मानसूनी बौछारों की संभावना है। दोपहर के समय तीव्र बारिश और तटीय हवाएं सक्रिय रहेंगी।'
       : 'Scattered thunderstorms and localized heavy downpours expected over the next 48 hours. Gusty coastal winds active during afternoon hours.';
@@ -468,10 +462,24 @@ const CityForecast = () => {
 
   const cityData = liveCityData || initialBase;
 
-  // Selected day object
-  const activeDay = (cityData.forecast7Days && cityData.forecast7Days[selectedDayIdx]) || 
-                    (cityData.forecast7Days && cityData.forecast7Days[0]) || 
-                    cityData;
+  // Selected day object (strictly synchronizes with live telemetry on Day 0: Today)
+  const activeDay = useMemo(() => {
+    const day = (cityData.forecast7Days && cityData.forecast7Days[selectedDayIdx]) || 
+                (cityData.forecast7Days && cityData.forecast7Days[0]) || 
+                cityData;
+    if (selectedDayIdx === 0 && cityData) {
+      return {
+        ...day,
+        temp: cityData.temp !== undefined && cityData.temp !== 'N/A' ? cityData.temp : day.temp,
+        feelsLike: cityData.feelsLike !== undefined && cityData.feelsLike !== 'N/A' ? cityData.feelsLike : day.feelsLike,
+        condition: cityData.condition || day.condition,
+        conditionHindi: cityData.conditionHindi || day.conditionHindi,
+        icon: cityData.icon || day.icon,
+        emoji: cityData.emoji || day.emoji
+      };
+    }
+    return day;
+  }, [cityData, selectedDayIdx]);
 
   // Search Location Modal states
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
@@ -889,6 +897,11 @@ const CityForecast = () => {
                       icon={activeDay.icon}
                       size="lg"
                       isNight={liveClock.now ? (liveClock.now.getHours() < 6 || liveClock.now.getHours() >= 18) : false}
+                      hasRain={
+                        selectedDayIdx === 0
+                          ? (parseFloat(cityData.precipitation?.rainfall || '0') > 0 || parseFloat(cityData.precipitation?.rate || '0') > 0)
+                          : (parseFloat(activeDay.rainfall || '0') > 0 || (activeDay.precipChance || 0) >= 40)
+                      }
                     />
                   </div>
 

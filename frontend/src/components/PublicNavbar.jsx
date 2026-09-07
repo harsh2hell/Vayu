@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { Shield, PhoneCall, Sun, Moon, Menu, X, ChevronRight, Clock } from 'lucide-react';
+import { PhoneCall, Sun, Moon, Menu, X, ChevronRight, Clock } from 'lucide-react';
 import { useLiveClock } from '../utils/liveDateTime';
-import { getAuthUrl } from '../utils/domain';
 
 export const FONT_SCALE_MAP = {
   '-3': 75,
@@ -360,21 +359,8 @@ const PublicNavbar = ({
           })}
         </nav>
 
-        {/* RIGHT SIDE CONTROLS: OFFICER LOGIN, HELPLINE, LANGUAGE, FONT, THEME, MOBILE HAMBURGER */}
+        {/* RIGHT SIDE CONTROLS: HELPLINE, LANGUAGE, FONT, THEME, MOBILE HAMBURGER */}
         <div className="header-controls-row flex items-center gap-1.5 sm:gap-2 shrink-0 flex-nowrap">
-          
-          {/* Official Portal Gateway - Collapses smoothly when scrolled past hero section */}
-          <button
-            onClick={() => { window.location.href = getAuthUrl(); }}
-            className={`header-ctrl-btn header-collapsible-item header-collapsible-login hidden xl:inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold text-white bg-slate-900 dark:bg-sky-600 hover:bg-slate-800 dark:hover:bg-sky-500 transition-all shadow-xs cursor-pointer shrink-0 whitespace-nowrap ${
-              isPastHero ? 'is-collapsed' : ''
-            }`}
-            title={isHindi ? "आधिकारिक आईएमडी / एमओईएस पोर्टल लॉगिन" : "Official IMD / MoES Portal Login"}
-          >
-            <Shield className="w-3.5 h-3.5 text-amber-400 dark:text-sky-200 shrink-0" />
-            <span className="hidden 2xl:inline whitespace-nowrap">{isHindi ? 'पोर्टल लॉगिन' : 'Portal Login'}</span>
-            <span className="2xl:hidden inline whitespace-nowrap">{isHindi ? 'लॉगिन' : 'Login'}</span>
-          </button>
 
           {/* Real-time Live Clock with Seconds & Pulsing Dot */}
           <div
@@ -494,29 +480,6 @@ const PublicNavbar = ({
             </div>
           </div>
           
-          {/* Officer Login Button */}
-          <button
-            onClick={() => {
-              setIsMobileMenuOpen(false);
-              window.location.href = getAuthUrl();
-            }}
-            className="w-full flex items-center justify-between p-3 rounded-2xl text-white bg-gradient-to-r from-slate-900 via-sky-950 to-slate-900 dark:from-sky-700 dark:via-blue-600 dark:to-indigo-700 shadow-md border border-slate-700/50 dark:border-white/20 active:scale-[0.99] transition-all cursor-pointer"
-          >
-            <div className="flex items-center gap-2.5">
-              <div className="w-8 h-8 rounded-xl bg-amber-400/20 dark:bg-white/20 flex items-center justify-center shrink-0">
-                <Shield className="w-4 h-4 text-amber-400 dark:text-white" />
-              </div>
-              <div className="text-left">
-                <div className="text-xs font-bold tracking-tight">
-                  {isHindi ? 'पोर्टल लॉगिन' : 'Official Portal Login'}
-                </div>
-                <div className="text-[10px] text-slate-300 dark:text-sky-100 font-medium">
-                  {isHindi ? 'आईएमडी / एमओईएस प्राधिकृत' : 'IMD / MoES Operational Gateway'}
-                </div>
-              </div>
-            </div>
-            <ChevronRight className="w-4 h-4 text-slate-400 dark:text-sky-200" />
-          </button>
 
           {/* Emergency Helpline */}
           <a
