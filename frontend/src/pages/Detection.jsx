@@ -57,7 +57,7 @@ const Detection = () => {
         throw new Error('No satellite frame available. Please select or upload a frame in Satellite Studio.');
       }
 
-      const res = await detectCycloneFromImage(fileToSend, activeBasin);
+      const res = await detectCycloneFromImage(fileToSend, activeBasin, currentInput?.bbox_geo);
 
       if (res && res.success) {
         setDetectionResult(res);
@@ -95,7 +95,7 @@ const Detection = () => {
         categoryColor="blue"
         modelBadge="MobileNetV3-Small (1.08M Params)"
         title="AI Deep Learning Detection Lab"
-        subtitle="Convolutional neural network for automated tropical cyclogenesis identification & eye center localization."
+        subtitle="Convolutional neural network for automated tropical cyclogenesis identification & center localization."
         actions={
           <>
             <span className="text-[11px] text-amber-800 bg-amber-50 font-mono px-2 py-0.5 rounded border border-amber-200 hidden sm:inline-block">
@@ -371,29 +371,62 @@ const Detection = () => {
 
                 {/* 2. Detailed Gated Localization & Architecture Table */}
                 <div className="space-y-2.5 text-xs">
-                  {/* Predicted Center Gated */}
+                  {/* Center Localization (Image Space Coordinates) */}
                   <div className="flex justify-between items-center py-1.5 border-b border-slate-100">
-                    <span className="text-slate-500 font-medium">Predicted Center:</span>
-                    <span className={`font-mono text-xs ${isCycloneDetected ? 'font-bold text-slate-900' : 'font-semibold text-slate-500'}`}>
+                    <span className="text-slate-500 font-medium">Center Localization:</span>
+                    <span className={`font-mono text-xs ${isCycloneDetected && detectionResult.center ? 'font-bold text-slate-900' : 'font-semibold text-slate-500'}`}>
                       {isCycloneDetected && detectionResult.center
-                        ? (detectionResult.coordinates?.formatted || `${detectionResult.center.lat?.toFixed(2)}°N, ${detectionResult.center.lon?.toFixed(2)}°E`)
+                        ? `X: ${Number(detectionResult.center.center_x_norm ?? 0).toFixed(3)}, Y: ${Number(detectionResult.center.center_y_norm ?? 0).toFixed(3)}`
                         : 'NOT AVAILABLE'}
                     </span>
                   </div>
 
-                  {/* Center Localization State */}
-                  <div className="flex justify-between items-center py-1.5 border-b border-slate-100">
-                    <span className="text-slate-500 font-medium">Center Localization:</span>
-                    <span className={`font-mono text-[11px] font-bold ${
-                      isCycloneDetected ? 'text-emerald-700' : 'text-slate-500'
-                    }`}>
-                      {isCycloneDetected ? 'AVAILABLE' : 'NOT AVAILABLE — CYCLONE NOT DETECTED'}
-                    </span>
+                  {/* Geographic Fix (Scientifically Gated on Verified Scene Extent) */}
+                  <div className="py-2 border-b border-slate-100 space-y-1">
+                    <div className="flex justify-between items-center">
+                      <span className="text-slate-500 font-medium">Geographic Fix:</span>
+                      {isCycloneDetected && detectionResult.is_georeferenced && detectionResult.center?.lat != null ? (
+                        <span className="font-mono text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                          {detectionResult.coordinates?.formatted || `${Number(detectionResult.center.lat).toFixed(2)}°N, ${Number(detectionResult.center.lon).toFixed(2)}°E`}
+                        </span>
+                      ) : (
+                        <span className="font-mono text-[11px] font-semibold text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
+                          Unavailable
+                        </span>
+                      )}
+                    </div>
+                    {isCycloneDetected && (
+                      <div className="text-[11px] font-mono leading-tight">
+                        {detectionResult.is_georeferenced && detectionResult.center?.lat != null ? (
+                          <div className="text-slate-600 flex flex-col gap-0.5">
+                            <span>Scene Extent: [{currentInput?.bbox_geo?.join(', ') || 'EPSG:4326'}]</span>
+                            {currentInput?.ground_truth_center && (
+                              <span className="text-emerald-800 font-semibold">
+                                Best-Track Ref: {currentInput.ground_truth_center.lat}°N, {currentInput.ground_truth_center.lon}°E
+                                {(() => {
+                                  const R = 6371;
+                                  const lat1 = detectionResult.center.lat, lon1 = detectionResult.center.lon;
+                                  const lat2 = currentInput.ground_truth_center.lat, lon2 = currentInput.ground_truth_center.lon;
+                                  const dLat = (lat2 - lat1) * Math.PI / 180, dLon = (lon2 - lon1) * Math.PI / 180;
+                                  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+                                  const cle = Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)) * 10) / 10;
+                                  return ` • CLE: ${cle} km`;
+                                })()}
+                              </span>
+                            )}
+                          </div>
+                        ) : (
+                          <span className="text-slate-500">
+                            Unavailable &mdash; uploaded image has no verified geospatial extent. Image-space center estimate available above.
+                          </span>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   {/* Bounding Box Gated */}
                   <div className="flex justify-between items-center py-1.5 border-b border-slate-100">
-                    <span className="text-slate-500 font-medium">Bounding Box:</span>
+                    <span className="text-slate-500 font-medium">Bounding Box (Norm):</span>
                     <span className={`font-mono text-[11px] ${isCycloneDetected ? 'font-semibold text-slate-800' : 'text-slate-500'}`}>
                       {isCycloneDetected && detectionResult.bounding_box
                         ? (Array.isArray(detectionResult.bounding_box)

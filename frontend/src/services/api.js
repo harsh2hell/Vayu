@@ -62,18 +62,31 @@ export async function checkBackendHealth() {
  * When the FastAPI backend is offline or unreachable on remote client devices,
  * processes the satellite raster directly in-browser using HTML5 Canvas pixel analysis.
  */
-function analyzeSatelliteImageInBrowser(imageFileOrBlob, basin = 'Bay of Bengal') {
+function analyzeSatelliteImageInBrowser(imageFileOrBlob, basin = 'Bay of Bengal', bboxGeo = null) {
   return new Promise((resolve) => {
-    const isArabian = basin.toLowerCase().includes('arabian');
+    // Determine georeferencing status
+    const isGeoreferenced = Array.isArray(bboxGeo) && bboxGeo.length === 4;
     
     // Default safe fallback in case image cannot be loaded or evaluated
     const getFallback = (cx = 0.52, cy = 0.48, isDetected = true, objectnessScore = 0.958) => {
-      const latMin = isArabian ? 12.0 : 14.0;
-      const latMax = isArabian ? 22.0 : 21.5;
-      const lonMin = isArabian ? 60.0 : 82.0;
-      const lonMax = isArabian ? 72.0 : 92.0;
-      const lat = parseFloat((latMax - cy * (latMax - latMin)).toFixed(2));
-      const lon = parseFloat((lonMin + cx * (lonMax - lonMin)).toFixed(2));
+      let lat = null;
+      let lon = null;
+      let formatted = null;
+
+      if (isGeoreferenced) {
+        const [minLat, minLon, maxLat, maxLon] = bboxGeo.map(Number);
+        lat = parseFloat((maxLat - cy * (maxLat - minLat)).toFixed(2));
+        if (minLon <= maxLon) {
+          lon = minLon + cx * (maxLon - minLon);
+        } else {
+          const lonSpan = (maxLon + 360.0) - minLon;
+          lon = minLon + cx * lonSpan;
+          lon = (lon + 180.0) % 360.0 - 180.0;
+        }
+        lon = parseFloat(lon.toFixed(2));
+        formatted = `${Math.abs(lat).toFixed(2)}°${lat >= 0 ? 'N' : 'S'}, ${Math.abs(lon).toFixed(2)}°${lon >= 0 ? 'E' : 'W'}`;
+      }
+
       return {
         success: true,
         isLiveApi: false,
@@ -83,18 +96,26 @@ function analyzeSatelliteImageInBrowser(imageFileOrBlob, basin = 'Bay of Bengal'
         confidence_percentage: parseFloat((objectnessScore * 100).toFixed(1)),
         objectness: objectnessScore,
         center_localization_available: isDetected,
+        is_georeferenced: isGeoreferenced,
+        geo_fix_status: isGeoreferenced ? "VERIFIED_EXTENT" : "UNAVAILABLE_NO_EXTENT",
+        geo_fix_message: isGeoreferenced 
+          ? "Geographic coordinates verified against scene extent."
+          : "Uploaded image has no verified geospatial extent.",
         model_version: "CycloneVision-MobileNetV3 (Client In-Browser Engine)",
         architecture: "MobileNetV3 Neural Centroid & Cloud Mask Extractor",
         center: isDetected ? {
+          center_x_norm: cx,
+          center_y_norm: cy,
+          is_georeferenced: isGeoreferenced,
           lat,
           lon,
-          center_x_norm: cx,
-          center_y_norm: cy
+          formatted
         } : null,
-        coordinates: isDetected ? { 
+        coordinates: (isDetected && isGeoreferenced && lat !== null) ? { 
           latitude: lat, 
           longitude: lon,
-          formatted: `${lat}°N, ${lon}°E`
+          formatted,
+          basin
         } : null,
         bounding_box: isDetected ? [
           Math.max(0.05, parseFloat((cy - 0.22).toFixed(3))),
@@ -340,10 +361,11 @@ function getFallbackTrajectoryForecast(stormId = 'DANA', basin = 'Bay of Bengal'
 }
 
 /**
- * Sends satellite image bytes to the CycloneVision-CNN v2.1 model for inference.
+ * Sends satellite image bytes to the CycloneVision-CNN / MobileNetV3 model for inference.
+ * Only derives geographic coordinates if explicit verified bboxGeo is supplied.
  * Fallback executes in-browser computer vision on client raster if backend is offline.
  */
-export async function detectCycloneFromImage(imageFileOrBlob, basin = 'Bay of Bengal') {
+export async function detectCycloneFromImage(imageFileOrBlob, basin = 'Bay of Bengal', bboxGeo = null) {
   try {
     const baseUrl = await getLiveBaseUrl();
     const formData = new FormData();
@@ -352,6 +374,9 @@ export async function detectCycloneFromImage(imageFileOrBlob, basin = 'Bay of Be
       formData.append('file', imageFileOrBlob, fileName);
     }
     formData.append('basin', basin);
+    if (bboxGeo && Array.isArray(bboxGeo) && bboxGeo.length === 4) {
+      formData.append('bbox_geo', JSON.stringify(bboxGeo));
+    }
 
     let response;
     try {
@@ -372,6 +397,7 @@ export async function detectCycloneFromImage(imageFileOrBlob, basin = 'Bay of Be
       const json = await response.json();
       const raw = json.data || json;
       const isDetected = Boolean(raw.cyclone_detected ?? raw.detected ?? false);
+      const isGeoreferenced = Boolean(raw.is_georeferenced ?? false);
       const objectness = raw.objectness !== undefined 
         ? raw.objectness 
         : ((raw.confidence_percentage ?? 0.0) / 100.0);
@@ -387,17 +413,20 @@ export async function detectCycloneFromImage(imageFileOrBlob, basin = 'Bay of Be
         ?? (Array.isArray(rawBbox) ? (rawBbox[0] + rawBbox[2]) / 2 : null);
 
       // Strict scientific gating: Center localization & bounding box ONLY available when cyclone is detected
+      // NO fabricated lat/lon when isGeoreferenced is false
       const center = isDetected && parsedCx !== null && parsedCy !== null ? {
-        lat: raw.center?.lat ?? raw.coordinates?.latitude ?? 18.3,
-        lon: raw.center?.lon ?? raw.coordinates?.longitude ?? 88.4,
         center_x_norm: parseFloat(Number(parsedCx).toFixed(4)),
-        center_y_norm: parseFloat(Number(parsedCy).toFixed(4))
+        center_y_norm: parseFloat(Number(parsedCy).toFixed(4)),
+        is_georeferenced: isGeoreferenced && raw.center?.lat != null,
+        lat: isGeoreferenced ? (raw.center?.lat ?? raw.coordinates?.latitude ?? null) : null,
+        lon: isGeoreferenced ? (raw.center?.lon ?? raw.coordinates?.longitude ?? null) : null,
+        formatted: isGeoreferenced ? (raw.center?.formatted ?? raw.coordinates?.formatted ?? null) : null
       } : null;
 
-      const coordinates = isDetected && center ? (raw.coordinates || { 
+      const coordinates = (isDetected && isGeoreferenced && center?.lat != null) ? (raw.coordinates || { 
         latitude: center.lat, 
         longitude: center.lon,
-        formatted: `${center.lat}°N, ${center.lon}°E`
+        formatted: center.formatted || `${center.lat}°N, ${center.lon}°E`
       }) : null;
 
       const bounding_box = isDetected ? rawBbox : null;
@@ -408,6 +437,9 @@ export async function detectCycloneFromImage(imageFileOrBlob, basin = 'Bay of Be
         ...raw,
         detected: isDetected,
         cyclone_detected: isDetected,
+        is_georeferenced: isGeoreferenced,
+        geo_fix_status: raw.geo_fix_status || (isGeoreferenced ? "VERIFIED_EXTENT" : "UNAVAILABLE_NO_EXTENT"),
+        geo_fix_message: raw.geo_fix_message || (isGeoreferenced ? "Geographic coordinates verified against scene extent." : "Uploaded image has no verified geospatial extent."),
         objectness,
         center_localization_available: isDetected,
         center,
@@ -425,7 +457,7 @@ export async function detectCycloneFromImage(imageFileOrBlob, basin = 'Bay of Be
     throw new Error(`API returned ${response?.status || 'network error'}`);
   } catch (err) {
     console.warn('[VAYU API] Live backend unavailable, executing in-browser neural analysis fallback:', err);
-    return await analyzeSatelliteImageInBrowser(imageFileOrBlob, basin);
+    return await analyzeSatelliteImageInBrowser(imageFileOrBlob, basin, bboxGeo);
   }
 }
 

@@ -82,7 +82,7 @@ const Landing = () => {
   };
 
   const benchmarks = [
-    { label: 'Eye Center CLE', value: '25.6 km', sub: 'Mean CLE (Validation Set) vs. IBTrACS', icon: Target, badge: 'MobileNetV3' },
+    { label: 'Center Localization CLE', value: '25.6 km', sub: 'Mean CLE (Validation Set) vs. IBTrACS', icon: Target, badge: 'MobileNetV3' },
     { label: '72h Forecast Lead', value: '+86.0 km', sub: 'GRU Outperforms Persistence Baseline', icon: Activity, badge: 'GRU Seq2Seq' },
     { label: 'Multi-Spectral Channels', value: '4 Feeds', sub: 'IR, VIS, WV, Multi-sensor (NASA/MOSDAC)', icon: Satellite, badge: 'Real-Time Ingestion' },
     { label: 'Historical Baseline', value: '34 Storms', sub: 'NOAA IBTrACS NIO Canonical Dataset', icon: History, badge: 'Phase 3B Dataset' },

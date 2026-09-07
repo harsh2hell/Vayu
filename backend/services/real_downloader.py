@@ -100,7 +100,9 @@ class RealSatelliteDownloader:
             is_live_download = False
 
         # 1. Run CycloneVision-CNN Detection
-        detection_result = cyclone_vision_model.predict(image_bytes, basin=basin)
+        # Only pass bbox_geo if source has verified spatial extent (e.g. NASA GIBS with explicit BBOX)
+        geo_bbox = [min_lat, min_lon, max_lat, max_lon] if (source != "ISRO_MOSDAC" and is_live_download) else None
+        detection_result = cyclone_vision_model.predict(image_bytes, bbox_geo=geo_bbox, basin=basin)
 
         # 2. Run PatternNet-ViT Morphological Classification
         classification_result = pattern_classifier.classify(image_bytes=image_bytes, basin=basin)

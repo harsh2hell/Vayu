@@ -31,10 +31,14 @@ const MIN_ZOOM       = 1;
 const MAX_ZOOM       = 18;
 
 // ─── Tile sources ──────────────────────────────────────────────────────────────
+// ─── Tile sources ──────────────────────────────────────────────────────────────
+// Esri World Dark Gray Canvas: Legitimate cartographic dark basemap specifically
+// designed for meteorological overlays and cyclone tracking. Free, stable, and requires
+// no API key for public/research use. Fully credited with standard Esri attribution.
 const TILES_DARK = {
-  url: 'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png',
-  attr: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
-  subdomains: 'abcd', maxZoom: 20,
+  url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+  attr: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, USGS, METI, and GIS User Community',
+  maxZoom: 16,
 };
 const TILES_ESRI_SAT = {
   url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
@@ -47,20 +51,20 @@ const TILES_NASA_GIBS = {
   maxNativeZoom: 9, maxZoom: MAX_ZOOM,
 };
 const TILES_LABELS = {
-  url: 'https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png',
+  url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}',
   attr: '',
-  subdomains: 'abcd', maxZoom: 20,
+  maxZoom: 16,
 };
 
 // ─── Wind speed legend ─────────────────────────────────────────────────────────
-// Matches the 12-stop colour scale in WindLayer.jsx
+// Matches the colour scale in WindLayer.jsx in SI units (m/s)
 const WIND_LEGEND = [
-  { label: 'Calm',     range: '0–7',    color: '#2166ac' },
-  { label: 'Light',    range: '7–28',   color: '#74add1' },
-  { label: 'Moderate', range: '28–54',  color: '#ffffbf' },
-  { label: 'Strong',   range: '54–80',  color: '#fdae61' },
-  { label: 'Severe',   range: '80–120', color: '#d73027' },
-  { label: 'Extreme',  range: '>120',   color: '#a50026' },
+  { label: 'Calm',     range: '0–2',    color: '#2166ac' },
+  { label: 'Light',    range: '2–6',    color: '#74add1' },
+  { label: 'Moderate', range: '6–12',   color: '#ffffbf' },
+  { label: 'Fresh',    range: '12–18',  color: '#fdae61' },
+  { label: 'Strong',   range: '18–25',  color: '#d73027' },
+  { label: 'Storm',    range: '>25',    color: '#a50026' },
 ];
 
 // ─── MapController ─────────────────────────────────────────────────────────────
@@ -131,7 +135,7 @@ const WindInfoBadge = ({ meta, loading, error }) => {
       <span className="text-slate-500">|</span>
       <span>{meta.level}</span>
       <span className="text-slate-500">|</span>
-      <span className="text-sky-300">Forecast</span>
+      <span className="text-sky-300">{meta.type ?? 'Model Forecast'}</span>
     </div>
   );
 };
@@ -140,7 +144,7 @@ const WindInfoBadge = ({ meta, loading, error }) => {
 const WindSpeedLegend = () => (
   <div className="bg-slate-900/90 backdrop-blur-md px-3 py-2 rounded-xl border border-slate-700/80 shadow-lg">
     <div className="text-[9px] font-mono text-slate-500 uppercase tracking-wider mb-1.5">
-      Wind Speed (km/h)
+      Wind Speed (m/s)
     </div>
     <div className="flex items-center gap-1">
       {WIND_LEGEND.map(({ label, range, color }) => (
@@ -203,10 +207,11 @@ const VayuEarth = () => {
           setWindMeta({
             refTime:    json.meta?.ref_time_utc    ?? null,
             source:     json.meta?.source          ?? 'NOAA GFS',
-            model:      json.meta?.model           ?? 'GFS',
-            resolution: json.meta?.resolution_deg  ? `${json.meta.resolution_deg}°` : '5°',
-            units:      json.meta?.u_units         ?? 'km/h',
+            model:      json.meta?.model           ?? 'GFS Seamless',
+            resolution: json.meta?.resolution_deg  ? `${json.meta.resolution_deg}°` : '12°',
+            units:      json.meta?.units           ?? json.meta?.u_units ?? 'm/s',
             level:      json.meta?.level           ?? '10m AGL',
+            type:       json.meta?.type            ?? 'Model Forecast',
           });
         }
       } catch (err) {
@@ -228,7 +233,7 @@ const VayuEarth = () => {
   // ── Derived display strings ─────────────────────────────────────────────
   const latStr = `${Math.abs(coords.lat).toFixed(4)}°${coords.lat >= 0 ? 'N' : 'S'}`;
   const lonStr = `${Math.abs(coords.lon).toFixed(4)}°${coords.lon >= 0 ? 'E' : 'W'}`;
-  const baseAttr = baseMode === 'satellite' ? 'Esri World Imagery' : 'CartoDB / OpenStreetMap';
+  const baseAttr = baseMode === 'satellite' ? 'Esri World Imagery' : 'Esri World Dark Gray Canvas';
 
   // ── Render ───────────────────────────────────────────────────────────────
   return (
@@ -246,7 +251,7 @@ const VayuEarth = () => {
           <div>
             <div className="flex items-center gap-1.5">
               <span className="text-xs font-bold text-white tracking-tight">VAYU Earth</span>
-              <span className="text-[9px] font-mono uppercase bg-emerald-500/20 text-emerald-300 px-1.5 py-0.5 rounded border border-emerald-500/30 font-semibold">LIVE</span>
+              <span className="text-[9px] font-mono uppercase bg-sky-500/20 text-sky-300 px-1.5 py-0.5 rounded border border-sky-500/30 font-semibold">GLOBAL</span>
             </div>
             <div className="text-[10px] text-slate-400 font-mono mt-0.5">Global Satellite Intelligence Explorer</div>
           </div>
@@ -440,7 +445,7 @@ const VayuEarth = () => {
                   <Info className="w-2.5 h-2.5 text-slate-500" />
                   <span>Source: NOAA GFS via Open-Meteo</span>
                 </div>
-                <div>U/V at 10 m AGL • 5° global grid • km/h</div>
+                <div>U/V at 10 m AGL • 12° global grid • m/s</div>
                 <div className="text-slate-500">
                   Direction: FROM convention (met) displayed in badge.<br/>
                   Particles travel in wind direction (TO vector).
@@ -448,7 +453,7 @@ const VayuEarth = () => {
                 {windLoading && (
                   <div className="flex items-center gap-1 text-cyan-400 mt-1">
                     <RefreshCw className="w-2.5 h-2.5 animate-spin" />
-                    <span>Fetching ~2,700 grid points…</span>
+                    <span>Fetching global meteorological grid…</span>
                   </div>
                 )}
                 {windError && (

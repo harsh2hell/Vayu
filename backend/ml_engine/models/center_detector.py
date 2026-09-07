@@ -6,6 +6,7 @@ import torch
 import torch.nn as nn
 import torchvision.models as models
 from ..preprocessor import preprocess_satellite_image, affine_pixel_to_geo
+from ..geolocation import transform_image_center_to_geo
 
 CHECKPOINT_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "checkpoints", "phase3b", "vayu_detector_mobilenetv3_p3b.pt")
 
@@ -46,25 +47,31 @@ class CycloneCenterDetector(nn.Module):
             nn.Sigmoid()
         )
         
-        # Head 3: Radiometric Intensity Regressor [Vmax_raw, MSLP_raw]
+        # Head 3: Radiometric Intensity Regressor [Vmax, MSLP]
         self.intensity_head = nn.Sequential(
             nn.Linear(feat_dim, 64),
             nn.SiLU(),
+            nn.Dropout(0.2),
             nn.Linear(64, 2)
         )
 
     def forward(self, x: torch.Tensor) -> Dict[str, torch.Tensor]:
         feats = self.features(x)
         feats = self.pool(feats)
-        feats = torch.flatten(feats, 1) # [B, 576]
+        feats = torch.flatten(feats, 1)
         
-        prob = self.classifier_head(feats) # [B, 1]
-        bbox_raw = self.bbox_head(feats)   # [B, 4] -> [cx, cy, w, h]
-        cx, cy, w, h = bbox_raw[:, 0:1], bbox_raw[:, 1:2], bbox_raw[:, 2:3], bbox_raw[:, 3:4]
+        prob = self.classifier_head(feats)
+        bbox_norm = self.bbox_head(feats)
         
+        cx = bbox_norm[:, 0:1]
+        cy = bbox_norm[:, 1:2]
+        w = bbox_norm[:, 2:3]
+        h = bbox_norm[:, 3:4]
+        
+        # Convert (cx, cy, w, h) to (ymin, xmin, ymax, xmax) clamped [0, 1]
         ymin = torch.clamp(cy - h / 2.0, 0.0, 1.0)
-        ymax = torch.clamp(cy + h / 2.0, 0.0, 1.0)
         xmin = torch.clamp(cx - w / 2.0, 0.0, 1.0)
+        ymax = torch.clamp(cy + h / 2.0, 0.0, 1.0)
         xmax = torch.clamp(cx + w / 2.0, 0.0, 1.0)
         
         intensity_raw = self.intensity_head(feats)
@@ -88,15 +95,12 @@ class CycloneCenterDetector(nn.Module):
     ) -> Dict[str, Any]:
         """
         Executes genuine PyTorch inference on satellite image bytes.
+        
+        NOTE: Does NOT fabricate geographic coordinates (lat/lon) if bbox_geo
+        is None or invalid. Normalized image-space coordinates (center_x_norm,
+        center_y_norm in [0, 1]) are always returned.
         """
         start_time = time.perf_counter()
-        
-        if bbox_geo is None:
-            # Default synoptic bounding box for selected basin
-            if basin == "Arabian Sea":
-                bbox_geo = [12.0, 60.0, 26.0, 75.0]
-            else:
-                bbox_geo = [10.0, 80.0, 24.0, 95.0]
 
         prep = preprocess_satellite_image(image_bytes)
         img_tensor = prep["tensor"]
@@ -125,38 +129,50 @@ class CycloneCenterDetector(nn.Module):
 
         is_detected = prob >= 0.50
         
-        # Translate normalized center pixel (cx, cy) to geographical coordinates (lat, lon)
-        lat, lon = affine_pixel_to_geo(cx, cy, bbox_geo)
+        # Geolocation Transformation: Only derive lat/lon if verified extent provided
+        geo_fix = transform_image_center_to_geo(cx, cy, bbox_geo)
+        
+        coords = None
+        if geo_fix["is_georeferenced"] and geo_fix["coordinates"]:
+            coords = dict(geo_fix["coordinates"])
+            coords["basin"] = basin
 
-        # Estimate radius in km (assuming bbox width over synoptic span)
-        dlon_deg = (bbox_geo[3] - bbox_geo[1]) * (xmax - xmin)
-        radius_km = round(float(dlon_deg * 111.0 * 0.5), 1)
-        radius_km = max(60.0, min(450.0, radius_km))
+        # Estimate radius in km (using scene extent if available, else nominal proportional estimate)
+        if bbox_geo is not None and len(bbox_geo) == 4:
+            try:
+                min_lat, min_lon, max_lat, max_lon = [float(v) for v in bbox_geo]
+                dlon_deg = abs(max_lon - min_lon) * (xmax - xmin)
+                radius_km = round(float(dlon_deg * 111.0 * 0.5), 1)
+                radius_km = max(60.0, min(450.0, radius_km))
+            except Exception:
+                radius_km = round(float((xmax - xmin) * 500.0), 1)
+                radius_km = max(60.0, min(450.0, radius_km))
+        else:
+            radius_km = round(float((xmax - xmin) * 500.0), 1)
+            radius_km = max(60.0, min(450.0, radius_km))
 
         return {
             "cyclone_detected": is_detected,
             "confidence_percentage": round(prob * 100.0, 1),
-            "coordinates": {
-                "latitude": lat,
-                "longitude": lon,
-                "formatted": f"{lat}°N, {lon}°E",
-                "center_x_norm": round(cx, 3),
-                "center_y_norm": round(cy, 3),
-                "basin": basin
-            },
+            "is_georeferenced": geo_fix["is_georeferenced"],
+            "geo_fix_status": geo_fix["geo_fix_status"],
+            "geo_fix_message": geo_fix["message"],
+            "coordinates": coords,
             "center": {
-                "lat": lat,
-                "lon": lon,
-                "center_x_norm": round(cx, 3),
-                "center_y_norm": round(cy, 3)
+                "center_x_norm": round(cx, 4),
+                "center_y_norm": round(cy, 4),
+                "is_georeferenced": geo_fix["is_georeferenced"],
+                "lat": geo_fix["latitude"],
+                "lon": geo_fix["longitude"],
+                "formatted": geo_fix["formatted"]
             },
             "bounding_box": {
                 "ymin": round(ymin, 3),
                 "xmin": round(xmin, 3),
                 "ymax": round(ymax, 3),
                 "xmax": round(xmax, 3),
-                "center_x_norm": round(cx, 3),
-                "center_y_norm": round(cy, 3)
+                "center_x_norm": round(cx, 4),
+                "center_y_norm": round(cy, 4)
             },
             "estimated_intensity": {
                 "vmax_knots": round(vmax, 1),

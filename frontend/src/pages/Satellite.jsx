@@ -130,7 +130,7 @@ const Satellite = () => {
 
       // 1. Run MobileNetV3-Small Detection
       setAnalysisProgressStep('DETECTION: Running MobileNetV3-Small...');
-      const detRes = await detectCycloneFromImage(imageBlob, currentInput?.basin || 'Bay of Bengal');
+      const detRes = await detectCycloneFromImage(imageBlob, currentInput?.basin || 'Bay of Bengal', currentInput?.bbox_geo);
       if (!detRes || !detRes.success) {
         throw new Error(detRes?.message || 'MobileNetV3 detection inference failed.');
       }
@@ -384,7 +384,9 @@ const Satellite = () => {
                           🎯
                         </div>
                         <div className="absolute top-4 -left-16 bg-slate-900/90 text-white px-2 py-0.5 rounded text-[9px] font-mono whitespace-nowrap shadow border border-amber-300/40">
-                          {detectionResult.coordinates?.formatted ? `Center: ${detectionResult.coordinates.formatted}` : 'Vortex Center'}
+                          {detectionResult.is_georeferenced && detectionResult.coordinates?.formatted 
+                            ? `Center: ${detectionResult.coordinates.formatted}` 
+                            : `Center: (${Number(detectionResult.center?.center_x_norm ?? 0).toFixed(2)}, ${Number(detectionResult.center?.center_y_norm ?? 0).toFixed(2)})`}
                         </div>
                       </div>
                     )}
@@ -558,10 +560,20 @@ const Satellite = () => {
                     </span>
                   </div>
                   <div className="flex justify-between items-center">
-                    <span className="font-medium">Center Coordinates:</span>
-                    <span className={`font-mono ${isCycloneDetected ? 'font-bold text-sky-800' : 'font-semibold text-slate-500'}`}>
+                    <span className="font-medium">Center Localization:</span>
+                    <span className={`font-mono ${isCycloneDetected && detectionResult.center ? 'font-bold text-sky-800' : 'font-semibold text-slate-500'}`}>
+                      {isCycloneDetected && detectionResult.center
+                        ? `X: ${Number(detectionResult.center.center_x_norm ?? 0).toFixed(3)}, Y: ${Number(detectionResult.center.center_y_norm ?? 0).toFixed(3)}`
+                        : 'NOT AVAILABLE'}
+                    </span>
+                  </div>
+                  <div className="flex justify-between items-center">
+                    <span className="font-medium">Geographic Fix:</span>
+                    <span className={`font-mono text-xs ${isCycloneDetected && detectionResult.is_georeferenced && detectionResult.center?.lat != null ? 'font-bold text-emerald-800 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-200' : 'font-semibold text-slate-500'}`}>
                       {isCycloneDetected
-                        ? (detectionResult.coordinates?.formatted || `${detectionResult.center?.lat?.toFixed(2)}°N, ${detectionResult.center?.lon?.toFixed(2)}°E`)
+                        ? (detectionResult.is_georeferenced && detectionResult.center?.lat != null
+                            ? (detectionResult.coordinates?.formatted || `${detectionResult.center.lat.toFixed(2)}°N, ${detectionResult.center.lon.toFixed(2)}°E`)
+                            : 'Unavailable (no georeference)')
                         : 'NOT AVAILABLE'}
                     </span>
                   </div>
