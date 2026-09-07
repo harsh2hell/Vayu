@@ -74,7 +74,13 @@ const WIND_LEGEND = [
 // ─── MapController ─────────────────────────────────────────────────────────────
 const MapController = ({ onCoordsChange, onZoomChange, onMapReady }) => {
   const map = useMap();
-  useEffect(() => { if (map && onMapReady) onMapReady(map); }, [map, onMapReady]);
+  useEffect(() => {
+    if (!map) return;
+    if (onMapReady) onMapReady(map);
+    map.invalidateSize();
+    const t = setTimeout(() => map.invalidateSize(), 200);
+    return () => clearTimeout(t);
+  }, [map, onMapReady]);
   useMapEvents({
     mousemove: (e) => onCoordsChange?.({ lat: e.latlng.lat, lon: e.latlng.lng }),
     zoomend:   ()  => onZoomChange?.(map.getZoom()),
@@ -241,8 +247,8 @@ const VayuEarth = () => {
 
   // ── Render ───────────────────────────────────────────────────────────────
   return (
-    <div className="relative w-full h-full flex flex-col bg-slate-950 select-none overflow-hidden"
-      style={{ fontFamily: 'system-ui, sans-serif' }}>
+    <div className="relative w-full h-full flex flex-col bg-slate-950 select-none overflow-hidden min-h-0"
+      style={{ fontFamily: 'system-ui, sans-serif', width: '100%', height: '100%', minHeight: '100%' }}>
 
       {/* ══ TOP HUD ══════════════════════════════════════════════════════════ */}
       <div className="absolute top-3 left-3 right-3 z-[1000] flex items-center justify-between gap-2 pointer-events-none">
@@ -286,7 +292,7 @@ const VayuEarth = () => {
       </div>
 
       {/* ══ MAP CANVAS ════════════════════════════════════════════════════════ */}
-      <div className="flex-1 w-full h-full relative">
+      <div className="flex-1 w-full h-full relative min-h-0" style={{ width: '100%', height: '100%', minHeight: '0' }}>
         <MapContainer
           center={DEFAULT_CENTER} zoom={DEFAULT_ZOOM}
           minZoom={MIN_ZOOM} maxZoom={MAX_ZOOM}
@@ -294,7 +300,7 @@ const VayuEarth = () => {
           scrollWheelZoom={true} doubleClickZoom={true}
           dragging={true} touchZoom={true}
           className="w-full h-full"
-          style={{ width: '100%', height: '100%', background: '#020617' }}
+          style={{ width: '100%', height: '100%', minHeight: '100%', background: '#020617' }}
         >
           <MapController
             onCoordsChange={setCoords}
