@@ -31,6 +31,7 @@ from .routers.alerts import router as alerts_router
 from .routers.bulletins import router as bulletins_router
 from .routers.analytics import router as analytics_router
 from .routers.training import router as training_router
+from .routers.wind import router as wind_router
 
 # Initialize enterprise database tables & seeds
 seed_database()
@@ -100,6 +101,7 @@ app.include_router(alerts_router)
 app.include_router(bulletins_router)
 app.include_router(analytics_router)
 app.include_router(training_router)
+app.include_router(wind_router)
 
 
 # -------------------------------------------------------------

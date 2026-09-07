@@ -1,138 +1,244 @@
-import React, { useState, useRef, useCallback } from 'react';
+/**
+ * VayuEarth.jsx
+ * =============
+ * VAYU Earth — Global Satellite Intelligence Explorer
+ *
+ * A genuinely explorable world map powered by:
+ *  - CartoDB Dark Matter  (global dark vector base, zoom 1–20)
+ *  - Esri World Imagery   (global satellite base,  zoom 1–18)
+ *  - NASA GIBS VIIRS NRT  (near real-time satellite overlay, zoom 1–9 native)
+ *  - CartoDB Labels        (country/city names + borders)
+ *  - NOAA GFS Wind Field   (real U/V wind particles via Open-Meteo, optional)
+ *
+ * Navigation: unrestricted global pan + zoom (minZoom=1, maxZoom=18, no maxBounds).
+ */
+
+import React, { useState, useRef, useCallback, useEffect } from 'react';
 import { MapContainer, TileLayer, useMap, useMapEvents } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import {
-  Globe2,
-  RotateCcw,
-  Plus,
-  Minus,
-  Layers,
-  Compass,
-  Sliders,
-  Satellite,
-  Map,
-  X,
+  Globe2, RotateCcw, Plus, Minus, Layers, Compass,
+  Sliders, Satellite, Map, X, Wind, Info, AlertTriangle,
+  RefreshCw, Clock,
 } from 'lucide-react';
+import WindLayer from '../components/WindLayer';
+import { getLiveBaseUrl } from '../services/api';
 
 // ─── Default camera ────────────────────────────────────────────────────────────
-// Zoom 3 gives a wide Indian-Ocean-centred view while still showing the whole
-// Eastern hemisphere. User can freely zoom / pan anywhere on Earth from here.
 const DEFAULT_CENTER = [15.0, 80.0];
 const DEFAULT_ZOOM   = 3;
-const MIN_ZOOM       = 1;   // Full-globe view (whole Earth on screen)
-const MAX_ZOOM       = 18;  // Street-level detail
+const MIN_ZOOM       = 1;
+const MAX_ZOOM       = 18;
 
-// ─── Tile Sources ──────────────────────────────────────────────────────────────
-// All free / public-domain services — no API key required.
-
-const TILES_DARK_BASE = {
+// ─── Tile sources ──────────────────────────────────────────────────────────────
+const TILES_DARK = {
   url: 'https://{s}.basemaps.cartocdn.com/dark_nolabels/{z}/{x}/{y}{r}.png',
-  attribution:
-    '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> ' +
-    'contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-  subdomains: 'abcd',
-  maxZoom: 20,
+  attr: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>',
+  subdomains: 'abcd', maxZoom: 20,
 };
-
 const TILES_ESRI_SAT = {
   url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-  attribution:
-    'Imagery &copy; Esri, Maxar, Earthstar Geographics, and the GIS User Community',
+  attr: 'Imagery &copy; Esri, Maxar, Earthstar Geographics, and the GIS User Community',
   maxZoom: 18,
 };
-
 const TILES_NASA_GIBS = {
-  url:
-    'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/' +
-    'VIIRS_SNPP_CorrectedReflectance_TrueColor/default/default/' +
-    'GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg',
-  attribution:
-    'Satellite (NRT): <a href="https://earthdata.nasa.gov/eosdis/science-system-description/eosdis-components/gibs">NASA GIBS</a> / VIIRS Suomi NPP',
-  maxNativeZoom: 9,
-  maxZoom: MAX_ZOOM,
+  url: 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_SNPP_CorrectedReflectance_TrueColor/default/default/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg',
+  attr: 'Satellite (NRT): <a href="https://earthdata.nasa.gov/eosdis/science-system-description/eosdis-components/gibs">NASA GIBS</a> / VIIRS NRT',
+  maxNativeZoom: 9, maxZoom: MAX_ZOOM,
 };
-
 const TILES_LABELS = {
   url: 'https://{s}.basemaps.cartocdn.com/dark_only_labels/{z}/{x}/{y}{r}.png',
-  attribution: '',
-  subdomains: 'abcd',
-  maxZoom: 20,
+  attr: '',
+  subdomains: 'abcd', maxZoom: 20,
 };
+
+// ─── Wind speed legend ─────────────────────────────────────────────────────────
+// Matches the 12-stop colour scale in WindLayer.jsx
+const WIND_LEGEND = [
+  { label: 'Calm',     range: '0–7',    color: '#2166ac' },
+  { label: 'Light',    range: '7–28',   color: '#74add1' },
+  { label: 'Moderate', range: '28–54',  color: '#ffffbf' },
+  { label: 'Strong',   range: '54–80',  color: '#fdae61' },
+  { label: 'Severe',   range: '80–120', color: '#d73027' },
+  { label: 'Extreme',  range: '>120',   color: '#a50026' },
+];
 
 // ─── MapController ─────────────────────────────────────────────────────────────
 const MapController = ({ onCoordsChange, onZoomChange, onMapReady }) => {
   const map = useMap();
-
-  React.useEffect(() => {
-    if (map && onMapReady) onMapReady(map);
-  }, [map, onMapReady]);
-
+  useEffect(() => { if (map && onMapReady) onMapReady(map); }, [map, onMapReady]);
   useMapEvents({
-    mousemove: (e) =>
-      onCoordsChange?.({ lat: e.latlng.lat, lon: e.latlng.lng }),
-    zoomend: () => onZoomChange?.(map.getZoom()),
+    mousemove: (e) => onCoordsChange?.({ lat: e.latlng.lat, lon: e.latlng.lng }),
+    zoomend:   ()  => onZoomChange?.(map.getZoom()),
   });
-
   return null;
 };
 
-// ─── LayerRow helper ─────────────────────────────────────────────────────────
-const LayerRow = ({ id, label, badge, checked, onChange }) => (
+// ─── LayerRow ─────────────────────────────────────────────────────────────────
+const LayerRow = ({ id, label, badge, checked, onChange, badgeColor = 'sky' }) => (
   <div className="flex items-center justify-between p-2 rounded-xl bg-slate-800/60 border border-slate-700/50">
     <div className="flex items-center gap-2">
-      <input
-        type="checkbox"
-        id={id}
-        checked={checked}
-        onChange={onChange}
-        className="rounded accent-sky-500 cursor-pointer w-3.5 h-3.5"
-      />
-      <label
-        htmlFor={id}
-        className="text-xs font-medium text-slate-200 cursor-pointer select-none"
-      >
-        {label}
-      </label>
+      <input type="checkbox" id={id} checked={checked} onChange={onChange}
+        className="rounded accent-sky-500 cursor-pointer w-3.5 h-3.5" />
+      <label htmlFor={id} className="text-xs font-medium text-slate-200 cursor-pointer select-none">{label}</label>
     </div>
     {badge && (
-      <span className="text-[9px] font-mono bg-sky-500/10 text-sky-400 px-1.5 py-0.5 rounded border border-sky-500/20">
-        {badge}
-      </span>
+      <span className={`text-[9px] font-mono px-1.5 py-0.5 rounded border ${
+        badgeColor === 'green'
+          ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+          : 'bg-sky-500/10 text-sky-400 border-sky-500/20'
+      }`}>{badge}</span>
     )}
   </div>
 );
 
-// ─── VayuEarth ─────────────────────────────────────────────────────────────────
+// ─── Wind info badge ──────────────────────────────────────────────────────────
+const WindInfoBadge = ({ meta, loading, error }) => {
+  if (loading) return (
+    <div className="bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-cyan-500/40 shadow-lg text-[10px] font-mono text-cyan-400 flex items-center gap-1.5">
+      <RefreshCw className="w-3 h-3 animate-spin" />
+      <span>Fetching wind field…</span>
+    </div>
+  );
+  if (error) return (
+    <div className="bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-red-500/40 shadow-lg text-[10px] font-mono text-red-400 flex items-center gap-1.5">
+      <AlertTriangle className="w-3 h-3" />
+      <span>Wind unavailable</span>
+    </div>
+  );
+  if (!meta) return null;
+
+  // Format refTime for display
+  let validAt = '—';
+  try {
+    const d = new Date(meta.refTime);
+    validAt = d.toUTCString().replace(' GMT', ' UTC').replace(/.*,\s/, '');
+  } catch (_) { validAt = meta.refTime ?? '—'; }
+
+  return (
+    <div className="bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-cyan-500/40 shadow-lg text-[10px] font-mono text-slate-300 flex items-center gap-2 flex-wrap">
+      <div className="flex items-center gap-1 text-cyan-400 font-semibold">
+        <Wind className="w-3 h-3" />
+        <span>WIND • {meta.source ?? 'NOAA GFS'}</span>
+      </div>
+      <span className="text-slate-500">|</span>
+      <span className="flex items-center gap-1">
+        <Clock className="w-2.5 h-2.5 text-slate-400" />
+        Valid: {validAt}
+      </span>
+      <span className="text-slate-500">|</span>
+      <span>{meta.resolution} grid</span>
+      <span className="text-slate-500">|</span>
+      <span>{meta.level}</span>
+      <span className="text-slate-500">|</span>
+      <span className="text-sky-300">Forecast</span>
+    </div>
+  );
+};
+
+// ─── Wind speed legend strip ──────────────────────────────────────────────────
+const WindSpeedLegend = () => (
+  <div className="bg-slate-900/90 backdrop-blur-md px-3 py-2 rounded-xl border border-slate-700/80 shadow-lg">
+    <div className="text-[9px] font-mono text-slate-500 uppercase tracking-wider mb-1.5">
+      Wind Speed (km/h)
+    </div>
+    <div className="flex items-center gap-1">
+      {WIND_LEGEND.map(({ label, range, color }) => (
+        <div key={label} className="flex flex-col items-center gap-0.5">
+          <div className="w-7 h-2 rounded-sm" style={{ backgroundColor: color }} />
+          <span className="text-[8px] font-mono text-slate-400">{range}</span>
+        </div>
+      ))}
+    </div>
+  </div>
+);
+
+// ─── VayuEarth ────────────────────────────────────────────────────────────────
 const VayuEarth = () => {
   const mapRef = useRef(null);
 
-  const [coords, setCoords]           = useState({ lat: DEFAULT_CENTER[0], lon: DEFAULT_CENTER[1] });
+  // Telemetry
+  const [coords,      setCoords]      = useState({ lat: DEFAULT_CENTER[0], lon: DEFAULT_CENTER[1] });
   const [currentZoom, setCurrentZoom] = useState(DEFAULT_ZOOM);
+
+  // UI toggles
   const [layerPanelOpen, setLayerPanelOpen] = useState(false);
-  const [baseMode, setBaseMode]       = useState('dark');
-  const [nasaGibsOn,  setNasaGibsOn]  = useState(true);
-  const [labelsOn,    setLabelsOn]     = useState(true);
-  const [nasaOpacity, setNasaOpacity]  = useState(0.88);
+  const [baseMode,       setBaseMode]       = useState('dark');
+  const [nasaGibsOn,     setNasaGibsOn]     = useState(true);
+  const [labelsOn,       setLabelsOn]       = useState(true);
+  const [nasaOpacity,    setNasaOpacity]    = useState(0.88);
 
+  // Wind layer state
+  const [windOn,      setWindOn]      = useState(false);
+  const [windData,    setWindData]    = useState(null);
+  const [windMeta,    setWindMeta]    = useState(null);   // from layer component callback
+  const [windLoading, setWindLoading] = useState(false);
+  const [windError,   setWindError]   = useState(null);
+
+  // ── Fetch wind data on toggle ───────────────────────────────────────────
+  useEffect(() => {
+    if (!windOn) return;
+    if (windData) return; // already loaded
+
+    let cancelled = false;
+    setWindLoading(true);
+    setWindError(null);
+
+    (async () => {
+      try {
+        const base = await getLiveBaseUrl();
+        const res = await fetch(`${base}/api/v1/wind/field`, {
+          signal: AbortSignal.timeout(60000), // 60 s — first fetch can be slow
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const json = await res.json();
+
+        if (!json.success || !json.velocity_data) {
+          throw new Error('Invalid response format from wind API');
+        }
+
+        if (!cancelled) {
+          setWindData(json.velocity_data);
+          // Expose server-side meta immediately (before leaflet-velocity callback)
+          setWindMeta({
+            refTime:    json.meta?.ref_time_utc    ?? null,
+            source:     json.meta?.source          ?? 'NOAA GFS',
+            model:      json.meta?.model           ?? 'GFS',
+            resolution: json.meta?.resolution_deg  ? `${json.meta.resolution_deg}°` : '5°',
+            units:      json.meta?.u_units         ?? 'km/h',
+            level:      json.meta?.level           ?? '10m AGL',
+          });
+        }
+      } catch (err) {
+        if (!cancelled) setWindError(err.message);
+      } finally {
+        if (!cancelled) setWindLoading(false);
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, [windOn]);
+
+  // ── Map controls ────────────────────────────────────────────────────────
   const handleMapReady = useCallback((map) => { mapRef.current = map; }, []);
-  const resetView = useCallback(() => {
-    mapRef.current?.setView(DEFAULT_CENTER, DEFAULT_ZOOM, { animate: true, duration: 1.0 });
-  }, []);
-  const zoomIn  = useCallback(() => mapRef.current?.zoomIn(),  []);
-  const zoomOut = useCallback(() => mapRef.current?.zoomOut(), []);
+  const resetView  = useCallback(() => mapRef.current?.setView(DEFAULT_CENTER, DEFAULT_ZOOM, { animate: true, duration: 1.0 }), []);
+  const zoomIn     = useCallback(() => mapRef.current?.zoomIn(),  []);
+  const zoomOut    = useCallback(() => mapRef.current?.zoomOut(), []);
 
+  // ── Derived display strings ─────────────────────────────────────────────
   const latStr = `${Math.abs(coords.lat).toFixed(4)}°${coords.lat >= 0 ? 'N' : 'S'}`;
   const lonStr = `${Math.abs(coords.lon).toFixed(4)}°${coords.lon >= 0 ? 'E' : 'W'}`;
-  const attributionText = baseMode === 'satellite' ? 'Esri World Imagery' : 'CartoDB / OpenStreetMap';
+  const baseAttr = baseMode === 'satellite' ? 'Esri World Imagery' : 'CartoDB / OpenStreetMap';
 
+  // ── Render ───────────────────────────────────────────────────────────────
   return (
-    <div
-      className="relative w-full h-full flex flex-col bg-slate-950 select-none overflow-hidden"
-      style={{ fontFamily: 'system-ui, sans-serif' }}
-    >
-      {/* ── TOP HUD ── */}
+    <div className="relative w-full h-full flex flex-col bg-slate-950 select-none overflow-hidden"
+      style={{ fontFamily: 'system-ui, sans-serif' }}>
+
+      {/* ══ TOP HUD ══════════════════════════════════════════════════════════ */}
       <div className="absolute top-3 left-3 right-3 z-[1000] flex items-center justify-between gap-2 pointer-events-none">
 
+        {/* Left — brand */}
         <div className="bg-slate-900/90 backdrop-blur-md px-3 py-2 rounded-xl border border-slate-700/80 shadow-lg flex items-center gap-2.5 pointer-events-auto">
           <div className="w-7 h-7 rounded-lg bg-sky-500/10 border border-sky-500/30 flex items-center justify-center">
             <Globe2 className="w-4 h-4 text-sky-400" style={{ animation: 'vayu-spin 14s linear infinite' }} />
@@ -146,117 +252,153 @@ const VayuEarth = () => {
           </div>
         </div>
 
+        {/* Right — controls */}
         <div className="flex items-center gap-2 pointer-events-auto">
+
+          {/* Map / Satellite switcher */}
           <div className="flex bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-xl overflow-hidden shadow-lg">
-            <button type="button" onClick={() => setBaseMode('dark')} title="Dark vector base map"
-              className={`px-3 py-2 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${baseMode === 'dark' ? 'bg-sky-600 text-white' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/80'}`}
-            >
-              <Map className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Map</span>
+            <button type="button" onClick={() => setBaseMode('dark')} title="Dark vector base"
+              className={`px-3 py-2 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${baseMode === 'dark' ? 'bg-sky-600 text-white' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/80'}`}>
+              <Map className="w-3.5 h-3.5" /><span className="hidden sm:inline">Map</span>
             </button>
             <div className="w-px bg-slate-700/80" />
-            <button type="button" onClick={() => setBaseMode('satellite')} title="Esri World Imagery satellite base"
-              className={`px-3 py-2 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${baseMode === 'satellite' ? 'bg-sky-600 text-white' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/80'}`}
-            >
-              <Satellite className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Satellite</span>
+            <button type="button" onClick={() => setBaseMode('satellite')} title="Satellite base"
+              className={`px-3 py-2 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${baseMode === 'satellite' ? 'bg-sky-600 text-white' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/80'}`}>
+              <Satellite className="w-3.5 h-3.5" /><span className="hidden sm:inline">Satellite</span>
             </button>
           </div>
 
+          {/* Layers panel */}
           <button type="button" onClick={() => setLayerPanelOpen((v) => !v)} title="Layer registry"
-            className={`px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 backdrop-blur-md border shadow-lg transition-all cursor-pointer ${layerPanelOpen ? 'bg-sky-600 text-white border-sky-500' : 'bg-slate-900/90 text-slate-300 border-slate-700/80 hover:bg-slate-800/80'}`}
-          >
-            <Layers className="w-3.5 h-3.5" />
-            <span className="hidden sm:inline">Layers</span>
+            className={`px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 backdrop-blur-md border shadow-lg transition-all cursor-pointer ${layerPanelOpen ? 'bg-sky-600 text-white border-sky-500' : 'bg-slate-900/90 text-slate-300 border-slate-700/80 hover:bg-slate-800/80'}`}>
+            <Layers className="w-3.5 h-3.5" /><span className="hidden sm:inline">Layers</span>
           </button>
         </div>
       </div>
 
-      {/* ── MAP CANVAS ── */}
+      {/* ══ MAP CANVAS ════════════════════════════════════════════════════════ */}
       <div className="flex-1 w-full h-full relative">
         <MapContainer
-          center={DEFAULT_CENTER}
-          zoom={DEFAULT_ZOOM}
-          minZoom={MIN_ZOOM}
-          maxZoom={MAX_ZOOM}
-          zoomControl={false}
-          attributionControl={false}
-          scrollWheelZoom={true}
-          doubleClickZoom={true}
-          dragging={true}
-          touchZoom={true}
+          center={DEFAULT_CENTER} zoom={DEFAULT_ZOOM}
+          minZoom={MIN_ZOOM} maxZoom={MAX_ZOOM}
+          zoomControl={false} attributionControl={false}
+          scrollWheelZoom={true} doubleClickZoom={true}
+          dragging={true} touchZoom={true}
           className="w-full h-full"
           style={{ width: '100%', height: '100%', background: '#020617' }}
         >
-          <MapController onCoordsChange={setCoords} onZoomChange={setCurrentZoom} onMapReady={handleMapReady} />
+          <MapController
+            onCoordsChange={setCoords}
+            onZoomChange={setCurrentZoom}
+            onMapReady={handleMapReady}
+          />
 
-          {/* Base layer */}
+          {/* 1. Base layer */}
           {baseMode === 'dark' && (
-            <TileLayer key="dark-base" url={TILES_DARK_BASE.url} attribution={TILES_DARK_BASE.attribution} subdomains={TILES_DARK_BASE.subdomains} maxZoom={TILES_DARK_BASE.maxZoom} />
+            <TileLayer key="dark" url={TILES_DARK.url} attribution={TILES_DARK.attr}
+              subdomains={TILES_DARK.subdomains} maxZoom={TILES_DARK.maxZoom} />
           )}
           {baseMode === 'satellite' && (
-            <TileLayer key="esri-sat" url={TILES_ESRI_SAT.url} attribution={TILES_ESRI_SAT.attribution} maxZoom={TILES_ESRI_SAT.maxZoom} />
+            <TileLayer key="esri" url={TILES_ESRI_SAT.url} attribution={TILES_ESRI_SAT.attr}
+              maxZoom={TILES_ESRI_SAT.maxZoom} />
           )}
 
-          {/* NASA GIBS NRT overlay */}
+          {/* 2. NASA GIBS NRT overlay */}
           {nasaGibsOn && (
-            <TileLayer key="nasa-gibs" url={TILES_NASA_GIBS.url} attribution={TILES_NASA_GIBS.attribution} opacity={nasaOpacity} maxNativeZoom={TILES_NASA_GIBS.maxNativeZoom} maxZoom={TILES_NASA_GIBS.maxZoom} tileSize={256} />
+            <TileLayer key="gibs" url={TILES_NASA_GIBS.url} attribution={TILES_NASA_GIBS.attr}
+              opacity={nasaOpacity} maxNativeZoom={TILES_NASA_GIBS.maxNativeZoom}
+              maxZoom={TILES_NASA_GIBS.maxZoom} tileSize={256} />
           )}
 
-          {/* Labels overlay */}
+          {/* 3. Labels overlay */}
           {labelsOn && (
-            <TileLayer key="labels" url={TILES_LABELS.url} attribution={TILES_LABELS.attribution} subdomains={TILES_LABELS.subdomains} maxZoom={TILES_LABELS.maxZoom} />
+            <TileLayer key="labels" url={TILES_LABELS.url} attribution={TILES_LABELS.attr}
+              subdomains={TILES_LABELS.subdomains} maxZoom={TILES_LABELS.maxZoom} />
+          )}
+
+          {/* 4. Wind particle layer — rendered by leaflet-velocity on canvas */}
+          {windOn && (
+            <WindLayer
+              windData={windData}
+              enabled={windOn && !!windData}
+              onMeta={setWindMeta}
+            />
           )}
         </MapContainer>
       </div>
 
-      {/* ── RIGHT CONTROLS ── */}
+      {/* ══ RIGHT ZOOM CONTROLS ═══════════════════════════════════════════════ */}
       <div className="absolute top-20 right-3 z-[1000] flex flex-col gap-1.5 pointer-events-auto">
-        <button type="button" onClick={resetView} title="Reset to Indian Ocean view"
-          className="w-9 h-9 rounded-xl bg-slate-900/90 hover:bg-sky-700 text-sky-400 hover:text-white border border-slate-700/80 shadow-xl flex items-center justify-center transition-all cursor-pointer backdrop-blur-md"
-        ><RotateCcw className="w-4 h-4" /></button>
+        <button type="button" onClick={resetView} title="Reset view"
+          className="w-9 h-9 rounded-xl bg-slate-900/90 hover:bg-sky-700 text-sky-400 hover:text-white border border-slate-700/80 shadow-xl flex items-center justify-center transition-all cursor-pointer backdrop-blur-md">
+          <RotateCcw className="w-4 h-4" />
+        </button>
         <div className="h-px bg-slate-700/60 mx-1" />
         <button type="button" onClick={zoomIn} title="Zoom in"
-          className="w-9 h-9 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700/80 shadow-xl flex items-center justify-center transition-all cursor-pointer backdrop-blur-md"
-        ><Plus className="w-4 h-4" /></button>
+          className="w-9 h-9 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700/80 shadow-xl flex items-center justify-center transition-all cursor-pointer backdrop-blur-md">
+          <Plus className="w-4 h-4" />
+        </button>
         <button type="button" onClick={zoomOut} title="Zoom out"
-          className="w-9 h-9 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700/80 shadow-xl flex items-center justify-center transition-all cursor-pointer backdrop-blur-md"
-        ><Minus className="w-4 h-4" /></button>
+          className="w-9 h-9 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700/80 shadow-xl flex items-center justify-center transition-all cursor-pointer backdrop-blur-md">
+          <Minus className="w-4 h-4" />
+        </button>
       </div>
 
-      {/* ── BOTTOM HUD ── */}
-      <div className="absolute bottom-3 left-3 right-3 z-[1000] flex flex-wrap items-end justify-between gap-2 pointer-events-none">
-        <div className="bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700/80 shadow-lg font-mono text-[11px] text-slate-300 flex items-center gap-2.5 pointer-events-auto">
-          <div className="flex items-center gap-1 text-sky-400 font-semibold">
-            <Compass className="w-3.5 h-3.5" />
-            <span>GEO</span>
+      {/* ══ BOTTOM HUD ════════════════════════════════════════════════════════ */}
+      <div className="absolute bottom-3 left-3 right-3 z-[1000] flex flex-col items-start gap-2 pointer-events-none">
+
+        {/* Wind info badge (only when wind is on) */}
+        {windOn && (
+          <div className="pointer-events-auto">
+            <WindInfoBadge meta={windMeta} loading={windLoading} error={windError} />
           </div>
-          <span className="tabular-nums">{latStr}  {lonStr}</span>
-          <span className="text-slate-600">|</span>
-          <span className="text-slate-400 tabular-nums">Z{typeof currentZoom === 'number' ? currentZoom.toFixed(1) : currentZoom}</span>
-        </div>
-        <div className="bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700/80 shadow-lg text-[10px] text-slate-500 flex items-center gap-1.5 pointer-events-auto">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
-          <span>{attributionText}{nasaGibsOn ? ' + NASA GIBS VIIRS NRT' : ''}</span>
+        )}
+
+        {/* Wind speed legend (only when wind is on and data loaded) */}
+        {windOn && windData && !windLoading && !windError && (
+          <div className="pointer-events-auto">
+            <WindSpeedLegend />
+          </div>
+        )}
+
+        {/* Bottom row: geo-fix + attribution */}
+        <div className="w-full flex flex-wrap items-end justify-between gap-2">
+          <div className="bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700/80 shadow-lg font-mono text-[11px] text-slate-300 flex items-center gap-2.5 pointer-events-auto">
+            <div className="flex items-center gap-1 text-sky-400 font-semibold">
+              <Compass className="w-3.5 h-3.5" /><span>GEO</span>
+            </div>
+            <span className="tabular-nums">{latStr}  {lonStr}</span>
+            <span className="text-slate-600">|</span>
+            <span className="text-slate-400 tabular-nums">Z{typeof currentZoom === 'number' ? currentZoom.toFixed(1) : currentZoom}</span>
+          </div>
+          <div className="bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700/80 shadow-lg text-[10px] text-slate-500 flex items-center gap-1.5 pointer-events-auto">
+            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
+            <span>{baseAttr}{nasaGibsOn ? ' + NASA GIBS VIIRS NRT' : ''}{windOn && windData ? ' + NOAA GFS Wind' : ''}</span>
+          </div>
         </div>
       </div>
 
-      {/* ── LAYER PANEL ── */}
+      {/* ══ LAYER PANEL ══════════════════════════════════════════════════════ */}
       {layerPanelOpen && (
         <div className="absolute top-16 right-3 w-72 max-w-[calc(100vw-1.5rem)] bg-slate-900/97 backdrop-blur-xl border border-slate-700/80 rounded-2xl shadow-2xl p-4 z-[1001] pointer-events-auto space-y-3 text-white">
+
           <div className="flex items-center justify-between pb-2 border-b border-slate-800">
             <div className="flex items-center gap-1.5 text-xs font-bold text-slate-200">
               <Sliders className="w-3.5 h-3.5 text-sky-400" />
               <span>Layer Registry</span>
             </div>
-            <button type="button" onClick={() => setLayerPanelOpen(false)} className="text-slate-500 hover:text-white transition p-1 rounded-lg hover:bg-slate-800 cursor-pointer">
+            <button type="button" onClick={() => setLayerPanelOpen(false)}
+              className="text-slate-500 hover:text-white transition p-1 rounded-lg hover:bg-slate-800 cursor-pointer">
               <X className="w-3.5 h-3.5" />
             </button>
           </div>
 
+          {/* Observation layers */}
           <div className="space-y-2">
             <p className="text-[10px] font-mono text-slate-500 uppercase tracking-wider font-bold">Observation</p>
-            <LayerRow id="layer-gibs" label="NASA GIBS VIIRS (NRT)" badge="Satellite NRT" checked={nasaGibsOn} onChange={() => setNasaGibsOn((v) => !v)} />
+
+            <LayerRow id="layer-gibs" label="NASA GIBS VIIRS (NRT)" badge="Satellite NRT"
+              checked={nasaGibsOn} onChange={() => setNasaGibsOn((v) => !v)} />
             {nasaGibsOn && (
               <div className="px-2 pb-1 space-y-1">
                 <div className="flex justify-between text-[10px] font-mono text-slate-400">
@@ -264,13 +406,62 @@ const VayuEarth = () => {
                 </div>
                 <input type="range" min="0.1" max="1.0" step="0.05" value={nasaOpacity}
                   onChange={(e) => setNasaOpacity(parseFloat(e.target.value))}
-                  className="w-full accent-sky-500 h-1.5 rounded-lg cursor-pointer"
-                />
+                  className="w-full accent-sky-500 h-1.5 rounded-lg cursor-pointer" />
               </div>
             )}
-            <LayerRow id="layer-labels" label="Geographic Labels & Borders" badge="OSM" checked={labelsOn} onChange={() => setLabelsOn((v) => !v)} />
+
+            <LayerRow id="layer-labels" label="Geographic Labels & Borders" badge="OSM"
+              checked={labelsOn} onChange={() => setLabelsOn((v) => !v)} />
           </div>
 
+          {/* Wind layer */}
+          <div className="space-y-2 pt-1 border-t border-slate-800">
+            <p className="text-[10px] font-mono text-slate-500 uppercase tracking-wider font-bold">
+              Meteorological
+            </p>
+
+            <div className="flex items-center justify-between p-2 rounded-xl bg-slate-800/60 border border-slate-700/50">
+              <div className="flex items-center gap-2">
+                <input type="checkbox" id="layer-wind" checked={windOn}
+                  onChange={() => setWindOn((v) => !v)}
+                  className="rounded accent-cyan-500 cursor-pointer w-3.5 h-3.5" />
+                <label htmlFor="layer-wind" className="text-xs font-medium text-slate-200 cursor-pointer select-none">
+                  Global Wind Field
+                </label>
+              </div>
+              <span className="text-[9px] font-mono bg-cyan-500/10 text-cyan-400 px-1.5 py-0.5 rounded border border-cyan-500/20">
+                NOAA GFS
+              </span>
+            </div>
+
+            {windOn && (
+              <div className="px-2 py-1 text-[10px] font-mono text-slate-400 space-y-0.5">
+                <div className="flex items-center gap-1">
+                  <Info className="w-2.5 h-2.5 text-slate-500" />
+                  <span>Source: NOAA GFS via Open-Meteo</span>
+                </div>
+                <div>U/V at 10 m AGL • 5° global grid • km/h</div>
+                <div className="text-slate-500">
+                  Direction: FROM convention (met) displayed in badge.<br/>
+                  Particles travel in wind direction (TO vector).
+                </div>
+                {windLoading && (
+                  <div className="flex items-center gap-1 text-cyan-400 mt-1">
+                    <RefreshCw className="w-2.5 h-2.5 animate-spin" />
+                    <span>Fetching ~2,700 grid points…</span>
+                  </div>
+                )}
+                {windError && (
+                  <div className="flex items-center gap-1 text-red-400 mt-1">
+                    <AlertTriangle className="w-2.5 h-2.5" />
+                    <span>Error: {windError}</span>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* AI intelligence slots */}
           <div className="space-y-1.5 pt-1 border-t border-slate-800">
             <p className="text-[10px] font-mono text-slate-500 uppercase tracking-wider font-bold">AI Intelligence (Upcoming)</p>
             {['Synoptic Storm Tracks', 'Vortex Eye Fix (MobileNetV3)', 'GRU 72h Track Forecast', 'MC Dropout Probability Cone', 'Impact & Surge Hazard Zone'].map((label) => (
