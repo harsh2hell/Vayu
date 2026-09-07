@@ -212,13 +212,11 @@ const PublicNavbar = ({
     const track = navTrackRef.current;
     const targetEl = itemRefs.current[targetIdx];
     if (!track || !targetEl) return;
-    const trackRect = track.getBoundingClientRect();
-    const targetRect = targetEl.getBoundingClientRect();
     setPillRect({
-      left: targetRect.left - trackRect.left,
-      top: targetRect.top - trackRect.top,
-      width: targetRect.width,
-      height: targetRect.height,
+      left: targetEl.offsetLeft,
+      top: targetEl.offsetTop,
+      width: targetEl.offsetWidth,
+      height: targetEl.offsetHeight,
       ready: true
     });
   }, [targetIdx]);

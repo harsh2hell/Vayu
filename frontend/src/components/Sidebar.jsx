@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { 
   LogOut, MoreVertical, Shield,
@@ -9,32 +9,31 @@ import {
 import { OfficerAccountDisplay, SafeSignOutButton } from './auth/ClerkAuth';
 import { getWebsiteUrl, isProductionDomain, toPortalPath, isPortalSubdomain } from '../utils/domain';
 
-// 3D Clear Crystal Glass Navigation Item (Matching Header Apple Glass Aesthetic)
-const SidebarNavItem = ({ item, isActive, onClick }) => {
+// 3D Clear Crystal Glass Navigation Item (Pure transparent shell over the continuous sliding glass pill)
+const SidebarNavItem = React.forwardRef(({ item, isActive, isHovered, onClick, onMouseEnter }, ref) => {
   const Icon = item.icon;
 
   return (
     <button
+      ref={ref}
       type="button"
       onClick={onClick}
-      className={`group relative overflow-hidden w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs cursor-pointer select-none transition-all duration-200 ${
+      onMouseEnter={onMouseEnter}
+      className={`group relative z-10 w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs cursor-pointer select-none transition-colors duration-200 bg-transparent border border-transparent ${
         isActive
-          ? 'sidebar-3d-glass-active text-slate-950 font-bold'
-          : 'sidebar-3d-glass-hover text-slate-700 hover:text-slate-950 font-medium border border-transparent'
+          ? 'text-slate-950 font-bold'
+          : isHovered
+          ? 'text-slate-950 font-semibold'
+          : 'text-slate-700 hover:text-slate-950 font-medium'
       }`}
     >
-      {/* 3D Convex Curved Specular Lens Reflection when active */}
-      {isActive && (
-        <>
-          <span className="absolute inset-x-1 top-0 h-[45%] rounded-t-xl bg-gradient-to-b from-white/95 via-white/30 to-transparent pointer-events-none" />
-          <span className="absolute left-1/4 top-[1px] w-1/2 h-[1px] bg-gradient-to-r from-transparent via-white to-transparent pointer-events-none opacity-90" />
-          <span className="absolute inset-x-3 bottom-0 h-[1.5px] bg-gradient-to-r from-transparent via-sky-400/90 to-transparent pointer-events-none" />
-        </>
-      )}
-
       <div className="relative z-10 flex items-center gap-2.5 min-w-0">
         <Icon className={`w-4 h-4 shrink-0 transition-colors duration-200 ${
-          isActive ? 'text-sky-600' : 'text-slate-500 group-hover:text-slate-800'
+          isActive
+            ? 'text-sky-600'
+            : isHovered
+            ? 'text-sky-500'
+            : 'text-slate-500 group-hover:text-slate-800'
         }`} />
         <span className="truncate tracking-tight">{item.label}</span>
       </div>
@@ -48,7 +47,7 @@ const SidebarNavItem = ({ item, isActive, onClick }) => {
       </div>
     </button>
   );
-};
+});
 
 const Sidebar = () => {
   const navigate = useNavigate();
@@ -122,6 +121,56 @@ const Sidebar = () => {
     return current === target || current.startsWith(target + '/') || normCurrent === normTarget || normCurrent.startsWith(normTarget + '/');
   };
 
+  // Continuous Apple 3D Clear Glass Sliding Pill State & Logic
+  const navRef = useRef(null);
+  const itemRefs = useRef({});
+  const [hoveredPath, setHoveredPath] = useState(null);
+  const [pillRect, setPillRect] = useState({ left: 0, top: 0, width: 0, height: 0, ready: false });
+  const [glassMouse, setGlassMouse] = useState({ x: 0, y: 0, isHovered: false });
+
+  // Find active item path
+  const allItems = NAV_GROUPS.flatMap(g => g.items);
+  const activeItem = allItems.find(it => isItemActive(it.path, it.exact));
+  const activePath = activeItem ? activeItem.path : (allItems[0]?.path || '');
+  const targetPath = hoveredPath || activePath;
+
+  const updatePill = useCallback(() => {
+    const navEl = navRef.current;
+    const targetEl = itemRefs.current[targetPath];
+    if (!navEl || !targetEl) return;
+
+    setPillRect({
+      left: targetEl.offsetLeft,
+      top: targetEl.offsetTop,
+      width: targetEl.offsetWidth,
+      height: targetEl.offsetHeight,
+      ready: true
+    });
+  }, [targetPath]);
+
+  useEffect(() => {
+    updatePill();
+    window.addEventListener('resize', updatePill);
+    const t = setTimeout(updatePill, 40);
+    return () => {
+      window.removeEventListener('resize', updatePill);
+      clearTimeout(t);
+    };
+  }, [updatePill, location.pathname]);
+
+  const handleNavMouseMove = (e) => {
+    if (!navRef.current) return;
+    const navRect = navRef.current.getBoundingClientRect();
+    const relX = e.clientX - navRect.left - pillRect.left;
+    const relY = e.clientY - navRect.top - pillRect.top;
+    setGlassMouse({ x: relX, y: relY, isHovered: true });
+  };
+
+  const handleNavMouseLeave = () => {
+    setHoveredPath(null);
+    setGlassMouse(prev => ({ ...prev, isHovered: false }));
+  };
+
   // Close account menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -161,7 +210,50 @@ const Sidebar = () => {
         </div>
 
         {/* Navigation Links List Grouped By Operations */}
-        <nav className="flex-1 px-3 py-3 space-y-3.5 overflow-y-auto bg-white">
+        <nav 
+          ref={navRef}
+          onMouseMove={handleNavMouseMove}
+          onMouseLeave={handleNavMouseLeave}
+          className="flex-1 px-3 py-3 space-y-3.5 overflow-y-auto bg-white relative"
+        >
+          {/* Continuous Motion Apple 3D Clear Crystal Glass Sliding Pill */}
+          {pillRect.ready && (
+            <div
+              className="sidebar-sliding-glass-pill overflow-hidden"
+              style={{
+                transform: `translate3d(${pillRect.left}px, ${pillRect.top}px, 0)`,
+                width: `${pillRect.width}px`,
+                height: `${pillRect.height}px`,
+                opacity: pillRect.ready ? 1 : 0
+              }}
+            >
+              {/* 3D Convex Top Curved Specular Lens Reflection */}
+              <span className="absolute inset-x-1.5 top-[1px] h-[46%] rounded-t-xl bg-gradient-to-b from-white/95 via-white/28 to-transparent pointer-events-none" />
+
+              {/* Specular Top-Center Glass Glint */}
+              <span className="absolute left-1/4 top-[2px] w-1/2 h-[1px] bg-gradient-to-r from-transparent via-white to-transparent pointer-events-none opacity-90" />
+
+              {/* Prismatic Lateral Refractions */}
+              <span className="absolute inset-y-1.5 left-[1px] w-[1.5px] bg-gradient-to-b from-white/85 via-white/20 to-transparent pointer-events-none rounded-l-xl" />
+              <span className="absolute inset-y-1.5 right-[1px] w-[1.5px] bg-gradient-to-b from-white/85 via-white/20 to-transparent pointer-events-none rounded-r-xl" />
+
+              {/* Lower Rim Cyan Specular Line */}
+              <span className="absolute inset-x-3 bottom-0 h-[1.5px] bg-gradient-to-r from-transparent via-sky-400/90 to-transparent pointer-events-none" />
+
+              {/* Interactive Dynamic Cursor Specular Flare inside Glass */}
+              {glassMouse.isHovered && (
+                <span
+                  className="absolute w-24 h-12 rounded-full pointer-events-none transition-opacity duration-200 -translate-x-1/2 -translate-y-1/2 blur-xs opacity-50"
+                  style={{
+                    left: `${glassMouse.x}px`,
+                    top: `${glassMouse.y}px`,
+                    background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.95) 0%, rgba(56,189,248,0.25) 55%, transparent 75%)'
+                  }}
+                />
+              )}
+            </div>
+          )}
+
           {NAV_GROUPS.map((group) => (
             <div key={group.title} className="space-y-1">
               <div className="text-[10px] font-mono uppercase tracking-wider text-slate-500 font-bold px-3 py-1 select-none">
@@ -169,12 +261,19 @@ const Sidebar = () => {
               </div>
               {group.items.map((item) => {
                 const isActive = isItemActive(item.path, item.exact);
+                const isHovered = hoveredPath === item.path;
                 return (
                   <SidebarNavItem
                     key={item.path}
+                    ref={(el) => (itemRefs.current[item.path] = el)}
                     item={item}
                     isActive={isActive}
-                    onClick={() => navigate(item.path)}
+                    isHovered={isHovered}
+                    onMouseEnter={() => setHoveredPath(item.path)}
+                    onClick={() => {
+                      setHoveredPath(null);
+                      navigate(item.path);
+                    }}
                   />
                 );
               })}

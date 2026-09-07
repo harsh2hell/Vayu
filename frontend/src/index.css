@@ -904,6 +904,9 @@ header .header-theme-btn {
 /* Apple Liquid 3D Clear Crystal Glass Continuous Motion Sliding Pill */
 .nav-sliding-glass-pill {
   position: absolute;
+  top: 0;
+  left: 0;
+  margin: 0;
   pointer-events: none;
   border-radius: 9999px;
   background: linear-gradient(
@@ -951,29 +954,40 @@ header .header-theme-btn {
 }
 
 /* =========================================================================
-   SIDEBAR 3D CLEAR CRYSTAL GLASS NAVIGATION ITEMS (MATCHING HEADER GLASS)
+   SIDEBAR 3D CLEAR CRYSTAL GLASS CONTINUOUS MOTION SLIDING PILL
    ========================================================================= */
-.sidebar-3d-glass-active {
+.sidebar-sliding-glass-pill {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin: 0;
+  pointer-events: none;
+  border-radius: 0.75rem;
   background: linear-gradient(
     135deg,
-    rgba(255, 255, 255, 0.94) 0%,
-    rgba(240, 249, 255, 0.76) 35%,
-    rgba(224, 242, 254, 0.65) 70%,
-    rgba(255, 255, 255, 0.90) 100%
+    rgba(255, 255, 255, 0.78) 0%,
+    rgba(255, 255, 255, 0.42) 35%,
+    rgba(240, 249, 255, 0.32) 65%,
+    rgba(255, 255, 255, 0.60) 100%
   ) !important;
-  border: 1px solid rgba(255, 255, 255, 0.95) !important;
+  border: 1px solid rgba(255, 255, 255, 0.9) !important;
   box-shadow: 
-    0 10px 26px -3px rgba(2, 132, 199, 0.18),
-    0 2px 6px 0 rgba(0, 0, 0, 0.04),
+    0 10px 28px -4px rgba(14, 116, 144, 0.16),
+    0 4px 10px 0 rgba(0, 0, 0, 0.04),
     inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 1),
     inset 0 -1.5px 2px 0 rgba(56, 189, 248, 0.35),
-    inset 1.5px 0 1.5px 0 rgba(255, 255, 255, 0.75),
-    inset -1.5px 0 1.5px 0 rgba(255, 255, 255, 0.75) !important;
+    inset 1.5px 0 1.5px 0 rgba(255, 255, 255, 0.7),
+    inset -1.5px 0 1.5px 0 rgba(255, 255, 255, 0.7) !important;
   backdrop-filter: blur(28px) saturate(210%) contrast(106%);
   -webkit-backdrop-filter: blur(28px) saturate(210%) contrast(106%);
+  will-change: transform, width, height, opacity;
+  transition: transform 0.44s cubic-bezier(0.19, 1, 0.22, 1),
+              width 0.44s cubic-bezier(0.19, 1, 0.22, 1),
+              height 0.44s cubic-bezier(0.19, 1, 0.22, 1),
+              opacity 0.25s ease;
 }
 
-.dark .sidebar-3d-glass-active {
+.dark .sidebar-sliding-glass-pill {
   background: linear-gradient(
     135deg,
     rgba(255, 255, 255, 0.22) 0%,
@@ -983,40 +997,14 @@ header .header-theme-btn {
   ) !important;
   border: 1px solid rgba(255, 255, 255, 0.35) !important;
   box-shadow: 
-    0 14px 32px -4px rgba(0, 0, 0, 0.7),
-    0 0 20px 2px rgba(56, 189, 248, 0.25),
+    0 14px 34px -4px rgba(0, 0, 0, 0.75),
+    0 0 24px 2px rgba(56, 189, 248, 0.28),
     inset 0 1.5px 1.5px 0 rgba(255, 255, 255, 0.65),
     inset 0 -1.5px 2px 0 rgba(56, 189, 248, 0.4),
     inset 1px 0 1px 0 rgba(255, 255, 255, 0.25),
     inset -1px 0 1px 0 rgba(255, 255, 255, 0.25) !important;
   backdrop-filter: blur(32px) saturate(220%);
   -webkit-backdrop-filter: blur(32px) saturate(220%);
-}
-
-.sidebar-3d-glass-hover {
-  transition: all 0.22s cubic-bezier(0.19, 1, 0.22, 1);
-}
-
-.sidebar-3d-glass-hover:hover {
-  background: linear-gradient(
-    135deg,
-    rgba(255, 255, 255, 0.75) 0%,
-    rgba(240, 249, 255, 0.45) 100%
-  ) !important;
-  border: 1px solid rgba(255, 255, 255, 0.85) !important;
-  box-shadow: 
-    0 6px 18px -2px rgba(2, 132, 199, 0.1),
-    inset 0 1px 1px 0 rgba(255, 255, 255, 0.95) !important;
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  transform: translateX(2px);
-}
-
-.dark .sidebar-3d-glass-hover:hover {
-  background: rgba(255, 255, 255, 0.08) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4) !important;
-  transform: translateX(2px);
 }
 
 /* =========================================================================
