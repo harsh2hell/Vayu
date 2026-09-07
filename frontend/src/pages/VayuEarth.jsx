@@ -41,22 +41,28 @@ const TILES_DARK = {
   maxZoom: 16,
   subdomains: 'abc',
 };
+const TILES_DARK_LABELS = {
+  url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}',
+  attr: '',
+  maxZoom: 16,
+  subdomains: 'abc',
+};
 const TILES_ESRI_SAT = {
   url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
   attr: 'Imagery &copy; Esri, Maxar, Earthstar Geographics, and the GIS User Community',
   maxZoom: 18,
   subdomains: 'abc',
 };
-const TILES_NASA_GIBS = {
-  url: 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_SNPP_CorrectedReflectance_TrueColor/default/default/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg',
-  attr: 'Satellite (NRT): <a href="https://earthdata.nasa.gov/eosdis/science-system-description/eosdis-components/gibs">NASA GIBS</a> / VIIRS NRT',
-  maxNativeZoom: 9, maxZoom: MAX_ZOOM,
+const TILES_SAT_LABELS = {
+  url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}',
+  attr: '',
+  maxZoom: 18,
   subdomains: 'abc',
 };
-const TILES_LABELS = {
-  url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}',
-  attr: '',
-  maxZoom: 16,
+const TILES_NASA_GIBS = {
+  url: 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_SNPP_CorrectedReflectance_TrueColor/default/default/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg',
+  attr: 'Satellite (NRT Swaths): <a href="https://earthdata.nasa.gov/eosdis/science-system-description/eosdis-components/gibs">NASA GIBS</a> / VIIRS NRT',
+  maxNativeZoom: 9, maxZoom: MAX_ZOOM,
   subdomains: 'abc',
 };
 
@@ -177,8 +183,8 @@ const VayuEarth = () => {
 
   // UI toggles
   const [layerPanelOpen, setLayerPanelOpen] = useState(false);
-  const [baseMode,       setBaseMode]       = useState('dark');
-  const [nasaGibsOn,     setNasaGibsOn]     = useState(true);
+  const [baseMode,       setBaseMode]       = useState('satellite');
+  const [nasaGibsOn,     setNasaGibsOn]     = useState(false);
   const [labelsOn,       setLabelsOn]       = useState(true);
   const [nasaOpacity,    setNasaOpacity]    = useState(0.88);
 
@@ -325,10 +331,15 @@ const VayuEarth = () => {
               maxZoom={TILES_NASA_GIBS.maxZoom} tileSize={256} subdomains="abc" />
           )}
 
-          {/* 3. Labels overlay */}
+          {/* 3. Geographic Labels & Borders (matched to basemap) */}
           {labelsOn && (
-            <TileLayer key="labels" url={TILES_LABELS.url} attribution={TILES_LABELS.attr}
-              subdomains="abc" maxZoom={TILES_LABELS.maxZoom} />
+            <TileLayer
+              key={`labels-${baseMode}`}
+              url={baseMode === 'satellite' ? TILES_SAT_LABELS.url : TILES_DARK_LABELS.url}
+              attribution=""
+              subdomains="abc"
+              maxZoom={baseMode === 'satellite' ? TILES_SAT_LABELS.maxZoom : TILES_DARK_LABELS.maxZoom}
+            />
           )}
 
           {/* 4. Wind particle layer — rendered by leaflet-velocity on canvas */}
@@ -412,12 +423,15 @@ const VayuEarth = () => {
           <div className="space-y-2">
             <p className="text-[10px] font-mono text-slate-500 uppercase tracking-wider font-bold">Observation</p>
 
-            <LayerRow id="layer-gibs" label="NASA GIBS VIIRS (NRT)" badge="Satellite NRT"
+            <LayerRow id="layer-gibs" label="NASA GIBS VIIRS (NRT Passes)" badge="Raw Swaths"
               checked={nasaGibsOn} onChange={() => setNasaGibsOn((v) => !v)} />
             {nasaGibsOn && (
               <div className="px-2 pb-1 space-y-1">
+                <p className="text-[10px] text-amber-400/90 leading-tight font-mono">
+                  Near real-time polar satellite swaths. Gaps between orbital passes show the underlying seamless base map.
+                </p>
                 <div className="flex justify-between text-[10px] font-mono text-slate-400">
-                  <span>Opacity</span><span>{Math.round(nasaOpacity * 100)}%</span>
+                  <span>Overlay Opacity</span><span>{Math.round(nasaOpacity * 100)}%</span>
                 </div>
                 <input type="range" min="0.1" max="1.0" step="0.05" value={nasaOpacity}
                   onChange={(e) => setNasaOpacity(parseFloat(e.target.value))}
@@ -425,7 +439,7 @@ const VayuEarth = () => {
               </div>
             )}
 
-            <LayerRow id="layer-labels" label="Geographic Labels & Borders" badge="OSM"
+            <LayerRow id="layer-labels" label="Geographic Labels & Borders" badge="Esri Ref"
               checked={labelsOn} onChange={() => setLabelsOn((v) => !v)} />
           </div>
 
