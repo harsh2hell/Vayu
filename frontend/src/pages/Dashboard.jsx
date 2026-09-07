@@ -317,24 +317,25 @@ const Dashboard = () => {
       </div>
 
       {/* 5. Active Benchmark Case Synopsis */}
-      <div className="card p-5 bg-gradient-to-r from-slate-900 to-[#002244] text-white">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/10 pb-4">
-          <div className="space-y-1">
+      <div className="card p-5 border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs rounded-2xl">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-4">
+          <div className="space-y-1.5">
             <div className="flex items-center gap-2">
-              <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider bg-white/10 text-cyan-300">
+              <span className="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800/80 font-mono">
                 Active Benchmark Case
               </span>
-              <span className="text-xs text-slate-300 font-mono">{activeCase.basin} Basin</span>
+              <span className="text-xs text-slate-500 dark:text-slate-400 font-mono font-medium">{activeCase.basin} Basin</span>
             </div>
-            <h3 className="text-xl font-black text-white tracking-tight">{activeCase.name}</h3>
-            <p className="text-xs text-slate-300 max-w-2xl">{activeCase.description}</p>
+            <h3 className="text-xl sm:text-2xl font-black text-slate-950 dark:text-white tracking-tight">{activeCase.name}</h3>
+            <p className="text-xs text-slate-600 dark:text-slate-300 max-w-3xl leading-relaxed">{activeCase.description}</p>
           </div>
 
-          <div className="flex items-center gap-2">
-            <span className="px-3 py-1 rounded-lg text-xs font-bold text-white shadow-sm" style={{ backgroundColor: intensityMeta.color }}>
+          <div className="flex items-center gap-2 shrink-0">
+            <span className="px-3 py-1.5 rounded-lg text-xs font-bold text-white shadow-xs" style={{ backgroundColor: intensityMeta.color }}>
               {activeCase.intensity_stage}
             </span>
-            <span className="px-2.5 py-1 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-xs font-mono">
+            <span className="px-2.5 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/80 text-xs font-bold font-mono flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 dark:bg-emerald-400" />
               72h Sequence Verified
             </span>
           </div>
@@ -342,29 +343,29 @@ const Dashboard = () => {
 
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 text-xs font-mono">
           <div>
-            <span className="text-slate-400 text-[10px] uppercase block">Benchmark Position</span>
-            <span className="text-white font-bold text-sm mt-0.5 block">{activeCase.current_lat}°N, {activeCase.current_lon}°E</span>
+            <span className="text-slate-500 dark:text-slate-400 text-[10px] uppercase font-bold tracking-wider block font-mono">Benchmark Position</span>
+            <span className="text-slate-900 dark:text-white font-extrabold text-sm sm:text-base mt-1 block font-mono">{activeCase.current_lat}°N, {activeCase.current_lon}°E</span>
           </div>
           <div>
-            <span className="text-slate-400 text-[10px] uppercase block">Sustained Wind Speed</span>
-            <span className="text-red-400 font-bold text-sm mt-0.5 block">{activeCase.wind_kmh} km/h ({activeCase.wind_kt} kt)</span>
+            <span className="text-slate-500 dark:text-slate-400 text-[10px] uppercase font-bold tracking-wider block font-mono">Sustained Wind Speed</span>
+            <span className="text-red-600 dark:text-red-400 font-extrabold text-sm sm:text-base mt-1 block font-mono">{activeCase.wind_kmh} km/h ({activeCase.wind_kt} kt)</span>
           </div>
           <div>
-            <span className="text-slate-400 text-[10px] uppercase block">Central MSLP</span>
-            <span className="text-cyan-300 font-bold text-sm mt-0.5 block">{activeCase.pressure_hpa} hPa</span>
+            <span className="text-slate-500 dark:text-slate-400 text-[10px] uppercase font-bold tracking-wider block font-mono">Central MSLP</span>
+            <span className="text-sky-700 dark:text-sky-400 font-extrabold text-sm sm:text-base mt-1 block font-mono">{activeCase.pressure_hpa} hPa</span>
           </div>
           <div>
-            <span className="text-slate-400 text-[10px] uppercase block">Target Landfall Sector</span>
-            <span className="text-amber-300 font-bold text-xs mt-0.5 block truncate">{activeCase.landfall_corridor}</span>
+            <span className="text-slate-500 dark:text-slate-400 text-[10px] uppercase font-bold tracking-wider block font-mono">Target Landfall Sector</span>
+            <span className="text-amber-700 dark:text-amber-400 font-bold text-xs sm:text-sm mt-1 block truncate">{activeCase.landfall_corridor}</span>
           </div>
         </div>
 
-        <div className="mt-4 pt-3 border-t border-white/10 flex items-center justify-between text-[11px] text-slate-300">
-          <div className="flex items-center gap-1.5">
-            <ShieldAlert className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-            <span><strong>Strict State Isolation:</strong> In-session satellite uploads on other pages remain isolated and do not alter this benchmark state.</span>
+        <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-600 dark:text-slate-400">
+          <div className="flex items-center gap-2">
+            <ShieldAlert className="w-4 h-4 text-amber-500 shrink-0" />
+            <span><strong className="text-slate-900 dark:text-slate-200 font-bold">Strict State Isolation:</strong> In-session satellite uploads on other pages remain isolated and do not alter this benchmark state.</span>
           </div>
-          <span className="font-mono text-cyan-400 hidden md:inline">Ground Truth Fix: 00:00 UTC</span>
+          <span className="font-mono text-[11px] font-semibold text-sky-700 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/60 px-2.5 py-1 rounded-md border border-sky-100 dark:border-sky-800/60 hidden md:inline">Ground Truth Fix: 00:00 UTC</span>
         </div>
       </div>
 
