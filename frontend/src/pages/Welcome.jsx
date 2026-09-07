@@ -1867,11 +1867,6 @@ const Welcome = () => {
                 </h2>
               </div>
               <div className="flex items-center gap-1.5 shrink-0">
-                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium hidden md:inline mr-1">
-                  {isCityCarouselPaused 
-                    ? (isHindi ? 'रोका गया (Paused)' : 'Paused on hover') 
-                    : (isHindi ? 'स्वचालित घूर्णन (3.5s)' : 'Auto-rotating (3.5s)')}
-                </span>
                 <button
                   onClick={handlePrevCity}
                   aria-label="Previous City"
