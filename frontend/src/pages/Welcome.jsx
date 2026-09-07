@@ -1549,11 +1549,6 @@ const Welcome = () => {
               </span>
             </div>
           </div>
-
-          {/* Pinned Observation Timestamp */}
-          <span className="text-xs text-amber-800 dark:text-amber-400 shrink-0 hidden md:inline font-mono font-medium pl-2.5 border-l border-amber-300/40 dark:border-amber-800/40 z-10 whitespace-nowrap">
-            {isHindi ? `अवलोकन: ${liveClock.observationStrHindi}` : `Observation: ${liveClock.observationStr}`}
-          </span>
         </div>
       </div>
 
@@ -1594,14 +1589,6 @@ const Welcome = () => {
                   {current.shortName}
                 </span>
               </div>
-            </div>
-
-            <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 font-medium">
-              <span>{isHindi ? 'भंवर निर्देशांक:' : 'Vortex Fix:'}</span>
-              <span className="font-bold text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-xl border border-slate-200/60 dark:border-slate-700 inline-flex items-center gap-1.5">
-                <span>{current.lat}°N, {current.lon}°E</span>
-                <InfoTooltip term="eye_fix" isHindi={isHindi} />
-              </span>
             </div>
           </div>
 
