@@ -39,21 +39,25 @@ const TILES_DARK = {
   url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}',
   attr: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ, TomTom, Intermap, USGS, METI, and GIS User Community',
   maxZoom: 16,
+  subdomains: 'abc',
 };
 const TILES_ESRI_SAT = {
   url: 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
   attr: 'Imagery &copy; Esri, Maxar, Earthstar Geographics, and the GIS User Community',
   maxZoom: 18,
+  subdomains: 'abc',
 };
 const TILES_NASA_GIBS = {
   url: 'https://gibs.earthdata.nasa.gov/wmts/epsg3857/best/VIIRS_SNPP_CorrectedReflectance_TrueColor/default/default/GoogleMapsCompatible_Level9/{z}/{y}/{x}.jpg',
   attr: 'Satellite (NRT): <a href="https://earthdata.nasa.gov/eosdis/science-system-description/eosdis-components/gibs">NASA GIBS</a> / VIIRS NRT',
   maxNativeZoom: 9, maxZoom: MAX_ZOOM,
+  subdomains: 'abc',
 };
 const TILES_LABELS = {
   url: 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Reference/MapServer/tile/{z}/{y}/{x}',
   attr: '',
   maxZoom: 16,
+  subdomains: 'abc',
 };
 
 // ─── Wind speed legend ─────────────────────────────────────────────────────────
@@ -301,24 +305,24 @@ const VayuEarth = () => {
           {/* 1. Base layer */}
           {baseMode === 'dark' && (
             <TileLayer key="dark" url={TILES_DARK.url} attribution={TILES_DARK.attr}
-              subdomains={TILES_DARK.subdomains} maxZoom={TILES_DARK.maxZoom} />
+              subdomains="abc" maxZoom={TILES_DARK.maxZoom} />
           )}
           {baseMode === 'satellite' && (
             <TileLayer key="esri" url={TILES_ESRI_SAT.url} attribution={TILES_ESRI_SAT.attr}
-              maxZoom={TILES_ESRI_SAT.maxZoom} />
+              subdomains="abc" maxZoom={TILES_ESRI_SAT.maxZoom} />
           )}
 
           {/* 2. NASA GIBS NRT overlay */}
           {nasaGibsOn && (
             <TileLayer key="gibs" url={TILES_NASA_GIBS.url} attribution={TILES_NASA_GIBS.attr}
               opacity={nasaOpacity} maxNativeZoom={TILES_NASA_GIBS.maxNativeZoom}
-              maxZoom={TILES_NASA_GIBS.maxZoom} tileSize={256} />
+              maxZoom={TILES_NASA_GIBS.maxZoom} tileSize={256} subdomains="abc" />
           )}
 
           {/* 3. Labels overlay */}
           {labelsOn && (
             <TileLayer key="labels" url={TILES_LABELS.url} attribution={TILES_LABELS.attr}
-              subdomains={TILES_LABELS.subdomains} maxZoom={TILES_LABELS.maxZoom} />
+              subdomains="abc" maxZoom={TILES_LABELS.maxZoom} />
           )}
 
           {/* 4. Wind particle layer — rendered by leaflet-velocity on canvas */}
