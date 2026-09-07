@@ -9,7 +9,7 @@ import {
 import { OfficerAccountDisplay, SafeSignOutButton } from './auth/ClerkAuth';
 import { getWebsiteUrl, isProductionDomain, toPortalPath, isPortalSubdomain } from '../utils/domain';
 
-// Clean, Professional VAYU Navigation Item (Solid White Dashboard Aesthetic)
+// 3D Clear Crystal Glass Navigation Item (Matching Header Apple Glass Aesthetic)
 const SidebarNavItem = ({ item, isActive, onClick }) => {
   const Icon = item.icon;
 
@@ -17,27 +17,33 @@ const SidebarNavItem = ({ item, isActive, onClick }) => {
     <button
       type="button"
       onClick={onClick}
-      className={`w-full flex items-center justify-between px-3 py-2 rounded-xl text-xs cursor-pointer transition-all duration-150 select-none group ${
+      className={`group relative overflow-hidden w-full flex items-center justify-between px-3 py-2.5 rounded-xl text-xs cursor-pointer select-none transition-all duration-200 ${
         isActive
-          ? 'bg-blue-50 text-[#003087] font-bold border border-blue-200/90 shadow-none'
-          : 'bg-transparent text-slate-800 hover:text-slate-950 hover:bg-slate-100/80 font-medium border border-transparent'
+          ? 'sidebar-3d-glass-active text-slate-950 font-bold'
+          : 'sidebar-3d-glass-hover text-slate-700 hover:text-slate-950 font-medium border border-transparent'
       }`}
     >
-      <div className="flex items-center gap-2.5 min-w-0">
-        <Icon className={`w-4 h-4 shrink-0 transition-colors ${
-          isActive ? 'text-[#003087]' : 'text-slate-500 group-hover:text-slate-700'
+      {/* 3D Convex Curved Specular Lens Reflection when active */}
+      {isActive && (
+        <>
+          <span className="absolute inset-x-1 top-0 h-[45%] rounded-t-xl bg-gradient-to-b from-white/95 via-white/30 to-transparent pointer-events-none" />
+          <span className="absolute left-1/4 top-[1px] w-1/2 h-[1px] bg-gradient-to-r from-transparent via-white to-transparent pointer-events-none opacity-90" />
+          <span className="absolute inset-x-3 bottom-0 h-[1.5px] bg-gradient-to-r from-transparent via-sky-400/90 to-transparent pointer-events-none" />
+        </>
+      )}
+
+      <div className="relative z-10 flex items-center gap-2.5 min-w-0">
+        <Icon className={`w-4 h-4 shrink-0 transition-colors duration-200 ${
+          isActive ? 'text-sky-600' : 'text-slate-500 group-hover:text-slate-800'
         }`} />
         <span className="truncate tracking-tight">{item.label}</span>
       </div>
 
-      <div className="flex items-center gap-1.5 shrink-0">
+      <div className="relative z-10 flex items-center gap-1.5 shrink-0">
         {item.badge && (
-          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded font-mono bg-red-50 text-red-700 border border-red-200">
+          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded font-mono bg-red-50 text-red-700 border border-red-200 shadow-2xs">
             {item.badge}
           </span>
-        )}
-        {isActive && (
-          <span className="w-1.5 h-1.5 rounded-full bg-[#003087] shrink-0" />
         )}
       </div>
     </button>

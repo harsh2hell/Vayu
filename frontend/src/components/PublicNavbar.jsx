@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Shield, PhoneCall, Sun, Moon, Menu, X, ChevronRight, Clock } from 'lucide-react';
 import { useLiveClock } from '../utils/liveDateTime';
@@ -27,88 +27,28 @@ export const applyGlobalFontScale = (offset) => {
   } catch (e) {}
 };
 
-// Interactive 3D Glass Option Button with Dynamic Mouse Parallax & Specular Light Reflection
-const Nav3DGlassButton = ({ link, isSelected, isScrolled, onClick }) => {
-  const [tilt, setTilt] = useState({ rx: 0, ry: 0, gx: 50, gy: 50, isHovered: false });
-  const btnRef = useRef(null);
-
-  const handleMouseMove = (e) => {
-    if (!btnRef.current) return;
-    const rect = btnRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
-    const centerX = rect.width / 2;
-    const centerY = rect.height / 2;
-    // Multi-axis 3D tilt
-    const rx = ((y - centerY) / centerY) * -12;
-    const ry = ((x - centerX) / centerX) * 12;
-    const gx = (x / rect.width) * 100;
-    const gy = (y / rect.height) * 100;
-    setTilt({ rx, ry, gx, gy, isHovered: true });
-  };
-
-  const handleMouseLeave = () => {
-    setTilt({ rx: 0, ry: 0, gx: 50, gy: 50, isHovered: false });
-  };
-
-  let transformStyle = '';
-  if (tilt.isHovered) {
-    transformStyle = `perspective(600px) rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg) translateZ(16px) scale3d(1.04, 1.04, 1.04) translateY(-1px)`;
-  } else if (isSelected) {
-    transformStyle = `perspective(600px) rotateX(0deg) rotateY(0deg) translateZ(${isScrolled ? '14px' : '10px'}) scale3d(1.02, 1.02, 1.02) translateY(-0.5px)`;
-  } else {
-    transformStyle = 'perspective(600px) rotateX(0deg) rotateY(0deg) translateZ(0px) scale3d(1, 1, 1)';
-  }
-
+// Interactive Nav Option Button (Pure transparent shell sitting over the continuous Apple glass pill)
+const Nav3DGlassButton = React.forwardRef(({ link, isSelected, isHovered, onClick, onMouseEnter }, ref) => {
   return (
     <button
-      ref={btnRef}
+      ref={ref}
       onClick={onClick}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      style={{ transform: transformStyle }}
-      className={`nav-3d-glass-btn group relative overflow-hidden px-3.5 lg:px-4 py-1.5 rounded-full text-xs font-semibold tracking-wide transition-all duration-250 cursor-pointer whitespace-nowrap shrink-0 flex items-center gap-2 select-none ${
+      onMouseEnter={onMouseEnter}
+      className={`nav-3d-glass-btn group relative z-10 px-3.5 lg:px-4 py-1.5 rounded-full text-xs tracking-wide cursor-pointer whitespace-nowrap shrink-0 flex items-center justify-center select-none transition-colors duration-200 ${
         isSelected
-          ? 'is-selected-glass text-slate-950 dark:text-white font-bold'
-          : 'border border-transparent text-slate-600 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white font-medium'
+          ? 'text-slate-950 dark:text-white font-bold'
+          : isHovered
+          ? 'text-slate-950 dark:text-white font-semibold'
+          : 'text-slate-600 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white font-medium'
       }`}
     >
-      {/* Specular Glare Layer that follows mouse cursor in 3D */}
-      <div
-        className="pointer-events-none absolute inset-0 rounded-full transition-opacity duration-300"
-        style={{
-          background: tilt.isHovered
-            ? `radial-gradient(circle at ${tilt.gx}% ${tilt.gy}%, rgba(255,255,255,0.6) 0%, rgba(255,255,255,0.12) 45%, transparent 70%)`
-            : isSelected
-            ? `radial-gradient(circle at 50% 0%, rgba(56,189,248,0.25) 0%, transparent 70%)`
-            : 'none',
-          opacity: tilt.isHovered || isSelected ? 1 : 0
-        }}
-      />
-
-      {/* Glass Upper Dome Reflection on Selected */}
-      {isSelected && (
-        <>
-          <span className="absolute inset-x-1 top-0 h-[48%] rounded-t-full bg-gradient-to-b from-white/90 via-white/35 to-transparent dark:from-white/60 dark:via-white/15 pointer-events-none" />
-          <span className="absolute inset-x-2.5 bottom-0 h-[1px] bg-gradient-to-r from-transparent via-white dark:via-white/70 to-transparent pointer-events-none" />
-        </>
-      )}
-
-      {/* Luminous Jewel Status Dot (Cyan / Sky-Blue with pulsing aura) - Only on Selected Option */}
-      {isSelected && (
-        <span className="relative flex items-center justify-center transition-all duration-300 shrink-0">
-          <span className="absolute w-2.5 h-2.5 rounded-full bg-cyan-400 dark:bg-cyan-300 animate-ping opacity-60" />
-          <span className="relative w-2 h-2 rounded-full bg-slate-950 dark:bg-cyan-200 shadow-[0_0_8px_rgba(56,189,248,1),0_0_12px_rgba(34,211,238,0.9)] ring-1.5 ring-cyan-400/90" />
-        </span>
-      )}
-
-      {/* Nav Label with floating depth */}
-      <span className="relative z-10 transition-transform duration-200" style={{ transform: 'translateZ(8px)' }}>
+      {/* Nav Label */}
+      <span className="relative z-10 transition-transform duration-200">
         {link.label}
       </span>
     </button>
   );
-};
+});
 
 const PublicNavbar = ({
   isHindi,
@@ -258,6 +198,56 @@ const PublicNavbar = ({
     }
   ];
 
+  const navTrackRef = useRef(null);
+  const itemRefs = useRef([]);
+  const [hoveredIdx, setHoveredIdx] = useState(null);
+  const [pillRect, setPillRect] = useState({ left: 0, top: 0, width: 0, height: 0, ready: false });
+  const [glassMouse, setGlassMouse] = useState({ x: 0, y: 0, isHovered: false });
+
+  const activeIdx = NAV_LINKS.findIndex(l => l.match.includes(location.pathname));
+  const validActiveIdx = activeIdx >= 0 ? activeIdx : 0;
+  const targetIdx = hoveredIdx !== null ? hoveredIdx : validActiveIdx;
+
+  const updatePill = useCallback(() => {
+    const track = navTrackRef.current;
+    const targetEl = itemRefs.current[targetIdx];
+    if (!track || !targetEl) return;
+    const trackRect = track.getBoundingClientRect();
+    const targetRect = targetEl.getBoundingClientRect();
+    setPillRect({
+      left: targetRect.left - trackRect.left,
+      top: targetRect.top - trackRect.top,
+      width: targetRect.width,
+      height: targetRect.height,
+      ready: true
+    });
+  }, [targetIdx]);
+
+  useEffect(() => {
+    updatePill();
+    window.addEventListener('resize', updatePill);
+    window.addEventListener('fontScaleChange', updatePill);
+    const t = setTimeout(updatePill, 40);
+    return () => {
+      window.removeEventListener('resize', updatePill);
+      window.removeEventListener('fontScaleChange', updatePill);
+      clearTimeout(t);
+    };
+  }, [updatePill, location.pathname, isHindi]);
+
+  const handleNavMouseMove = (e) => {
+    if (!navTrackRef.current) return;
+    const trackRect = navTrackRef.current.getBoundingClientRect();
+    const relX = e.clientX - trackRect.left - pillRect.left;
+    const relY = e.clientY - trackRect.top - pillRect.top;
+    setGlassMouse({ x: relX, y: relY, isHovered: true });
+  };
+
+  const handleNavMouseLeave = () => {
+    setHoveredIdx(null);
+    setGlassMouse(prev => ({ ...prev, isHovered: false }));
+  };
+
   return (
     <header className={`sticky top-0 z-[1000] w-full transition-all duration-300 header-glass-bar ${
       isScrolled ? 'is-scrolled' : ''
@@ -290,9 +280,12 @@ const PublicNavbar = ({
           />
         </div>
 
-        {/* Ultra-Glossy 3D Glass Pill Track with Scroll & Hover Interaction */}
+        {/* Ultra-Glossy 3D Clear Glass Pill Track with Continuous Apple Motion Animation */}
         <nav
+          ref={navTrackRef}
           onWheel={handleNavWheel}
+          onMouseMove={handleNavMouseMove}
+          onMouseLeave={handleNavMouseLeave}
           className={`nav-pill-track-3d hidden md:flex items-center gap-1.5 p-1 rounded-full backdrop-blur-2xl transition-all duration-500 shrink min-w-0 flex-nowrap relative select-none ${
             isPastHero ? 'mx-auto' : ''
           } ${
@@ -307,15 +300,57 @@ const PublicNavbar = ({
           {/* Specular top rim highlight */}
           <div className="pointer-events-none absolute inset-x-3 top-0 h-[1px] bg-gradient-to-r from-transparent via-white/90 dark:via-white/30 to-transparent" />
 
-          {NAV_LINKS.map((link) => {
+          {/* Continuous Motion Apple Liquid 3D Clear Glass Sliding Pill */}
+          {pillRect.ready && (
+            <div
+              className="nav-sliding-glass-pill overflow-hidden"
+              style={{
+                transform: `translate3d(${pillRect.left}px, ${pillRect.top}px, 0)`,
+                width: `${pillRect.width}px`,
+                height: `${pillRect.height}px`,
+                opacity: pillRect.ready ? 1 : 0
+              }}
+            >
+              {/* 3D Convex Top Curved Specular Lens Reflection */}
+              <span className="absolute inset-x-1.5 top-[1px] h-[46%] rounded-t-full bg-gradient-to-b from-white/95 via-white/28 to-transparent pointer-events-none" />
+
+              {/* Specular Top-Center Glass Glint */}
+              <span className="absolute left-1/4 top-[2px] w-1/2 h-[1px] bg-gradient-to-r from-transparent via-white to-transparent pointer-events-none opacity-90" />
+
+              {/* Prismatic Lateral Refractions (Left & Right Edge Bevels) */}
+              <span className="absolute inset-y-1.5 left-[1px] w-[1.5px] bg-gradient-to-b from-white/85 via-white/20 to-transparent pointer-events-none rounded-l-full" />
+              <span className="absolute inset-y-1.5 right-[1px] w-[1.5px] bg-gradient-to-b from-white/85 via-white/20 to-transparent pointer-events-none rounded-r-full" />
+
+              {/* Lower Rim Cyan Specular Refractive Line */}
+              <span className="absolute inset-x-3 bottom-0 h-[1.5px] bg-gradient-to-r from-transparent via-sky-400/90 dark:via-cyan-300/90 to-transparent pointer-events-none" />
+
+              {/* Interactive Dynamic Cursor Specular Flare inside Glass */}
+              {glassMouse.isHovered && (
+                <span
+                  className="absolute w-24 h-12 rounded-full pointer-events-none transition-opacity duration-200 -translate-x-1/2 -translate-y-1/2 blur-xs opacity-50 dark:opacity-40"
+                  style={{
+                    left: `${glassMouse.x}px`,
+                    top: `${glassMouse.y}px`,
+                    background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.95) 0%, rgba(56,189,248,0.25) 55%, transparent 75%)'
+                  }}
+                />
+              )}
+            </div>
+          )}
+
+          {NAV_LINKS.map((link, idx) => {
             const isSelected = link.match.includes(location.pathname);
+            const isHovered = hoveredIdx === idx;
             return (
               <Nav3DGlassButton
                 key={link.path}
+                ref={(el) => (itemRefs.current[idx] = el)}
                 link={link}
                 isSelected={isSelected}
-                isScrolled={isScrolled || isPastHero}
+                isHovered={isHovered}
+                onMouseEnter={() => setHoveredIdx(idx)}
                 onClick={() => {
+                  setHoveredIdx(null);
                   if (link.path === '/' && location.pathname === '/') {
                     window.scrollTo({ top: 0, behavior: 'smooth' });
                   } else {
