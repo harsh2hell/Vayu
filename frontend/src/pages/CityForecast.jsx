@@ -92,7 +92,7 @@ const renderHourlyWeatherIcon = (icon) => {
 };
 
 // Generate dynamic, city-specific 48-hour forecast with tailored 2-hour interval cadence and true astronomical events
-const generate48HourForecast = (city, isHindi, currentTime = new Date()) => {
+const generate48HourForecast = (city, isHindi, currentTime = new Date(), selectedDayIdx = 0) => {
   if (!city) return [];
 
   const profile = getCityAstronomy(city);
@@ -108,68 +108,84 @@ const generate48HourForecast = (city, isHindi, currentTime = new Date()) => {
   const M_EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const M_HI = ['जन', 'फर', 'मार्च', 'अप्रै', 'मई', 'जून', 'जुला', 'अग', 'सितं', 'अक्टू', 'नव', 'दिस'];
 
-  // Current real-time point ("Now" / "अभी")
-  const nowDayNum = String(now.getDate()).padStart(2, '0');
-  const nowDateStr = isHindi ? `${nowDayNum} ${M_HI[now.getMonth()]}` : `${nowDayNum} ${M_EN[now.getMonth()]}`;
-
-  // Current real-time point ("Now" / "अभी") - strictly grounded in live observation
-  const cityIcon = (city.icon || '').toLowerCase();
-  const hasLivePrecip = parseFloat(city.precipitation?.rainfall || '0') > 0 || parseFloat(city.precipitation?.rate || '0') > 0;
-
-  let nowIcon = 'cloud';
-  let nowCondLabel = isHindi ? (city.conditionHindi || 'बादल') : (city.condition || 'Cloudy');
-
-  const nowH = now.getHours();
-  const nowMinOfDay = nowH * 60 + now.getMinutes();
-  const isNowNight = nowMinOfDay < profile.sunriseMin || nowMinOfDay >= profile.sunsetMin;
-
-  if (cityIcon.includes('thunder') && hasLivePrecip) {
-    nowIcon = 'thunderstorm';
-  } else if (cityIcon.includes('rain') && hasLivePrecip) {
-    nowIcon = isNowNight ? 'night-rain' : 'rain';
-  } else if (cityIcon.includes('sun') || condition.includes('clear') || condition.includes('sun')) {
-    nowIcon = isNowNight ? 'clear-night' : 'sun';
-  } else if (cityIcon.includes('fog') || condition.includes('fog') || condition.includes('haze') || condition.includes('mist')) {
-    nowIcon = 'fog';
-  } else if (cityIcon.includes('cloud') || condition.includes('cloud')) {
-    nowIcon = isNowNight ? 'cloud-night' : 'cloud-sun';
-  } else {
-    nowIcon = isNowNight ? 'cloud-night' : 'cloud-sun';
-  }
-
-  rawPoints.push({
-    type: 'hour',
-    key: 'hour-now',
-    date: new Date(now),
-    offsetH: 0,
-    timeLabel: isHindi ? 'अभी' : 'Now',
-    temp: Math.round(baseTemp),
-    icon: nowIcon,
-    condLabel: nowCondLabel,
-    rainProb: pChance0 >= 20 ? pChance0 : 0,
-    isNow: true,
-    isMidnight: false,
-    isDay2: false,
-    dateLabel: nowDateStr
-  });
-
-  // Determine city-specific station cadence track ('even' vs 'odd')
-  let candidateH = nowH + 1;
-  if (profile.slotCadence === 'even' && candidateH % 2 !== 0) candidateH += 1;
-  if (profile.slotCadence === 'odd' && candidateH % 2 === 0) candidateH += 1;
-
-  let currentSlotDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), candidateH, 0, 0);
-  if (currentSlotDate.getTime() <= now.getTime()) {
-    currentSlotDate.setTime(currentSlotDate.getTime() + 2 * 3600000);
-  }
-
-  const endTime = now.getTime() + 48 * 3600000;
   const nowDayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+  const isSelectedFutureDay = selectedDayIdx > 0;
 
-  // Generate 2-hour interval timepoints following this city's station cadence
+  let startTime;
+  let endTime;
+  let currentSlotDate;
+
+  if (isSelectedFutureDay) {
+    // Start strictly at 12:00 AM (midnight) of the selected day
+    const startD = new Date(now.getFullYear(), now.getMonth(), now.getDate() + selectedDayIdx, 0, 0, 0, 0);
+    startTime = startD.getTime();
+    endTime = startTime + 48 * 3600000;
+    currentSlotDate = new Date(startD);
+  } else {
+    // Day 0: start at current real-time clock ("Now" / "अभी")
+    startTime = now.getTime();
+    endTime = startTime + 48 * 3600000;
+
+    // Current real-time point ("Now" / "अभी") - strictly grounded in live observation
+    const nowDayNum = String(now.getDate()).padStart(2, '0');
+    const nowDateStr = isHindi ? `${nowDayNum} ${M_HI[now.getMonth()]}` : `${nowDayNum} ${M_EN[now.getMonth()]}`;
+
+    const cityIcon = (city.icon || '').toLowerCase();
+    const hasLivePrecip = parseFloat(city.precipitation?.rainfall || '0') > 0 || parseFloat(city.precipitation?.rate || '0') > 0;
+
+    let nowIcon = 'cloud';
+    let nowCondLabel = isHindi ? (city.conditionHindi || 'बादल') : (city.condition || 'Cloudy');
+
+    const nowH = now.getHours();
+    const nowMinOfDay = nowH * 60 + now.getMinutes();
+    const isNowNight = nowMinOfDay < profile.sunriseMin || nowMinOfDay >= profile.sunsetMin;
+
+    if (cityIcon.includes('thunder') && hasLivePrecip) {
+      nowIcon = 'thunderstorm';
+    } else if (cityIcon.includes('rain') && hasLivePrecip) {
+      nowIcon = isNowNight ? 'night-rain' : 'rain';
+    } else if (cityIcon.includes('sun') || condition.includes('clear') || condition.includes('sun')) {
+      nowIcon = isNowNight ? 'clear-night' : 'sun';
+    } else if (cityIcon.includes('fog') || condition.includes('fog') || condition.includes('haze') || condition.includes('mist')) {
+      nowIcon = 'fog';
+    } else if (cityIcon.includes('cloud') || condition.includes('cloud')) {
+      nowIcon = isNowNight ? 'cloud-night' : 'cloud-sun';
+    } else {
+      nowIcon = isNowNight ? 'cloud-night' : 'cloud-sun';
+    }
+
+    rawPoints.push({
+      type: 'hour',
+      key: 'hour-now',
+      date: new Date(now),
+      offsetH: 0,
+      timeLabel: isHindi ? 'अभी' : 'Now',
+      temp: Math.round(baseTemp),
+      icon: nowIcon,
+      condLabel: nowCondLabel,
+      rainProb: pChance0 >= 20 ? pChance0 : 0,
+      isNow: true,
+      isStart: false,
+      isMidnight: false,
+      isDay2: false,
+      dateLabel: nowDateStr
+    });
+
+    // Determine city-specific station cadence track ('even' vs 'odd')
+    let candidateH = nowH + 1;
+    if (profile.slotCadence === 'even' && candidateH % 2 !== 0) candidateH += 1;
+    if (profile.slotCadence === 'odd' && candidateH % 2 === 0) candidateH += 1;
+
+    currentSlotDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), candidateH, 0, 0);
+    if (currentSlotDate.getTime() <= now.getTime()) {
+      currentSlotDate.setTime(currentSlotDate.getTime() + 2 * 3600000);
+    }
+  }
+
+  // Generate 2-hour interval timepoints
   while (currentSlotDate.getTime() <= endTime) {
     const d = new Date(currentSlotDate);
-    const offsetH = Math.round((d.getTime() - now.getTime()) / 3600000);
+    const offsetH = Math.round((d.getTime() - startTime) / 3600000);
     const slotDayStart = new Date(d.getFullYear(), d.getMonth(), d.getDate()).getTime();
     const dayOffsetDays = Math.max(0, Math.round((slotDayStart - nowDayStart) / 86400000));
 
@@ -187,7 +203,7 @@ const generate48HourForecast = (city, isHindi, currentTime = new Date()) => {
       ? Number(targetDay.precipChance)
       : (city.precipitation?.chance !== undefined ? city.precipitation.chance : 40);
     const dayCond = (targetDay.condition || city.condition || '').toLowerCase();
-    const isTargetRainyCity = dayCond.includes('rain') || dayCond.includes('storm') || dayCond.includes('squall') || baseRain >= 50;
+    const isTargetRainyCity = dayCond.includes('rain') || dayCond.includes('storm') || dayCond.includes('squall') || dayCond.includes('drizzle') || dayCond.includes('shower') || baseRain >= 50;
 
     const h = d.getHours();
 
@@ -246,8 +262,9 @@ const generate48HourForecast = (city, isHindi, currentTime = new Date()) => {
       condLabel,
       rainProb: rainProb >= 20 ? rainProb : 0,
       isNow: false,
+      isStart: isSelectedFutureDay && offsetH === 0,
       isMidnight: h === 0,
-      isDay2: dayOffsetDays >= 1,
+      isDay2: offsetH >= 24,
       dateLabel: slotDateStr
     });
 
@@ -255,7 +272,10 @@ const generate48HourForecast = (city, isHindi, currentTime = new Date()) => {
   }
 
   // Insert geographically accurate Sunrise and Sunset events for this specific city
-  for (let dayOffset = 0; dayOffset <= 3; dayOffset++) {
+  const startDayLoop = isSelectedFutureDay ? selectedDayIdx : 0;
+  const endDayLoop = startDayLoop + 3;
+
+  for (let dayOffset = startDayLoop; dayOffset <= endDayLoop; dayOffset++) {
     const sunriseD = new Date(
       now.getFullYear(),
       now.getMonth(),
@@ -264,7 +284,7 @@ const generate48HourForecast = (city, isHindi, currentTime = new Date()) => {
       profile.sunriseMin % 60,
       0
     );
-    if (sunriseD.getTime() > now.getTime() && sunriseD.getTime() <= endTime) {
+    if (sunriseD.getTime() > startTime && sunriseD.getTime() <= endTime) {
       rawPoints.push({
         type: 'event',
         key: `event-sunrise-${sunriseD.getTime()}`,
@@ -273,7 +293,7 @@ const generate48HourForecast = (city, isHindi, currentTime = new Date()) => {
         label: isHindi ? 'सूर्योदय' : 'Sunrise',
         icon: 'sunrise',
         rainProb: 0,
-        isDay2: sunriseD.getTime() >= now.getTime() + 24 * 3600000
+        isDay2: sunriseD.getTime() >= startTime + 24 * 3600000
       });
     }
 
@@ -285,7 +305,7 @@ const generate48HourForecast = (city, isHindi, currentTime = new Date()) => {
       profile.sunsetMin % 60,
       0
     );
-    if (sunsetD.getTime() > now.getTime() && sunsetD.getTime() <= endTime) {
+    if (sunsetD.getTime() > startTime && sunsetD.getTime() <= endTime) {
       rawPoints.push({
         type: 'event',
         key: `event-sunset-${sunsetD.getTime()}`,
@@ -294,7 +314,7 @@ const generate48HourForecast = (city, isHindi, currentTime = new Date()) => {
         label: isHindi ? 'सूर्यास्त' : 'Sunset',
         icon: 'sunset',
         rainProb: 0,
-        isDay2: sunsetD.getTime() >= now.getTime() + 24 * 3600000
+        isDay2: sunsetD.getTime() >= startTime + 24 * 3600000
       });
     }
   }
@@ -317,36 +337,66 @@ const generate48HourForecast = (city, isHindi, currentTime = new Date()) => {
 };
 
 // Summary text generator for 48-hour forecast with city-specific astronomy and cadence
-const get48HourSummary = (city, isHindi) => {
+const get48HourSummary = (city, isHindi, selectedDayIdx = 0, activeDay = null) => {
   if (!city) return '';
   const profile = getCityAstronomy(city);
-  const cond = (city.condition || '').toLowerCase();
-  const precip = city.precipitation?.chance || 0;
+  const targetDay = activeDay || (city.forecast7Days && city.forecast7Days[selectedDayIdx]) || {};
+  const cond = (targetDay.condition || city.condition || '').toLowerCase();
+  const precip = targetDay.precipChance !== undefined ? Number(targetDay.precipChance) : (city.precipitation?.chance || 0);
   const sRise = isHindi ? profile.sunriseHi : profile.sunrise;
   const sSet = isHindi ? profile.sunsetHi : profile.sunset;
 
+  const dayLabelEn = selectedDayIdx === 0 ? 'Today' : (targetDay.day || (selectedDayIdx === 1 ? 'Tomorrow' : `Day ${selectedDayIdx + 1}`));
+  const dayLabelHi = selectedDayIdx === 0 ? 'आज' : (targetDay.dayHindi || (selectedDayIdx === 1 ? 'कल' : `दिन ${selectedDayIdx + 1}`));
+
   let weatherDesc = '';
-  const isActualThunder = cond.includes('thunder') || (cond.includes('storm') && !cond.includes('storm surge') && !cond.includes('storm inflow') && !cond.includes('dust') && !cond.includes('sand') && !cond.includes('gale'));
-  if (isActualThunder && precip >= 50) {
-    weatherDesc = isHindi
-      ? 'अगले 48 घंटों में गरज-चमक के साथ मानसूनी बौछारों की संभावना है। दोपहर के समय तीव्र बारिश और तटीय हवाएं सक्रिय रहेंगी।'
-      : 'Scattered thunderstorms and localized heavy downpours expected over the next 48 hours. Gusty coastal winds active during afternoon hours.';
-  } else if (precip >= 40 || cond.includes('rain') || cond.includes('shower')) {
-    weatherDesc = isHindi
-      ? 'अगले 48 घंटों में रुक-रुक कर बारिश होने का अनुमान है। कल दोपहर वर्षा की तीव्रता में वृद्धि हो सकती है।'
-      : 'Passing showers and coastal cloud cover expected over the next 48 hours, with peak precipitation chances developing tomorrow afternoon.';
-  } else if (cond.includes('haze') || cond.includes('fog') || cond.includes('dust')) {
-    weatherDesc = isHindi
-      ? 'सुबह के समय धुंध और हल्का कोहरा बना रहेगा। दिन चढ़ने के साथ दृश्यता में सुधार होगा। अगले 48 घंटे शुष्क मौसम रहेगा।'
-      : 'Moderate haze during early morning hours, improving with daytime solar heating. Dry conditions forecast across the next 48 hours.';
-  } else if (cond.includes('sun') || cond.includes('clear')) {
-    weatherDesc = isHindi
-      ? 'अगले 48 घंटों तक मुख्यतः साफ आसमान और तेज धूप खिली रहेगी। रात का तापमान सुखद बना रहेगा।'
-      : 'Mainly clear skies and bright sunshine expected throughout the next 48 hours. Warm afternoons with pleasant night breezes.';
+  const isActualThunder = cond.includes('thunder') && precip >= 50;
+
+  if (selectedDayIdx > 0) {
+    if (isActualThunder) {
+      weatherDesc = isHindi
+        ? `${dayLabelHi} रात 12:00 बजे से अगले 48 घंटों में गरज-चमक व वर्षा का पूर्वानुमान है। दोपहर में तेज बौछारें संभव हैं।`
+        : `Scattered thunderstorms and rain expected across the 48 hours starting ${dayLabelEn} 12:00 AM. Localized downpours possible.`;
+    } else if (precip >= 40 || cond.includes('rain') || cond.includes('shower') || cond.includes('drizzle')) {
+      weatherDesc = isHindi
+        ? `${dayLabelHi} 12:00 AM से अगले 48 घंटों में रुक-रुक कर बारिश और बादलों का दौर रहने का अनुमान है।`
+        : `Passing rain showers and cloud cover forecast over the 48-hour period starting ${dayLabelEn} 12:00 AM.`;
+    } else if (cond.includes('haze') || cond.includes('fog') || cond.includes('dust')) {
+      weatherDesc = isHindi
+        ? `${dayLabelHi} 12:00 AM से अगले 48 घंटों में सुबह के समय धुंध व दोपहर में मौसम साफ रहने का अनुमान है।`
+        : `Moderate haze during early mornings transitioning to pleasant conditions across 48 hours from ${dayLabelEn} 12:00 AM.`;
+    } else if (cond.includes('sun') || cond.includes('clear')) {
+      weatherDesc = isHindi
+        ? `${dayLabelHi} 12:00 AM से अगले 48 घंटों में मुख्यतः साफ आसमान और खिली धूप रहेगी। रात में सुहावना मौसम रहेगा।`
+        : `Mainly clear skies and abundant sunshine anticipated across the 48 hours starting ${dayLabelEn} 12:00 AM.`;
+    } else {
+      weatherDesc = isHindi
+        ? `${dayLabelHi} 12:00 AM से अगले 48 घंटों में आंशिक बादल और स्थिर तापमान बने रहने की संभावना है।`
+        : `Partly cloudy skies with stable temperatures forecast across the 48 hours starting ${dayLabelEn} 12:00 AM.`;
+    }
   } else {
-    weatherDesc = isHindi
-      ? 'मध्यम तापमान और आंशिक बादलों के साथ सामान्य मौसम रहने का अनुमान है। अगले 48 घंटों में मौसम स्थिर रहेगा।'
-      : 'Partly cloudy skies with stable temperatures forecast over the next 48 hours. Humidity levels remaining moderate.';
+    const isTodayThunder = cond.includes('thunder') || (cond.includes('storm') && !cond.includes('storm surge') && !cond.includes('storm inflow') && !cond.includes('dust') && !cond.includes('sand') && !cond.includes('gale'));
+    if (isTodayThunder && precip >= 50) {
+      weatherDesc = isHindi
+        ? 'अगले 48 घंटों में गरज-चमक के साथ मानसूनी बौछारों की संभावना है। दोपहर के समय तीव्र बारिश और तटीय हवाएं सक्रिय रहेंगी।'
+        : 'Scattered thunderstorms and localized heavy downpours expected over the next 48 hours. Gusty coastal winds active during afternoon hours.';
+    } else if (precip >= 40 || cond.includes('rain') || cond.includes('shower') || cond.includes('drizzle')) {
+      weatherDesc = isHindi
+        ? 'अगले 48 घंटों में रुक-रुक कर बारिश होने का अनुमान है। कल दोपहर वर्षा की तीव्रता में वृद्धि हो सकती है।'
+        : 'Passing showers and coastal cloud cover expected over the next 48 hours, with peak precipitation chances developing tomorrow afternoon.';
+    } else if (cond.includes('haze') || cond.includes('fog') || cond.includes('dust')) {
+      weatherDesc = isHindi
+        ? 'सुबह के समय धुंध और हल्का कोहरा बना रहेगा। दिन चढ़ने के साथ दृश्यता में सुधार होगा। अगले 48 घंटे शुष्क मौसम रहेगा।'
+        : 'Moderate haze during early morning hours, improving with daytime solar heating. Dry conditions forecast across the next 48 hours.';
+    } else if (cond.includes('sun') || cond.includes('clear')) {
+      weatherDesc = isHindi
+        ? 'अगले 48 घंटों तक मुख्यतः साफ आसमान और तेज धूप खिली रहेगी। रात का तापमान सुखद बना रहेगा।'
+        : 'Mainly clear skies and bright sunshine expected throughout the next 48 hours. Warm afternoons with pleasant night breezes.';
+    } else {
+      weatherDesc = isHindi
+        ? 'मध्यम तापमान और आंशिक बादलों के साथ सामान्य मौसम रहने का अनुमान है। अगले 48 घंटों में मौसम स्थिर रहेगा।'
+        : 'Partly cloudy skies with stable temperatures forecast over the next 48 hours. Humidity levels remaining moderate.';
+    }
   }
 
   const astroNote = isHindi
@@ -516,9 +566,22 @@ const CityForecast = () => {
 
   // 48-Hour Hourly Weather Forecast Strip State & Ref
   const hourlyScrollRef = React.useRef(null);
-  const hourly48Data = useMemo(() => generate48HourForecast(cityData, isHindi, liveClock.now), [cityData, isHindi, liveClock.now]);
-  const hourly48Summary = useMemo(() => get48HourSummary(cityData, isHindi), [cityData, isHindi]);
+  const hourly48Data = useMemo(
+    () => generate48HourForecast(cityData, isHindi, liveClock.now, selectedDayIdx),
+    [cityData, isHindi, liveClock.now, selectedDayIdx]
+  );
+  const hourly48Summary = useMemo(
+    () => get48HourSummary(cityData, isHindi, selectedDayIdx, activeDay),
+    [cityData, isHindi, selectedDayIdx, activeDay]
+  );
   const cityAstronomy = useMemo(() => getCityAstronomy(cityData), [cityData]);
+
+  // Reset hourly scroll to start whenever selectedDayIdx changes
+  useEffect(() => {
+    if (hourlyScrollRef.current) {
+      hourlyScrollRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+    }
+  }, [selectedDayIdx]);
 
   // Smooth scroll compensation when an expired slot drops off the left, preventing visual jumps
   const firstFutureSlotKey = hourly48Data.find(item => !item.isNow)?.key;
@@ -1294,11 +1357,22 @@ const CityForecast = () => {
             <div className="flex items-center gap-2 flex-wrap">
               <Clock className="w-4 h-4 text-sky-600 dark:text-sky-400 shrink-0" />
               <h3 className="text-xs sm:text-sm font-heading font-extrabold uppercase tracking-wider text-slate-800 dark:text-slate-200">
-                {isHindi ? '48 घंटे का प्रति घंटा पूर्वानुमान (2 घंटे का अंतराल)' : '48-HOUR HOURLY FORECAST (2-HOUR INTERVALS)'}
+                {selectedDayIdx === 0
+                  ? (isHindi ? '48 घंटे का प्रति घंटा पूर्वानुमान (2 घंटे का अंतराल)' : '48-HOUR HOURLY FORECAST (2-HOUR INTERVALS)')
+                  : (isHindi
+                      ? `${activeDay.dayHindi || activeDay.day} • 48 घंटे का पूर्वानुमान (12:00 AM से)`
+                      : `${activeDay.day?.toUpperCase() || `DAY ${selectedDayIdx + 1}`} • 48-HOUR FORECAST (FROM 12:00 AM)`
+                    )
+                }
               </h3>
               <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-500/10 dark:bg-sky-500/20 text-sky-700 dark:text-sky-300 border border-sky-300/60 dark:border-sky-400/30">
                 {isHindi ? cityData.nameHindi : cityData.name}
               </span>
+              {selectedDayIdx > 0 && (
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 dark:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-300/60 dark:border-emerald-400/30">
+                  {isHindi ? '12:00 AM से शुरू' : 'Starts 12:00 AM'}
+                </span>
+              )}
               {cityAstronomy && (
                 <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-amber-500/10 dark:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-300/60 dark:border-amber-400/30 inline-flex items-center gap-1.5 shadow-2xs">
                   <span>🌅 {isHindi ? cityAstronomy.sunriseHi : cityAstronomy.sunrise}</span>
@@ -1356,7 +1430,7 @@ const CityForecast = () => {
                 <div
                   key={item.key || (item.isNow ? 'hour-now' : `${item.type}-${item.date?.getTime()}`)}
                   className={`min-w-[68px] sm:min-w-[76px] h-[116px] flex flex-col items-center justify-between py-2 px-1.5 rounded-2xl transition-all duration-150 shrink-0 ${
-                    item.isNow
+                    item.isNow || item.isStart
                       ? 'bg-sky-500/15 dark:bg-sky-500/20 border border-sky-400/50 dark:border-sky-400/40 shadow-xs ring-1 ring-sky-400/20'
                       : item.type === 'event'
                         ? 'bg-amber-500/10 dark:bg-amber-500/15 border border-amber-300/50 dark:border-amber-400/30'
@@ -1365,10 +1439,10 @@ const CityForecast = () => {
                 >
                   {/* Top Row: Time label */}
                   <div className="text-center w-full">
-                    <span className={`text-xs block truncate ${item.isNow ? 'text-sky-700 dark:text-sky-300 font-bold' : 'text-slate-600 dark:text-slate-300 font-semibold'}`}>
+                    <span className={`text-xs block truncate ${(item.isNow || item.isStart) ? 'text-sky-700 dark:text-sky-300 font-bold' : 'text-slate-600 dark:text-slate-300 font-semibold'}`}>
                       {item.timeLabel}
                     </span>
-                    {item.isMidnight && (
+                    {(item.isMidnight || item.isStart) && (
                       <span className="text-[9px] font-bold text-sky-600 dark:text-sky-400 uppercase tracking-wider block leading-tight">
                         {item.dateLabel}
                       </span>
