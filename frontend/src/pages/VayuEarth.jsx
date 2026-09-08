@@ -207,6 +207,10 @@ const VayuEarth = () => {
     (async () => {
       try {
         const base = await getLiveBaseUrl();
+        if (!base) {
+          // Live wind API offline; synthesized streamline fallback is active
+          return;
+        }
         const res = await fetch(`${base}/api/v1/wind/field`, {
           signal: AbortSignal.timeout(60000), // 60 s — first fetch can be slow
         });

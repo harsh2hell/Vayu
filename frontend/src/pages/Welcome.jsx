@@ -1214,6 +1214,10 @@ const Welcome = () => {
     setIsSyncing(true);
     try {
       const baseUrl = await getLiveBaseUrl();
+      if (!baseUrl) {
+        setIsSyncing(false);
+        return;
+      }
       const bayPromise = fetch(`${baseUrl}/api/v1/cyclones/genesis-watch?basin=Bay%20of%20Bengal`, { signal: AbortSignal.timeout(2500) })
         .then(r => r.ok ? r.json() : null)
         .catch(() => null);

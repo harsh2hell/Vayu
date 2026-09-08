@@ -1,31 +1,55 @@
 import { BENCHMARK_STORMS } from '../data/benchmarkData';
 
-const CANDIDATE_URLS = [
-  import.meta.env.VITE_API_URL,
-  'http://127.0.0.1:8000',
-  'http://localhost:8000',
-  'http://127.0.0.1:8001',
-  'http://localhost:8001'
-].filter(Boolean);
+// Configured API base endpoint (e.g. from VITE_API_URL in .env.local).
+// When VITE_API_URL is unset, the app runs in pure client-side mode with built-in
+// in-browser neural networks and live public meteorological APIs, avoiding
+// failed connection refused logs in the browser console.
+const CONFIGURED_API_URL = import.meta.env.VITE_API_URL
+  ? import.meta.env.VITE_API_URL.trim().replace(/\/+$/, '')
+  : null;
 
-let activeBaseUrl = CANDIDATE_URLS[0];
+let cachedLiveUrl = null;
+let lastHealthCheckTime = 0;
+let isCheckingHealth = false;
+const HEALTH_CHECK_TTL = 30000; // 30s cache
 
 /**
  * Automatically resolves and caches the live active API base URL.
+ * Returns null if no live backend is configured or accessible.
  */
 export async function getLiveBaseUrl() {
-  for (const url of CANDIDATE_URLS) {
-    try {
-      const res = await fetch(`${url}/api/health`, { method: 'GET', signal: AbortSignal.timeout(1500) });
-      if (res.ok) {
-        activeBaseUrl = url;
-        return url;
-      }
-    } catch {
-      // Continue to next candidate
-    }
+  if (!CONFIGURED_API_URL) {
+    return null;
   }
-  return activeBaseUrl;
+
+  const now = Date.now();
+  if (cachedLiveUrl !== null && (now - lastHealthCheckTime < HEALTH_CHECK_TTL)) {
+    return cachedLiveUrl;
+  }
+
+  if (isCheckingHealth) {
+    return cachedLiveUrl;
+  }
+
+  isCheckingHealth = true;
+  try {
+    const res = await fetch(`${CONFIGURED_API_URL}/api/health`, {
+      method: 'GET',
+      signal: AbortSignal.timeout(1500)
+    });
+    if (res.ok) {
+      cachedLiveUrl = CONFIGURED_API_URL;
+    } else {
+      cachedLiveUrl = null;
+    }
+  } catch {
+    cachedLiveUrl = null;
+  } finally {
+    lastHealthCheckTime = Date.now();
+    isCheckingHealth = false;
+  }
+
+  return cachedLiveUrl;
 }
 
 /**
@@ -47,6 +71,9 @@ export function getFormattedLastUpdated() {
 export async function checkBackendHealth() {
   try {
     const baseUrl = await getLiveBaseUrl();
+    if (!baseUrl) {
+      return { status: 'OFFLINE' };
+    }
     const response = await fetch(`${baseUrl}/api/health`, { method: 'GET' });
     if (response.ok) {
       return await response.json();
@@ -368,6 +395,9 @@ function getFallbackTrajectoryForecast(stormId = 'DANA', basin = 'Bay of Bengal'
 export async function detectCycloneFromImage(imageFileOrBlob, basin = 'Bay of Bengal', bboxGeo = null) {
   try {
     const baseUrl = await getLiveBaseUrl();
+    if (!baseUrl) {
+      return await analyzeSatelliteImageInBrowser(imageFileOrBlob, basin, bboxGeo);
+    }
     const formData = new FormData();
     const fileName = imageFileOrBlob?.name || 'satellite_frame.png';
     if (imageFileOrBlob) {
@@ -468,6 +498,9 @@ export async function detectCycloneFromImage(imageFileOrBlob, basin = 'Bay of Be
 export async function classifyMorphologyPattern(imageFileOrBlob, basin = 'Bay of Bengal', shearKnots = 12.0) {
   try {
     const baseUrl = await getLiveBaseUrl();
+    if (!baseUrl) {
+      return analyzeMorphologyInBrowser(imageFileOrBlob, basin, shearKnots);
+    }
     const formData = new FormData();
     if (imageFileOrBlob) {
       const fileName = imageFileOrBlob.name || 'morphology_frame.png';
@@ -519,6 +552,9 @@ export async function predictCycloneTrack(params = {}) {
 
   try {
     const baseUrl = await getLiveBaseUrl();
+    if (!baseUrl) {
+      return getFallbackTrajectoryForecast(stormId, basin);
+    }
     const response = await fetch(`${baseUrl}/api/predict-track`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -563,6 +599,7 @@ export async function predictCycloneTrack(params = {}) {
 export async function fuseMultiSourceData(params) {
   try {
     const baseUrl = await getLiveBaseUrl();
+    if (!baseUrl) return null;
     const response = await fetch(`${baseUrl}/api/fuse`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -585,6 +622,7 @@ export async function fuseMultiSourceData(params) {
 export async function fetchActiveAlerts() {
   try {
     const baseUrl = await getLiveBaseUrl();
+    if (!baseUrl) return [];
     const response = await fetch(`${baseUrl}/api/alerts`, { method: 'GET' });
     if (response.ok) {
       const json = await response.json();
@@ -603,6 +641,7 @@ export async function fetchActiveAlerts() {
 export async function fetchInferenceHistory(limit = 15) {
   try {
     const baseUrl = await getLiveBaseUrl();
+    if (!baseUrl) return [];
     const response = await fetch(`${baseUrl}/api/history/inferences?limit=${limit}`, { method: 'GET' });
     if (response.ok) {
       const json = await response.json();
@@ -621,6 +660,7 @@ export async function fetchInferenceHistory(limit = 15) {
 export async function syncLiveSatelliteStream(channelId = 'insat-3dr-ir', basin = 'Bay of Bengal') {
   try {
     const baseUrl = await getLiveBaseUrl();
+    if (!baseUrl) return null;
     const response = await fetch(`${baseUrl}/api/satellite/live-sync?channel_id=${channelId}&basin=${encodeURIComponent(basin)}`, {
       method: 'POST',
     });
@@ -641,6 +681,7 @@ export async function syncLiveSatelliteStream(channelId = 'insat-3dr-ir', basin 
 export async function processManualSatelliteData(formDataPayload) {
   try {
     const baseUrl = await getLiveBaseUrl();
+    if (!baseUrl) return null;
     const response = await fetch(`${baseUrl}/api/satellite/process-manual`, {
       method: 'POST',
       body: formDataPayload,
@@ -662,6 +703,10 @@ export async function processManualSatelliteData(formDataPayload) {
 export async function downloadOfficialBulletinPdf(cycloneData = {}) {
   try {
     const baseUrl = await getLiveBaseUrl();
+    if (!baseUrl) {
+      window.print();
+      return false;
+    }
     const response = await fetch(`${baseUrl}/api/generate-bulletin`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -702,6 +747,7 @@ export async function downloadOfficialBulletinPdf(cycloneData = {}) {
 export async function fetchNasaGibsLayers(date) {
   try {
     const baseUrl = await getLiveBaseUrl();
+    if (!baseUrl) return null;
     const url = date ? `${baseUrl}/api/v1/satellites/nasa-gibs/tiles?date=${date}` : `${baseUrl}/api/v1/satellites/nasa-gibs/tiles`;
     const response = await fetch(url, { method: 'GET' });
     if (response.ok) {
@@ -720,6 +766,7 @@ export async function fetchNasaGibsLayers(date) {
 export async function fetchIsroMosdacCatalog() {
   try {
     const baseUrl = await getLiveBaseUrl();
+    if (!baseUrl) return null;
     const response = await fetch(`${baseUrl}/api/v1/satellites/isro-mosdac/catalog`, { method: 'GET' });
     if (response.ok) {
       return await response.json();
@@ -737,6 +784,7 @@ export async function fetchIsroMosdacCatalog() {
 export async function fetchLiveSstGrid(basin) {
   try {
     const baseUrl = await getLiveBaseUrl();
+    if (!baseUrl) return [];
     const url = basin ? `${baseUrl}/api/v1/ocean/live-sst-grid?basin=${encodeURIComponent(basin)}` : `${baseUrl}/api/v1/ocean/live-sst-grid`;
     const response = await fetch(url, { method: 'GET' });
     if (response.ok) {
@@ -756,6 +804,7 @@ export async function fetchLiveSstGrid(basin) {
 export async function fetchLiveVerticalWindShear(lat = 15.5, lon = 88.0) {
   try {
     const baseUrl = await getLiveBaseUrl();
+    if (!baseUrl) return null;
     const response = await fetch(`${baseUrl}/api/v1/ocean/vertical-wind-shear?latitude=${lat}&longitude=${lon}`, { method: 'GET' });
     if (response.ok) {
       const json = await response.json();
@@ -774,6 +823,7 @@ export async function fetchLiveVerticalWindShear(lat = 15.5, lon = 88.0) {
 export async function fetchRainViewerTiles() {
   try {
     const baseUrl = await getLiveBaseUrl();
+    if (!baseUrl) return null;
     const response = await fetch(`${baseUrl}/api/v1/satellites/rainviewer/tiles`, { method: 'GET' });
     if (response.ok) {
       return await response.json();
@@ -791,6 +841,7 @@ export async function fetchRainViewerTiles() {
 export async function downloadAndAnalyzeRealSnapshot(params) {
   try {
     const baseUrl = await getLiveBaseUrl();
+    if (!baseUrl) return null;
     const response = await fetch(`${baseUrl}/api/v1/satellites/download-real-snapshot`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -812,6 +863,7 @@ export async function downloadAndAnalyzeRealSnapshot(params) {
 export async function syncIbtracsArchive() {
   try {
     const baseUrl = await getLiveBaseUrl();
+    if (!baseUrl) return null;
     const response = await fetch(`${baseUrl}/api/v1/cyclones/sync-ibtracs`, { method: 'POST' });
     if (response.ok) {
       return await response.json();
@@ -829,6 +881,7 @@ export async function syncIbtracsArchive() {
 export async function fetchAllCyclones(basin = null) {
   try {
     const baseUrl = await getLiveBaseUrl();
+    if (!baseUrl) return [];
     const url = basin ? `${baseUrl}/api/v1/cyclones/all?basin=${encodeURIComponent(basin)}` : `${baseUrl}/api/v1/cyclones/all`;
     const response = await fetch(url, { method: 'GET' });
     if (response.ok) {
@@ -848,6 +901,7 @@ export async function fetchAllCyclones(basin = null) {
 export async function fetchCycloneById(systemId) {
   try {
     const baseUrl = await getLiveBaseUrl();
+    if (!baseUrl) return null;
     const response = await fetch(`${baseUrl}/api/v1/cyclones/${systemId}`, { method: 'GET' });
     if (response.ok) {
       const data = await response.json();
@@ -866,6 +920,7 @@ export async function fetchCycloneById(systemId) {
 export async function fetchLiveOceanTelemetry(basin = 'Bay of Bengal') {
   try {
     const baseUrl = await getLiveBaseUrl();
+    if (!baseUrl) return null;
     const response = await fetch(`${baseUrl}/api/v1/ocean/live-telemetry?basin=${encodeURIComponent(basin)}`, { method: 'GET' });
     if (response.ok) {
       const json = await response.json();
@@ -938,6 +993,7 @@ export async function fetchLiveCyclogenesisWatch(basin = 'Bay of Bengal') {
 export async function inspectAIModels() {
   try {
     const baseUrl = await getLiveBaseUrl();
+    if (!baseUrl) return null;
     const res = await fetch(`${baseUrl}/api/v1/ml/inspect`, { method: 'GET' });
     if (res.ok) {
       return await res.json();
@@ -955,10 +1011,12 @@ export async function inspectAIModels() {
 export async function compareStormBenchmark(stormId = 'cyclone_dana_2024') {
   try {
     const baseUrl = await getLiveBaseUrl();
-    const res = await fetch(`${baseUrl}/api/v1/ml/benchmark-compare?storm_id=${encodeURIComponent(stormId)}`, { method: 'GET' });
-    if (res.ok) {
-      const json = await res.json();
-      if (json && json.data) return json.data;
+    if (baseUrl) {
+      const res = await fetch(`${baseUrl}/api/v1/ml/benchmark-compare?storm_id=${encodeURIComponent(stormId)}`, { method: 'GET' });
+      if (res.ok) {
+        const json = await res.json();
+        if (json && json.data) return json.data;
+      }
     }
   } catch (err) {
     console.warn('[VAYU API] Benchmark compare error (using ground-truth verified fallback):', err);
@@ -976,6 +1034,7 @@ export const compareWeatherNextBenchmark = compareStormBenchmark;
 export async function fetchModelBenchmarks() {
   try {
     const baseUrl = await getLiveBaseUrl();
+    if (!baseUrl) return null;
     const res = await fetch(`${baseUrl}/api/benchmarks`, { method: 'GET' });
     if (res.ok) {
       const json = await res.json();
