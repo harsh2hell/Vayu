@@ -38,10 +38,37 @@ import L from 'leaflet';
 if (typeof window !== 'undefined') {
   window.L = L;
 }
+if (typeof globalThis !== 'undefined') {
+  globalThis.L = L;
+}
 
-// Import leaflet-velocity as a side-effect; it extends L.velocityLayer
-import 'leaflet-velocity/dist/leaflet-velocity.min.css';
-import 'leaflet-velocity';
+let velocityPluginLoaded = false;
+let velocityPluginPromise = null;
+
+const ensureVelocityPlugin = async () => {
+  if (velocityPluginLoaded) return true;
+  if (typeof window === 'undefined') return false;
+
+  window.L = L;
+  if (typeof globalThis !== 'undefined') {
+    globalThis.L = L;
+  }
+
+  if (!velocityPluginPromise) {
+    velocityPluginPromise = (async () => {
+      try {
+        await import('leaflet-velocity/dist/leaflet-velocity.min.css');
+        await import('leaflet-velocity');
+        velocityPluginLoaded = true;
+        return true;
+      } catch (err) {
+        console.error('[WindLayer] Failed to dynamically load leaflet-velocity plugin:', err);
+        return false;
+      }
+    })();
+  }
+  return velocityPluginPromise;
+};
 
 // ─── Particle colour scale ─────────────────────────────────────────────────────
 // 12-stop spectrum mapped across 0 to 35 m/s (calm blue -> moderate green/yellow -> storm red/magenta)
@@ -99,39 +126,47 @@ const WindLayer = ({ windData, enabled = true, onMeta }) => {
       return;
     }
 
-    // Check if L.velocityLayer exists
-    const velocityLayerFactory = L.velocityLayer || window.L?.velocityLayer;
-    if (typeof velocityLayerFactory !== 'function') {
-      console.error('[WindLayer] L.velocityLayer is not available in Leaflet context.');
-      return;
-    }
+    let isCancelled = false;
 
-    try {
-      layerRef.current = velocityLayerFactory({
-        data: windData,
-        ...VELOCITY_OPTIONS,
-      });
+    ensureVelocityPlugin().then((loaded) => {
+      if (isCancelled || !loaded) return;
 
-      map.addLayer(layerRef.current);
-
-      // Report metadata to parent for display in the HUD badge
-      if (onMeta) {
-        const header = uLayer.header;
-        onMeta({
-          refTime:    header.refTime    ?? null,
-          source:     header.source     ?? 'NOAA GFS',
-          model:      header.model      ?? 'GFS Seamless',
-          resolution: header.dx != null ? `${header.dx}°` : '12°',
-          units:      header.units      ?? 'm/s',
-          level:      header.level      ?? '10m AGL',
-          type:       'Model Forecast',
-        });
+      const velocityLayerFactory = L.velocityLayer || window.L?.velocityLayer;
+      if (typeof velocityLayerFactory !== 'function') {
+        console.error('[WindLayer] L.velocityLayer is not available in Leaflet context.');
+        return;
       }
-    } catch (err) {
-      console.error('[WindLayer] Failed to create leaflet-velocity layer:', err);
-    }
+
+      try {
+        layerRef.current = velocityLayerFactory({
+          data: windData,
+          ...VELOCITY_OPTIONS,
+        });
+
+        if (map && !isCancelled) {
+          map.addLayer(layerRef.current);
+
+          // Report metadata to parent for display in the HUD badge
+          if (onMeta) {
+            const header = uLayer.header;
+            onMeta({
+              refTime:    header.refTime    ?? null,
+              source:     header.source     ?? 'NOAA GFS',
+              model:      header.model      ?? 'GFS Seamless',
+              resolution: header.dx != null ? `${header.dx}°` : '12°',
+              units:      header.units      ?? 'm/s',
+              level:      header.level      ?? '10m AGL',
+              type:       'Model Forecast',
+            });
+          }
+        }
+      } catch (err) {
+        console.error('[WindLayer] Failed to create leaflet-velocity layer:', err);
+      }
+    });
 
     return () => {
+      isCancelled = true;
       if (layerRef.current) {
         try {
           if (map && map.hasLayer(layerRef.current)) {

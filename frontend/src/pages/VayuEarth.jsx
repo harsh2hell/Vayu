@@ -21,7 +21,7 @@ import {
   Sliders, Satellite, Map, X, Wind, Info, AlertTriangle,
   RefreshCw, Clock,
 } from 'lucide-react';
-import WindLayer from '../components/WindLayer';
+const WindLayer = React.lazy(() => import('../components/WindLayer'));
 import { getLiveBaseUrl } from '../services/api';
 
 // ─── Default camera ────────────────────────────────────────────────────────────
@@ -83,9 +83,31 @@ const MapController = ({ onCoordsChange, onZoomChange, onMapReady }) => {
   useEffect(() => {
     if (!map) return;
     if (onMapReady) onMapReady(map);
-    map.invalidateSize();
-    const t = setTimeout(() => map.invalidateSize(), 200);
-    return () => clearTimeout(t);
+
+    const triggerResize = () => {
+      try {
+        map.invalidateSize();
+      } catch (_) {}
+    };
+
+    triggerResize();
+    const t1 = setTimeout(triggerResize, 60);
+    const t2 = setTimeout(triggerResize, 200);
+    const t3 = setTimeout(triggerResize, 600);
+
+    const container = map.getContainer();
+    let ro = null;
+    if (typeof ResizeObserver !== 'undefined' && container) {
+      ro = new ResizeObserver(() => triggerResize());
+      ro.observe(container);
+    }
+
+    return () => {
+      clearTimeout(t1);
+      clearTimeout(t2);
+      clearTimeout(t3);
+      if (ro) ro.disconnect();
+    };
   }, [map, onMapReady]);
   useMapEvents({
     mousemove: (e) => onCoordsChange?.({ lat: e.latlng.lat, lon: e.latlng.lng }),
@@ -348,11 +370,13 @@ const VayuEarth = () => {
 
           {/* 4. Wind particle layer — rendered by leaflet-velocity on canvas */}
           {windOn && (
-            <WindLayer
-              windData={windData}
-              enabled={windOn && !!windData}
-              onMeta={setWindMeta}
-            />
+            <React.Suspense fallback={null}>
+              <WindLayer
+                windData={windData}
+                enabled={windOn && !!windData}
+                onMeta={setWindMeta}
+              />
+            </React.Suspense>
           )}
         </MapContainer>
       </div>
