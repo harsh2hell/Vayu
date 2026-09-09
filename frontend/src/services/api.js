@@ -6,7 +6,7 @@ import { BENCHMARK_STORMS } from '../data/benchmarkData';
 // failed connection refused logs in the browser console.
 const CONFIGURED_API_URL = import.meta.env.VITE_API_URL
   ? import.meta.env.VITE_API_URL.trim().replace(/\/+$/, '')
-  : null;
+  : (import.meta.env.DEV ? 'http://localhost:8000' : null);
 
 let cachedLiveUrl = null;
 let lastHealthCheckTime = 0;
