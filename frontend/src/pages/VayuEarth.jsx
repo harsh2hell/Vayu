@@ -76,10 +76,11 @@ const MAP_SRC_DOC = `<!DOCTYPE html>
     #fallback-map { display: none; position: absolute; inset: 0; z-index: 5; }
     .status-toast {
       position: absolute; top: 12px; right: 12px; z-index: 9999;
-      background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(8px);
-      border: 1px solid rgba(56, 189, 248, 0.3); color: #38bdf8;
+      background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(8px);
+      border: 1px solid rgba(56, 189, 248, 0.4); color: #38bdf8;
       padding: 6px 12px; border-radius: 20px; font-size: 11px; font-family: monospace;
       display: flex; align-items: center; gap: 6px; pointer-events: none;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
     }
     .dot { width: 6px; height: 6px; background: #38bdf8; border-radius: 50%; animation: pulse 1.5s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.3; transform: scale(0.8); } }
@@ -91,20 +92,80 @@ const MAP_SRC_DOC = `<!DOCTYPE html>
   <div id="fallback-map"></div>
   <div id="status-toast" class="status-toast">
     <div class="dot"></div>
-    <span id="status-text">Connecting to Windy.com API...</span>
+    <span id="status-text">Loading Windy.com Live Weather...</span>
   </div>
   <script>
     const WINDY_KEY = '${WINDY_KEY}';
     let isWindyActive = false;
     let windyStore = null;
     let mapInstance = null;
+    let activeMarkers = [];
 
     function updateToast(text, color) {
       const toast = document.getElementById('status-toast');
       const label = document.getElementById('status-text');
       if (toast && label) {
         label.innerText = text;
-        if (color) toast.style.color = color;
+        if (color) {
+          toast.style.borderColor = color;
+          toast.style.color = color;
+          const dot = toast.querySelector('.dot');
+          if (dot) dot.style.background = color;
+        }
+      }
+    }
+
+    function addBasemapAndCyclone(map) {
+      if (!map) return;
+      try {
+        // High-resolution Esri World Imagery Basemap
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+          maxZoom: 18,
+          zIndex: 1
+        }).addTo(map);
+
+        // Reference Boundaries & Labels
+        L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
+          maxZoom: 18,
+          opacity: 0.85,
+          zIndex: 3
+        }).addTo(map);
+
+        // Cyclone DANA Animated Pulse Marker
+        const cycloneHtml = \`
+          <div style="position:relative; width:44px; height:44px; display:flex; align-items:center; justify-content:center;">
+            <div style="position:absolute; inset:0; border-radius:50%; background:#ef4444; opacity:0.4; animation:pulse 1.5s infinite;"></div>
+            <div style="position:absolute; inset:6px; border-radius:50%; background:#ef4444; border:2px solid white; box-shadow:0 0 12px #ef4444; display:flex; align-items:center; justify-content:center; color:white; font-size:16px;">
+              🌀
+            </div>
+          </div>
+        \`;
+        const cycloneIcon = L.divIcon({
+          className: 'cyclone-marker-vayu',
+          html: cycloneHtml,
+          iconSize: [44, 44],
+          iconAnchor: [22, 22]
+        });
+
+        const dana = L.marker([20.5, 87.2], { icon: cycloneIcon, zIndexOffset: 1000 }).addTo(map);
+        dana.bindPopup(\`
+          <div style="font-family:-apple-system,BlinkMacSystemFont,sans-serif; min-width:190px; padding:2px;">
+            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:4px; margin-bottom:6px;">
+              <strong style="font-size:14px; color:#0f172a;">Cyclone DANA</strong>
+              <span style="font-size:10px; background:#ef444415; color:#ef4444; font-weight:bold; padding:2px 6px; border-radius:99px; border:1px solid #ef444430;">Severe</span>
+            </div>
+            <div style="font-size:11px; color:#475569; line-height:1.6;">
+              <div><b>Basin:</b> Bay of Bengal</div>
+              <div><b>Intensity:</b> 65 kts (120 km/h)</div>
+              <div><b>Pressure:</b> 984 hPa</div>
+              <div><b>Fix:</b> 20.50°N, 87.20°E</div>
+            </div>
+          </div>
+        \`).openPopup();
+        activeMarkers.push(dana);
+
+      } catch (e) {
+        console.warn('Basemap/marker error:', e);
       }
     }
 
@@ -120,40 +181,27 @@ const MAP_SRC_DOC = `<!DOCTYPE html>
         const map = L.map('fallback-map', {
           center: [20.5, 87.2],
           zoom: 5,
-          zoomControl: false,
+          zoomControl: true,
           attributionControl: false
         });
         mapInstance = map;
 
-        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-          maxZoom: 18
-        }).addTo(map);
+        addBasemapAndCyclone(map);
 
-        L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
-          maxZoom: 18, opacity: 0.8
-        }).addTo(map);
-
+        // RainViewer Live Weather Radar
         fetch('https://api.rainviewer.com/public/weather-maps.json')
           .then(res => res.json())
           .then(data => {
             if (data && data.radar && data.radar.past && data.radar.past.length > 0) {
               const latest = data.radar.past[data.radar.past.length - 1];
               L.tileLayer('https://tilecache.rainviewer.com/v2/radar/' + latest.path + '/256/{z}/{x}/{y}/2/1_1.png', {
-                opacity: 0.75, zIndex: 10
+                opacity: 0.75,
+                zIndex: 10
               }).addTo(map);
             }
           })
           .catch(function() {});
 
-        const cycloneIcon = L.divIcon({
-          className: 'cyclone-marker',
-          html: '<div style="font-size:24px; animation:spin 4s linear infinite; display:flex; align-items:center; justify-content:center;">🌀</div>',
-          iconSize: [30, 30], iconAnchor: [15, 15]
-        });
-        L.marker([20.5, 87.2], { icon: cycloneIcon })
-          .addTo(map)
-          .bindPopup('<b>Cyclone DANA</b><br/>Severe Cyclonic Storm (984 hPa)<br/>Sustained Winds: 65 kts')
-          .openPopup();
       } catch (err) {
         console.error('Fallback error:', err);
       }
@@ -161,21 +209,33 @@ const MAP_SRC_DOC = `<!DOCTYPE html>
 
     function initWindy() {
       if (typeof windyInit !== 'function') {
-        activateFallbackMap('windyInit missing');
+        activateFallbackMap('windyInit script missing');
         return;
       }
+
+      const options = {
+        key: WINDY_KEY,
+        lat: 20.5,
+        lon: 87.2,
+        zoom: 5,
+        overlay: 'wind',
+        verbose: false
+      };
+
       try {
-        windyInit({
-          key: WINDY_KEY,
-          lat: 20.5,
-          lon: 87.2,
-          zoom: 5,
-          verbose: false
-        }, function(windyAPI) {
+        windyInit(options, function(windyAPI) {
           isWindyActive = true;
           mapInstance = windyAPI.map;
           windyStore = windyAPI.store;
+
           updateToast('Windy.com API Live', '#38bdf8');
+          console.log('Windy Map Initialized successfully with key:', WINDY_KEY);
+
+          try {
+            windyStore.set('overlay', 'wind');
+          } catch(e) {}
+
+          addBasemapAndCyclone(mapInstance);
 
           window.addEventListener('message', function(e) {
             if (!e.data) return;
@@ -183,7 +243,7 @@ const MAP_SRC_DOC = `<!DOCTYPE html>
               try { windyStore.set('overlay', e.data.overlay); } catch (err) {}
             }
             if (e.data.type === 'PAN_TO' && mapInstance) {
-              mapInstance.panTo([e.data.lat, e.data.lon]);
+              try { mapInstance.panTo([e.data.lat, e.data.lon]); } catch (err) {}
             }
           });
         });
@@ -196,7 +256,7 @@ const MAP_SRC_DOC = `<!DOCTYPE html>
       if (!isWindyActive) {
         activateFallbackMap('Windy API timeout / domain restriction');
       }
-    }, 3000);
+    }, 3500);
 
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', initWindy);
@@ -273,7 +333,7 @@ const VayuEarth = () => {
       style={{ fontFamily: 'system-ui, -apple-system, sans-serif', width: '100%', height: '100%', minHeight: '100%' }}
     >
       
-      {/* Top HUD: VAYU Earth & Layer Controls */}
+      {/* Top HUD: Layer Controls & Storm Selector */}
       <div className="absolute top-3 left-3 right-3 z-30 flex flex-wrap items-center justify-between gap-2 pointer-events-none">
         
         {/* Left Badge & Storm Selector */}
@@ -282,7 +342,7 @@ const VayuEarth = () => {
             <Globe2 className="w-4 h-4 text-sky-400" style={{ animation: 'vayu-spin 14s linear infinite' }} />
             <span>VAYU Earth</span>
             <span className="px-1.5 py-0.2 rounded-full bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-[9px] font-mono font-bold">
-              LIVE WINDY
+              LIVE
             </span>
           </div>
 
@@ -381,7 +441,7 @@ const VayuEarth = () => {
         </div>
       )}
 
-      {/* In-Memory Sandboxed Windy Engine — Immune to X-Frame-Options Header */}
+      {/* Embedded Map Canvas */}
       <div className="flex-1 w-full h-full relative z-10 bg-slate-950 min-h-0">
         <iframe
           ref={iframeRef}
