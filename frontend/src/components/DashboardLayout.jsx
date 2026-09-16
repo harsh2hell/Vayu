@@ -31,7 +31,7 @@ const DashboardLayout = () => {
                 <span>Loading Geospatial Intelligence...</span>
               </div>
             }>
-              <ErrorBoundary>
+              <ErrorBoundary key={location.pathname}>
                 <Outlet />
               </ErrorBoundary>
             </React.Suspense>
