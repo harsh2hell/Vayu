@@ -23,7 +23,7 @@ const DashboardLayout = () => {
           
           <main 
             style={isMapFirst ? { height: 'calc(100vh - 3.5rem)', minHeight: 'calc(100vh - 3.5rem)', width: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative', background: '#020617' } : undefined}
-            className={isMapFirst ? "flex-1 flex flex-col overflow-hidden relative bg-slate-950 min-h-0" : "flex-1 flex flex-col min-w-0 bg-white pb-12"}
+            className={isMapFirst ? "flex-1 flex flex-col overflow-hidden relative bg-slate-950 min-h-0" : "flex-1 p-4 sm:p-6 lg:p-8 bg-slate-50/50 pb-12 min-w-0"}
           >
             <React.Suspense fallback={
               <div className="flex-1 flex flex-col items-center justify-center p-8 bg-slate-950 text-slate-400 font-mono text-xs" style={{ minHeight: 'calc(100vh - 3.5rem)' }}>
