@@ -23,6 +23,7 @@ import DataUnavailableNotice from '../components/DataUnavailableNotice';
 import CycloneLifecycleBar from '../components/CycloneLifecycleBar';
 import AIReasoningCard from '../components/AIReasoningCard';
 import DataSourceStatusCard from '../components/DataSourceStatusCard';
+import { ResponsiveContainer, LineChart, Line, AreaChart, Area, XAxis, YAxis, Tooltip as RechartsTooltip } from 'recharts';
 import { getLiveBaseUrl, fetchLiveOceanTelemetry, getFormattedLastUpdated } from '../services/api';
 import {
   MapContainer,
@@ -1180,6 +1181,9 @@ const Welcome = () => {
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSyncTime, setLastSyncTime] = useState('');
   const [syncStatus, setSyncStatus] = useState('LIVE_AI_CONNECTED');
+  const [heroChartTab, setHeroChartTab] = useState('wind');
+  const [heroTimeframe, setHeroTimeframe] = useState('Today');
+  const [isTimeframeOpen, setIsTimeframeOpen] = useState(false);
 
   // Persist language in localStorage
   useEffect(() => {
