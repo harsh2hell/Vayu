@@ -17,8 +17,8 @@ const DashboardLayout = () => {
         {/* Left Column: Fixed White Sidebar (width 14rem / 56) */}
         <Sidebar />
         
-        {/* Main Content Area (strictly constrained to remaining screen width) */}
-        <div className="flex flex-col min-h-screen ml-0 lg:ml-56 w-full lg:w-[calc(100%-14rem)] min-w-0 transition-all relative z-10">
+        {/* Main Content Area (consistently offset by sidebar width) */}
+        <div className="flex flex-col min-h-screen ml-56 w-[calc(100%-14rem)] min-w-0 transition-all relative z-10">
           <Topbar />
           
           <main 
