@@ -93,7 +93,6 @@ const CollapsibleGroup = ({ title, items, activePath, onNavigate }) => {
 const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [activeTab, setActiveTab] = useState('Favorites');
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
 
   // Normalization logic for matching routes
@@ -117,13 +116,10 @@ const Sidebar = () => {
   };
 
   // Nav mapping mimicking Snow UI structure but using Vayu pages
-  const FAVORITES = [
-    { path: toPortalPath('/dashboard'), label: 'Overview' },
-    { path: toPortalPath('/dashboard/earth'), label: 'VAYU Earth', badge: 'Live' }
-  ];
-
+  // Navigation items matching Snow UI structure with all Vayu pages
   const DASHBOARDS = [
     { path: toPortalPath('/dashboard'), label: 'Command Overview', icon: PieChart },
+    { path: toPortalPath('/dashboard/earth'), label: 'VAYU Earth', icon: Globe, badge: 'Live' },
     { path: toPortalPath('/dashboard/satellite'), label: 'Satellite Feed', icon: Satellite },
     { path: toPortalPath('/dashboard/detection'), label: 'Cyclone Models', icon: Crosshair }
   ];
@@ -150,43 +146,12 @@ const Sidebar = () => {
         
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Top Profile Area */}
-          <div className="pt-5 px-4 pb-4">
+          <div className="pt-5 px-4 pb-3">
             <OfficerAccountDisplay />
           </div>
 
-          {/* Tabs: Favorites / Recently */}
-          <div className="px-4 flex gap-4 text-[13px]">
-            <button 
-              className={`${activeTab === 'Favorites' ? 'text-slate-900 font-medium' : 'text-slate-400 hover:text-slate-600'} cursor-pointer`}
-              onClick={() => setActiveTab('Favorites')}
-            >
-              Favorites
-            </button>
-            <button 
-              className={`${activeTab === 'Recently' ? 'text-slate-900 font-medium' : 'text-slate-400 hover:text-slate-600'} cursor-pointer`}
-              onClick={() => setActiveTab('Recently')}
-            >
-              Recently
-            </button>
-          </div>
-
           {/* Nav Links */}
-          <div className="flex-1 overflow-y-auto px-2 py-2 mt-2">
-            
-            {/* Favorites List */}
-            {activeTab === 'Favorites' && (
-              <div className="space-y-0.5 px-1">
-                {FAVORITES.map((item) => (
-                  <SidebarNavItem
-                    key={item.path}
-                    item={item}
-                    isActive={activePath === item.path || normCurrent === item.path.replace(/^\/dashboard\/?/, '/')}
-                    onClick={() => handleNavigate(item.path)}
-                  />
-                ))}
-              </div>
-            )}
-
+          <div className="flex-1 overflow-y-auto px-2 py-2">
             <CollapsibleGroup 
               title="Dashboards" 
               items={DASHBOARDS} 
@@ -200,15 +165,28 @@ const Sidebar = () => {
               activePath={activePath} 
               onNavigate={handleNavigate} 
             />
-
           </div>
         </div>
 
-        {/* Bottom Logo / Logout trigger area */}
-        <div className="p-4 border-t border-slate-100 flex items-center justify-between shrink-0">
-          <div className="flex items-center gap-2 text-sky-500 font-bold text-sm select-none cursor-pointer" onClick={() => navigate(toPortalPath('/dashboard'))}>
-            <Globe className="w-5 h-5 text-sky-400" />
-            <span className="text-slate-900 tracking-tight">vayu <span className="text-sky-500 font-normal">ui</span></span>
+        {/* Bottom Logo & End Session */}
+        <div className="p-3.5 border-t border-slate-100 flex items-center justify-between shrink-0 bg-slate-50/50">
+          <div 
+            className="flex items-center gap-2.5 cursor-pointer select-none group" 
+            onClick={() => handleNavigate(toPortalPath('/dashboard'))}
+            title="VAYU Cyclone Intelligence"
+          >
+            <img 
+              src="/vayu-icon.png" 
+              alt="VAYU Logo" 
+              className="w-6 h-6 object-contain transition-transform group-hover:scale-105" 
+            />
+            <div className="flex flex-col">
+              <div className="flex items-center gap-1.5">
+                <span className="text-xs font-bold text-slate-900 tracking-tight font-heading leading-none">VAYU</span>
+                <span className="text-[9px] px-1 py-0.2 bg-sky-100 text-sky-700 font-bold rounded font-mono">v2.1</span>
+              </div>
+              <span className="text-[10px] text-slate-400 leading-tight">MoES Cyclone Intel</span>
+            </div>
           </div>
           
           <button
