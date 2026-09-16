@@ -4,6 +4,7 @@ from ..database.db_manager import db
 from ..services.feed_ingestion import REAL_HISTORICAL_SYSTEMS, get_live_cyclogenesis_watch
 from ..services.geojson_service import geojson_service
 from ..services.ibtracs_importer import ibtracs_importer
+from ..services.gdacs_importer import gdacs_importer
 
 router = APIRouter(prefix="/api/v1/cyclones", tags=["Cyclone Systems & Best-Tracks"])
 
@@ -15,12 +16,16 @@ def get_cyclogenesis_watch_feed(basin: str = Query("Bay of Bengal", description=
 
 @router.get("/all")
 def get_all_cyclone_systems(basin: Optional[str] = Query(None, description="Filter by basin")):
-    """Returns all active and benchmark cyclone records stored in the enterprise database."""
-    cyclones = db.get_all_cyclones(basin=basin)
+    """Returns all active cyclones from GDACS combined with historical systems."""
+    live_cyclones = gdacs_importer.fetch_active_cyclones()
+    historical_cyclones = db.get_all_cyclones(basin=basin)
+    
+    # Merge live and historical
+    all_cyclones = live_cyclones + historical_cyclones
     return {
         "success": True,
-        "count": len(cyclones),
-        "cyclones": cyclones
+        "count": len(all_cyclones),
+        "cyclones": all_cyclones
     }
 
 @router.post("/sync-ibtracs")
