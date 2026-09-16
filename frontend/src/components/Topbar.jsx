@@ -9,7 +9,6 @@ import { toPortalPath } from '../utils/domain';
 
 const SEARCH_ITEMS = [
   { id: 'overview', title: 'Command Overview', category: 'Dashboards', path: '/dashboard', icon: '📊', desc: 'Real-time cyclone metrics, active alerts & regional distribution' },
-  { id: 'earth', title: 'VAYU Earth', category: 'Dashboards', path: '/dashboard/earth', icon: '🌍', desc: 'Global live wind particles & GDACS cyclone geospatial viewer' },
   { id: 'satellite', title: 'Satellite Feed', category: 'Dashboards', path: '/dashboard/satellite', icon: '🛰️', desc: 'INSAT-3D & NASA GIBS multispectral infrared & visible imagery' },
   { id: 'detection', title: 'Cyclone Models', category: 'Dashboards', path: '/dashboard/detection', icon: '🎯', desc: 'MobileNetV3 center detection & confidence bounding boxes' },
   { id: 'trajectory', title: 'Forecast Data — Trajectory', category: 'Pages', path: '/dashboard/trajectory', icon: '📈', desc: 'Deep GRU Seq2Seq 72-hour track predictions vs persistence' },
@@ -25,13 +24,13 @@ const SEARCH_ITEMS = [
 const INITIAL_NOTIFICATIONS = [
   { id: 1, title: 'Severe Cyclone DANA Tracking Active', desc: 'Estimated central pressure 988 hPa, sustained winds 65 kts.', time: '5m ago', unread: true, type: 'critical', path: '/dashboard/trajectory' },
   { id: 2, title: 'Red Warning: Odisha & West Bengal Coast', desc: 'Heavy precipitation and storm surge alert issued for 4 districts.', time: '28m ago', unread: true, type: 'warning', path: '/dashboard/impact' },
-  { id: 3, title: 'Windy.com Live Stream Connected', desc: 'Global wind vectors and GDACS live data feed active.', time: '1h ago', unread: false, type: 'info', path: '/dashboard/earth' },
+  { id: 3, title: 'Windy.com Live Telemetry Stream Active', desc: 'Real-time wind vectors and cyclone models data feed active.', time: '1h ago', unread: false, type: 'info', path: '/dashboard/trajectory' },
   { id: 4, title: 'AI Model Inference Updated', desc: 'Landfall prediction error calibrated to 32.4 km from target.', time: '2h ago', unread: false, type: 'info', path: '/dashboard/models' },
 ];
 
 const INITIAL_HISTORY = [
   { id: 1, action: 'Calculated 72h forecast trajectory for Cyclone DANA', time: '12 mins ago', path: '/dashboard/trajectory' },
-  { id: 2, action: 'Viewed VAYU Earth global wind particles and radar overlay', time: '34 mins ago', path: '/dashboard/earth' },
+  { id: 2, action: 'Synchronized live wind particles and storm vectors for Cyclone models', time: '34 mins ago', path: '/dashboard/trajectory' },
   { id: 3, action: 'Generated Official Advisory Bulletin ADV-08 for disaster authorities', time: '1 hour ago', path: '/dashboard/bulletin' },
   { id: 4, action: 'Analyzed INSAT-3D thermal IR convective band morphology', time: '3 hours ago', path: '/dashboard/classification' },
   { id: 5, action: 'Synchronized GDACS real-time cyclone database', time: '5 hours ago', path: '/dashboard' },

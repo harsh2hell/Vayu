@@ -407,15 +407,15 @@ const Dashboard = () => {
             </div>
 
             <div 
-              onClick={() => navigate(toPortalPath('/dashboard/earth'))}
+              onClick={() => navigate(toPortalPath('/dashboard/trajectory'))}
               className="flex gap-3 items-start p-2 rounded-xl hover:bg-sky-50/50 dark:hover:bg-sky-950/30 transition-colors cursor-pointer group"
             >
               <div className="w-8 h-8 rounded-full bg-sky-50 dark:bg-sky-950/60 flex items-center justify-center shrink-0 group-hover:bg-sky-100 dark:group-hover:bg-sky-900/60">
                 <UserPlus className="w-4 h-4 text-sky-600 dark:text-sky-400" />
               </div>
               <div>
-                <p className="text-[13px] font-semibold text-slate-800 dark:text-slate-200 leading-tight group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">Windy.com stream active.</p>
-                <p className="text-[11px] font-medium text-slate-400 dark:text-slate-500 mt-1">Live Feed</p>
+                <p className="text-[13px] font-semibold text-slate-800 dark:text-slate-200 leading-tight group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">Windy.com telemetry active.</p>
+                <p className="text-[11px] font-medium text-slate-400 dark:text-slate-500 mt-1">Live Model Ingestion</p>
               </div>
             </div>
 

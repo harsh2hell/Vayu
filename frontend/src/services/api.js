@@ -1047,3 +1047,39 @@ export async function fetchModelBenchmarks() {
   }
 }
 
+/**
+ * Fetches real-time point meteorological telemetry (wind speed, gusts, MSLP, shear)
+ * directly from Windy.com API & GFS Engine to feed into cyclone models.
+ */
+export async function fetchLivePointWindTelemetry(lat, lon) {
+  try {
+    const baseUrl = await getLiveBaseUrl();
+    if (!baseUrl) return null;
+    const res = await fetch(`${baseUrl}/api/v1/wind/live-point?lat=${lat}&lon=${lon}`);
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch (err) {
+    console.warn('[VAYU API] Failed to fetch live point wind telemetry:', err);
+  }
+  return null;
+}
+
+/**
+ * Fetches real-time atmospheric telemetry at the center of an active/historical cyclone system.
+ */
+export async function fetchLiveCycloneWindTelemetry(systemId) {
+  try {
+    const baseUrl = await getLiveBaseUrl();
+    if (!baseUrl) return null;
+    const res = await fetch(`${baseUrl}/api/v1/wind/cyclone/${systemId}`);
+    if (res.ok) {
+      return await res.json();
+    }
+  } catch (err) {
+    console.warn(`[VAYU API] Failed to fetch live telemetry for cyclone ${systemId}:`, err);
+  }
+  return null;
+}
+
+

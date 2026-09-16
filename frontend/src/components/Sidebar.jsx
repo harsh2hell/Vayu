@@ -119,7 +119,6 @@ const Sidebar = () => {
   // Navigation items matching Snow UI structure with all Vayu pages
   const DASHBOARDS = [
     { path: toPortalPath('/dashboard'), label: 'Command Overview', icon: PieChart },
-    { path: toPortalPath('/dashboard/earth'), label: 'VAYU Earth', icon: Globe, badge: 'Live' },
     { path: toPortalPath('/dashboard/satellite'), label: 'Satellite Feed', icon: Satellite },
     { path: toPortalPath('/dashboard/detection'), label: 'Cyclone Models', icon: Crosshair }
   ];
