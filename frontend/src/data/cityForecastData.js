@@ -20,10 +20,10 @@ export const CITY_FORECAST_DATA = {
     feelsLike: 35.4,
     tempMin: 25.0,
     tempMax: 32.8,
-    condition: 'Thunderstorm with Rain',
-    conditionHindi: 'तूफान व बारिश',
-    icon: 'thunderstorm',
-    emoji: '⛈️',
+    condition: 'Partly Cloudy',
+    conditionHindi: 'आंशिक रूप से बादल',
+    icon: 'cloudy',
+    emoji: '⛅',
 
     // AQI (Air Quality Index)
     aqi: {
@@ -78,10 +78,10 @@ export const CITY_FORECAST_DATA = {
         day: 'Today',
         dayHindi: 'आज',
         date: '05 Sep',
-        condition: 'Thunderstorm with Rain',
-        conditionHindi: 'तूफान व बारिश',
-        emoji: '⛈️',
-        icon: 'thunderstorm',
+        condition: 'Partly Cloudy',
+        conditionHindi: 'आंशिक रूप से बादल',
+        emoji: '⛅',
+        icon: 'cloudy',
         tempMax: 31,
         tempMin: 25,
         precipChance: 85,
@@ -1397,10 +1397,10 @@ export const CITY_FORECAST_DATA = {
     feelsLike: 37.0,
     tempMin: 25.4,
     tempMax: 32.2,
-    condition: 'Gusty Winds & Rain',
-    conditionHindi: 'तेज हवाएं व बारिश',
-    icon: 'thunderstorm',
-    emoji: '⛈️',
+    condition: 'Partly Cloudy with Coastal Breeze',
+    conditionHindi: 'आंशिक बादल व तटीय हवाएं',
+    icon: 'cloudy',
+    emoji: '⛅',
 
     aqi: {
       value: 70,
@@ -2398,10 +2398,10 @@ export const getCityForecast = (cityId) => {
       const isSevere = coastalMatch.level === 'orange';
       
       const default7Days = [
-        { day: 'Day 1', dayName: 'Today', dayNameHindi: 'आज', condition: coastalMatch.condition || (isExtreme ? 'Squally Heavy Gale' : 'Passing Rain Showers'), emoji: isExtreme ? '⛈️' : isSevere ? '🌧️' : '⛅', icon: isExtreme ? 'thunderstorm' : isSevere ? 'rain' : 'cloudy', tempMax: Math.round(baseTemp + 2.5), tempMin: Math.round(baseTemp - 3.2), precipChance: isExtreme ? 95 : isSevere ? 80 : 45, windSpeed: `${baseWind} km/h`, windDir: 'SE', humidity: baseHumidity, aqi: isExtreme ? 45 : 75 },
-        { day: 'Day 2', dayName: 'Tomorrow', dayNameHindi: 'कल', condition: isExtreme ? 'Severe Tropical Downpours' : 'Heavy Coastal Showers', emoji: isExtreme ? '⛈️' : '🌧️', icon: isExtreme ? 'thunderstorm' : 'rain', tempMax: Math.round(baseTemp + 1.8), tempMin: Math.round(baseTemp - 3.5), precipChance: isExtreme ? 90 : 75, windSpeed: `${Math.round(baseWind * 0.95)} km/h`, windDir: 'E', humidity: baseHumidity + 2, aqi: 50 },
-        { day: 'Day 3', dayName: 'Day 3', dayNameHindi: 'दिन 3', condition: 'Moderate Thunder Showers', emoji: '🌧️', icon: 'rain', tempMax: Math.round(baseTemp + 2.0), tempMin: Math.round(baseTemp - 3.0), precipChance: 65, windSpeed: `${Math.round(baseWind * 0.75)} km/h`, windDir: 'SE', humidity: 82, aqi: 68 },
-        { day: 'Day 4', dayName: 'Day 4', dayNameHindi: 'दिन 4', condition: 'Partly Cloudy with Coastal Breeze', emoji: '⛅', icon: 'cloudy', tempMax: Math.round(baseTemp + 3.0), tempMin: Math.round(baseTemp - 2.8), precipChance: 35, windSpeed: `${Math.round(baseWind * 0.55)} km/h`, windDir: 'S', humidity: 76, aqi: 78 },
+        { day: 'Day 1', dayName: 'Today', dayNameHindi: 'आज', condition: coastalMatch.condition || (isExtreme ? 'Squally Heavy Gale & Surge' : 'Passing Clouds & Breeze'), emoji: isExtreme ? '☁️' : isSevere ? '⛅' : '⛅', icon: isExtreme ? 'cloudy' : isSevere ? 'cloudy' : 'cloudy', tempMax: Math.round(baseTemp + 2.5), tempMin: Math.round(baseTemp - 3.2), precipChance: isExtreme ? 45 : isSevere ? 35 : 20, windSpeed: `${baseWind} km/h`, windDir: 'SE', humidity: baseHumidity, aqi: isExtreme ? 45 : 75 },
+        { day: 'Day 2', dayName: 'Tomorrow', dayNameHindi: 'कल', condition: isExtreme ? 'Coastal Heavy Showers' : 'Passing Showers', emoji: isExtreme ? '🌧️' : '🌦️', icon: 'rain', tempMax: Math.round(baseTemp + 1.8), tempMin: Math.round(baseTemp - 3.5), precipChance: isExtreme ? 65 : 40, windSpeed: `${Math.round(baseWind * 0.95)} km/h`, windDir: 'E', humidity: baseHumidity + 2, aqi: 50 },
+        { day: 'Day 3', dayName: 'Day 3', dayNameHindi: 'दिन 3', condition: 'Moderate Showers', emoji: '🌧️', icon: 'rain', tempMax: Math.round(baseTemp + 2.0), tempMin: Math.round(baseTemp - 3.0), precipChance: 45, windSpeed: `${Math.round(baseWind * 0.75)} km/h`, windDir: 'SE', humidity: 82, aqi: 68 },
+        { day: 'Day 4', dayName: 'Day 4', dayNameHindi: 'दिन 4', condition: 'Partly Cloudy with Coastal Breeze', emoji: '⛅', icon: 'cloudy', tempMax: Math.round(baseTemp + 3.0), tempMin: Math.round(baseTemp - 2.8), precipChance: 30, windSpeed: `${Math.round(baseWind * 0.55)} km/h`, windDir: 'S', humidity: 76, aqi: 78 },
         { day: 'Day 5', dayName: 'Day 5', dayNameHindi: 'दिन 5', condition: 'Bright Sun with Ocean Breeze', emoji: '☀️', icon: 'sun', tempMax: Math.round(baseTemp + 3.5), tempMin: Math.round(baseTemp - 2.5), precipChance: 20, windSpeed: `${Math.max(12, Math.round(baseWind * 0.4))} km/h`, windDir: 'SW', humidity: 70, aqi: 85 },
         { day: 'Day 6', dayName: 'Day 6', dayNameHindi: 'दिन 6', condition: 'Clear Skies & Warm Sunshine', emoji: '☀️', icon: 'sun', tempMax: Math.round(baseTemp + 4.0), tempMin: Math.round(baseTemp - 2.0), precipChance: 10, windSpeed: `${Math.max(10, Math.round(baseWind * 0.35))} km/h`, windDir: 'W', humidity: 65, aqi: 92 },
         { day: 'Day 7', dayName: 'Day 7', dayNameHindi: 'दिन 7', condition: 'Pleasant Coastal Weather', emoji: '🌤️', icon: 'cloudy', tempMax: Math.round(baseTemp + 3.2), tempMin: Math.round(baseTemp - 2.2), precipChance: 15, windSpeed: `${Math.max(12, Math.round(baseWind * 0.38))} km/h`, windDir: 'SW', humidity: 68, aqi: 88 }
@@ -2423,10 +2423,10 @@ export const getCityForecast = (cityId) => {
         feelsLike: Math.round((baseTemp + (isExtreme ? 5.8 : 3.8)) * 10) / 10,
         tempMin: Math.round((baseTemp - 3.2) * 10) / 10,
         tempMax: Math.round((baseTemp + 2.5) * 10) / 10,
-        condition: coastalMatch.condition || (isExtreme ? 'Severe Tropical Storm Gale' : 'Breezy with Passing Showers'),
-        conditionHindi: isExtreme ? 'तीव्र चक्रवाती तूफान व वर्षा' : 'तेज हवाएं व बारिश',
-        icon: isExtreme ? 'thunderstorm' : isSevere ? 'rain' : 'cloudy',
-        emoji: isExtreme ? '⛈️' : isSevere ? '🌧️' : '⛅',
+        condition: coastalMatch.condition || (isExtreme ? 'Squally High Winds & Maritime Surge' : 'Breezy with Passing Clouds'),
+        conditionHindi: isExtreme ? 'तीव्र समुद्री हवाएं व ज्वार' : 'तेज हवाएं व बादल',
+        icon: isExtreme ? 'cloudy' : isSevere ? 'cloudy' : 'cloudy',
+        emoji: isExtreme ? '☁️' : isSevere ? '⛅' : '⛅',
         aqi: {
           value: isExtreme ? 45 : 72,
           category: isExtreme ? 'Good' : 'Satisfactory',

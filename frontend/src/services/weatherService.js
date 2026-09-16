@@ -307,7 +307,7 @@ export const WMO_CODES = {
   77: { label: 'Snow Grains', labelHi: 'हिम कण', icon: 'rain', emoji: '❄️' },
   80: { label: 'Passing Rain Showers', labelHi: 'छिटपुट बारिश की बौछारें', icon: 'rain', emoji: '🌦️' },
   81: { label: 'Scattered Showers', labelHi: 'बारिश की बौछारें', icon: 'rain', emoji: '🌧️' },
-  82: { label: 'Violent Rain Downpour', labelHi: 'मूसलाधार बारिश', icon: 'thunderstorm', emoji: '⛈️' },
+  82: { label: 'Violent Rain Downpour', labelHi: 'मूसलाधार बारिश', icon: 'rain', emoji: '🌧️' },
   85: { label: 'Slight Snow Showers', labelHi: 'हल्की हिम बौछारें', icon: 'rain', emoji: '🌨️' },
   86: { label: 'Heavy Snow Showers', labelHi: 'भारी हिम बौछारें', icon: 'rain', emoji: '❄️' },
   95: { label: 'Thunderstorm with Rain', labelHi: 'गरज-चमक के साथ बारिश', icon: 'thunderstorm', emoji: '⛈️' },
@@ -315,8 +315,65 @@ export const WMO_CODES = {
   99: { label: 'Violent Thunderstorm & Gale', labelHi: 'भीषण तूफान व ओलावृष्टि', icon: 'thunderstorm', emoji: '⛈️' }
 };
 
-export const getWmoInfo = (code) => {
-  return WMO_CODES[code] || { label: 'Partly Cloudy', labelHi: 'आंशिक रूप से बादल', icon: 'cloudy', emoji: '⛅' };
+/**
+ * Enhanced WMO Code Normalizer:
+ * Takes into account ground-truth precipitation and cloud cover.
+ * If precipitation is zero / negligible (<= 0.05 mm), it prevents false "Thunderstorm with Rain"
+ * or "Downpour" states and maps to accurate "Cloudy with Thunder Risk", "Partly Cloudy", or "Mainly Clear".
+ */
+export const getWmoInfo = (code, precip = null, rain = null, cloudCover = null) => {
+  const base = WMO_CODES[code] || { label: 'Partly Cloudy', labelHi: 'आंशिक रूप से बादल', icon: 'cloudy', emoji: '⛅' };
+
+  // Check if precipitation is zero or near zero
+  const isZeroRain = precip !== null && Number(precip) <= 0.05 && (rain === null || Number(rain) <= 0.05);
+
+  if (isZeroRain) {
+    // 1. Thunderstorm codes (95, 96, 99) with ZERO precipitation:
+    if (code === 95 || code === 96 || code === 99) {
+      if (cloudCover !== null && Number(cloudCover) < 30) {
+        return {
+          label: 'Mainly Clear (Isolated Thunder Risk)',
+          labelHi: 'मुख्यतः साफ (गरज की संभावना)',
+          icon: 'sun',
+          emoji: '🌤️'
+        };
+      }
+      return {
+        label: 'Cloudy with Thunder Risk',
+        labelHi: 'बादल व गरज की संभावना',
+        icon: 'cloudy',
+        emoji: '☁️'
+      };
+    }
+
+    // 2. Rain & Drizzle codes (51-67, 80-82) with ZERO precipitation:
+    if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) {
+      if (cloudCover !== null && Number(cloudCover) > 75) {
+        return {
+          label: 'Overcast Clouds',
+          labelHi: 'घने बादल',
+          icon: 'cloudy',
+          emoji: '☁️'
+        };
+      }
+      if (cloudCover !== null && Number(cloudCover) < 25) {
+        return {
+          label: 'Mainly Clear',
+          labelHi: 'मुख्यतः साफ',
+          icon: 'sun',
+          emoji: '🌤️'
+        };
+      }
+      return {
+        label: 'Partly Cloudy',
+        labelHi: 'आंशिक रूप से बादल',
+        icon: 'cloudy',
+        emoji: '⛅'
+      };
+    }
+  }
+
+  return base;
 };
 
 /**
@@ -633,7 +690,11 @@ export const fetchGlobalLocationWeather = async (targetLocation) => {
     const todayIdx = 1;
     const tomIdx = 2;
 
-    const wmoInfo = getWmoInfo(cur.weather_code);
+    const curPrecip = cur.precipitation != null ? cur.precipitation : 0;
+    const curRain = cur.rain != null ? cur.rain : 0;
+    const curCloud = cur.cloud_cover != null ? cur.cloud_cover : 50;
+
+    const wmoInfo = getWmoInfo(cur.weather_code, curPrecip, curRain, curCloud);
     const windInfo = getCompassDirection(cur.wind_direction_10m);
     const beaufort = getBeaufortScale(cur.wind_speed_10m);
     const aqiCat = getAqiCategory(aqiCur.us_aqi);
@@ -697,6 +758,13 @@ export const fetchGlobalLocationWeather = async (targetLocation) => {
     const forecast7Days = [];
     const dailyTimes = daily.time || [];
 
+    const hourlyTimes = (wRes.hourly && wRes.hourly.time) || [];
+    const hourlyCodes = (wRes.hourly && wRes.hourly.weather_code) || [];
+    const hourlyPrecip = (wRes.hourly && wRes.hourly.precipitation) || [];
+    const hourlyTemps = (wRes.hourly && wRes.hourly.temperature_2m) || [];
+    const hourlyWinds = (wRes.hourly && wRes.hourly.wind_speed_10m) || [];
+    const hourlyChances = (wRes.hourly && wRes.hourly.precipitation_probability) || [];
+
     for (let i = todayIdx; i < Math.min(dailyTimes.length, todayIdx + 7); i++) {
       const dayOffset = i - todayIdx;
       const dDate = new Date(dailyTimes[i] + 'T12:00:00');
@@ -704,7 +772,12 @@ export const fetchGlobalLocationWeather = async (targetLocation) => {
       const dateEn = `${dayNum} ${MONTHS_EN[dDate.getMonth()]}`;
       const dateHi = `${dayNum} ${MONTHS_HI[dDate.getMonth()]}`;
 
-      const dWmo = getWmoInfo(daily.weather_code ? daily.weather_code[i] : 2);
+      // Ground-truth check for day: if dayOffset === 0 (Today), prioritize live real-time observation
+      const dayPrecipSum = daily.precipitation_sum && daily.precipitation_sum[i] != null ? daily.precipitation_sum[i] : null;
+      const dWmo = dayOffset === 0 
+        ? wmoInfo 
+        : getWmoInfo(daily.weather_code ? daily.weather_code[i] : 2, dayPrecipSum, null, curCloud);
+
       const dMax = daily.temperature_2m_max && daily.temperature_2m_max[i] != null ? Math.round(daily.temperature_2m_max[i]) : 30;
       const dMin = daily.temperature_2m_min && daily.temperature_2m_min[i] != null ? Math.round(daily.temperature_2m_min[i]) : 24;
       const dTemp = dayOffset === 0 ? tempVal : Math.round((dMax * 0.6) + (dMin * 0.4));
@@ -716,6 +789,37 @@ export const fetchGlobalLocationWeather = async (targetLocation) => {
       const dBeaufort = getBeaufortScale(dWindSpeedNum);
       const dUv = daily.uv_index_max && daily.uv_index_max[i] != null ? Math.round(daily.uv_index_max[i]) : 5;
       const dUvCat = getUvCategory(dUv);
+
+      // Build accurate 6-hourly milestone telemetry for this day
+      const targetHours = ['06:00', '09:00', '12:00', '15:00', '18:00', '21:00'];
+      const dayHourlyList = targetHours.map((slotTime) => {
+        const fullIso = `${dailyTimes[i]}T${slotTime}`;
+        const hIdx = hourlyTimes.indexOf(fullIso);
+        if (hIdx !== -1) {
+          const hCode = hourlyCodes[hIdx];
+          const hPrecip = hourlyPrecip[hIdx];
+          const hWmo = getWmoInfo(hCode, hPrecip);
+          const hTemp = hourlyTemps[hIdx] != null ? Math.round(hourlyTemps[hIdx]) : dTemp;
+          const hChance = hourlyChances[hIdx] != null ? Math.round(hourlyChances[hIdx]) : dPrecipChance;
+          const hWind = hourlyWinds[hIdx] != null ? `${Math.round(hourlyWinds[hIdx])} km/h` : `${dWindSpeedNum} km/h`;
+          return {
+            time: slotTime,
+            temp: hTemp,
+            emoji: hWmo.emoji,
+            cond: hWmo.label,
+            rain: hChance,
+            wind: hWind
+          };
+        }
+        return {
+          time: slotTime,
+          temp: slotTime === '12:00' || slotTime === '15:00' ? dMax : dMin,
+          emoji: dWmo.emoji,
+          cond: dWmo.label,
+          rain: dPrecipChance,
+          wind: `${dWindSpeedNum} km/h`
+        };
+      });
 
       forecast7Days.push({
         day: DAYS_EN[dayOffset] || `Day ${dayOffset + 1}`,
@@ -774,14 +878,7 @@ export const fetchGlobalLocationWeather = async (targetLocation) => {
           beaufortScale: dBeaufort.en,
           beaufortScaleHindi: dBeaufort.hi
         },
-        hourly: [
-          { time: '06:00', temp: dMin, emoji: dWmo.emoji, cond: dWmo.label, rain: Math.max(0, dPrecipChance - 10), wind: `${Math.round(dWindSpeedNum * 0.7)} km/h` },
-          { time: '09:00', temp: Math.round(dMin + (dMax - dMin) * 0.4), emoji: dWmo.emoji, cond: dWmo.label, rain: dPrecipChance, wind: `${Math.round(dWindSpeedNum * 0.85)} km/h` },
-          { time: '12:00', temp: dMax, emoji: dWmo.emoji, cond: dWmo.label, rain: Math.min(100, dPrecipChance + 10), wind: `${dWindSpeedNum} km/h` },
-          { time: '15:00', temp: Math.round(dMax - 0.8), emoji: dWmo.emoji, cond: dWmo.label, rain: dPrecipChance, wind: `${dWindSpeedNum} km/h` },
-          { time: '18:00', temp: Math.round(dMin + (dMax - dMin) * 0.5), emoji: dWmo.emoji, cond: dWmo.label, rain: Math.max(0, dPrecipChance - 10), wind: `${Math.round(dWindSpeedNum * 0.8)} km/h` },
-          { time: '21:00', temp: Math.round(dMin + (dMax - dMin) * 0.2), emoji: '☁️', cond: 'Overcast', rain: Math.max(0, dPrecipChance - 20), wind: `${Math.round(dWindSpeedNum * 0.65)} km/h` }
-        ]
+        hourly: dayHourlyList
       });
     }
 

@@ -176,6 +176,8 @@ function App() {
       <Route path="/live-map"   element={<div style={{ width:'100%', height:'100dvh' }}><VayuEarth /></div>} />
       <Route path="/live-earth" element={<div style={{ width:'100%', height:'100dvh' }}><VayuEarth /></div>} />
       <Route path="/3d-earth"   element={<div style={{ width:'100%', height:'100dvh' }}><VayuEarth /></div>} />
+      <Route path="/earth"      element={<div style={{ width:'100%', height:'100dvh' }}><VayuEarth /></div>} />
+      <Route path="/vayu-earth" element={<div style={{ width:'100%', height:'100dvh' }}><VayuEarth /></div>} />
 
       {/* Unified Safety & Updates (IMD Bulletins & NDMA Safety Protocol) */}
       <Route path="/safety-updates" element={<SafetyUpdates />} />
