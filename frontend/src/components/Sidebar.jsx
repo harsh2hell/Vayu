@@ -4,7 +4,7 @@ import {
   LogOut, Shield, ChevronRight, ChevronDown,
   PieChart, Globe, Satellite, Crosshair, Layers,
   Compass, MapPin, Database, Cpu, FileText,
-  User, Briefcase, BookOpen, MessageSquare, ShieldCheck, X
+  User, Briefcase, BookOpen, MessageSquare, ShieldCheck
 } from 'lucide-react';
 import { OfficerAccountDisplay, SafeSignOutButton } from './auth/ClerkAuth';
 import { getWebsiteUrl, isProductionDomain, toPortalPath } from '../utils/domain';
@@ -90,7 +90,7 @@ const CollapsibleGroup = ({ title, items, activePath, onNavigate }) => {
   );
 };
 
-const Sidebar = ({ isMobileOpen = false, onClose }) => {
+const Sidebar = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
@@ -104,7 +104,6 @@ const Sidebar = ({ isMobileOpen = false, onClose }) => {
 
   const handleNavigate = (path) => {
     navigate(path);
-    if (onClose) onClose();
   };
 
   const handleLogoutSuccess = () => {
@@ -143,26 +142,12 @@ const Sidebar = ({ isMobileOpen = false, onClose }) => {
 
   return (
     <>
-      <aside 
-        className={`bg-white dark:bg-slate-900 flex flex-col justify-between fixed top-0 left-0 h-screen z-50 border-r border-slate-100 dark:border-slate-800 w-64 lg:w-56 select-none font-sans transition-transform duration-300 ease-in-out ${
-          isMobileOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full lg:translate-x-0'
-        }`}
-      >
+      <aside className="bg-white flex flex-col justify-between fixed top-0 left-0 h-screen z-40 border-r border-slate-100 w-56 select-none font-sans">
         
         <div className="flex-1 flex flex-col overflow-hidden">
-          {/* Top Profile Area with Mobile Close Button */}
-          <div className="pt-4 px-4 pb-3 flex items-center justify-between border-b border-slate-100/60 dark:border-slate-800/60 lg:border-none">
-            <div className="flex-1 min-w-0">
-              <OfficerAccountDisplay />
-            </div>
-            <button
-              type="button"
-              onClick={onClose}
-              className="lg:hidden p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors cursor-pointer shrink-0 ml-1"
-              title="Close Menu"
-            >
-              <X className="w-5 h-5" />
-            </button>
+          {/* Top Profile Area */}
+          <div className="pt-5 px-4 pb-3">
+            <OfficerAccountDisplay />
           </div>
 
           {/* Nav Links */}

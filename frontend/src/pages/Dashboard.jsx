@@ -44,11 +44,11 @@ const METRIC_DATASETS = {
 
 const KPI_CONFIGS = {
   Today: {
-    cyclones: '7,265',
+    cyclones: '7',
     cyclonesTrend: '+11.01%',
     regions: '3,671',
     regionsTrend: '-0.03%',
-    alerts: '256',
+    alerts: '156',
     alertsTrend: '+15.03%',
     dataPoints: '2,318',
     dataPointsTrend: '+6.08%',
@@ -110,41 +110,6 @@ const topRegions = [
   { name: 'Tamil Nadu', val: '10%', risk: 'Watch' },
 ];
 
-const deviceTrafficData = [
-  { name: 'Linux', val: 38 },
-  { name: 'Mac', val: 78 },
-  { name: 'iOS', val: 56 },
-  { name: 'Windows', val: 92 },
-  { name: 'Android', val: 115, isHighlight: true, badge: '243K' },
-  { name: 'Other', val: 34 },
-];
-
-const locationTrafficData = [
-  { name: 'US', val: 42 },
-  { name: 'Canada', val: 82 },
-  { name: 'Mexico', val: 72 },
-  { name: 'China', val: 36 },
-  { name: 'Japan', val: 94 },
-  { name: 'Australia', val: 62 },
-];
-
-const productTrafficData = [
-  { month: 'Jan', all: 28, snow: 16 },
-  { month: 'Feb', all: 48, snow: 26 },
-  { month: 'Mar', all: 36, snow: 20 },
-  { month: 'Apr', all: 68, snow: 42 },
-  { month: 'May', all: 78, snow: 48 },
-  { month: 'Jun', all: 45, snow: 24 },
-];
-
-const referenceProjects = [
-  { name: 'ByeWind', role: 'Chief Meteorologist', status: 'In Progress', statusColor: 'bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300', avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=80&auto=format&fit=crop&q=80' },
-  { name: 'Natali Craig', role: 'Radar Operations', status: 'Complete', statusColor: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300', avatar: 'https://images.unsplash.com/photo-1517841905240-472988babdf9?w=80&auto=format&fit=crop&q=80' },
-  { name: 'Drew Cano', role: 'Telemetry Ingestion', status: 'Pending', statusColor: 'bg-sky-100 text-sky-700 dark:bg-sky-950/60 dark:text-sky-300', avatar: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=80&auto=format&fit=crop&q=80' },
-  { name: 'Orlando Diggs', role: 'Evacuation Lead', status: 'Approved', statusColor: 'bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300', avatar: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=80&auto=format&fit=crop&q=80' },
-  { name: 'Andi Lane', role: 'Disaster Liaison', status: 'Rejected', statusColor: 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-400', avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&auto=format&fit=crop&q=80' },
-];
-
 const Dashboard = () => {
   const navigate = useNavigate();
 
@@ -203,251 +168,226 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* 4 Colored KPI Cards (2x2 grid on mobile, 4 cols on desktop) matching reference mockup */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          {/* Card 1: Vibrant Royal Blue */}
+        {/* 4 KPI Cards (Dynamic values reacting to timeRange) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <div 
             onClick={() => navigate(toPortalPath('/dashboard/trajectory'))}
-            className="bg-[#1877F2] text-white p-3.5 sm:p-5 rounded-2xl flex flex-col justify-between h-28 sm:h-32 cursor-pointer shadow-sm hover:shadow-md transition-shadow group select-none"
+            className="bg-[#F3F4F6] p-5 rounded-2xl flex flex-col justify-between h-32 cursor-pointer hover:shadow-md transition-shadow group"
           >
             <div className="flex items-center justify-between">
-              <span className="text-xs sm:text-sm font-medium text-white/90">Views</span>
-              <span className="p-1 rounded-full bg-white/20 text-white">
-                <TrendingUp className="w-3.5 h-3.5" />
-              </span>
+              <span className="text-sm font-semibold text-slate-700">Active Cyclones</span>
+              <ArrowRight className="w-3.5 h-3.5 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
-            <div>
-              <div className="text-xl sm:text-[28px] leading-none font-bold text-white tracking-tight">{kpis.cyclones}</div>
-              <div className="text-[11px] font-medium text-white/80 mt-1 flex items-center">
-                {kpis.cyclonesTrend}
-              </div>
+            <div className="flex items-end gap-3">
+              <span className="text-[28px] leading-none font-bold text-slate-900">{kpis.cyclones}</span>
+              <span className="text-xs font-semibold text-slate-500 flex items-center pb-1">
+                {kpis.cyclonesTrend} <TrendingUp className="w-3 h-3 ml-0.5 text-emerald-600" />
+              </span>
             </div>
           </div>
 
-          {/* Card 2: Dark Charcoal / Black */}
           <div 
             onClick={() => navigate(toPortalPath('/dashboard/impact'))}
-            className="bg-[#18181B] dark:bg-slate-900 text-white p-3.5 sm:p-5 rounded-2xl flex flex-col justify-between h-28 sm:h-32 cursor-pointer shadow-sm hover:shadow-md transition-shadow group select-none"
+            className="bg-[#EBF5FF] p-5 rounded-2xl flex flex-col justify-between h-32 cursor-pointer hover:shadow-md transition-shadow group"
           >
             <div className="flex items-center justify-between">
-              <span className="text-xs sm:text-sm font-medium text-white/80">Visits</span>
-              <span className="p-1 rounded-full bg-white/10 text-white/80">
-                <TrendingDown className="w-3.5 h-3.5" />
-              </span>
+              <span className="text-sm font-semibold text-slate-700">Affected Regions</span>
+              <ArrowRight className="w-3.5 h-3.5 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
-            <div>
-              <div className="text-xl sm:text-[28px] leading-none font-bold text-white tracking-tight">{kpis.regions}</div>
-              <div className="text-[11px] font-medium text-white/60 mt-1 flex items-center">
-                {kpis.regionsTrend}
-              </div>
+            <div className="flex items-end gap-3">
+              <span className="text-[28px] leading-none font-bold text-slate-900">{kpis.regions}</span>
+              <span className="text-xs font-semibold text-slate-500 flex items-center pb-1">
+                {kpis.regionsTrend} <TrendingDown className="w-3 h-3 ml-0.5 text-slate-400" />
+              </span>
             </div>
           </div>
 
-          {/* Card 3: Dark Charcoal / Black */}
           <div 
             onClick={() => navigate(toPortalPath('/dashboard/impact'))}
-            className="bg-[#18181B] dark:bg-slate-900 text-white p-3.5 sm:p-5 rounded-2xl flex flex-col justify-between h-28 sm:h-32 cursor-pointer shadow-sm hover:shadow-md transition-shadow group select-none"
+            className="bg-[#F3F0FF] p-5 rounded-2xl flex flex-col justify-between h-32 cursor-pointer hover:shadow-md transition-shadow group"
           >
             <div className="flex items-center justify-between">
-              <span className="text-xs sm:text-sm font-medium text-white/80">New Users</span>
-              <span className="p-1 rounded-full bg-white/10 text-white/80">
-                <TrendingUp className="w-3.5 h-3.5" />
-              </span>
+              <span className="text-sm font-semibold text-slate-700">Alerts Issued</span>
+              <ArrowRight className="w-3.5 h-3.5 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
-            <div>
-              <div className="text-xl sm:text-[28px] leading-none font-bold text-white tracking-tight">{kpis.alerts}</div>
-              <div className="text-[11px] font-medium text-white/60 mt-1 flex items-center">
-                {kpis.alertsTrend}
-              </div>
+            <div className="flex items-end gap-3">
+              <span className="text-[28px] leading-none font-bold text-slate-900">{kpis.alerts}</span>
+              <span className="text-xs font-semibold text-slate-500 flex items-center pb-1">
+                {kpis.alertsTrend} <TrendingUp className="w-3 h-3 ml-0.5 text-emerald-600" />
+              </span>
             </div>
           </div>
 
-          {/* Card 4: Vivid Electric Blue */}
           <div 
             onClick={() => navigate(toPortalPath('/dashboard/earth'))}
-            className="bg-[#2B87FF] text-white p-3.5 sm:p-5 rounded-2xl flex flex-col justify-between h-28 sm:h-32 cursor-pointer shadow-sm hover:shadow-md transition-shadow group select-none"
+            className="bg-[#F0FDF4] p-5 rounded-2xl flex flex-col justify-between h-32 cursor-pointer hover:shadow-md transition-shadow group"
           >
             <div className="flex items-center justify-between">
-              <span className="text-xs sm:text-sm font-medium text-white/90">Active Users</span>
-              <span className="p-1 rounded-full bg-white/20 text-white">
-                <TrendingUp className="w-3.5 h-3.5" />
+              <span className="text-sm font-semibold text-slate-700">Data Points</span>
+              <ArrowRight className="w-3.5 h-3.5 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+            </div>
+            <div className="flex items-end gap-3">
+              <span className="text-[28px] leading-none font-bold text-slate-900">{kpis.dataPoints}</span>
+              <span className="text-xs font-semibold text-slate-500 flex items-center pb-1">
+                {kpis.dataPointsTrend} <TrendingUp className="w-3 h-3 ml-0.5 text-emerald-600" />
               </span>
             </div>
-            <div>
-              <div className="text-xl sm:text-[28px] leading-none font-bold text-white tracking-tight">{kpis.dataPoints}</div>
-              <div className="text-[11px] font-medium text-white/80 mt-1 flex items-center">
-                {kpis.dataPointsTrend}
+          </div>
+        </div>
+
+        {/* Middle Row: Interactive Line Chart Tabs + Regions List */}
+        <div className="flex flex-col lg:flex-row gap-6 bg-[#FAFAFA] rounded-[32px] p-6 border border-slate-100/60">
+          
+          <div className="flex-1 flex flex-col min-w-0 pr-0 lg:pr-6 lg:border-r border-slate-100/50">
+            {/* Interactive Metric Switcher Tabs */}
+            <div className="flex flex-wrap items-center gap-6 mb-8">
+              <button 
+                onClick={() => setActiveMetricTab('wind')}
+                className={`text-sm cursor-pointer transition-all ${
+                  activeMetricTab === 'wind'
+                    ? 'font-bold text-slate-900 relative after:absolute after:-bottom-2 after:left-0 after:w-full after:h-0.5 after:bg-slate-800'
+                    : 'font-medium text-slate-400 hover:text-slate-700'
+                }`}
+              >
+                Wind Speed Trends
+              </button>
+
+              <button 
+                onClick={() => setActiveMetricTab('pressure')}
+                className={`text-sm cursor-pointer transition-all ${
+                  activeMetricTab === 'pressure'
+                    ? 'font-bold text-slate-900 relative after:absolute after:-bottom-2 after:left-0 after:w-full after:h-0.5 after:bg-slate-800'
+                    : 'font-medium text-slate-400 hover:text-slate-700'
+                }`}
+              >
+                Pressure Anomalies
+              </button>
+
+              <button 
+                onClick={() => setActiveMetricTab('rainfall')}
+                className={`text-sm cursor-pointer transition-all ${
+                  activeMetricTab === 'rainfall'
+                    ? 'font-bold text-slate-900 relative after:absolute after:-bottom-2 after:left-0 after:w-full after:h-0.5 after:bg-slate-800'
+                    : 'font-medium text-slate-400 hover:text-slate-700'
+                }`}
+              >
+                Rainfall
+              </button>
+
+              <div className="ml-auto flex gap-5 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
+                <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-slate-800"></span> 2026 Season</span>
+                <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-blue-300"></span> 2025 Benchmark</span>
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* 1. Line Chart Card: Users, Projects, Operating Status */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl p-5 border border-slate-100 dark:border-slate-800 shadow-xs">
-          <div className="flex items-center gap-5 mb-6 text-[13px]">
-            <button 
-              onClick={() => setActiveMetricTab('wind')}
-              className={`cursor-pointer transition-all ${
-                activeMetricTab === 'wind' 
-                  ? 'text-purple-600 dark:text-purple-400 font-bold relative after:absolute after:-bottom-1.5 after:left-0 after:w-full after:h-0.5 after:bg-purple-600' 
-                  : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 font-medium'
-              }`}
-            >
-              Users
-            </button>
-            <button 
-              onClick={() => setActiveMetricTab('pressure')}
-              className={`cursor-pointer transition-all ${
-                activeMetricTab === 'pressure' 
-                  ? 'text-purple-600 dark:text-purple-400 font-bold relative after:absolute after:-bottom-1.5 after:left-0 after:w-full after:h-0.5 after:bg-purple-600' 
-                  : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 font-medium'
-              }`}
-            >
-              Projects
-            </button>
-            <button 
-              onClick={() => setActiveMetricTab('rainfall')}
-              className={`cursor-pointer transition-all ${
-                activeMetricTab === 'rainfall' 
-                  ? 'text-purple-600 dark:text-purple-400 font-bold relative after:absolute after:-bottom-1.5 after:left-0 after:w-full after:h-0.5 after:bg-purple-600' 
-                  : 'text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 font-medium'
-              }`}
-            >
-              Operating Status
-            </button>
-          </div>
-
-          <div className="h-[200px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={currentChartData} margin={{ top: 15, right: 10, left: -25, bottom: 0 }}>
-                <CartesianGrid vertical={false} stroke="#F1F5F9" strokeDasharray="3 3" />
-                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#94A3B8' }} dy={10} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#94A3B8' }} domain={['auto', 'auto']} />
-                <Tooltip 
-                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 20px -2px rgba(0,0,0,0.1)' }}
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="currentYear" 
-                  stroke="#C084FC" 
-                  strokeWidth={2} 
-                  dot={{ r: 4, stroke: '#18181B', strokeWidth: 2, fill: '#FFFFFF' }} 
-                  activeDot={{ r: 6, fill: '#A855F7', stroke: '#18181B', strokeWidth: 2 }} 
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* 2. Device Traffic Card */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl p-5 border border-slate-100 dark:border-slate-800 shadow-xs">
-          <h3 className="text-base font-bold text-blue-600 dark:text-blue-400 mb-4">Device Traffic</h3>
-          
-          <div className="h-[200px] w-full pt-4">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={deviceTrafficData} barSize={34} margin={{ top: 25, right: 0, left: -20, bottom: 0 }}>
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#94A3B8' }} dy={10} />
-                <YAxis hide domain={[0, 140]} />
-                <Tooltip cursor={{ fill: 'transparent' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px -2px rgba(0,0,0,0.1)' }} />
-                <Bar 
-                  dataKey="val" 
-                  radius={[12, 12, 12, 12]}
-                >
-                  {deviceTrafficData.map((entry, index) => (
-                    <Cell 
-                      key={`device-${index}`} 
-                      fill={entry.isHighlight ? '#3B82F6' : '#F1F5F9'} 
-                    />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* 3. Location Traffic Card */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl p-5 border border-slate-100 dark:border-slate-800 shadow-xs">
-          <h3 className="text-base font-bold text-emerald-500 dark:text-emerald-400 mb-4">Location Traffic</h3>
-          
-          <div className="h-[180px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={locationTrafficData} barSize={32} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#94A3B8' }} dy={10} />
-                <YAxis hide domain={[0, 110]} />
-                <Tooltip cursor={{ fill: 'transparent' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px -2px rgba(0,0,0,0.1)' }} />
-                <Bar 
-                  dataKey="val" 
-                  fill="#F1F5F9"
-                  radius={[12, 12, 12, 12]} 
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
-
-        {/* 4. Product Traffic Card */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl p-5 border border-slate-100 dark:border-slate-800 shadow-xs">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-base font-bold text-rose-500 dark:text-rose-400">Product Traffic</h3>
-            <div className="flex items-center gap-3 text-[11px] text-slate-500 dark:text-slate-400 font-medium">
-              <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-slate-900 dark:bg-slate-100" /> All</span>
-              <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-rose-400" /> SnowUI</span>
-              <span className="flex items-center gap-1"><span className="w-1.5 h-1.5 rounded-full bg-slate-300" /> Dashboard</span>
+            
+            <div className="h-[240px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={currentChartData} margin={{ top: 5, right: 0, left: -25, bottom: 0 }}>
+                  <CartesianGrid vertical={false} stroke="#E2E8F0" strokeDasharray="4 4" />
+                  <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#94A3B8' }} dy={10} />
+                  <YAxis 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{ fontSize: 11, fill: '#94A3B8' }} 
+                    domain={activeMetricTab === 'pressure' ? [970, 1020] : ['auto', 'auto']}
+                    tickFormatter={(val) => {
+                      if (activeMetricTab === 'pressure') return `${val}`;
+                      if (activeMetricTab === 'rainfall') return `${val}mm`;
+                      return val > 0 ? `${val}k` : '0';
+                    }} 
+                  />
+                  <Tooltip 
+                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 20px -2px rgba(0,0,0,0.1)' }}
+                    itemStyle={{ fontSize: '13px', fontWeight: 600 }}
+                  />
+                  <Line type="monotone" dataKey="currentYear" name="Current Season" stroke="#0F172A" strokeWidth={2} dot={false} activeDot={{ r: 5, fill: '#0F172A', stroke: '#fff', strokeWidth: 2 }} />
+                  <Line type="monotone" dataKey="lastYear" name="Historical" stroke="#93C5FD" strokeWidth={2} strokeDasharray="4 4" dot={false} />
+                </LineChart>
+              </ResponsiveContainer>
             </div>
           </div>
-          
-          <div className="h-[180px] w-full">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={productTrafficData} barSize={6} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
-                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#94A3B8' }} dy={10} />
-                <YAxis hide domain={[0, 100]} />
-                <Tooltip cursor={{ fill: 'transparent' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px -2px rgba(0,0,0,0.1)' }} />
-                <Bar dataKey="snow" fill="#FB7185" radius={[4, 4, 4, 4]} />
-                <Bar dataKey="all" fill="#94A3B8" radius={[4, 4, 4, 4]} />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        </div>
 
-        {/* 5. Projects Card */}
-        <div className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl p-5 border border-slate-100 dark:border-slate-800 shadow-xs">
-          <h3 className="text-base font-bold text-cyan-500 dark:text-cyan-400 mb-4">Projects</h3>
-          
-          <div className="space-y-3.5">
-            {referenceProjects.map((p) => (
-              <div 
-                key={p.name}
-                onClick={() => setActiveOfficerModal({ name: p.name, role: p.role, status: p.status, bg: 'bg-cyan-100', text: 'text-cyan-700' })}
-                className="flex items-center justify-between py-1.5 px-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer"
-              >
-                <div className="flex items-center gap-3 min-w-0">
-                  <img 
-                    src={p.avatar} 
-                    alt={p.name} 
-                    className="w-8 h-8 rounded-full object-cover shrink-0 ring-1 ring-slate-200 dark:ring-slate-700" 
-                  />
-                  <div className="truncate">
-                    <span className="text-[13px] font-semibold text-slate-800 dark:text-slate-200 block truncate leading-tight">
-                      {p.name}
-                    </span>
-                    <span className="text-[11px] text-slate-400 truncate block">
-                      {p.role}
-                    </span>
+          <div className="w-full lg:w-[220px] shrink-0 pt-2">
+            <h3 className="text-[13px] font-bold text-slate-900 mb-6">Top Affected Regions</h3>
+            <div className="space-y-4">
+              {topRegions.map((region, idx) => (
+                <div 
+                  key={idx} 
+                  onClick={() => navigate(toPortalPath('/dashboard/impact'))}
+                  className="flex items-center gap-4 cursor-pointer group"
+                >
+                  <span className="text-[13px] font-medium text-slate-700 group-hover:text-sky-600 transition-colors w-24 truncate">{region.name}</span>
+                  <div className="flex-1 flex items-center gap-3">
+                    <div className="flex-1 h-[3px] bg-slate-100 rounded-full overflow-hidden">
+                      <div className="h-full bg-slate-800 group-hover:bg-sky-500 rounded-full transition-colors" style={{ width: region.val }}></div>
+                    </div>
                   </div>
                 </div>
-                
-                <span className={`text-[11px] font-semibold px-2.5 py-1 rounded-full shrink-0 ${p.statusColor}`}>
-                  {p.status}
-                </span>
+              ))}
+            </div>
+          </div>
+
+        </div>
+
+        {/* Bottom 2 charts */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-[#FAFAFA] rounded-[32px] p-6 border border-slate-100/60">
+            <h3 className="text-sm font-bold text-slate-900 mb-6">Warnings by Region</h3>
+            <div className="h-[200px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={warningsRegionData} barSize={28} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+                  <CartesianGrid vertical={false} stroke="#E2E8F0" strokeDasharray="3 3" />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#94A3B8' }} dy={10} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#94A3B8' }} tickFormatter={(val) => val > 0 ? `${val}k` : '0'} />
+                  <Tooltip cursor={{ fill: 'transparent' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px -2px rgba(0,0,0,0.1)' }} />
+                  <Bar dataKey="val" radius={[6, 6, 6, 6]}>
+                    {warningsRegionData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.fill} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+          
+          <div className="bg-[#FAFAFA] rounded-[32px] p-6 border border-slate-100/60 flex flex-col">
+            <h3 className="text-sm font-bold text-slate-900 mb-2">Severity Distribution</h3>
+            <div className="flex-1 flex flex-row items-center justify-between px-4">
+              <div className="w-[160px] h-[160px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={severityData}
+                      innerRadius={45}
+                      outerRadius={80}
+                      paddingAngle={0}
+                      dataKey="value"
+                      stroke="none"
+                    >
+                      {severityData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
               </div>
-            ))}
+              <div className="flex flex-col gap-3 justify-center">
+                {severityData.map((item, idx) => (
+                  <div key={idx} className="flex items-center gap-2">
+                    <span className="text-[11px] font-semibold text-slate-500 w-20">{item.name}</span>
+                    <span className="text-xs font-bold text-slate-900">{item.value}%</span>
+                    <span className="w-1.5 h-1.5 rounded-full ml-1" style={{ backgroundColor: item.color }}></span>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
 
       </div>
 
-      {/* RIGHT COLUMN (Desktop sidebar for alerts and field units) */}
-      <div className="hidden xl:flex w-[280px] shrink-0 flex-col gap-10 xl:pl-2">
+      {/* RIGHT COLUMN */}
+      <div className="w-full xl:w-[280px] shrink-0 flex flex-col gap-10 xl:pl-2">
         
         {/* System Alerts */}
         <div>
