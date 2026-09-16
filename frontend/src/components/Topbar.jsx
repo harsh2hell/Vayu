@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Bell, Clock, ChevronRight, ExternalLink, User, LogOut, Search,
-  Sun, History, LayoutSidebar, Sidebar, Menu
+  Sun, History, Sidebar, Menu
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getWebsiteUrl, isProductionDomain, toPortalPath } from '../utils/domain';
@@ -40,7 +40,7 @@ const Topbar = () => {
         <div className="flex items-center gap-3 min-w-0">
           <div className="flex items-center gap-2 text-[13px] min-w-0">
             <button className="hidden sm:flex text-slate-400 hover:text-slate-600 transition-colors cursor-pointer">
-              <LayoutSidebar className="w-4 h-4" />
+              <Sidebar className="w-4 h-4" />
             </button>
             <div className="hidden sm:flex items-center text-slate-400">
               <span>{getBreadcrumbCategory()}</span>
