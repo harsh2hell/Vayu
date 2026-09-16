@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
-  Bell, Clock, ChevronRight, ExternalLink, User, LogOut, Search,
+  Bell, Clock, ChevronRight, ChevronLeft, ExternalLink, User, LogOut, Search,
   Sun, Moon, History, Sidebar, Menu, X, Check, ShieldAlert,
   AlertTriangle, Info, ArrowRight, Sparkles, Compass
 } from 'lucide-react';
@@ -37,7 +37,7 @@ const INITIAL_HISTORY = [
   { id: 5, action: 'Synchronized GDACS real-time cyclone database', time: '5 hours ago', path: '/dashboard' },
 ];
 
-const Topbar = () => {
+const Topbar = ({ onToggleSidebar, isMobileSidebarOpen }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -170,31 +170,48 @@ const Topbar = () => {
 
   const unreadCount = notifications.filter(n => n.unread).length;
 
+  const isOverviewPage = location.pathname === toPortalPath('/dashboard') || location.pathname === '/dashboard' || location.pathname === '/';
+
   return (
     <>
-      <header className="h-14 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between px-4 sm:px-6 sticky top-0 z-30 text-slate-800 dark:text-slate-200 transition-colors">
+      <header className="h-14 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between px-3 sm:px-6 sticky top-0 z-30 text-slate-800 dark:text-slate-200 transition-colors relative">
         
-        {/* Left Section: Breadcrumbs */}
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="flex items-center gap-2 text-[13px] min-w-0">
-            <button 
-              onClick={() => setIsMobileMenuOpen(prev => !prev)}
-              className="sm:hidden p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors cursor-pointer"
-              title="Open Navigation"
-            >
-              <Menu className="w-4 h-4" />
-            </button>
-            <div className="hidden sm:flex items-center text-slate-400 dark:text-slate-500">
-              <span>{getBreadcrumbCategory()}</span>
-              <span className="mx-2 text-slate-300 dark:text-slate-600">/</span>
-              <span className="text-slate-900 dark:text-slate-100 font-medium truncate">{getPageTitle()}</span>
-            </div>
-            
-            {/* Mobile Title */}
-            <div className="sm:hidden font-semibold text-slate-900 dark:text-slate-100 text-sm">
-              {getPageTitle()}
-            </div>
+        {/* Left Section: Breadcrumbs / Mobile Navigation Button */}
+        <div className="flex items-center gap-2 min-w-0">
+          {/* Mobile Back / Menu Navigation matching reference mockup */}
+          <div className="sm:hidden flex items-center">
+            {!isOverviewPage ? (
+              <button 
+                onClick={() => navigate(toPortalPath('/dashboard'))}
+                className="flex items-center gap-0.5 text-sky-600 dark:text-sky-400 text-[14px] font-medium hover:opacity-80 py-1 px-1 rounded-md cursor-pointer transition-opacity"
+                title="Back to Overview"
+              >
+                <ChevronLeft className="w-5 h-5 -ml-1 text-sky-600 dark:text-sky-400" />
+                <span>Home</span>
+              </button>
+            ) : (
+              <button 
+                onClick={onToggleSidebar}
+                className="flex items-center gap-1.5 text-sky-600 dark:text-sky-400 text-[14px] font-medium hover:opacity-80 py-1 px-1 rounded-md cursor-pointer transition-opacity"
+                title="Open Navigation"
+              >
+                <Menu className="w-5 h-5 text-slate-700 dark:text-slate-200" />
+                <span className="hidden xs:inline">Menu</span>
+              </button>
+            )}
           </div>
+
+          {/* Desktop Breadcrumbs */}
+          <div className="hidden sm:flex items-center text-[13px] text-slate-400 dark:text-slate-500">
+            <span>{getBreadcrumbCategory()}</span>
+            <span className="mx-2 text-slate-300 dark:text-slate-600">/</span>
+            <span className="text-slate-900 dark:text-slate-100 font-medium truncate">{getPageTitle()}</span>
+          </div>
+        </div>
+
+        {/* Mobile Centered Page Title (matches reference layout) */}
+        <div className="sm:hidden absolute left-1/2 -translate-x-1/2 font-bold text-slate-900 dark:text-slate-100 text-[15px] tracking-tight pointer-events-none text-center truncate max-w-[160px]">
+          {getPageTitle()}
         </div>
 
         {/* Right Section: Search & Functional Icons */}
