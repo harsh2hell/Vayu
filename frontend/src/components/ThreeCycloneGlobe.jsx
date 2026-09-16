@@ -632,7 +632,7 @@ const ThreeCycloneGlobe = ({
       {/* Top Floating Telemetry Pills */}
       {showTelemetry && (
         <div className="w-full flex items-center justify-between px-2 pt-2 z-10 pointer-events-none">
-          <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md px-3.5 py-2 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm text-xs space-y-0.5 pointer-events-auto">
+          <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md px-3.5 py-2 rounded-2xl border border-slate-100/80 dark:border-slate-800 shadow-sm text-xs space-y-0.5 pointer-events-auto">
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-red-500 animate-ping" />
               <span className="font-bold text-slate-950 dark:text-white">{systemName}</span>
@@ -645,7 +645,7 @@ const ThreeCycloneGlobe = ({
             </div>
           </div>
 
-          <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md px-3 py-1.5 rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-sm text-xs font-semibold text-amber-700 dark:text-amber-400 flex items-center gap-1.5 pointer-events-auto">
+          <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md px-3 py-1.5 rounded-2xl border border-slate-100/80 dark:border-slate-800 shadow-sm text-xs font-semibold text-amber-700 dark:text-amber-400 flex items-center gap-1.5 pointer-events-auto">
             <Sparkles className="w-3.5 h-3.5" />
             <span>{risk} 48h Risk</span>
           </div>
@@ -658,7 +658,7 @@ const ThreeCycloneGlobe = ({
       {/* Bottom Hint */}
       {showTelemetry && (
         <div className="w-full pb-2 z-10 pointer-events-none text-center">
-          <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium tracking-wide bg-white/60 dark:bg-slate-900/60 backdrop-blur-xs px-3.5 py-1 rounded-full border border-slate-200/60 dark:border-slate-800 shadow-2xs">
+          <span className="text-[11px] text-slate-400 dark:text-slate-500 font-medium tracking-wide bg-white/60 dark:bg-slate-900/60 backdrop-blur-xs px-3.5 py-1 rounded-full border border-slate-100/60 dark:border-slate-800 shadow-2xs">
             Active Swirling Cyclone Vortex • Natural 3D Earth Rotation
           </span>
         </div>

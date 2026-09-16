@@ -64,7 +64,7 @@ const Topbar = () => {
             <input 
               type="text"
               placeholder="Search"
-              className="pl-8 pr-12 py-1.5 w-48 bg-slate-100/50 border border-transparent hover:border-slate-200 focus:bg-white focus:border-sky-500 focus:outline-none rounded-lg text-[13px] text-slate-800 transition-all placeholder:text-slate-400"
+              className="pl-8 pr-12 py-1.5 w-48 bg-slate-100/50 border border-transparent hover:border-slate-100 focus:bg-white focus:border-sky-500 focus:outline-none rounded-lg text-[13px] text-slate-800 transition-all placeholder:text-slate-400"
             />
             <div className="absolute right-2.5 flex items-center">
               <span className="text-[10px] font-mono text-slate-400 font-medium">⌘/</span>

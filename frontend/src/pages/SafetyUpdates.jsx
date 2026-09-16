@@ -116,7 +116,7 @@ const SafetyUpdates = ({ initialTab }) => {
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-5 sm:py-6 space-y-6">
         
         {/* Top Header & Overview */}
-        <div className="border-b border-slate-200 dark:border-slate-800 pb-5 space-y-3">
+        <div className="border-b border-slate-100 dark:border-slate-800 pb-5 space-y-3">
           <div className="flex flex-wrap items-center justify-between gap-2.5">
             <div className="flex items-center gap-2 flex-wrap">
               <span className="text-xs font-bold px-3 py-1 rounded-full bg-sky-100 dark:bg-sky-950 text-sky-800 dark:text-sky-300 border border-sky-200 dark:border-sky-800 shadow-2xs">
@@ -135,7 +135,7 @@ const SafetyUpdates = ({ initialTab }) => {
               </span>
               <a 
                 href="tel:112" 
-                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-red-50 dark:bg-red-950/50 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-900/60 font-bold hover:bg-red-100 transition-colors shadow-2xs"
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-2xl bg-red-50 dark:bg-red-950/50 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-900/60 font-bold hover:bg-red-100 transition-colors shadow-2xs"
                 title={isHindi ? "राष्ट्रीय आपातकालीन हेल्पलाइन: 112" : "National Emergency Helpline: 112"}
               >
                 <PhoneCall className="w-3 h-3 text-red-600" />
@@ -143,14 +143,14 @@ const SafetyUpdates = ({ initialTab }) => {
               </a>
               <a 
                 href="tel:1078" 
-                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-900/60 font-bold hover:bg-amber-100 transition-colors shadow-2xs"
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-2xl bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-900/60 font-bold hover:bg-amber-100 transition-colors shadow-2xs"
                 title={isHindi ? "एनडीएमए आपदा नियंत्रण: 1078" : "NDMA Disaster Control: 1078"}
               >
                 <span>1078</span>
               </a>
               <a 
                 href="tel:1554" 
-                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors shadow-2xs"
+                className="inline-flex items-center gap-1 px-2.5 py-1 rounded-2xl bg-slate-100 dark:bg-slate-800 text-slate-800 dark:text-slate-200 border border-slate-100 dark:border-slate-700 font-bold hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors shadow-2xs"
                 title={isHindi ? "तटरक्षक समुद्री खोज व बचाव: 1554" : "Coast Guard SAR: 1554"}
               >
                 <span>1554</span>
@@ -171,12 +171,12 @@ const SafetyUpdates = ({ initialTab }) => {
 
           {/* Unified Primary Navigation Tabs: All vs Bulletins vs Safety Guide */}
           <div className="pt-2">
-            <div className="inline-flex p-1.5 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-xs max-w-full overflow-x-auto gap-1.5">
+            <div className="inline-flex p-1.5 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-100/90 dark:border-slate-800 shadow-sm max-w-full overflow-x-auto gap-1.5">
               <button
                 onClick={() => setActiveTab('all')}
-                className={`flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer whitespace-nowrap ${
+                className={`flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-2xl font-bold text-xs sm:text-sm transition-all cursor-pointer whitespace-nowrap ${
                   activeTab === 'all'
-                    ? 'bg-white dark:bg-slate-800 text-slate-950 dark:text-white shadow-sm border border-slate-200/60 dark:border-slate-700 -translate-y-0.5'
+                    ? 'bg-white dark:bg-slate-800 text-slate-950 dark:text-white shadow-sm border border-slate-100/60 dark:border-slate-700 -translate-y-0.5'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-950 dark:hover:text-white hover:bg-white/50 dark:hover:bg-slate-800/50'
                 }`}
               >
@@ -186,30 +186,30 @@ const SafetyUpdates = ({ initialTab }) => {
 
               <button
                 onClick={() => setActiveTab('bulletins')}
-                className={`flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer whitespace-nowrap ${
+                className={`flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-2xl font-bold text-xs sm:text-sm transition-all cursor-pointer whitespace-nowrap ${
                   activeTab === 'bulletins'
-                    ? 'bg-white dark:bg-slate-800 text-slate-950 dark:text-white shadow-sm border border-slate-200/60 dark:border-slate-700 -translate-y-0.5'
+                    ? 'bg-white dark:bg-slate-800 text-slate-950 dark:text-white shadow-sm border border-slate-100/60 dark:border-slate-700 -translate-y-0.5'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-950 dark:hover:text-white hover:bg-white/50 dark:hover:bg-slate-800/50'
                 }`}
               >
                 <FileText className="w-4 h-4 text-sky-600 dark:text-sky-400" />
                 <span>{isHindi ? 'आधिकारिक बुलेटिन' : 'Official Bulletins & Warnings'}</span>
-                <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-sky-50 dark:bg-sky-950 text-sky-700 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-sky-50 dark:bg-sky-950 text-sky-700 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800">
                   {isHindi ? '३ लाइव' : '3 Live'}
                 </span>
               </button>
 
               <button
                 onClick={() => setActiveTab('safety')}
-                className={`flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer whitespace-nowrap ${
+                className={`flex items-center gap-2 px-4 sm:px-5 py-2.5 rounded-2xl font-bold text-xs sm:text-sm transition-all cursor-pointer whitespace-nowrap ${
                   activeTab === 'safety'
-                    ? 'bg-white dark:bg-slate-800 text-slate-950 dark:text-white shadow-sm border border-slate-200/60 dark:border-slate-700 -translate-y-0.5'
+                    ? 'bg-white dark:bg-slate-800 text-slate-950 dark:text-white shadow-sm border border-slate-100/60 dark:border-slate-700 -translate-y-0.5'
                     : 'text-slate-600 dark:text-slate-400 hover:text-slate-950 dark:hover:text-white hover:bg-white/50 dark:hover:bg-slate-800/50'
                 }`}
               >
                 <ShieldCheck className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 <span>{isHindi ? 'नागरिक सुरक्षा प्रोटोकॉल व किट' : 'Disaster Safety Protocol & Kit'}</span>
-                <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800">
                   NDMA
                 </span>
               </button>
@@ -230,10 +230,10 @@ const SafetyUpdates = ({ initialTab }) => {
               <div className="lg:col-span-2 space-y-4">
                 
                 {/* Bulletin 14 Card */}
-                <IOSGlassCard className="rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-xs space-y-3.5">
+                <IOSGlassCard className="rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-sm space-y-3.5">
                   <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
                     <div className="flex items-center gap-2">
-                      <span className="font-extrabold text-slate-950 dark:text-white px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                      <span className="font-bold text-slate-950 dark:text-white px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-100 dark:border-slate-700">
                         {isHindi ? 'बुलेटिन संख्या 14' : 'BULLETIN NO. 14'}
                       </span>
                       <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1">
@@ -261,7 +261,7 @@ const SafetyUpdates = ({ initialTab }) => {
                   <div className="pt-2 flex items-center gap-3">
                     <button 
                       onClick={() => handleDownloadPdf('Bulletin No. 14 - Cyclone DANA')}
-                      className="inline-flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-white hover:text-black dark:hover:text-white border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-2.5 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer shadow-2xs"
+                      className="inline-flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-white hover:text-black dark:hover:text-white border border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-2.5 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer shadow-2xs"
                     >
                       <Download className="w-4 h-4 text-sky-500" />
                       <span>{isHindi ? 'आधिकारिक सलाह डाउनलोड करें (PDF)' : 'Download Official Advisory (PDF)'}</span>
@@ -270,10 +270,10 @@ const SafetyUpdates = ({ initialTab }) => {
                 </IOSGlassCard>
 
                 {/* Genesis Advisory 03 Card */}
-                <IOSGlassCard className="rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-xs space-y-3.5">
+                <IOSGlassCard className="rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-sm space-y-3.5">
                   <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
                     <div className="flex items-center gap-2">
-                      <span className="font-extrabold text-slate-950 dark:text-white px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                      <span className="font-bold text-slate-950 dark:text-white px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-100 dark:border-slate-700">
                         {isHindi ? 'उत्पत्ति सलाह संख्या 03' : 'GENESIS ADVISORY NO. 03'}
                       </span>
                       <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1">
@@ -301,7 +301,7 @@ const SafetyUpdates = ({ initialTab }) => {
                   <div className="pt-2 flex items-center gap-3">
                     <button 
                       onClick={() => handleDownloadPdf('Genesis Advisory No. 03 - Invest 92B')}
-                      className="inline-flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-white hover:text-black dark:hover:text-white border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-2.5 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer shadow-2xs"
+                      className="inline-flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-white hover:text-black dark:hover:text-white border border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-2.5 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer shadow-2xs"
                     >
                       <Download className="w-4 h-4 text-amber-500" />
                       <span>{isHindi ? 'उत्पत्ति सलाह डाउनलोड करें (PDF)' : 'Download Genesis Advisory (PDF)'}</span>
@@ -310,10 +310,10 @@ const SafetyUpdates = ({ initialTab }) => {
                 </IOSGlassCard>
 
                 {/* Special Tropical Weather Outlook */}
-                <div className="border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-900/90 p-5 sm:p-6 shadow-xs space-y-3.5 transition-all">
+                <div className="border border-slate-100 dark:border-slate-800 rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-800/90 p-5 sm:p-6 shadow-sm space-y-3.5 transition-all">
                   <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
                     <div className="flex items-center gap-2">
-                      <span className="font-extrabold text-slate-950 dark:text-white px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                      <span className="font-bold text-slate-950 dark:text-white px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-100 dark:border-slate-700">
                         {isHindi ? 'विशेष उष्णकटिबंधीय दृष्टिकोण' : 'SPECIAL TROPICAL WEATHER OUTLOOK'}
                       </span>
                       <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1">
@@ -341,7 +341,7 @@ const SafetyUpdates = ({ initialTab }) => {
                   <div className="pt-2 flex items-center gap-3">
                     <button 
                       onClick={() => handleDownloadPdf('RSMC 5-Day Cyclogenesis Outlook')}
-                      className="inline-flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-white hover:text-black dark:hover:text-white border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-2.5 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer shadow-2xs"
+                      className="inline-flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-white hover:text-black dark:hover:text-white border border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-2.5 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer shadow-2xs"
                     >
                       <Download className="w-4 h-4 text-emerald-500" />
                       <span>{isHindi ? '5-दिवसीय दृष्टिकोण डाउनलोड करें (PDF)' : 'Download 5-Day Outlook (PDF)'}</span>
@@ -355,7 +355,7 @@ const SafetyUpdates = ({ initialTab }) => {
               <div className="space-y-6">
                 
                 {/* Maritime Sea Warning Box */}
-                <div className="border border-red-200 dark:border-red-900/60 rounded-2xl sm:rounded-3xl bg-red-50/40 dark:bg-red-950/20 p-5 sm:p-6 shadow-xs space-y-4">
+                <div className="border border-red-200 dark:border-red-900/60 rounded-2xl sm:rounded-3xl bg-red-50/40 dark:bg-red-950/20 p-5 sm:p-6 shadow-sm space-y-4">
                   <div>
                     <h3 className="text-sm font-bold text-red-950 dark:text-red-200 flex items-center gap-2 font-heading">
                       <AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400" />
@@ -403,7 +403,7 @@ const SafetyUpdates = ({ initialTab }) => {
                 </div>
 
                 {/* Port Warning Signals Guide */}
-                <div className="border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-900/90 p-5 shadow-xs space-y-3">
+                <div className="border border-slate-100 dark:border-slate-800 rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-800/90 p-5 shadow-sm space-y-3">
                   <div className="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-2.5">
                     <Anchor className="w-4 h-4 text-sky-600 dark:text-sky-400" />
                     <h3 className="text-xs font-bold text-slate-950 dark:text-white uppercase tracking-wider font-heading">
@@ -449,7 +449,7 @@ const SafetyUpdates = ({ initialTab }) => {
           <div className="space-y-6 animate-in fade-in duration-300">
             
             {/* Header & Phase Switcher */}
-            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-5">
+            <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-5">
               <div>
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-bold bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/80 mb-2">
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
@@ -468,12 +468,12 @@ const SafetyUpdates = ({ initialTab }) => {
               </div>
 
               {/* Phase Selector Tabs */}
-              <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-900 p-1 rounded-2xl border border-slate-200 dark:border-slate-800 text-xs font-bold shrink-0">
+              <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl border border-slate-100 dark:border-slate-800 text-xs font-bold shrink-0">
                 <button
                   onClick={() => setSafetyPhase('before')}
-                  className={`px-3 sm:px-4 py-1.5 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
+                  className={`px-3 sm:px-4 py-1.5 rounded-2xl transition-all cursor-pointer whitespace-nowrap ${
                     safetyPhase === 'before' 
-                      ? 'bg-white dark:bg-slate-800 text-slate-950 dark:text-white shadow-xs' 
+                      ? 'bg-white dark:bg-slate-800 text-slate-950 dark:text-white shadow-sm' 
                       : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                   }`}
                 >
@@ -481,9 +481,9 @@ const SafetyUpdates = ({ initialTab }) => {
                 </button>
                 <button
                   onClick={() => setSafetyPhase('during')}
-                  className={`px-3 sm:px-4 py-1.5 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
+                  className={`px-3 sm:px-4 py-1.5 rounded-2xl transition-all cursor-pointer whitespace-nowrap ${
                     safetyPhase === 'during' 
-                      ? 'bg-white dark:bg-slate-800 text-slate-950 dark:text-white shadow-xs' 
+                      ? 'bg-white dark:bg-slate-800 text-slate-950 dark:text-white shadow-sm' 
                       : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                   }`}
                 >
@@ -491,9 +491,9 @@ const SafetyUpdates = ({ initialTab }) => {
                 </button>
                 <button
                   onClick={() => setSafetyPhase('after')}
-                  className={`px-3 sm:px-4 py-1.5 rounded-xl transition-all cursor-pointer whitespace-nowrap ${
+                  className={`px-3 sm:px-4 py-1.5 rounded-2xl transition-all cursor-pointer whitespace-nowrap ${
                     safetyPhase === 'after' 
-                      ? 'bg-white dark:bg-slate-800 text-slate-950 dark:text-white shadow-xs' 
+                      ? 'bg-white dark:bg-slate-800 text-slate-950 dark:text-white shadow-sm' 
                       : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                   }`}
                 >
@@ -506,7 +506,7 @@ const SafetyUpdates = ({ initialTab }) => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-6">
               
               {/* Essential Actions (Do's) */}
-              <div className="border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-3xl p-5 sm:p-6 bg-white dark:bg-slate-900/90 shadow-xs space-y-4">
+              <div className="border border-slate-100 dark:border-slate-800 rounded-2xl sm:rounded-3xl p-5 sm:p-6 bg-white dark:bg-slate-800/90 shadow-sm space-y-4">
                 <h3 className="text-xs font-bold text-emerald-800 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-2 font-heading">
                   <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                   <span>{isHindi ? 'आवश्यक कार्य (क्या करें)' : 'Essential Actions (Do\'s)'}</span>
@@ -577,7 +577,7 @@ const SafetyUpdates = ({ initialTab }) => {
               </div>
 
               {/* Avoid Hazards (Don'ts) */}
-              <div className="border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-3xl p-5 sm:p-6 bg-white dark:bg-slate-900/90 shadow-xs space-y-4">
+              <div className="border border-slate-100 dark:border-slate-800 rounded-2xl sm:rounded-3xl p-5 sm:p-6 bg-white dark:bg-slate-800/90 shadow-sm space-y-4">
                 <h3 className="text-xs font-bold text-red-800 dark:text-red-400 uppercase tracking-wider flex items-center gap-2 font-heading">
                   <XCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
                   <span>{isHindi ? 'इन खतरों से बचें (क्या न करें)' : "Avoid These Hazards (Don'ts)"}</span>
@@ -655,7 +655,7 @@ const SafetyUpdates = ({ initialTab }) => {
             </div>
 
             {/* Emergency Survival Kit Checklist */}
-            <div className="border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-900/90 p-5 sm:p-6 shadow-xs space-y-4">
+            <div className="border border-slate-100 dark:border-slate-800 rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-800/90 p-5 sm:p-6 shadow-sm space-y-4">
               <div className="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
                 <PackageCheck className="w-5 h-5 text-sky-600 dark:text-sky-400" />
                 <div>
@@ -685,7 +685,7 @@ const SafetyUpdates = ({ initialTab }) => {
             {/* Emergency Helplines Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {EMERGENCY_HELPLINES.map((hl, idx) => (
-                <IOSGlassCard key={idx} wrapperClassName="h-full" className="rounded-2xl sm:rounded-3xl p-5 shadow-xs flex flex-col justify-between space-y-3 h-full">
+                <IOSGlassCard key={idx} wrapperClassName="h-full" className="rounded-2xl sm:rounded-3xl p-5 shadow-sm flex flex-col justify-between space-y-3 h-full">
                   <div>
                     <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">
                       {isHindi ? hl.nameHindi : hl.name}
@@ -711,7 +711,7 @@ const SafetyUpdates = ({ initialTab }) => {
       </main>
 
       {/* Footer */}
-      <footer className="bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 py-10 px-4 sm:px-6 text-xs text-slate-500 dark:text-slate-400 transition-colors mt-12">
+      <footer className="bg-slate-50 dark:bg-slate-950 border-t border-slate-100 dark:border-slate-800 py-10 px-4 sm:px-6 text-xs text-slate-500 dark:text-slate-400 transition-colors mt-12">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
             &copy; 2026 {isHindi ? 'पृथ्वी विज्ञान मंत्रालय, भारत सरकार। सर्वाधिकार सुरक्षित।' : 'Ministry of Earth Sciences, Government of India. All Rights Reserved.'}

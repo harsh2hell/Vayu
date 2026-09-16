@@ -202,7 +202,7 @@ export default function RainfallIntelligence() {
   const CustomTooltip = ({ active, payload, label }) => {
     if (active && payload && payload.length) {
       return (
-        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-xs shadow-lg">
+        <div className="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl p-3 text-xs shadow-lg">
           <p className="font-bold text-slate-700 dark:text-slate-200 mb-1">{label}</p>
           {payload.map((p, i) => (
             <p key={i} style={{ color: p.color }} className="font-medium">{p.name}: {p.value} mm</p>
@@ -231,7 +231,7 @@ export default function RainfallIntelligence() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => navigate('/')}
-              className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all cursor-pointer"
+              className="p-2 rounded-2xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all cursor-pointer"
             >
               <ArrowLeft className="w-4 h-4 text-slate-600 dark:text-slate-300" />
             </button>
@@ -246,7 +246,7 @@ export default function RainfallIntelligence() {
           </div>
           <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 shrink-0">
             <LastUpdatedBadge timestamp={liveClock.observationStr} source="IMD DWR & AWS Network" />
-            <button className="ml-1 p-1.5 rounded-lg bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all cursor-pointer" title="Refresh">
+            <button className="ml-1 p-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all cursor-pointer" title="Refresh">
               <RefreshCw className="w-3 h-3" />
             </button>
           </div>
@@ -270,7 +270,7 @@ export default function RainfallIntelligence() {
                 { label: 'Basin Avg. 24h', value: '87.4 mm', sub: '+42% above normal', icon: BarChart2, color: 'text-amber-600 dark:text-amber-400', bg: 'bg-amber-500/10' },
               ].map((m, i) => (
                 <IOSGlassCard key={i} className="p-4 rounded-2xl">
-                  <div className={`inline-flex p-2 rounded-xl ${m.bg} mb-2`}>
+                  <div className={`inline-flex p-2 rounded-2xl ${m.bg} mb-2`}>
                     <m.icon className={`w-4 h-4 ${m.color}`} />
                   </div>
                   <div className={`text-xl sm:text-2xl font-heading font-black ${m.color}`}>{m.value}</div>
@@ -297,12 +297,12 @@ export default function RainfallIntelligence() {
                           <AlertTriangle className={`w-4 h-4 ${cfg.icon} shrink-0`} />
                           <span className="font-bold text-sm text-slate-900 dark:text-white">{alert.title}</span>
                         </div>
-                        <span className={`text-[9px] font-extrabold px-2 py-0.5 rounded-full shrink-0 ${cfg.badge}`}>{cfg.label}</span>
+                        <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full shrink-0 ${cfg.badge}`}>{cfg.label}</span>
                       </div>
                       <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-2">{alert.description}</p>
                       <div className="flex flex-wrap gap-1 mb-2">
                         {alert.districts.map(d => (
-                          <span key={d} className="text-[10px] px-2 py-0.5 rounded-full bg-white/60 dark:bg-white/10 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium">{d}</span>
+                          <span key={d} className="text-[10px] px-2 py-0.5 rounded-full bg-white/60 dark:bg-white/10 border border-slate-100 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-medium">{d}</span>
                         ))}
                       </div>
                       <div className="flex items-center justify-between text-[10px] text-slate-500 dark:text-slate-400">
@@ -395,7 +395,7 @@ export default function RainfallIntelligence() {
                     <button
                       key={tab}
                       onClick={() => setActiveStationTab(tab)}
-                      className={`px-3 py-1 rounded-full text-[10px] font-bold transition-all cursor-pointer capitalize ${activeStationTab === tab ? 'bg-sky-600 text-white' : 'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:border-sky-400'}`}
+                      className={`px-3 py-1 rounded-full text-[10px] font-bold transition-all cursor-pointer capitalize ${activeStationTab === tab ? 'bg-sky-600 text-white' : 'bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-800 text-slate-600 dark:text-slate-300 hover:border-sky-400'}`}
                     >
                       {tab.replace('_', ' ')}
                     </button>
@@ -407,9 +407,9 @@ export default function RainfallIntelligence() {
                 <div className="overflow-x-auto">
                   <table className="w-full text-xs">
                     <thead>
-                      <tr className="bg-slate-100/80 dark:bg-slate-800/60 border-b border-slate-200 dark:border-slate-700">
+                      <tr className="bg-slate-100/80 dark:bg-slate-800/60 border-b border-slate-100 dark:border-slate-700">
                         {['#', 'Station', 'State', '24h Rainfall', 'Status', 'Trend'].map(h => (
-                          <th key={h} className="px-4 py-2.5 text-left text-[10px] font-extrabold uppercase tracking-wider text-slate-500 dark:text-slate-400">{h}</th>
+                          <th key={h} className="px-4 py-2.5 text-left text-[10px] font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">{h}</th>
                         ))}
                       </tr>
                     </thead>
@@ -484,10 +484,10 @@ export default function RainfallIntelligence() {
                   <IOSGlassCard key={i} className="p-4 rounded-2xl">
                     <div className="flex items-center justify-between mb-2">
                       <h3 className="font-bold text-sm text-slate-800 dark:text-white">{ins.title}</h3>
-                      <span className="text-[10px] font-extrabold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">{ins.confidence}% conf.</span>
+                      <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded-full">{ins.confidence}% conf.</span>
                     </div>
                     <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">{ins.detail}</p>
-                    <div className="mt-3 pt-2 border-t border-slate-200 dark:border-slate-700">
+                    <div className="mt-3 pt-2 border-t border-slate-100 dark:border-slate-700">
                       <span className="text-[10px] text-slate-400 dark:text-slate-500">Model: {ins.model}</span>
                     </div>
                   </IOSGlassCard>
@@ -503,7 +503,7 @@ export default function RainfallIntelligence() {
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
                 {DATA_SOURCES.map((src, i) => (
-                  <IOSGlassCard key={i} className="p-3.5 rounded-xl text-center">
+                  <IOSGlassCard key={i} className="p-3.5 rounded-2xl text-center">
                     <div className="text-2xl mb-1.5">{src.icon}</div>
                     <div className="text-xs font-bold text-slate-800 dark:text-white">{src.name}</div>
                     <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 leading-tight">{src.desc}</div>

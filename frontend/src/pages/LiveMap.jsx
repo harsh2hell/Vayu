@@ -167,7 +167,7 @@ const LiveMap = () => {
         >
           {/* Frosted Glass Notification Card */}
           <div 
-            className="w-full max-w-lg bg-white/95 dark:bg-slate-900/95 border border-slate-200/90 dark:border-white/10 rounded-3xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.35)] p-6 sm:p-7 relative overflow-hidden flex flex-col justify-between"
+            className="w-full max-w-lg bg-white/95 dark:bg-slate-800/95 border border-slate-100/90 dark:border-white/10 rounded-3xl shadow-[0_25px_60px_-15px_rgba(0,0,0,0.35)] p-6 sm:p-7 relative overflow-hidden flex flex-col justify-between"
             style={{
               backdropFilter: 'blur(28px) saturate(190%)',
               WebkitBackdropFilter: 'blur(28px) saturate(190%)',
@@ -213,7 +213,7 @@ const LiveMap = () => {
               </div>
 
               {/* Informative Description */}
-              <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/70 dark:border-slate-700/60 space-y-2 text-xs leading-relaxed text-slate-600 dark:text-slate-300">
+              <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100/70 dark:border-slate-700/60 space-y-2 text-xs leading-relaxed text-slate-600 dark:text-slate-300">
                 <p>
                   {isHindi 
                     ? 'यह मॉड्यूल वास्तविक समय के मौसम संबंधी उपग्रह डेटा के साथ एक इंटरैक्टिव 3D अर्थ ग्लोब शुरू करता है। इसमें चक्रवाती भंवर (Cyclonic Vortex), वायुमंडलीय बादल और सौर प्रकाश शामिल हैं।'
@@ -254,7 +254,7 @@ const LiveMap = () => {
               <button
                 type="button"
                 onClick={handleLeave}
-                className="px-4 py-2.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 transition-all cursor-pointer shadow-2xs hover:scale-[1.02] active:scale-95 flex items-center gap-1.5"
+                className="px-4 py-2.5 rounded-2xl text-xs font-semibold text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-100 dark:border-slate-700 transition-all cursor-pointer shadow-2xs hover:scale-[1.02] active:scale-95 flex items-center gap-1.5"
                 title={isHindi ? 'पिछले पेज पर वापस जाएं' : 'Go back to previous page'}
               >
                 <ArrowLeft className="w-3.5 h-3.5" />
@@ -264,7 +264,7 @@ const LiveMap = () => {
               <button
                 type="button"
                 onClick={handleAllow}
-                className="px-5 py-2.5 rounded-xl text-xs font-semibold text-white bg-gradient-to-r from-sky-600 to-cyan-600 hover:from-sky-500 hover:to-cyan-500 shadow-md shadow-sky-600/25 transition-all cursor-pointer flex items-center gap-1.5 hover:scale-[1.02] active:scale-95"
+                className="px-5 py-2.5 rounded-2xl text-xs font-semibold text-white bg-gradient-to-r from-sky-600 to-cyan-600 hover:from-sky-500 hover:to-cyan-500 shadow-md shadow-sky-600/25 transition-all cursor-pointer flex items-center gap-1.5 hover:scale-[1.02] active:scale-95"
                 title={isHindi ? '3D अर्थ मॉड्यूल में प्रवेश करें' : 'Enter the 3D Live Earth Module'}
               >
                 <span>{isHindi ? 'अनुमति दें' : 'Allow'}</span>
@@ -282,7 +282,7 @@ const LiveMap = () => {
       <main className="flex-1 flex flex-col relative w-full max-w-[1800px] mx-auto px-2 sm:px-4 lg:px-6 py-3 sm:py-4 gap-3">
         
         {/* Top Control Bar: Title, Target Selectors, and Info Button */}
-        <div className="flex flex-wrap items-center justify-between gap-2.5 p-3 sm:p-4 rounded-3xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border border-slate-200/80 dark:border-white/10 shadow-sm">
+        <div className="flex flex-wrap items-center justify-between gap-2.5 p-3 sm:p-4 rounded-3xl bg-white/80 dark:bg-slate-800/80 backdrop-blur-md border border-slate-100/80 dark:border-white/10 shadow-sm">
           {/* Brand Badge */}
           <div className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-2xl bg-sky-500/10 dark:bg-sky-400/15 border border-sky-300/60 dark:border-sky-400/30 text-sky-600 dark:text-sky-400 flex items-center justify-center shadow-2xs">
@@ -312,9 +312,9 @@ const LiveMap = () => {
                 <button
                   key={target.id}
                   onClick={() => setSelectedTargetIndex(index)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 ${
+                  className={`px-3 py-1.5 rounded-2xl text-xs font-semibold whitespace-nowrap transition-all cursor-pointer flex items-center gap-1.5 ${
                     isSelected
-                      ? 'bg-sky-600 text-white shadow-xs scale-102'
+                      ? 'bg-sky-600 text-white shadow-sm scale-102'
                       : 'bg-slate-100 dark:bg-slate-800/80 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                   }`}
                 >
@@ -328,7 +328,7 @@ const LiveMap = () => {
           {/* Re-open Info Dialog Button */}
           <button
             onClick={() => setShowNotification(true)}
-            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/80 dark:border-slate-700 transition cursor-pointer"
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-2xl text-xs font-medium text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-100/80 dark:border-slate-700 transition cursor-pointer"
             title={isHindi ? "3D अर्थ मॉड्यूल विवरण देखें" : "View 3D Live Earth Module Details"}
           >
             <Info className="w-3.5 h-3.5 text-sky-500" />
@@ -338,14 +338,14 @@ const LiveMap = () => {
 
         {/* 3D Earth Workstation Box */}
         <div 
-          className={`relative w-full rounded-3xl overflow-hidden border border-slate-200/80 dark:border-white/10 shadow-xl bg-gradient-to-b from-slate-900 via-[#0a1122] to-black text-white flex flex-col justify-between transition-all ${
+          className={`relative w-full rounded-3xl overflow-hidden border border-slate-100/80 dark:border-white/10 shadow-xl bg-gradient-to-b from-slate-900 via-[#0a1122] to-black text-white flex flex-col justify-between transition-all ${
             isFullscreen ? 'fixed inset-0 z-[1500] rounded-none' : 'min-h-[620px] sm:min-h-[700px] lg:min-h-[750px] flex-1'
           }`}
         >
           {/* Top Left Floating Target Telemetry Card */}
           <div className="absolute top-4 left-4 z-20 pointer-events-auto max-w-xs sm:max-w-sm">
             <div 
-              className="p-3.5 sm:p-4 rounded-2xl bg-slate-900/80 backdrop-blur-xl border border-white/15 shadow-2xl text-xs space-y-2 text-white"
+              className="p-3.5 sm:p-4 rounded-2xl bg-slate-800/80 backdrop-blur-xl border border-white/15 shadow-2xl text-xs space-y-2 text-white"
               style={{ backdropFilter: 'blur(20px)' }}
             >
               <div className="flex items-center justify-between gap-2 border-b border-white/10 pb-2">
@@ -389,7 +389,7 @@ const LiveMap = () => {
             {/* Zoom In Button */}
             <button
               onClick={handleZoomIn}
-              className="p-2.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-white border border-white/15 backdrop-blur-md transition shadow-lg cursor-pointer"
+              className="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-700 text-white border border-white/15 backdrop-blur-md transition shadow-lg cursor-pointer"
               title={isHindi ? "ज़ूम इन" : "Zoom In"}
             >
               <Plus className="w-4 h-4" />
@@ -398,7 +398,7 @@ const LiveMap = () => {
             {/* Zoom Out Button */}
             <button
               onClick={handleZoomOut}
-              className="p-2.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-white border border-white/15 backdrop-blur-md transition shadow-lg cursor-pointer"
+              className="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-700 text-white border border-white/15 backdrop-blur-md transition shadow-lg cursor-pointer"
               title={isHindi ? "ज़ूम आउट" : "Zoom Out"}
             >
               <Minus className="w-4 h-4" />
@@ -407,7 +407,7 @@ const LiveMap = () => {
             {/* Reset to North / Recenter */}
             <button
               onClick={handleResetNorth}
-              className="p-2.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-cyan-400 border border-white/15 backdrop-blur-md transition shadow-lg cursor-pointer"
+              className="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-800 text-cyan-400 border border-white/15 backdrop-blur-md transition shadow-lg cursor-pointer"
               title={isHindi ? "उत्तर दिशा पर रीसेट करें" : "Reset North Orientation"}
             >
               <Compass className="w-4 h-4" />
@@ -416,8 +416,8 @@ const LiveMap = () => {
             {/* Toggle Auto Rotation */}
             <button
               onClick={() => setAutoRotate((prev) => !prev)}
-              className={`p-2.5 rounded-xl border border-white/15 backdrop-blur-md transition shadow-lg cursor-pointer ${
-                autoRotate ? 'bg-sky-600 text-white' : 'bg-slate-900/80 hover:bg-slate-800 text-slate-300'
+              className={`p-2.5 rounded-2xl border border-white/15 backdrop-blur-md transition shadow-lg cursor-pointer ${
+                autoRotate ? 'bg-sky-600 text-white' : 'bg-slate-800/80 hover:bg-slate-800 text-slate-300'
               }`}
               title={autoRotate ? (isHindi ? "घूर्णन रोकें" : "Pause Rotation") : (isHindi ? "घूर्णन शुरू करें" : "Start Rotation")}
             >
@@ -427,8 +427,8 @@ const LiveMap = () => {
             {/* Toggle Cyclonic Vortex */}
             <button
               onClick={() => setShowCyclone((prev) => !prev)}
-              className={`p-2.5 rounded-xl border border-white/15 backdrop-blur-md transition shadow-lg cursor-pointer ${
-                showCyclone ? 'bg-cyan-600 text-white' : 'bg-slate-900/80 hover:bg-slate-800 text-slate-300'
+              className={`p-2.5 rounded-2xl border border-white/15 backdrop-blur-md transition shadow-lg cursor-pointer ${
+                showCyclone ? 'bg-cyan-600 text-white' : 'bg-slate-800/80 hover:bg-slate-800 text-slate-300'
               }`}
               title={showCyclone ? (isHindi ? "चक्रवात परत छुपाएं" : "Hide Cyclone Layer") : (isHindi ? "चक्रवात परत दिखाएं" : "Show Cyclone Layer")}
             >
@@ -438,7 +438,7 @@ const LiveMap = () => {
             {/* Fullscreen Toggle */}
             <button
               onClick={() => setIsFullscreen((prev) => !prev)}
-              className="p-2.5 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-white border border-white/15 backdrop-blur-md transition shadow-lg cursor-pointer"
+              className="p-2.5 rounded-2xl bg-slate-800/80 hover:bg-slate-700 text-white border border-white/15 backdrop-blur-md transition shadow-lg cursor-pointer"
               title={isFullscreen ? (isHindi ? "पूर्ण स्क्रीन से बाहर निकलें" : "Exit Fullscreen") : (isHindi ? "पूर्ण स्क्रीन" : "Fullscreen")}
             >
               {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
@@ -465,12 +465,12 @@ const LiveMap = () => {
 
           {/* Bottom Interactive Guidance Pill */}
           <div className="absolute bottom-4 inset-x-4 z-20 flex flex-wrap items-center justify-between gap-2 pointer-events-none">
-            <div className="px-3.5 py-1.5 rounded-full bg-slate-900/80 border border-white/15 backdrop-blur-md text-[11px] text-slate-300 font-mono shadow-xl pointer-events-auto flex items-center gap-2">
+            <div className="px-3.5 py-1.5 rounded-full bg-slate-800/80 border border-white/15 backdrop-blur-md text-[11px] text-slate-300 font-mono shadow-xl pointer-events-auto flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
               <span>{isHindi ? 'ग्लोब घुमाने के लिए ड्रैग करें • स्क्रॉल से ज़ूम करें' : 'Drag to Rotate 3D Earth • Scroll / Pinch to Zoom'}</span>
             </div>
 
-            <div className="px-3 py-1 rounded-full bg-slate-900/80 border border-white/15 backdrop-blur-md text-[10px] text-slate-400 font-mono shadow-xl pointer-events-auto flex items-center gap-2">
+            <div className="px-3 py-1 rounded-full bg-slate-800/80 border border-white/15 backdrop-blur-md text-[10px] text-slate-400 font-mono shadow-xl pointer-events-auto flex items-center gap-2">
               <span>{isHindi ? 'मौसम विज्ञान प्रभाग' : 'Meteorological Intelligence'}</span>
               <span>•</span>
               <span className="text-sky-400 font-semibold">vayusat.live</span>

@@ -102,13 +102,13 @@ const Dashboard = () => {
         {/* Middle Row: Line Chart + Regions List */}
         <div className="flex flex-col lg:flex-row gap-6 bg-[#FAFAFA] rounded-[32px] p-6 border border-slate-100/60">
           
-          <div className="flex-1 flex flex-col min-w-0 pr-0 lg:pr-6 lg:border-r border-slate-200/50">
+          <div className="flex-1 flex flex-col min-w-0 pr-0 lg:pr-6 lg:border-r border-slate-100/50">
             <div className="flex flex-wrap items-center gap-6 mb-8">
-              <button className="text-sm font-bold text-slate-900 relative after:absolute after:-bottom-2 after:left-0 after:w-full after:h-0.5 after:bg-slate-900 cursor-pointer">Wind Speed Trends</button>
+              <button className="text-sm font-bold text-slate-900 relative after:absolute after:-bottom-2 after:left-0 after:w-full after:h-0.5 after:bg-slate-800 cursor-pointer">Wind Speed Trends</button>
               <button className="text-sm font-medium text-slate-400 hover:text-slate-700 cursor-pointer">Pressure Anomalies</button>
               <button className="text-sm font-medium text-slate-400 hover:text-slate-700 cursor-pointer">Rainfall</button>
               <div className="ml-auto flex gap-5 text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
-                <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-slate-900"></span> This year</span>
+                <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-slate-800"></span> This year</span>
                 <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-blue-300"></span> Last year</span>
               </div>
             </div>

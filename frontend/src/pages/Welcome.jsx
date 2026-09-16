@@ -481,7 +481,7 @@ const CityWeather3DCard = ({
         <div className="pointer-events-none absolute -top-8 -right-8 w-24 h-24 bg-gradient-to-br from-sky-400/20 to-transparent rounded-full blur-xl" />
 
         {/* 3D Floating Layer: City Name */}
-        <h3 className="glass-layer-title text-center font-heading font-extrabold text-sm sm:text-base tracking-wide text-slate-900 dark:text-white mb-2 relative z-10 transition-colors">
+        <h3 className="glass-layer-title text-center font-heading font-bold text-sm sm:text-base tracking-wide text-slate-900 dark:text-white mb-2 relative z-10 transition-colors">
           {isHindi ? city.nameHindi : city.name}
         </h3>
 
@@ -534,7 +534,7 @@ const CityWeather3DCard = ({
         {/* 3D Floating Layer: Forecast CTA */}
         <button
           onClick={() => onOpenForecast(city)}
-          className={`glass-layer-cta text-center text-xs font-black uppercase tracking-wider py-1.5 px-3 rounded-xl border backdrop-blur-xs transition-all duration-200 block w-full cursor-pointer mt-1.5 relative z-10 shadow-2xs hover:shadow-xs active:scale-[0.97] ${
+          className={`glass-layer-cta text-center text-xs font-black uppercase tracking-wider py-1.5 px-3 rounded-2xl border backdrop-blur-xs transition-all duration-200 block w-full cursor-pointer mt-1.5 relative z-10 shadow-2xs hover:shadow-sm active:scale-[0.97] ${
             isActive || tilt.isHovered
               ? 'bg-amber-500/20 dark:bg-amber-400/20 text-amber-700 dark:text-amber-300 border-amber-500/35 dark:border-amber-400/35'
               : 'bg-amber-500/10 hover:bg-amber-500/20 dark:bg-amber-400/10 dark:hover:bg-amber-400/20 text-amber-600 dark:text-amber-400 border-amber-500/25 dark:border-amber-400/25'
@@ -1566,7 +1566,7 @@ const Welcome = () => {
         <div className="max-w-7xl mx-auto w-full my-auto space-y-3 sm:space-y-3.5 lg:space-y-4">
 
           {/* Active Detected Area Status Indicator */}
-          <div className="flex flex-wrap items-center justify-between gap-2.5 border-b border-slate-200 dark:border-slate-800 pb-2.5 sm:pb-3">
+          <div className="flex flex-wrap items-center justify-between gap-2.5 border-b border-slate-100 dark:border-slate-800 pb-2.5 sm:pb-3">
             <div className="flex items-center gap-2.5 flex-wrap">
               {/* Active Detection Live Badge */}
               <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-50 dark:bg-red-950/50 text-red-700 dark:text-red-300 border border-red-200 dark:border-red-900/60 text-xs font-bold shadow-2xs">
@@ -1584,7 +1584,7 @@ const Welcome = () => {
               />
 
               {/* Detected Area Name */}
-              <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100/80 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 text-xs text-slate-800 dark:text-slate-200">
+              <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-100/80 dark:bg-slate-800/80 border border-slate-100/80 dark:border-slate-700/80 text-xs text-slate-800 dark:text-slate-200">
                 <span className="font-bold text-slate-950 dark:text-white">
                   {isHindi ? current.basinHindi || current.basin : current.basin}
                 </span>
@@ -1627,7 +1627,7 @@ const Welcome = () => {
                 </span>
               </span>
               {current.sst && (
-                <span className="hidden sm:inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-slate-100/80 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 text-[11px] font-mono border border-slate-200/60 dark:border-white/5">
+                <span className="hidden sm:inline-flex items-center gap-2 px-2.5 py-1 rounded-full bg-slate-100/80 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 text-[11px] font-mono border border-slate-100/60 dark:border-white/5">
                   <Waves className="w-3 h-3 text-sky-500" />
                   <span>SST {current.sst}°C</span>
                   <span className="text-slate-300 dark:text-slate-600">•</span>
@@ -1661,12 +1661,12 @@ const Welcome = () => {
           {/* 4 Playful & Interactive Metric Blocks */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
             {/* Card 1: Sustained Wind */}
-            <div className="group p-4 rounded-3xl cursor-default transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.02] hover:shadow-[0_14px_32px_rgba(14,165,233,0.18)] dark:hover:shadow-[0_16px_36px_rgba(14,165,233,0.25)] border border-slate-200/80 dark:border-white/10 hover:border-sky-400 dark:hover:border-sky-400/60 bg-white/90 dark:!bg-[#0c1322]/90 relative overflow-hidden flex flex-col justify-between select-none">
+            <div className="group p-4 rounded-3xl cursor-default transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.02] hover:shadow-[0_14px_32px_rgba(14,165,233,0.18)] dark:hover:shadow-[0_16px_36px_rgba(14,165,233,0.25)] border border-slate-100/80 dark:border-white/10 hover:border-sky-400 dark:hover:border-sky-400/60 bg-white/90 dark:!bg-[#0c1322]/90 relative overflow-hidden flex flex-col justify-between select-none">
               <div className="pointer-events-none absolute inset-x-4 top-0 h-0.5 bg-gradient-to-r from-transparent via-sky-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <div className="flex items-center gap-1.5">
-                    <div className="p-1.5 rounded-xl bg-sky-500/10 dark:bg-sky-400/15 border border-sky-300/60 dark:border-sky-400/30 text-sky-600 dark:text-sky-400 group-hover:rotate-45 group-hover:scale-110 transition-transform duration-500 shadow-2xs">
+                    <div className="p-1.5 rounded-2xl bg-sky-500/10 dark:bg-sky-400/15 border border-sky-300/60 dark:border-sky-400/30 text-sky-600 dark:text-sky-400 group-hover:rotate-45 group-hover:scale-110 transition-transform duration-500 shadow-2xs">
                       <Wind className="w-3.5 h-3.5" />
                     </div>
                     <span className="text-xs font-bold text-slate-600 dark:text-slate-300">
@@ -1691,12 +1691,12 @@ const Welcome = () => {
             </div>
 
             {/* Card 2: Central Pressure */}
-            <div className="group p-4 rounded-3xl cursor-default transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.02] hover:shadow-[0_14px_32px_rgba(99,102,241,0.18)] dark:hover:shadow-[0_16px_36px_rgba(99,102,241,0.25)] border border-slate-200/80 dark:border-white/10 hover:border-indigo-400 dark:hover:border-indigo-400/60 bg-white/90 dark:!bg-[#0f1124]/90 relative overflow-hidden flex flex-col justify-between select-none">
+            <div className="group p-4 rounded-3xl cursor-default transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.02] hover:shadow-[0_14px_32px_rgba(99,102,241,0.18)] dark:hover:shadow-[0_16px_36px_rgba(99,102,241,0.25)] border border-slate-100/80 dark:border-white/10 hover:border-indigo-400 dark:hover:border-indigo-400/60 bg-white/90 dark:!bg-[#0f1124]/90 relative overflow-hidden flex flex-col justify-between select-none">
               <div className="pointer-events-none absolute inset-x-4 top-0 h-0.5 bg-gradient-to-r from-transparent via-indigo-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <div className="flex items-center gap-1.5">
-                    <div className="p-1.5 rounded-xl bg-indigo-500/10 dark:bg-indigo-400/15 border border-indigo-300/60 dark:border-indigo-400/30 text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform duration-300 shadow-2xs">
+                    <div className="p-1.5 rounded-2xl bg-indigo-500/10 dark:bg-indigo-400/15 border border-indigo-300/60 dark:border-indigo-400/30 text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform duration-300 shadow-2xs">
                       <Gauge className="w-3.5 h-3.5" />
                     </div>
                     <span className="text-xs font-bold text-slate-600 dark:text-slate-300">
@@ -1721,12 +1721,12 @@ const Welcome = () => {
             </div>
 
             {/* Card 3: Next 48h Formation Risk */}
-            <div className="group p-4 rounded-3xl cursor-default transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.02] hover:shadow-[0_14px_32px_rgba(245,158,11,0.2)] dark:hover:shadow-[0_16px_36px_rgba(245,158,11,0.28)] border border-slate-200/80 dark:border-white/10 hover:border-amber-400 dark:hover:border-amber-400/60 bg-white/90 dark:!bg-[#191209]/90 relative overflow-hidden flex flex-col justify-between select-none">
+            <div className="group p-4 rounded-3xl cursor-default transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.02] hover:shadow-[0_14px_32px_rgba(245,158,11,0.2)] dark:hover:shadow-[0_16px_36px_rgba(245,158,11,0.28)] border border-slate-100/80 dark:border-white/10 hover:border-amber-400 dark:hover:border-amber-400/60 bg-white/90 dark:!bg-[#191209]/90 relative overflow-hidden flex flex-col justify-between select-none">
               <div className="pointer-events-none absolute inset-x-4 top-0 h-0.5 bg-gradient-to-r from-transparent via-amber-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <div className="flex items-center gap-1.5">
-                    <div className="p-1.5 rounded-xl bg-amber-500/10 dark:bg-amber-400/15 border border-amber-300/60 dark:border-amber-400/30 text-amber-600 dark:text-amber-400 group-hover:scale-125 transition-transform duration-300 shadow-2xs">
+                    <div className="p-1.5 rounded-2xl bg-amber-500/10 dark:bg-amber-400/15 border border-amber-300/60 dark:border-amber-400/30 text-amber-600 dark:text-amber-400 group-hover:scale-125 transition-transform duration-300 shadow-2xs">
                       <Activity className="w-3.5 h-3.5 animate-pulse" />
                     </div>
                     <span className="text-xs font-bold text-slate-600 dark:text-slate-300">
@@ -1759,12 +1759,12 @@ const Welcome = () => {
             </div>
 
             {/* Card 4: Movement & Direction */}
-            <div className="group p-4 rounded-3xl cursor-default transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.02] hover:shadow-[0_14px_32px_rgba(16,185,129,0.18)] dark:hover:shadow-[0_16px_36px_rgba(16,185,129,0.25)] border border-slate-200/80 dark:border-white/10 hover:border-emerald-400 dark:hover:border-emerald-400/60 bg-white/90 dark:!bg-[#0a1815]/90 relative overflow-hidden flex flex-col justify-between select-none">
+            <div className="group p-4 rounded-3xl cursor-default transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.02] hover:shadow-[0_14px_32px_rgba(16,185,129,0.18)] dark:hover:shadow-[0_16px_36px_rgba(16,185,129,0.25)] border border-slate-100/80 dark:border-white/10 hover:border-emerald-400 dark:hover:border-emerald-400/60 bg-white/90 dark:!bg-[#0a1815]/90 relative overflow-hidden flex flex-col justify-between select-none">
               <div className="pointer-events-none absolute inset-x-4 top-0 h-0.5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <div className="flex items-center gap-1.5">
-                    <div className="p-1.5 rounded-xl bg-emerald-500/10 dark:bg-emerald-400/15 border border-emerald-300/60 dark:border-emerald-400/30 text-emerald-600 dark:text-emerald-400 group-hover:rotate-180 transition-transform duration-700 shadow-2xs">
+                    <div className="p-1.5 rounded-2xl bg-emerald-500/10 dark:bg-emerald-400/15 border border-emerald-300/60 dark:border-emerald-400/30 text-emerald-600 dark:text-emerald-400 group-hover:rotate-180 transition-transform duration-700 shadow-2xs">
                       <Compass className="w-3.5 h-3.5" />
                     </div>
                     <span className="text-xs font-bold text-slate-600 dark:text-slate-300">
@@ -1803,7 +1803,7 @@ const Welcome = () => {
           />
 
           {/* Coastal Corridor Strip */}
-          <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-2xl sm:rounded-3xl px-4 py-2.5 sm:py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs shadow-xs">
+          <div className="bg-white dark:bg-slate-800/90 border border-slate-100 dark:border-slate-800 rounded-2xl sm:rounded-3xl px-4 py-2.5 sm:py-3 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 text-xs shadow-sm">
             <div className="flex items-center gap-1.5 flex-wrap">
               <span className="text-slate-500 dark:text-slate-400 font-medium">
                 {isHindi ? 'अनुमानित तटीय प्रभाव क्षेत्र:' : 'Projected Coastal Corridor:'}
@@ -1863,7 +1863,7 @@ const Welcome = () => {
             <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white dark:via-white/25 to-transparent" />
 
             {/* Header / Title */}
-            <div className="flex items-center justify-between mb-3 px-1 border-b border-slate-200/70 dark:border-white/10 pb-2.5 relative z-10">
+            <div className="flex items-center justify-between mb-3 px-1 border-b border-slate-100/70 dark:border-white/10 pb-2.5 relative z-10">
               <div className="flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-sky-500 animate-pulse" />
                 <h2 className="font-heading font-black text-xs sm:text-sm tracking-wider uppercase text-slate-950 dark:text-white">
@@ -1874,14 +1874,14 @@ const Welcome = () => {
                 <button
                   onClick={handlePrevCity}
                   aria-label="Previous City"
-                  className="p-1.5 rounded-xl border border-white/80 dark:border-white/15 bg-white/70 hover:bg-white dark:bg-white/10 dark:hover:bg-white/20 backdrop-blur-md text-slate-700 dark:text-slate-200 shadow-xs transition-all cursor-pointer"
+                  className="p-1.5 rounded-2xl border border-white/80 dark:border-white/15 bg-white/70 hover:bg-white dark:bg-white/10 dark:hover:bg-white/20 backdrop-blur-md text-slate-700 dark:text-slate-200 shadow-sm transition-all cursor-pointer"
                 >
                   <ChevronLeft className="w-3.5 h-3.5" />
                 </button>
                 <button
                   onClick={handleNextCity}
                   aria-label="Next City"
-                  className="p-1.5 rounded-xl border border-white/80 dark:border-white/15 bg-white/70 hover:bg-white dark:bg-white/10 dark:hover:bg-white/20 backdrop-blur-md text-slate-700 dark:text-slate-200 shadow-xs transition-all cursor-pointer"
+                  className="p-1.5 rounded-2xl border border-white/80 dark:border-white/15 bg-white/70 hover:bg-white dark:bg-white/10 dark:hover:bg-white/20 backdrop-blur-md text-slate-700 dark:text-slate-200 shadow-sm transition-all cursor-pointer"
                 >
                   <ChevronRight className="w-3.5 h-3.5" />
                 </button>
@@ -1943,7 +1943,7 @@ const Welcome = () => {
             <div className="pointer-events-none absolute -top-16 left-12 w-96 h-96 bg-sky-500/10 dark:bg-sky-500/5 rounded-full blur-3xl" />
             <div className="pointer-events-none absolute -bottom-16 right-12 w-96 h-96 bg-indigo-500/10 dark:bg-indigo-500/5 rounded-full blur-3xl" />
 
-            <div className="border-b border-slate-200/80 dark:border-white/10 pb-1.5 mb-3 flex items-center justify-between relative z-10">
+            <div className="border-b border-slate-100/80 dark:border-white/10 pb-1.5 mb-3 flex items-center justify-between relative z-10">
               <h2 className="text-xs sm:text-sm font-black tracking-wider uppercase text-slate-950 dark:text-white font-heading flex items-center gap-2">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                 <span>{isHindi ? 'हमारी सेवाएं (OUR SERVICES)' : 'OUR SERVICES'}</span>
@@ -1961,7 +1961,7 @@ const Welcome = () => {
                     key={srv.id}
                     onClick={() => navigate(srv.route)}
                     wrapperClassName="h-full"
-                    className={`p-4 sm:p-4.5 rounded-2xl sm:rounded-3xl cursor-pointer group flex flex-col justify-between h-full dark:!bg-slate-900/85 dark:hover:!bg-slate-900/95 dark:border-white/10 ${srv.borderHover} transition-all duration-300`}
+                    className={`p-4 sm:p-4.5 rounded-2xl sm:rounded-3xl cursor-pointer group flex flex-col justify-between h-full dark:!bg-slate-800/85 dark:hover:!bg-slate-800/95 dark:border-white/10 ${srv.borderHover} transition-all duration-300`}
                   >
                     {/* Ambient corner jewel glow - crisp and subtle */}
                     <div className={`absolute -right-8 -top-8 w-36 h-36 rounded-full bg-gradient-to-br ${srv.gradient} blur-xl pointer-events-none opacity-40 group-hover:opacity-90 group-hover:scale-125 transition-all duration-500`} />
@@ -1973,7 +1973,7 @@ const Welcome = () => {
                     <div className="relative z-10">
                       {/* Card Header: Icon Badge + Pill Tag */}
                       <div className="flex items-center justify-between gap-2 mb-3">
-                        <div className={`p-2.5 rounded-2xl border ${srv.iconBg} transition-all duration-300 shadow-xs flex items-center justify-center`}>
+                        <div className={`p-2.5 rounded-2xl border ${srv.iconBg} transition-all duration-300 shadow-sm flex items-center justify-center`}>
                           <IconComponent className="w-5 h-5 sm:w-6 sm:h-6 group-hover:scale-110 transition-transform duration-300" />
                         </div>
                         <span className={`text-[9.5px] sm:text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${srv.tagClass} shrink-0`}>
@@ -1993,11 +1993,11 @@ const Welcome = () => {
                     </div>
 
                     {/* Card Bottom: Read More Action with animated arrow */}
-                    <div className="pt-3 mt-3 border-t border-slate-200/60 dark:border-white/10 flex items-center justify-between text-slate-600 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors relative z-10">
+                    <div className="pt-3 mt-3 border-t border-slate-100/60 dark:border-white/10 flex items-center justify-between text-slate-600 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors relative z-10">
                       <span className="text-[11px] font-bold">
                         {isHindi ? 'विवरण देखें' : 'Explore Service'}
                       </span>
-                      <div className="p-1 rounded-xl bg-white/80 dark:bg-slate-800/80 group-hover:bg-slate-900 group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-slate-950 border border-slate-200/80 dark:border-white/15 backdrop-blur-md shadow-2xs transition-all">
+                      <div className="p-1 rounded-2xl bg-white/80 dark:bg-slate-800/80 group-hover:bg-slate-800 group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-slate-950 border border-slate-100/80 dark:border-white/15 backdrop-blur-md shadow-2xs transition-all">
                         <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
                       </div>
                     </div>
@@ -2011,13 +2011,13 @@ const Welcome = () => {
                SIH AI CYCLONE INTELLIGENCE & PATTERN CLASSIFICATION SUITE PREVIEW
                Problem Statement: "AI/ML system for identification, classification, and prediction of tropical cyclone patterns using multi-source satellite data"
                ========================================================================= */}
-          <div className="relative overflow-hidden rounded-3xl p-5 sm:p-6 bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 dark:bg-gradient-to-b dark:from-[#0b0f19] dark:via-[#070a12] dark:to-[#04060a] border border-slate-200/80 dark:border-white/10 shadow-[0_16px_40px_rgba(0,0,0,0.05)] dark:shadow-[0_24px_60px_rgba(0,0,0,0.85)] transition-all duration-300">
+          <div className="relative overflow-hidden rounded-3xl p-5 sm:p-6 bg-gradient-to-br from-slate-50 via-white to-indigo-50/30 dark:bg-gradient-to-b dark:from-[#0b0f19] dark:via-[#070a12] dark:to-[#04060a] border border-slate-100/80 dark:border-white/10 shadow-[0_16px_40px_rgba(0,0,0,0.05)] dark:shadow-[0_24px_60px_rgba(0,0,0,0.85)] transition-all duration-300">
             {/* Top specular highlight */}
             <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/80 dark:via-white/20 to-transparent" />
 
             <div className="relative z-10 space-y-4">
               {/* Header Banner */}
-              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-slate-200/70 dark:border-white/10 pb-4">
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-3 border-b border-slate-100/70 dark:border-white/10 pb-4">
                 <div>
                   <div className="flex flex-wrap items-center gap-2 mb-1.5">
                     <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-500/10 dark:bg-purple-500/15 border border-purple-300/70 dark:border-purple-400/30 text-purple-700 dark:text-purple-300 text-[10px] font-bold tracking-wide shadow-[0_0_12px_rgba(168,85,247,0.12)]">
@@ -2060,10 +2060,10 @@ const Welcome = () => {
                 <IOSGlassCard
                   onClick={() => navigate('/ai-cyclone?tab=identification')}
                   wrapperClassName="h-full"
-                  className="p-4 rounded-2xl sm:rounded-3xl cursor-pointer group h-full flex flex-col justify-between bg-white/90 dark:!bg-[#0c1322]/90 dark:hover:!bg-[#0f172a]/95 border border-slate-200/80 dark:border-sky-500/20 hover:border-sky-400 dark:hover:border-sky-400/60 shadow-xs hover:shadow-[0_12px_32px_rgba(14,165,233,0.18)] transition-all duration-300"
+                  className="p-4 rounded-2xl sm:rounded-3xl cursor-pointer group h-full flex flex-col justify-between bg-white/90 dark:!bg-[#0c1322]/90 dark:hover:!bg-[#0f172a]/95 border border-slate-100/80 dark:border-sky-500/20 hover:border-sky-400 dark:hover:border-sky-400/60 shadow-sm hover:shadow-[0_12px_32px_rgba(14,165,233,0.18)] transition-all duration-300"
                 >
                   <div className="flex items-center justify-between gap-2 mb-2.5">
-                    <div className="p-2 rounded-xl bg-sky-500/10 dark:bg-sky-400/15 border border-sky-300/60 dark:border-sky-400/30 text-sky-600 dark:text-sky-300 shadow-[0_0_12px_rgba(14,165,233,0.2)] group-hover:scale-105 transition-transform duration-300">
+                    <div className="p-2 rounded-2xl bg-sky-500/10 dark:bg-sky-400/15 border border-sky-300/60 dark:border-sky-400/30 text-sky-600 dark:text-sky-300 shadow-[0_0_12px_rgba(14,165,233,0.2)] group-hover:scale-105 transition-transform duration-300">
                       <Crosshair className="w-4 h-4" />
                     </div>
                     <span className="text-[9.5px] sm:text-[10px] font-mono font-bold tracking-wider uppercase text-sky-700 dark:text-sky-300 bg-sky-500/10 dark:bg-sky-400/15 border border-sky-300/60 dark:border-sky-400/30 px-2.5 py-0.5 rounded-full shadow-[0_0_8px_rgba(14,165,233,0.15)]">
@@ -2082,10 +2082,10 @@ const Welcome = () => {
                 <IOSGlassCard
                   onClick={() => navigate('/ai-cyclone?tab=classification')}
                   wrapperClassName="h-full"
-                  className="p-4 rounded-2xl sm:rounded-3xl cursor-pointer group h-full flex flex-col justify-between bg-white/90 dark:!bg-[#130d22]/90 dark:hover:!bg-[#18102e]/95 border border-slate-200/80 dark:border-purple-500/20 hover:border-purple-400 dark:hover:border-purple-400/60 shadow-xs hover:shadow-[0_12px_32px_rgba(168,85,247,0.18)] transition-all duration-300"
+                  className="p-4 rounded-2xl sm:rounded-3xl cursor-pointer group h-full flex flex-col justify-between bg-white/90 dark:!bg-[#130d22]/90 dark:hover:!bg-[#18102e]/95 border border-slate-100/80 dark:border-purple-500/20 hover:border-purple-400 dark:hover:border-purple-400/60 shadow-sm hover:shadow-[0_12px_32px_rgba(168,85,247,0.18)] transition-all duration-300"
                 >
                   <div className="flex items-center justify-between gap-2 mb-2.5">
-                    <div className="p-2 rounded-xl bg-purple-500/10 dark:bg-purple-400/15 border border-purple-300/60 dark:border-purple-400/30 text-purple-600 dark:text-purple-300 shadow-[0_0_12px_rgba(168,85,247,0.2)] group-hover:scale-105 transition-transform duration-300">
+                    <div className="p-2 rounded-2xl bg-purple-500/10 dark:bg-purple-400/15 border border-purple-300/60 dark:border-purple-400/30 text-purple-600 dark:text-purple-300 shadow-[0_0_12px_rgba(168,85,247,0.2)] group-hover:scale-105 transition-transform duration-300">
                       <Layers className="w-4 h-4" />
                     </div>
                     <span className="text-[9.5px] sm:text-[10px] font-mono font-bold tracking-wider uppercase text-purple-700 dark:text-purple-300 bg-purple-500/10 dark:bg-purple-400/15 border border-purple-300/60 dark:border-purple-400/30 px-2.5 py-0.5 rounded-full shadow-[0_0_8px_rgba(168,85,247,0.15)]">
@@ -2104,10 +2104,10 @@ const Welcome = () => {
                 <IOSGlassCard
                   onClick={() => navigate('/ai-cyclone?tab=multisource')}
                   wrapperClassName="h-full"
-                  className="p-4 rounded-2xl sm:rounded-3xl cursor-pointer group h-full flex flex-col justify-between bg-white/90 dark:!bg-[#0a1815]/90 dark:hover:!bg-[#0d221d]/95 border border-slate-200/80 dark:border-emerald-500/20 hover:border-emerald-400 dark:hover:border-emerald-400/60 shadow-xs hover:shadow-[0_12px_32px_rgba(16,185,129,0.18)] transition-all duration-300"
+                  className="p-4 rounded-2xl sm:rounded-3xl cursor-pointer group h-full flex flex-col justify-between bg-white/90 dark:!bg-[#0a1815]/90 dark:hover:!bg-[#0d221d]/95 border border-slate-100/80 dark:border-emerald-500/20 hover:border-emerald-400 dark:hover:border-emerald-400/60 shadow-sm hover:shadow-[0_12px_32px_rgba(16,185,129,0.18)] transition-all duration-300"
                 >
                   <div className="flex items-center justify-between gap-2 mb-2.5">
-                    <div className="p-2 rounded-xl bg-emerald-500/10 dark:bg-emerald-400/15 border border-emerald-300/60 dark:border-emerald-400/30 text-emerald-600 dark:text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.2)] group-hover:scale-105 transition-transform duration-300">
+                    <div className="p-2 rounded-2xl bg-emerald-500/10 dark:bg-emerald-400/15 border border-emerald-300/60 dark:border-emerald-400/30 text-emerald-600 dark:text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.2)] group-hover:scale-105 transition-transform duration-300">
                       <Satellite className="w-4 h-4" />
                     </div>
                     <span className="text-[9.5px] sm:text-[10px] font-mono font-bold tracking-wider uppercase text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 dark:bg-emerald-400/15 border border-emerald-300/60 dark:border-emerald-400/30 px-2.5 py-0.5 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.15)]">
@@ -2126,10 +2126,10 @@ const Welcome = () => {
                 <IOSGlassCard
                   onClick={() => navigate('/ai-cyclone?tab=prediction')}
                   wrapperClassName="h-full"
-                  className="p-4 rounded-2xl sm:rounded-3xl cursor-pointer group h-full flex flex-col justify-between bg-white/90 dark:!bg-[#1c0e14]/90 dark:hover:!bg-[#26131b]/95 border border-slate-200/80 dark:border-rose-500/20 hover:border-rose-400 dark:hover:border-rose-400/60 shadow-xs hover:shadow-[0_12px_32px_rgba(244,63,94,0.18)] transition-all duration-300"
+                  className="p-4 rounded-2xl sm:rounded-3xl cursor-pointer group h-full flex flex-col justify-between bg-white/90 dark:!bg-[#1c0e14]/90 dark:hover:!bg-[#26131b]/95 border border-slate-100/80 dark:border-rose-500/20 hover:border-rose-400 dark:hover:border-rose-400/60 shadow-sm hover:shadow-[0_12px_32px_rgba(244,63,94,0.18)] transition-all duration-300"
                 >
                   <div className="flex items-center justify-between gap-2 mb-2.5">
-                    <div className="p-2 rounded-xl bg-rose-500/10 dark:bg-rose-400/15 border border-rose-300/60 dark:border-rose-400/30 text-rose-600 dark:text-rose-300 shadow-[0_0_12px_rgba(244,63,94,0.2)] group-hover:scale-105 transition-transform duration-300">
+                    <div className="p-2 rounded-2xl bg-rose-500/10 dark:bg-rose-400/15 border border-rose-300/60 dark:border-rose-400/30 text-rose-600 dark:text-rose-300 shadow-[0_0_12px_rgba(244,63,94,0.2)] group-hover:scale-105 transition-transform duration-300">
                       <TrendingUp className="w-4 h-4" />
                     </div>
                     <span className="text-[9.5px] sm:text-[10px] font-mono font-bold tracking-wider uppercase text-rose-700 dark:text-rose-300 bg-rose-500/10 dark:bg-rose-400/15 border border-rose-300/60 dark:border-rose-400/30 px-2.5 py-0.5 rounded-full shadow-[0_0_8px_rgba(244,63,94,0.15)]">
@@ -2151,7 +2151,7 @@ const Welcome = () => {
           <div className="flex flex-wrap items-center gap-3 pt-0.5 pb-1">
             <button
               onClick={() => navigate('/threat-map')}
-              className="px-5 py-2.5 rounded-2xl bg-slate-950 hover:bg-slate-800 text-white dark:bg-white dark:text-slate-950 dark:hover:bg-slate-100 font-semibold text-xs transition-all shadow-xs flex items-center gap-2 cursor-pointer"
+              className="px-5 py-2.5 rounded-2xl bg-slate-950 hover:bg-slate-700 text-white dark:bg-white dark:text-slate-950 dark:hover:bg-slate-100 font-semibold text-xs transition-all shadow-sm flex items-center gap-2 cursor-pointer"
             >
               <Eye className="w-4 h-4" />
               <span>{isHindi ? 'जीआईएस रडार मैप देखें' : 'Inspect GIS Radar Map'}</span>
@@ -2159,7 +2159,7 @@ const Welcome = () => {
 
             <button
               onClick={() => navigate('/threat-map')}
-              className="px-5 py-2.5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 font-semibold text-xs transition-all shadow-xs flex items-center gap-2 cursor-pointer"
+              className="px-5 py-2.5 rounded-2xl border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 font-semibold text-xs transition-all shadow-sm flex items-center gap-2 cursor-pointer"
             >
               <ShieldAlert className="w-4 h-4 text-red-600 dark:text-red-400" />
               <span>{isHindi ? 'तटीय जिला आपदा मैट्रिक्स' : 'View District Threat Matrix'}</span>
@@ -2180,7 +2180,7 @@ const Welcome = () => {
             onClick={(e) => e.stopPropagation()}
           >
             {/* Modal Header */}
-            <div className="bg-slate-950 dark:bg-black p-4 sm:p-5 text-white relative border-b border-slate-200 dark:border-slate-800">
+            <div className="bg-slate-950 dark:bg-black p-4 sm:p-5 text-white relative border-b border-slate-100 dark:border-slate-800">
               <button
                 onClick={() => setActiveServiceModal(null)}
                 className="absolute top-3.5 right-3.5 p-1.5 rounded-full bg-white/10 hover:bg-white/20 text-white transition-all cursor-pointer"
@@ -2216,7 +2216,7 @@ const Welcome = () => {
               {/* Stats Highlights */}
               <div className="grid grid-cols-3 gap-2.5 pt-1">
                 {activeServiceModal.stats.map((st, idx) => (
-                  <div key={idx} className="bg-slate-50 dark:bg-slate-800/80 border border-slate-200/80 dark:border-slate-700/80 rounded-2xl p-2.5 text-center">
+                  <div key={idx} className="bg-slate-50 dark:bg-slate-800/80 border border-slate-100/80 dark:border-slate-700/80 rounded-2xl p-2.5 text-center">
                     <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium block truncate">
                       {isHindi ? st.labelHindi : st.label}
                     </span>
@@ -2231,7 +2231,7 @@ const Welcome = () => {
               </div>
 
               {/* Modal Actions */}
-              <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-200 dark:border-slate-800">
+              <div className="flex items-center justify-end gap-2.5 pt-2 border-t border-slate-100 dark:border-slate-800">
                 <button
                   onClick={() => setActiveServiceModal(null)}
                   className="px-4 py-2 rounded-2xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
@@ -2244,7 +2244,7 @@ const Welcome = () => {
                     setActiveServiceModal(null);
                     navigate(r);
                   }}
-                  className="px-4.5 py-2.5 rounded-2xl text-xs font-bold text-white bg-slate-950 hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-100 transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+                  className="px-4.5 py-2.5 rounded-2xl text-xs font-bold text-white bg-slate-950 hover:bg-slate-800 dark:bg-white dark:text-slate-950 dark:hover:bg-slate-100 transition-all shadow-sm flex items-center gap-1.5 cursor-pointer"
                 >
                   <span>{isHindi ? activeServiceModal.routeLabelHindi : activeServiceModal.routeLabel}</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -2268,7 +2268,7 @@ const Welcome = () => {
             className="bg-white/95 dark:bg-slate-950/95 backdrop-blur-2xl border border-white/80 dark:border-white/10 rounded-3xl shadow-[0_24px_64px_rgba(0,0,0,0.2)] dark:shadow-[0_24px_64px_rgba(0,0,0,0.8)] max-w-md w-full overflow-hidden text-slate-900 dark:text-white"
           >
             {/* Modal Header */}
-            <div className="bg-slate-950 dark:bg-black text-white p-4 sm:p-5 relative border-b border-slate-200 dark:border-slate-800">
+            <div className="bg-slate-950 dark:bg-black text-white p-4 sm:p-5 relative border-b border-slate-100 dark:border-slate-800">
               <button
                 onClick={() => setActiveCityForecastModal(null)}
                 aria-label="Close Forecast Modal"
@@ -2300,7 +2300,7 @@ const Welcome = () => {
             <div className="p-4 sm:p-5 space-y-4">
               {/* Current Key Metrics */}
               <div className="grid grid-cols-3 gap-2 text-center text-xs">
-                <div className="bg-slate-50 dark:bg-slate-800/80 p-2.5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80">
+                <div className="bg-slate-50 dark:bg-slate-800/80 p-2.5 rounded-2xl border border-slate-100/80 dark:border-slate-700/80">
                   <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium block">
                     {isHindi ? 'हवा की गति' : 'Wind'}
                   </span>
@@ -2312,7 +2312,7 @@ const Welcome = () => {
                   </span>
                 </div>
 
-                <div className="bg-slate-50 dark:bg-slate-800/80 p-2.5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80">
+                <div className="bg-slate-50 dark:bg-slate-800/80 p-2.5 rounded-2xl border border-slate-100/80 dark:border-slate-700/80">
                   <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium block">
                     {isHindi ? 'आर्द्रता' : 'Humidity'}
                   </span>
@@ -2324,7 +2324,7 @@ const Welcome = () => {
                   </span>
                 </div>
 
-                <div className="bg-slate-50 dark:bg-slate-800/80 p-2.5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80">
+                <div className="bg-slate-50 dark:bg-slate-800/80 p-2.5 rounded-2xl border border-slate-100/80 dark:border-slate-700/80">
                   <span className="text-[10px] text-slate-500 dark:text-slate-400 font-medium block">
                     {isHindi ? 'दबाव' : 'Pressure'}
                   </span>
@@ -2344,7 +2344,7 @@ const Welcome = () => {
                 </h4>
                 <div className="grid grid-cols-3 gap-2">
                   {activeCityForecastModal.forecast?.map((fc, idx) => (
-                    <div key={idx} className="p-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/80 text-center">
+                    <div key={idx} className="p-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-700/80 text-center">
                       <span className="text-[11px] font-bold text-slate-700 dark:text-slate-300 block">
                         {isHindi ? fc.dayHindi : fc.day}
                       </span>
@@ -2362,7 +2362,7 @@ const Welcome = () => {
               </div>
 
               {/* Modal Actions */}
-              <div className="flex items-center justify-between pt-2 border-t border-slate-200 dark:border-slate-800">
+              <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800">
                 <button
                   onClick={() => setActiveCityForecastModal(null)}
                   className="px-4 py-2 rounded-2xl text-xs font-semibold text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
@@ -2385,7 +2385,7 @@ const Welcome = () => {
                       setActiveCityForecastModal(null);
                       navigate(`/forecast/${cId}`);
                     }}
-                    className="px-4.5 py-2.5 rounded-2xl text-xs font-bold text-white bg-sky-600 hover:bg-sky-500 dark:bg-sky-500 dark:text-white dark:hover:bg-sky-400 transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+                    className="px-4.5 py-2.5 rounded-2xl text-xs font-bold text-white bg-sky-600 hover:bg-sky-500 dark:bg-sky-500 dark:text-white dark:hover:bg-sky-400 transition-all shadow-sm flex items-center gap-1.5 cursor-pointer"
                   >
                     <span>{isHindi ? '7-दिवसीय विस्तृत पूर्वानुमान' : 'Open 7-Day City Forecast'}</span>
                     <ArrowRight className="w-3.5 h-3.5" />

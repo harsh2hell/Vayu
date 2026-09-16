@@ -146,7 +146,7 @@ const Sidebar = () => {
 
   return (
     <>
-      <aside className="bg-white flex flex-col justify-between fixed top-0 left-0 h-screen z-40 border-r border-slate-200 w-56 select-none font-sans">
+      <aside className="bg-white flex flex-col justify-between fixed top-0 left-0 h-screen z-40 border-r border-slate-100 w-56 select-none font-sans">
         
         <div className="flex-1 flex flex-col overflow-hidden">
           {/* Top Profile Area */}
@@ -225,10 +225,10 @@ const Sidebar = () => {
       {/* Logout Confirmation Dialog Modal */}
       {isLogoutDialogOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="w-full max-w-sm bg-white border border-slate-200 rounded-2xl p-5 shadow-2xl space-y-4">
+          <div className="w-full max-w-sm bg-white border border-slate-100 rounded-2xl p-5 shadow-2xl space-y-4">
             
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600 shrink-0">
+              <div className="w-10 h-10 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600 shrink-0">
                 <LogOut className="w-5 h-5" />
               </div>
               <div>

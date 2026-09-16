@@ -85,7 +85,7 @@ const Performance = () => {
     if (active && payload && payload.length) {
       const data = payload[0].payload;
       return (
-        <div className="bg-slate-900/95 backdrop-blur-md text-white p-3 rounded-xl shadow-xl border border-slate-700/80 text-xs space-y-2 max-w-xs">
+        <div className="bg-slate-800/95 backdrop-blur-md text-white p-3 rounded-2xl shadow-xl border border-slate-700/80 text-xs space-y-2 max-w-xs">
           <div className="flex items-center justify-between border-b border-slate-700/60 pb-1.5">
             <span className="font-bold text-sky-400">{data.horizon} Horizon</span>
             <span className="text-[10px] px-2 py-0.5 rounded bg-slate-800 text-slate-300 font-medium">
@@ -156,7 +156,7 @@ const Performance = () => {
         <button 
           onClick={fetchInspectionData}
           disabled={loading}
-          className="flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 shadow-sm transition"
+          className="flex items-center gap-2 px-3.5 py-2 text-xs font-semibold rounded-2xl bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-100 dark:border-slate-700 shadow-sm transition"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} /> Refresh Telemetry
         </button>
@@ -164,7 +164,7 @@ const Performance = () => {
 
       {/* 4 Clean System Status Cards (Simple & Meaningful) */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="card p-4 border-l-4 border-[#003087] bg-white dark:bg-slate-900 shadow-sm">
+        <div className="card p-4 border-l-4 border-[#003087] bg-white dark:bg-slate-800 shadow-sm">
           <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">AI Pipeline Status</p>
           <p className="text-lg font-bold text-[#003087] dark:text-sky-400 mt-1">
             100% Operational
@@ -174,7 +174,7 @@ const Performance = () => {
           </p>
         </div>
 
-        <div className="card p-4 border-l-4 border-sky-500 bg-white dark:bg-slate-900 shadow-sm">
+        <div className="card p-4 border-l-4 border-sky-500 bg-white dark:bg-slate-800 shadow-sm">
           <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Forecast Accuracy</p>
           <p className="text-lg font-bold text-slate-900 dark:text-slate-100 mt-1">
             94.8% Spatial Fidelity
@@ -184,7 +184,7 @@ const Performance = () => {
           </p>
         </div>
 
-        <div className="card p-4 border-l-4 border-amber-500 bg-white dark:bg-slate-900 shadow-sm">
+        <div className="card p-4 border-l-4 border-amber-500 bg-white dark:bg-slate-800 shadow-sm">
           <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Inference Speed</p>
           <p className="text-lg font-bold text-slate-800 dark:text-slate-200 mt-1 flex items-center gap-1.5">
             <Zap className="w-4 h-4 text-amber-500" /> ~15 ms
@@ -194,7 +194,7 @@ const Performance = () => {
           </p>
         </div>
 
-        <div className="card p-4 border-l-4 border-emerald-500 bg-white dark:bg-slate-900 shadow-sm">
+        <div className="card p-4 border-l-4 border-emerald-500 bg-white dark:bg-slate-800 shadow-sm">
           <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Forecast Horizon</p>
           <p className="text-lg font-bold text-emerald-700 dark:text-emerald-400 mt-1">
             72 Hours Rollout
@@ -208,10 +208,10 @@ const Performance = () => {
       {/* 3 Core Model Modules (Clean, simple, no technical hashes) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Module 1: Eye Detection */}
-        <div className="card overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm rounded-2xl bg-white dark:bg-slate-900">
+        <div className="card overflow-hidden border border-slate-100 dark:border-slate-800 shadow-sm rounded-2xl bg-white dark:bg-slate-800">
           <div className="p-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <span className="p-2 rounded-xl bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400">
+              <span className="p-2 rounded-2xl bg-blue-100 dark:bg-blue-950 text-blue-600 dark:text-blue-400">
                 <Eye className="w-4 h-4" />
               </span>
               <div>
@@ -227,7 +227,7 @@ const Performance = () => {
               Continuously scans INSAT-3D/3DR satellite imagery to locate the storm eye and center coordinates in real-time.
             </p>
             
-            <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl space-y-2 border border-slate-100 dark:border-slate-800">
+            <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-2xl space-y-2 border border-slate-100 dark:border-slate-800">
               <div className="flex justify-between items-center text-slate-600 dark:text-slate-300">
                 <span>Center Accuracy:</span>
                 <span className="font-semibold text-emerald-600 dark:text-emerald-400 flex items-center gap-1">
@@ -247,10 +247,10 @@ const Performance = () => {
         </div>
 
         {/* Module 2: Intensity Classification */}
-        <div className="card overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm rounded-2xl bg-white dark:bg-slate-900">
+        <div className="card overflow-hidden border border-slate-100 dark:border-slate-800 shadow-sm rounded-2xl bg-white dark:bg-slate-800">
           <div className="p-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <span className="p-2 rounded-xl bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400">
+              <span className="p-2 rounded-2xl bg-amber-100 dark:bg-amber-950 text-amber-600 dark:text-amber-400">
                 <Layers className="w-4 h-4" />
               </span>
               <div>
@@ -266,7 +266,7 @@ const Performance = () => {
               Classifies cloud organization patterns (Eye, Curved Band, Shear) to determine current cyclone strength and T-Number.
             </p>
             
-            <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl space-y-2 border border-slate-100 dark:border-slate-800">
+            <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-2xl space-y-2 border border-slate-100 dark:border-slate-800">
               <div className="flex justify-between items-center text-slate-600 dark:text-slate-300">
                 <span>Pattern Types:</span>
                 <span className="font-semibold text-slate-800 dark:text-slate-100">5 Dvorak Formations</span>
@@ -286,10 +286,10 @@ const Performance = () => {
         </div>
 
         {/* Module 3: 72-Hour Forecaster */}
-        <div className="card overflow-hidden border border-slate-200 dark:border-slate-800 shadow-sm rounded-2xl bg-white dark:bg-slate-900">
+        <div className="card overflow-hidden border border-slate-100 dark:border-slate-800 shadow-sm rounded-2xl bg-white dark:bg-slate-800">
           <div className="p-4 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <span className="p-2 rounded-xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400">
+              <span className="p-2 rounded-2xl bg-emerald-100 dark:bg-emerald-950 text-emerald-600 dark:text-emerald-400">
                 <Compass className="w-4 h-4" />
               </span>
               <div>
@@ -305,7 +305,7 @@ const Performance = () => {
               Predicts the forward storm trajectory up to 72 hours with dynamic probability cones using atmospheric wind & sea surface data.
             </p>
             
-            <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-xl space-y-2 border border-slate-100 dark:border-slate-800">
+            <div className="bg-slate-50 dark:bg-slate-800/50 p-3 rounded-2xl space-y-2 border border-slate-100 dark:border-slate-800">
               <div className="flex justify-between items-center text-slate-600 dark:text-slate-300">
                 <span>Forecast Range:</span>
                 <span className="font-semibold text-slate-800 dark:text-slate-100">+6h to +72h Autoregressive</span>
@@ -328,9 +328,9 @@ const Performance = () => {
       {/* ========================================================================= */}
       {/* CLEAN & USER-FRIENDLY BENCHMARK EVALUATION SECTION                        */}
       {/* ========================================================================= */}
-      <div className="card overflow-hidden shadow-sm border border-slate-200 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-900 transition-all">
+      <div className="card overflow-hidden shadow-sm border border-slate-100 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-800 transition-all">
         {/* Section Header */}
-        <div className="p-5 border-b border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40">
+        <div className="p-5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/40">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
             <div>
               <div className="flex flex-wrap items-center gap-2">
@@ -352,7 +352,7 @@ const Performance = () => {
               <select 
                 value={selectedStorm}
                 onChange={(e) => setSelectedStorm(e.target.value)}
-                className="text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-slate-800 dark:text-slate-100 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20"
+                className="text-xs font-semibold bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-lg px-3 py-1.5 text-slate-800 dark:text-slate-100 shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20"
               >
                 <option value="cyclone_dana_2024">Cyclone DANA (Oct 2024 · Bay of Bengal)</option>
                 <option value="cyclone_biparjoy_2023">Cyclone BIPARJOY (Jun 2023 · Arabian Sea)</option>
@@ -361,7 +361,7 @@ const Performance = () => {
           </div>
 
           {/* Subheader & Tabs */}
-          <div className="mt-4 pt-3 border-t border-slate-200/80 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs">
+          <div className="mt-4 pt-3 border-t border-slate-100/80 dark:border-slate-800 flex flex-wrap items-center justify-between gap-3 text-xs">
             <div className="flex items-center gap-2 text-slate-600 dark:text-slate-300">
               <MapPin className="w-3.5 h-3.5 text-rose-500" />
               <span>Landfall Sector: <strong className="text-rose-600 dark:text-rose-400">{currentStormMeta.landfall_location}</strong></span>
@@ -409,12 +409,12 @@ const Performance = () => {
         <div className="p-5 space-y-6">
           {/* 3 Prominent KPI Highlights */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div className="p-4 rounded-xl bg-sky-50/60 dark:bg-sky-950/20 border border-sky-200/80 dark:border-sky-800/40">
+            <div className="p-4 rounded-2xl bg-sky-50/60 dark:bg-sky-950/20 border border-sky-200/80 dark:border-sky-800/40">
               <span className="text-xs font-bold uppercase tracking-wider text-sky-800 dark:text-sky-300">
                 VAYU AI Model Error
               </span>
               <div className="mt-1 flex items-baseline gap-2">
-                <span className="text-2xl font-extrabold text-slate-900 dark:text-slate-100">{vayuMeanErr} km</span>
+                <span className="text-2xl font-bold text-slate-900 dark:text-slate-100">{vayuMeanErr} km</span>
                 <span className="text-xs text-slate-500">average displacement</span>
               </div>
               <p className="text-[11px] text-emerald-600 dark:text-emerald-400 mt-1 flex items-center gap-1">
@@ -422,12 +422,12 @@ const Performance = () => {
               </p>
             </div>
 
-            <div className="p-4 rounded-xl bg-indigo-50/60 dark:bg-indigo-950/20 border border-indigo-200/80 dark:border-indigo-800/40">
+            <div className="p-4 rounded-2xl bg-indigo-50/60 dark:bg-indigo-950/20 border border-indigo-200/80 dark:border-indigo-800/40">
               <span className="text-xs font-bold uppercase tracking-wider text-indigo-800 dark:text-indigo-300">
                 Global Benchmark (ECMWF)
               </span>
               <div className="mt-1 flex items-baseline gap-2">
-                <span className="text-2xl font-extrabold text-slate-900 dark:text-slate-100">{wnMeanErr} km</span>
+                <span className="text-2xl font-bold text-slate-900 dark:text-slate-100">{wnMeanErr} km</span>
                 <span className="text-xs text-slate-500">average displacement</span>
               </div>
               <p className="text-[11px] text-indigo-600 dark:text-indigo-400 mt-1 flex items-center gap-1">
@@ -435,12 +435,12 @@ const Performance = () => {
               </p>
             </div>
 
-            <div className="p-4 rounded-xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-200/80 dark:border-emerald-800/40">
+            <div className="p-4 rounded-2xl bg-emerald-50/60 dark:bg-emerald-950/20 border border-emerald-200/80 dark:border-emerald-800/40">
               <span className="text-xs font-bold uppercase tracking-wider text-emerald-800 dark:text-emerald-300">
                 Landfall Eye Precision
               </span>
               <div className="mt-1 flex items-baseline gap-2">
-                <span className="text-2xl font-extrabold text-emerald-700 dark:text-emerald-300">{vayuLandfallErr} km</span>
+                <span className="text-2xl font-bold text-emerald-700 dark:text-emerald-300">{vayuLandfallErr} km</span>
                 <span className="text-xs text-slate-500">error at landfall</span>
               </div>
               <p className="text-[11px] text-emerald-700 dark:text-emerald-400 mt-1 flex items-center gap-1">
@@ -452,7 +452,7 @@ const Performance = () => {
           {/* TAB 1: VISUAL CHART */}
           {benchmarkTab === 'overview' && (
             <div className="space-y-4">
-              <div className="bg-slate-50/80 dark:bg-slate-800/30 rounded-xl p-4 border border-slate-200/80 dark:border-slate-800">
+              <div className="bg-slate-50/80 dark:bg-slate-800/30 rounded-2xl p-4 border border-slate-100/80 dark:border-slate-800">
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-3">
                   <p className="text-xs font-bold text-slate-800 dark:text-slate-200">
                     Track Error in Kilometers (Lower Bar = Higher Accuracy)
@@ -495,7 +495,7 @@ const Performance = () => {
 
           {/* TAB 2: DETAILED TABLE */}
           {benchmarkTab === 'table' && (
-            <div className="overflow-x-auto rounded-xl border border-slate-200 dark:border-slate-800 shadow-sm">
+            <div className="overflow-x-auto rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm">
               <table className="w-full text-left text-xs divide-y divide-slate-200 dark:divide-slate-800">
                 <thead className="bg-slate-50 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 font-semibold">
                   <tr>
@@ -507,7 +507,7 @@ const Performance = () => {
                     <th className="px-4 py-3 min-w-[180px]">Operational Safety Status</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/60 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300">
                   {steps.map((step) => {
                     const v_err = step.vayu_ai_model?.error_km || 0;
                     const wn_err = step.weathernext_benchmark?.error_km;
@@ -609,7 +609,7 @@ const Performance = () => {
           {/* TAB 3: HOW TO READ */}
           {benchmarkTab === 'guide' && (
             <div className="space-y-3 text-xs">
-              <div className="p-4 rounded-xl bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/40 text-blue-900 dark:text-blue-200 leading-relaxed">
+              <div className="p-4 rounded-2xl bg-blue-50/50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/40 text-blue-900 dark:text-blue-200 leading-relaxed">
                 <p className="font-semibold text-sm mb-1 text-blue-800 dark:text-blue-300 flex items-center gap-1.5">
                   <Info className="w-4 h-4" /> Why do we show this benchmark?
                 </p>
@@ -619,19 +619,19 @@ const Performance = () => {
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
-                <div className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-1">
+                <div className="p-3.5 rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-800 space-y-1">
                   <h5 className="font-bold text-slate-900 dark:text-slate-100">1. What is Track Error?</h5>
                   <p className="text-slate-500 dark:text-slate-400 text-[11px] leading-relaxed">
                     Distance in kilometers between where VAYU predicted the cyclone eye would be vs where it actually made contact. Under 50 km means local authorities evacuated the exact right district.
                   </p>
                 </div>
-                <div className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-1">
+                <div className="p-3.5 rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-800 space-y-1">
                   <h5 className="font-bold text-slate-900 dark:text-slate-100">2. Why does 15 ms matter?</h5>
                   <p className="text-slate-500 dark:text-slate-400 text-[11px] leading-relaxed">
                     Global models like ECMWF take 4 to 6 hours on supercomputers. VAYU generates track updates in 15 milliseconds, giving emergency teams hours of extra preparation time.
                   </p>
                 </div>
-                <div className="p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 space-y-1">
+                <div className="p-3.5 rounded-2xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-800 space-y-1">
                   <h5 className="font-bold text-slate-900 dark:text-slate-100">3. Works Offline</h5>
                   <p className="text-slate-500 dark:text-slate-400 text-[11px] leading-relaxed">
                     During Cat-4 cyclones, coastal internet and power towers fail. VAYU runs offline on field laptops without needing cloud servers.
@@ -642,7 +642,7 @@ const Performance = () => {
           )}
 
           {/* Scientific Note */}
-          <div className="p-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/60 rounded-xl text-xs text-slate-600 dark:text-slate-400 flex items-start gap-2">
+          <div className="p-3 bg-slate-50 dark:bg-slate-800/50 border border-slate-100 dark:border-slate-700/60 rounded-2xl text-xs text-slate-600 dark:text-slate-400 flex items-start gap-2">
             <Activity className="w-3.5 h-3.5 text-blue-600 dark:text-sky-400 shrink-0 mt-0.5" />
             <p className="text-[11px] leading-relaxed">
               All benchmark evaluations are performed strictly against official NOAA IBTrACS post-storm best-track observations. No synthetic noise or fabricated metrics.

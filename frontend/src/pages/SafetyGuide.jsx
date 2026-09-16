@@ -82,9 +82,9 @@ const SafetyGuide = () => {
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         
         {/* Header & Phase Switcher */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-5">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-5">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 mb-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-100 dark:border-slate-700 mb-2">
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-500" />
               <span>
                 {isHindi ? 'राष्ट्रीय आपदा प्रबंधन प्राधिकरण (NDMA) दिशानिर्देश' : 'National Disaster Management Authority (NDMA) Protocol'}
@@ -101,11 +101,11 @@ const SafetyGuide = () => {
           </div>
 
           {/* Phase Selector Tabs */}
-          <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-900 p-1 rounded-xl border border-slate-200 dark:border-slate-800 text-xs font-bold">
+          <div className="flex items-center gap-1.5 bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl border border-slate-100 dark:border-slate-800 text-xs font-bold">
             <button
               onClick={() => setSafetyTab('before')}
               className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
-                safetyTab === 'before' ? 'bg-white dark:bg-slate-800 text-slate-950 dark:text-white shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                safetyTab === 'before' ? 'bg-white dark:bg-slate-800 text-slate-950 dark:text-white shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               {isHindi ? '१. पूर्व-तैयारी (Before)' : '1. Before Cyclone'}
@@ -113,7 +113,7 @@ const SafetyGuide = () => {
             <button
               onClick={() => setSafetyTab('during')}
               className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
-                safetyTab === 'during' ? 'bg-white dark:bg-slate-800 text-slate-950 dark:text-white shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                safetyTab === 'during' ? 'bg-white dark:bg-slate-800 text-slate-950 dark:text-white shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               {isHindi ? '२. लैंडफॉल के दौरान (During)' : '2. During Landfall'}
@@ -121,7 +121,7 @@ const SafetyGuide = () => {
             <button
               onClick={() => setSafetyTab('after')}
               className={`px-3.5 py-1.5 rounded-lg transition-all cursor-pointer whitespace-nowrap ${
-                safetyTab === 'after' ? 'bg-white dark:bg-slate-800 text-slate-950 dark:text-white shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                safetyTab === 'after' ? 'bg-white dark:bg-slate-800 text-slate-950 dark:text-white shadow-sm' : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               {isHindi ? '३. बाद में रिकवरी (After)' : '3. After Storm'}
@@ -133,7 +133,7 @@ const SafetyGuide = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           
           {/* Essential Actions (Do's) */}
-          <div className="border border-slate-200 dark:border-slate-800 rounded-2xl p-6 bg-white dark:bg-slate-900/90 shadow-xs space-y-4">
+          <div className="border border-slate-100 dark:border-slate-800 rounded-2xl p-6 bg-white dark:bg-slate-800/90 shadow-sm space-y-4">
             <h3 className="text-xs font-bold text-emerald-800 dark:text-emerald-400 uppercase tracking-wider flex items-center gap-2">
               <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
               <span>{isHindi ? 'आवश्यक कार्य (क्या करें)' : 'Essential Actions (Do\'s)'}</span>
@@ -204,7 +204,7 @@ const SafetyGuide = () => {
           </div>
 
           {/* Avoid Hazards (Don'ts) */}
-          <div className="border border-slate-200 dark:border-slate-800 rounded-2xl p-6 bg-white dark:bg-slate-900/90 shadow-xs space-y-4">
+          <div className="border border-slate-100 dark:border-slate-800 rounded-2xl p-6 bg-white dark:bg-slate-800/90 shadow-sm space-y-4">
             <h3 className="text-xs font-bold text-red-800 dark:text-red-400 uppercase tracking-wider flex items-center gap-2">
               <XCircle className="w-4 h-4 text-red-600 dark:text-red-400" />
               <span>{isHindi ? 'इन खतरों से बचें (क्या न करें)' : "Avoid These Hazards (Don'ts)"}</span>
@@ -233,7 +233,7 @@ const SafetyGuide = () => {
               )}
               {safetyTab === 'during' && (
                 <>
-                  <li className="flex items-start gap-2.5 p-2.5 rounded-xl bg-red-50/70 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60">
+                  <li className="flex items-start gap-2.5 p-2.5 rounded-2xl bg-red-50/70 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60">
                     <span className="text-red-600 font-bold shrink-0">✕</span>
                     <span>
                       <strong className="text-red-700 dark:text-red-300">{isHindi ? 'अति महत्वपूर्ण चेतावनी:' : 'CRITICAL WARNING:'}</strong>{' '}
@@ -282,7 +282,7 @@ const SafetyGuide = () => {
         </div>
 
         {/* Emergency Survival Kit Checklist */}
-        <div className="border border-slate-200 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-900/90 p-6 shadow-xs space-y-4">
+        <div className="border border-slate-100 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-800/90 p-6 shadow-sm space-y-4">
           <div className="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
             <PackageCheck className="w-5 h-5 text-sky-600 dark:text-sky-400" />
             <div>
@@ -297,7 +297,7 @@ const SafetyGuide = () => {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 text-xs">
             {SURVIVAL_ITEMS.map((item, idx) => (
-              <div key={idx} className="p-3.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 space-y-1">
+              <div key={idx} className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800 space-y-1">
                 <span className="font-bold text-slate-900 dark:text-white block">
                   {isHindi ? item.nameHindi : item.name}
                 </span>
@@ -312,7 +312,7 @@ const SafetyGuide = () => {
         {/* Emergency Helplines Cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {EMERGENCY_HELPLINES.map((hl, idx) => (
-            <div key={idx} className="border border-slate-200 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-900/90 p-5 shadow-xs flex flex-col justify-between space-y-3">
+            <div key={idx} className="border border-slate-100 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-800/90 p-5 shadow-sm flex flex-col justify-between space-y-3">
               <div>
                 <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider block mb-1">
                   {isHindi ? hl.nameHindi : hl.name}
@@ -335,7 +335,7 @@ const SafetyGuide = () => {
       </main>
 
       {/* Footer */}
-      <footer className="bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 py-10 px-4 sm:px-6 text-xs text-slate-500 dark:text-slate-400 transition-colors mt-12">
+      <footer className="bg-slate-50 dark:bg-slate-950 border-t border-slate-100 dark:border-slate-800 py-10 px-4 sm:px-6 text-xs text-slate-500 dark:text-slate-400 transition-colors mt-12">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
             &copy; 2026 {isHindi ? 'पृथ्वी विज्ञान मंत्रालय, भारत सरकार। सर्वाधिकार सुरक्षित।' : 'Ministry of Earth Sciences, Government of India. All Rights Reserved.'}

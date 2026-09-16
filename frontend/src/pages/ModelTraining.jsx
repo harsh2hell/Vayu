@@ -63,10 +63,10 @@ const ModelTraining = () => {
       {/* Production Model Summary Overview KPI Strip */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
-        <div className="bg-white border border-slate-200/80 rounded-2xl p-4.5 space-y-2 shadow-2xs">
+        <div className="bg-white border border-slate-100/80 rounded-2xl p-4.5 space-y-2 shadow-2xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Production Models</span>
-            <span className="w-8 h-8 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center">
+            <span className="w-8 h-8 rounded-2xl bg-sky-50 text-sky-600 flex items-center justify-center">
               <Cpu className="w-4 h-4" />
             </span>
           </div>
@@ -74,10 +74,10 @@ const ModelTraining = () => {
           <p className="text-[11px] text-slate-500">Detector + Classifier + Forecaster</p>
         </div>
 
-        <div className="bg-white border border-slate-200/80 rounded-2xl p-4.5 space-y-2 shadow-2xs">
+        <div className="bg-white border border-slate-100/80 rounded-2xl p-4.5 space-y-2 shadow-2xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Trainable Weights</span>
-            <span className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+            <span className="w-8 h-8 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
               <Binary className="w-4 h-4" />
             </span>
           </div>
@@ -85,10 +85,10 @@ const ModelTraining = () => {
           <p className="text-[11px] text-slate-500">Parameters active across checkpoints</p>
         </div>
 
-        <div className="bg-white border border-slate-200/80 rounded-2xl p-4.5 space-y-2 shadow-2xs">
+        <div className="bg-white border border-slate-100/80 rounded-2xl p-4.5 space-y-2 shadow-2xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Forecast Horizon</span>
-            <span className="w-8 h-8 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+            <span className="w-8 h-8 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center">
               <Compass className="w-4 h-4" />
             </span>
           </div>
@@ -96,10 +96,10 @@ const ModelTraining = () => {
           <p className="text-[11px] text-slate-500">3-hourly multi-step trajectory</p>
         </div>
 
-        <div className="bg-white border border-slate-200/80 rounded-2xl p-4.5 space-y-2 shadow-2xs">
+        <div className="bg-white border border-slate-100/80 rounded-2xl p-4.5 space-y-2 shadow-2xs">
           <div className="flex items-center justify-between">
             <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">MC Uncertainty</span>
-            <span className="w-8 h-8 rounded-xl bg-violet-50 text-violet-600 flex items-center justify-center">
+            <span className="w-8 h-8 rounded-2xl bg-violet-50 text-violet-600 flex items-center justify-center">
               <Activity className="w-4 h-4" />
             </span>
           </div>
@@ -110,33 +110,33 @@ const ModelTraining = () => {
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex items-center gap-2 border-b border-slate-200 pb-2">
+      <div className="flex items-center gap-2 border-b border-slate-100 pb-2">
         <button
           onClick={() => setActiveTab('models')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+          className={`px-4 py-2 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
             activeTab === 'models'
-              ? 'bg-slate-900 text-white shadow-xs'
-              : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
+              ? 'bg-slate-700 text-white shadow-sm'
+              : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-100'
           }`}
         >
           Production Model Architectures (3)
         </button>
         <button
           onClick={() => setActiveTab('schema')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+          className={`px-4 py-2 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
             activeTab === 'schema'
-              ? 'bg-slate-900 text-white shadow-xs'
-              : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
+              ? 'bg-slate-700 text-white shadow-sm'
+              : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-100'
           }`}
         >
           10-Feature Kinematic Schema
         </button>
         <button
           onClick={() => setActiveTab('benchmarks')}
-          className={`px-4 py-2 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+          className={`px-4 py-2 rounded-2xl text-xs font-bold transition-all cursor-pointer ${
             activeTab === 'benchmarks'
-              ? 'bg-slate-900 text-white shadow-xs'
-              : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-200'
+              ? 'bg-slate-700 text-white shadow-sm'
+              : 'bg-white text-slate-600 hover:bg-slate-50 border border-slate-100'
           }`}
         >
           Empirical Benchmark Protocols
@@ -148,10 +148,10 @@ const ModelTraining = () => {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
           {/* MODEL 1: Cyclone Detection */}
-          <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-xs space-y-4 flex flex-col justify-between hover:border-slate-300 transition-all">
+          <div className="bg-white border border-slate-100/80 rounded-2xl p-6 shadow-sm space-y-4 flex flex-col justify-between hover:border-slate-300 transition-all">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="w-9 h-9 rounded-xl bg-sky-50 text-sky-600 border border-sky-100 flex items-center justify-center font-bold text-xs">
+                <span className="w-9 h-9 rounded-2xl bg-sky-50 text-sky-600 border border-sky-100 flex items-center justify-center font-bold text-xs">
                   01
                 </span>
                 <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-sky-50 text-sky-700 border border-sky-200">
@@ -168,7 +168,7 @@ const ModelTraining = () => {
                 Dual-head deep convolutional network for instantaneous binary cyclone identification and geographic center coordinate localization on single-frame satellite raster feeds.
               </p>
 
-              <div className="bg-slate-50 rounded-xl p-3 space-y-2 text-xs font-mono border border-slate-100">
+              <div className="bg-slate-50 rounded-2xl p-3 space-y-2 text-xs font-mono border border-slate-100">
                 <div className="flex justify-between">
                   <span className="text-slate-500">Parameters:</span>
                   <span className="font-bold text-slate-900">1,075,431 (1.08M)</span>
@@ -211,10 +211,10 @@ const ModelTraining = () => {
           </div>
 
           {/* MODEL 2: Morphology Classification */}
-          <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-xs space-y-4 flex flex-col justify-between hover:border-slate-300 transition-all">
+          <div className="bg-white border border-slate-100/80 rounded-2xl p-6 shadow-sm space-y-4 flex flex-col justify-between hover:border-slate-300 transition-all">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="w-9 h-9 rounded-xl bg-violet-50 text-violet-600 border border-violet-100 flex items-center justify-center font-bold text-xs">
+                <span className="w-9 h-9 rounded-2xl bg-violet-50 text-violet-600 border border-violet-100 flex items-center justify-center font-bold text-xs">
                   02
                 </span>
                 <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-violet-50 text-violet-700 border border-violet-200">
@@ -231,7 +231,7 @@ const ModelTraining = () => {
                 Convolutional residual classifier mapping cloud structure into 4 validated Dvorak morphological patterns with PyTorch Autograd Grad-CAM explainability activation maps.
               </p>
 
-              <div className="bg-slate-50 rounded-xl p-3 space-y-2 text-xs font-mono border border-slate-100">
+              <div className="bg-slate-50 rounded-2xl p-3 space-y-2 text-xs font-mono border border-slate-100">
                 <div className="flex justify-between">
                   <span className="text-slate-500">Parameters:</span>
                   <span className="font-bold text-slate-900">11,246,436 (11.2M)</span>
@@ -277,10 +277,10 @@ const ModelTraining = () => {
           </div>
 
           {/* MODEL 3: Trajectory Forecasting */}
-          <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-xs space-y-4 flex flex-col justify-between hover:border-slate-300 transition-all">
+          <div className="bg-white border border-slate-100/80 rounded-2xl p-6 shadow-sm space-y-4 flex flex-col justify-between hover:border-slate-300 transition-all">
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 border border-amber-100 flex items-center justify-center font-bold text-xs">
+                <span className="w-9 h-9 rounded-2xl bg-amber-50 text-amber-600 border border-amber-100 flex items-center justify-center font-bold text-xs">
                   03
                 </span>
                 <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-amber-50 text-amber-700 border border-amber-200">
@@ -297,7 +297,7 @@ const ModelTraining = () => {
                 Sequence-to-sequence recurrent neural network with 10 kinematic features, predicting 3-hourly coordinate progression and barometric intensity with 25-pass MC Dropout uncertainty.
               </p>
 
-              <div className="bg-slate-50 rounded-xl p-3 space-y-2 text-xs font-mono border border-slate-100">
+              <div className="bg-slate-50 rounded-2xl p-3 space-y-2 text-xs font-mono border border-slate-100">
                 <div className="flex justify-between">
                   <span className="text-slate-500">Parameters:</span>
                   <span className="font-bold text-slate-900">41,764 (41.8K)</span>
@@ -344,7 +344,7 @@ const ModelTraining = () => {
 
       {/* TAB 2: 10-FEATURE KINEMATIC SCHEMA */}
       {activeTab === 'schema' && (
-        <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-xs space-y-5">
+        <div className="bg-white border border-slate-100/80 rounded-2xl p-6 shadow-sm space-y-5">
           <div>
             <h3 className="text-base font-bold text-slate-900 font-heading">Canonical 10-Feature Trajectory Schema</h3>
             <p className="text-xs text-slate-500 mt-0.5">
@@ -355,7 +355,7 @@ const ModelTraining = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
               <thead>
-                <tr className="border-b border-slate-200 text-slate-500 uppercase tracking-wider font-semibold font-mono text-[11px]">
+                <tr className="border-b border-slate-100 text-slate-500 uppercase tracking-wider font-semibold font-mono text-[11px]">
                   <th className="pb-2.5">Index</th>
                   <th className="pb-2.5">Feature Name</th>
                   <th className="pb-2.5">Physical Dimension / Unit</th>
@@ -442,7 +442,7 @@ const ModelTraining = () => {
 
       {/* TAB 3: EMPIRICAL BENCHMARK PROTOCOLS */}
       {activeTab === 'benchmarks' && (
-        <div className="bg-white border border-slate-200/80 rounded-2xl p-6 shadow-xs space-y-6">
+        <div className="bg-white border border-slate-100/80 rounded-2xl p-6 shadow-sm space-y-6">
           <div>
             <h3 className="text-base font-bold text-slate-900 font-heading">Held-Out Empirical Benchmark Horizons</h3>
             <p className="text-xs text-slate-500 mt-0.5">
@@ -453,7 +453,7 @@ const ModelTraining = () => {
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs font-mono">
               <thead>
-                <tr className="border-b border-slate-200 text-slate-500 uppercase tracking-wider font-semibold text-[11px]">
+                <tr className="border-b border-slate-100 text-slate-500 uppercase tracking-wider font-semibold text-[11px]">
                   <th className="pb-2.5">Horizon</th>
                   <th className="pb-2.5">GRU Seq2Seq Error (MAE)</th>
                   <th className="pb-2.5">Persistence Baseline Error</th>
@@ -512,7 +512,7 @@ const ModelTraining = () => {
             </table>
           </div>
 
-          <div className="p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-600 space-y-1 font-sans">
+          <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 text-xs text-slate-600 space-y-1 font-sans">
             <span className="font-bold text-slate-800 block">Scientific Truth Statement:</span>
             <p>
               VAYU reports genuine held-out evaluation numbers without inflation. GRU Seq2Seq models outperform persistence significantly at long lead times (+72 hours) where straight-line extrapolation breaks down due to track recurvature, land interaction, and atmospheric steering.

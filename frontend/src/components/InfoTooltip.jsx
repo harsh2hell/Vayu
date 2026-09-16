@@ -183,7 +183,7 @@ export default function InfoTooltip({
       {isOpen && (
         <div
           role="tooltip"
-          className="absolute z-[9999] bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 sm:w-80 p-3 rounded-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl border border-slate-200/90 dark:border-white/10 shadow-[0_12px_36px_rgba(0,0,0,0.16)] dark:shadow-[0_16px_40px_rgba(0,0,0,0.7)] text-left animate-in fade-in zoom-in-95 duration-150"
+          className="absolute z-[9999] bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 sm:w-80 p-3 rounded-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl border border-slate-100/90 dark:border-white/10 shadow-[0_12px_36px_rgba(0,0,0,0.16)] dark:shadow-[0_16px_40px_rgba(0,0,0,0.7)] text-left animate-in fade-in zoom-in-95 duration-150"
         >
           {/* Top Edge Specular Glare */}
           <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white dark:via-white/20 to-transparent" />
@@ -214,7 +214,7 @@ export default function InfoTooltip({
           )}
 
           {/* Arrow pointing down */}
-          <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-px w-2.5 h-2.5 bg-white dark:bg-slate-900 rotate-45 border-r border-b border-slate-200/90 dark:border-white/10" />
+          <div className="absolute top-full left-1/2 -translate-x-1/2 -mt-px w-2.5 h-2.5 bg-white dark:bg-slate-900 rotate-45 border-r border-b border-slate-100/90 dark:border-white/10" />
         </div>
       )}
     </div>

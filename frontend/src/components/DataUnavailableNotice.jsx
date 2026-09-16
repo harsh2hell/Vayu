@@ -22,7 +22,7 @@ export default function DataUnavailableNotice({
   if (compact) {
     return (
       <div
-        className={`flex items-center justify-between p-3 rounded-xl border border-amber-200/80 dark:border-amber-900/60 bg-amber-50/70 dark:bg-amber-950/30 text-amber-900 dark:text-amber-300 text-xs ${className}`}
+        className={`flex items-center justify-between p-3 rounded-2xl border border-amber-200/80 dark:border-amber-900/60 bg-amber-50/70 dark:bg-amber-950/30 text-amber-900 dark:text-amber-300 text-xs ${className}`}
       >
         <div className="flex items-center gap-2">
           <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" />
@@ -47,7 +47,7 @@ export default function DataUnavailableNotice({
 
   return (
     <div
-      className={`p-5 rounded-2xl border border-slate-200/90 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/60 backdrop-blur-md text-center flex flex-col items-center justify-center space-y-2.5 ${className}`}
+      className={`p-5 rounded-2xl border border-slate-100/90 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-900/60 backdrop-blur-md text-center flex flex-col items-center justify-center space-y-2.5 ${className}`}
     >
       <div className="w-10 h-10 rounded-full bg-slate-200/70 dark:bg-slate-800 flex items-center justify-center text-slate-500 dark:text-slate-400">
         <Radio className="w-5 h-5 animate-pulse" />
@@ -64,7 +64,7 @@ export default function DataUnavailableNotice({
         <button
           onClick={onRetry}
           disabled={isRetrying}
-          className="mt-1 px-3 py-1.5 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-medium transition-all shadow-2xs flex items-center gap-1.5"
+          className="mt-1 px-3 py-1.5 rounded-2xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-medium transition-all shadow-2xs flex items-center gap-1.5"
         >
           <RefreshCw className={`w-3.5 h-3.5 ${isRetrying ? 'animate-spin' : ''}`} />
           <span>{isHindi ? 'कनेक्शन पुनः जांचें' : 'Check Sensor Connection'}</span>

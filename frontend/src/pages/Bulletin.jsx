@@ -124,7 +124,7 @@ const Bulletin = () => {
 
       {/* Generation Status Alert Banner */}
       {generationStatus === 'error' && errorMsg && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3">
+        <div className="p-4 bg-red-50 border border-red-200 rounded-2xl flex items-start gap-3">
           <AlertTriangle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
           <div className="text-xs">
             <h4 className="font-bold text-red-900">BULLETIN COMPILATION FAILED</h4>
@@ -134,7 +134,7 @@ const Bulletin = () => {
       )}
 
       {generationStatus === 'success' && (
-        <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-xl flex items-start gap-3 animate-in fade-in duration-200">
+        <div className="p-4 bg-emerald-50 border border-emerald-200 rounded-2xl flex items-start gap-3 animate-in fade-in duration-200">
           <CheckCircle className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
           <div className="text-xs">
             <h4 className="font-bold text-emerald-900">BULLETIN PDF GENERATED & DOWNLOADED</h4>
@@ -146,7 +146,7 @@ const Bulletin = () => {
       )}
 
       {/* Main Advisory Compilation Dossier Card */}
-      <div className="bg-white border border-slate-200 rounded-2xl p-6 shadow-xs space-y-6">
+      <div className="bg-white border border-slate-100 rounded-2xl p-6 shadow-sm space-y-6">
         
         <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-3">
           <div>
@@ -159,7 +159,7 @@ const Bulletin = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            <span className="px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-slate-100 text-slate-700 border border-slate-200">
+            <span className="px-2.5 py-1 rounded-lg text-xs font-mono font-bold bg-slate-100 text-slate-700 border border-slate-100">
               {advisoryNumber}
             </span>
             <span className="badge badge-orange text-[10px]">
@@ -170,7 +170,7 @@ const Bulletin = () => {
 
         {/* Technical Bulletin Parameters Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4 text-xs font-mono">
-          <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+          <div className="p-3.5 bg-slate-50 border border-slate-100 rounded-2xl space-y-1">
             <span className="text-[10px] text-slate-400 block uppercase">Reference Fix</span>
             <span className="font-bold text-slate-900 text-sm block">
               {activeStorm.lat.toFixed(2)}°N, {activeStorm.lon.toFixed(2)}°E
@@ -178,7 +178,7 @@ const Bulletin = () => {
             <span className="text-[10px] text-slate-500 font-sans">IMD Synoptic Coordinates</span>
           </div>
 
-          <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+          <div className="p-3.5 bg-slate-50 border border-slate-100 rounded-2xl space-y-1">
             <span className="text-[10px] text-slate-400 block uppercase">Maximum Winds</span>
             <span className="font-bold text-red-600 text-sm block">
               {Math.round(activeStorm.wind * 1.852)} km/h ({Math.round(activeStorm.wind)} kt)
@@ -186,7 +186,7 @@ const Bulletin = () => {
             <span className="text-[10px] text-slate-500 font-sans">3-Minute Sustained</span>
           </div>
 
-          <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+          <div className="p-3.5 bg-slate-50 border border-slate-100 rounded-2xl space-y-1">
             <span className="text-[10px] text-slate-400 block uppercase">Central Pressure</span>
             <span className="font-bold text-slate-900 text-sm block">
               {activeStorm.pressure} hPa
@@ -194,7 +194,7 @@ const Bulletin = () => {
             <span className="text-[10px] text-slate-500 font-sans">MSLP Isobar Depth</span>
           </div>
 
-          <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-1">
+          <div className="p-3.5 bg-slate-50 border border-slate-100 rounded-2xl space-y-1">
             <span className="text-[10px] text-slate-400 block uppercase">Primary Threat</span>
             <span className="font-bold text-amber-700 text-sm block">
               COASTAL STRIKE
@@ -204,7 +204,7 @@ const Bulletin = () => {
         </div>
 
         {/* Advisory Narrative Content Preview */}
-        <div className="p-4 bg-slate-50 border border-slate-200 rounded-xl space-y-2 text-xs">
+        <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl space-y-2 text-xs">
           <div className="font-bold text-slate-800 uppercase tracking-wider text-[11px]">
             Synoptic Meteorological Summary
           </div>

@@ -42,7 +42,7 @@ const MultiSource = () => (
       <div className="max-w-2xl mx-auto flex flex-col items-center gap-3">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 w-full">
           {['Satellite Imagery', 'Atmospheric Data', 'Ocean Data', 'Historical Records'].map(s => (
-            <div key={s} className="bg-[#003087]/5 border border-[#003087]/20 rounded-xl p-3 text-center">
+            <div key={s} className="bg-[#003087]/5 border border-[#003087]/20 rounded-2xl p-3 text-center">
               <p className="text-xs font-semibold text-[#003087]">{s}</p>
             </div>
           ))}
@@ -50,12 +50,12 @@ const MultiSource = () => (
         <div className="flex justify-center gap-10 text-slate-400">
           {[0, 1, 2, 3].map(i => <ArrowDown key={i} className="w-5 h-5" />)}
         </div>
-        <div className="w-full bg-[#003087] text-white rounded-xl p-4 text-center">
+        <div className="w-full bg-[#003087] text-white rounded-2xl p-4 text-center">
           <p className="font-bold text-base">Multi-Source AI Data Fusion Engine</p>
           <p className="text-blue-200 text-xs mt-1">Feature concatenation · Temporal alignment · Spatial interpolation</p>
         </div>
         <ArrowDown className="w-5 h-5 text-slate-400" />
-        <div className="w-full bg-amber-50 border-2 border-amber-400 rounded-xl p-4 text-center">
+        <div className="w-full bg-amber-50 border-2 border-amber-400 rounded-2xl p-4 text-center">
           <p className="font-bold text-amber-700">Cyclone Intelligence Output</p>
           <p className="text-amber-600 text-xs mt-1">Detection → Classification → Track Prediction → Risk Assessment</p>
         </div>

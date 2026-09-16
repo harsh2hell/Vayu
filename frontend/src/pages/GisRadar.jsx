@@ -310,7 +310,7 @@ const GisRadar = () => {
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         
         {/* Page Title & System Tabs */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-5">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-5">
           <div>
             <div className="flex items-center gap-2 mb-1.5">
               <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-sky-100 dark:bg-sky-950 text-sky-800 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
@@ -331,7 +331,7 @@ const GisRadar = () => {
           </div>
 
           {/* System Switcher Tabs */}
-          <div className="flex items-center gap-1.5 p-1 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl">
+          <div className="flex items-center gap-1.5 p-1 bg-slate-100 dark:bg-slate-800 border border-slate-100 dark:border-slate-800 rounded-2xl">
             {Object.keys(SYSTEMS).map((sysKey) => {
               const sys = SYSTEMS[sysKey];
               const isSelected = selectedSystemId === sysKey;
@@ -341,7 +341,7 @@ const GisRadar = () => {
                   onClick={() => setSelectedSystemId(sysKey)}
                   className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all cursor-pointer whitespace-nowrap ${
                     isSelected
-                      ? 'bg-white dark:bg-slate-800 text-slate-950 dark:text-white shadow-xs'
+                      ? 'bg-white dark:bg-slate-800 text-slate-950 dark:text-white shadow-sm'
                       : 'text-slate-600 dark:text-slate-400 hover:text-slate-950 dark:hover:text-white'
                   }`}
                 >
@@ -353,10 +353,10 @@ const GisRadar = () => {
         </div>
 
         {/* GIS Interactive Command Bar */}
-        <div className="bg-white dark:bg-slate-900/90 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs flex flex-wrap items-center justify-between gap-3">
+        <div className="bg-white dark:bg-slate-800/90 p-3.5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-sm flex flex-wrap items-center justify-between gap-3">
           
           {/* Base Map Selector */}
-          <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800/80 p-1 rounded-xl">
+          <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800/80 p-1 rounded-2xl">
             {Object.keys(BASE_LAYERS).map((key) => {
               const layer = BASE_LAYERS[key];
               const isSelected = mapBaseLayer === key;
@@ -366,7 +366,7 @@ const GisRadar = () => {
                   onClick={() => setMapBaseLayer(key)}
                   className={`px-3 py-1 text-xs font-semibold rounded-lg transition-all cursor-pointer whitespace-nowrap ${
                     isSelected
-                      ? 'bg-white dark:bg-slate-700 text-slate-950 dark:text-white shadow-xs'
+                      ? 'bg-white dark:bg-slate-700 text-slate-950 dark:text-white shadow-sm'
                       : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                   }`}
                 >
@@ -380,10 +380,10 @@ const GisRadar = () => {
           <div className="flex flex-wrap items-center gap-1.5">
             <button
               onClick={() => setShowDopplerRadar(!showDopplerRadar)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl border transition-all cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-2xl border transition-all cursor-pointer ${
                 showDopplerRadar
                   ? 'bg-sky-50 dark:bg-sky-950/70 border-sky-300 dark:border-sky-700 text-sky-700 dark:text-sky-300'
-                  : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                  : 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-700 text-slate-500 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               <CloudRain className="w-3.5 h-3.5" />
@@ -392,10 +392,10 @@ const GisRadar = () => {
 
             <button
               onClick={() => setShowSatelliteIR(!showSatelliteIR)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl border transition-all cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-2xl border transition-all cursor-pointer ${
                 showSatelliteIR
                   ? 'bg-purple-50 dark:bg-purple-950/70 border-purple-300 dark:border-purple-700 text-purple-700 dark:text-purple-300'
-                  : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                  : 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-700 text-slate-500 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               <Satellite className="w-3.5 h-3.5" />
@@ -404,10 +404,10 @@ const GisRadar = () => {
 
             <button
               onClick={() => setShowCone(!showCone)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl border transition-all cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-2xl border transition-all cursor-pointer ${
                 showCone
                   ? 'bg-amber-50 dark:bg-amber-950/70 border-amber-300 dark:border-amber-700 text-amber-700 dark:text-amber-300'
-                  : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                  : 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-700 text-slate-500 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               <AlertTriangle className="w-3.5 h-3.5" />
@@ -416,10 +416,10 @@ const GisRadar = () => {
 
             <button
               onClick={() => setShowWindRadii(!showWindRadii)}
-              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl border transition-all cursor-pointer ${
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-2xl border transition-all cursor-pointer ${
                 showWindRadii
                   ? 'bg-rose-50 dark:bg-rose-950/70 border-rose-300 dark:border-rose-700 text-rose-700 dark:text-rose-300'
-                  : 'bg-slate-50 dark:bg-slate-800/50 border-slate-200 dark:border-slate-700 text-slate-500 hover:text-slate-900 dark:hover:text-white'
+                  : 'bg-slate-50 dark:bg-slate-800/50 border-slate-100 dark:border-slate-700 text-slate-500 hover:text-slate-900 dark:hover:text-white'
               }`}
             >
               <Wind className="w-3.5 h-3.5" />
@@ -429,7 +429,7 @@ const GisRadar = () => {
 
           {/* Radar Opacity Slider */}
           {showDopplerRadar && (
-            <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800/60 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 text-xs">
+            <div className="flex items-center gap-2 bg-slate-50 dark:bg-slate-800/60 px-3 py-1.5 rounded-2xl border border-slate-100 dark:border-slate-700 text-xs">
               <Sliders className="w-3.5 h-3.5 text-slate-400" />
               <span className="text-slate-500 dark:text-slate-400 font-medium">
                 {isHindi ? 'पारदर्शिता' : 'Opacity'}
@@ -452,7 +452,7 @@ const GisRadar = () => {
         </div>
 
         {/* Map Frame */}
-        <div className="border border-slate-200 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-900 overflow-hidden shadow-md relative h-[560px]">
+        <div className="border border-slate-100 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-800 overflow-hidden shadow-md relative h-[560px]">
           
           {/* Top-Left Telemetry HUD Card */}
           {(() => {
@@ -461,7 +461,7 @@ const GisRadar = () => {
               lat: current.lat, lon: current.lon, wind: current.wind, pressure: current.pressure, cat: current.stage, step: '+00h', label: 'Observed Vortex'
             };
             return (
-              <div className="absolute top-4 left-4 z-[400] bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200 dark:border-slate-700 p-3.5 rounded-2xl text-xs shadow-lg max-w-xs space-y-2 pointer-events-auto">
+              <div className="absolute top-4 left-4 z-[400] bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border border-slate-100 dark:border-slate-700 p-3.5 rounded-2xl text-xs shadow-lg max-w-xs space-y-2 pointer-events-auto">
                 <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
                   <div className="flex items-center gap-2">
                     <strong className="font-heading text-sm text-slate-950 dark:text-white">
@@ -505,7 +505,7 @@ const GisRadar = () => {
 
           {/* Top-Right Doppler Radar dBZ Reflectivity Scale */}
           {showDopplerRadar && (
-            <div className="absolute top-4 right-4 z-[400] bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200 dark:border-slate-700 p-2.5 rounded-2xl text-[10px] shadow-lg flex flex-col gap-1 pointer-events-auto">
+            <div className="absolute top-4 right-4 z-[400] bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border border-slate-100 dark:border-slate-700 p-2.5 rounded-2xl text-[10px] shadow-lg flex flex-col gap-1 pointer-events-auto">
               <span className="font-bold text-slate-800 dark:text-slate-200 text-center">
                 {isHindi ? 'डॉपलर रडार dBZ' : 'Doppler Radar dBZ'}
               </span>
@@ -725,12 +725,12 @@ const GisRadar = () => {
           {(() => {
             const waypoints = current.waypoints || [];
             return (
-              <div className="absolute bottom-4 left-4 right-4 z-[400] bg-white/95 dark:bg-slate-900/95 backdrop-blur-md border border-slate-200 dark:border-slate-700 p-2.5 rounded-2xl shadow-lg flex flex-wrap items-center justify-between gap-3 pointer-events-auto">
+              <div className="absolute bottom-4 left-4 right-4 z-[400] bg-white/95 dark:bg-slate-800/95 backdrop-blur-md border border-slate-100 dark:border-slate-700 p-2.5 rounded-2xl shadow-lg flex flex-wrap items-center justify-between gap-3 pointer-events-auto">
                 
                 {/* Play/Pause Button */}
                 <button
                   onClick={() => setIsPlayingTimeline(!isPlayingTimeline)}
-                  className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl font-bold text-xs shadow-xs transition-all cursor-pointer ${
+                  className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-2xl font-bold text-xs shadow-sm transition-all cursor-pointer ${
                     isPlayingTimeline
                       ? 'bg-red-600 text-white shadow-md shadow-red-500/30 ring-2 ring-red-400/50 scale-105'
                       : 'bg-slate-950 text-white dark:bg-white dark:text-slate-950 hover:opacity-90'
@@ -752,10 +752,10 @@ const GisRadar = () => {
                           setActiveStepIndex(idx);
                           setIsPlayingTimeline(false);
                         }}
-                        className={`px-3 py-1 text-xs font-semibold rounded-xl border transition-all cursor-pointer whitespace-nowrap ${
+                        className={`px-3 py-1 text-xs font-semibold rounded-2xl border transition-all cursor-pointer whitespace-nowrap ${
                           isSelected
-                            ? 'bg-sky-600 text-white border-sky-600 shadow-xs'
-                            : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-700'
+                            ? 'bg-sky-600 text-white border-sky-600 shadow-sm'
+                            : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-100 dark:border-slate-700 hover:bg-white dark:hover:bg-slate-700'
                         }`}
                       >
                         {wp.step}
@@ -769,7 +769,7 @@ const GisRadar = () => {
                   onClick={() => {
                     setActiveStepIndex(0);
                   }}
-                  className="flex items-center gap-1 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-950 dark:hover:text-white px-2.5 py-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer"
+                  className="flex items-center gap-1 text-xs font-semibold text-slate-600 dark:text-slate-400 hover:text-slate-950 dark:hover:text-white px-2.5 py-1.5 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-all cursor-pointer"
                 >
                   <Crosshair className="w-3.5 h-3.5 text-sky-500" />
                   <span>{isHindi ? 'प्रारंभिक केंद्र' : 'Eye Origin'}</span>
@@ -783,7 +783,7 @@ const GisRadar = () => {
 
         {/* Coastal Radar Network Status Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-3.5 rounded-2xl shadow-2xs">
+          <div className="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-800 p-3.5 rounded-2xl shadow-2xs">
             <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block mb-0.5">
               {isHindi ? 'पारादीप डॉपलर रडार (DWR)' : 'Paradip Radar (DWR)'}
             </span>
@@ -796,7 +796,7 @@ const GisRadar = () => {
             </span>
           </div>
 
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-3.5 rounded-2xl shadow-2xs">
+          <div className="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-800 p-3.5 rounded-2xl shadow-2xs">
             <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block mb-0.5">
               {isHindi ? 'कोलकाता डॉपलर रडar' : 'Kolkata DWR Radar'}
             </span>
@@ -809,7 +809,7 @@ const GisRadar = () => {
             </span>
           </div>
 
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-3.5 rounded-2xl shadow-2xs">
+          <div className="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-800 p-3.5 rounded-2xl shadow-2xs">
             <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block mb-0.5">
               {isHindi ? 'गोपालपुर व विशाखापट्टनम' : 'Gopalpur & Vizag DWR'}
             </span>
@@ -822,7 +822,7 @@ const GisRadar = () => {
             </span>
           </div>
 
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-3.5 rounded-2xl shadow-2xs">
+          <div className="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-800 p-3.5 rounded-2xl shadow-2xs">
             <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block mb-0.5">
               {isHindi ? 'भूझ (कच्छ) व वेरावल' : 'Bhuj & Veraval DWR'}
             </span>
@@ -839,7 +839,7 @@ const GisRadar = () => {
       </main>
 
       {/* Footer */}
-      <footer className="bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 py-10 px-4 sm:px-6 text-xs text-slate-500 dark:text-slate-400 transition-colors mt-12">
+      <footer className="bg-slate-50 dark:bg-slate-950 border-t border-slate-100 dark:border-slate-800 py-10 px-4 sm:px-6 text-xs text-slate-500 dark:text-slate-400 transition-colors mt-12">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
             &copy; 2026 {isHindi ? 'पृथ्वी विज्ञान मंत्रालय, भारत सरकार। सर्वाधिकार सुरक्षित।' : 'Ministry of Earth Sciences, Government of India. All Rights Reserved.'}

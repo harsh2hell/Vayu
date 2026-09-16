@@ -117,7 +117,7 @@ const Classification = () => {
             <button 
               onClick={handleRunClassification}
               disabled={isClassifying || !activeImageSrc}
-              className="btn-primary text-xs sm:text-sm py-2 px-4 gap-2 shadow-xs"
+              className="btn-primary text-xs sm:text-sm py-2 px-4 gap-2 shadow-sm"
             >
               <Sparkles className={`w-3.5 h-3.5 ${isClassifying ? 'animate-spin' : ''}`} />
               <span>
@@ -133,7 +133,7 @@ const Classification = () => {
       />
 
       {/* Frame Selection / Shared Session Bar */}
-      <div className="bg-white border border-slate-200 rounded-xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 shadow-2xs">
+      <div className="bg-white border border-slate-100 rounded-2xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 shadow-2xs">
         <div className="flex flex-wrap items-center gap-2 text-xs">
           <span className="font-bold text-slate-700 uppercase tracking-wider text-[11px]">
             Current Analysis Input:
@@ -174,7 +174,7 @@ const Classification = () => {
 
       {/* Error Banner */}
       {errorMsg && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3">
+        <div className="p-4 bg-red-50 border border-red-200 rounded-2xl flex items-start gap-3">
           <AlertTriangle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
           <div className="text-xs">
             <h4 className="font-bold text-red-900">ANALYSIS FAILED</h4>
@@ -185,7 +185,7 @@ const Classification = () => {
 
       {/* Negative Detection Gating Notice */}
       {detectionResult && !isCycloneDetected && (
-        <div className="p-4 bg-amber-50/90 border border-amber-300 rounded-xl flex items-start gap-3 shadow-2xs">
+        <div className="p-4 bg-amber-50/90 border border-amber-300 rounded-2xl flex items-start gap-3 shadow-2xs">
           <ShieldAlert className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
           <div className="text-xs space-y-1 text-left">
             <h4 className="font-bold text-amber-950 uppercase tracking-wider font-mono">
@@ -233,7 +233,7 @@ const Classification = () => {
                   <span className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold border backdrop-blur-md shadow-sm ${
                     isCustomUpload 
                       ? 'bg-amber-950/85 text-amber-300 border-amber-500/50' 
-                      : 'bg-slate-900/85 text-sky-300 border-white/20'
+                      : 'bg-slate-800/85 text-sky-300 border-white/20'
                   }`}>
                     {isCustomUpload ? `USER-UPLOADED IMAGE • ${currentInput?.name}` : `BENCHMARK FRAME: ${currentInput?.name}`}
                   </span>
@@ -296,17 +296,17 @@ const Classification = () => {
           </div>
 
           <div className="p-4 space-y-2 text-xs border-t border-slate-100 bg-slate-50">
-            <div className="flex justify-between items-center py-1 border-b border-slate-200">
+            <div className="flex justify-between items-center py-1 border-b border-slate-100">
               <span className="text-slate-500">Predicted Morphology:</span>
               <span className="font-bold text-slate-900">{topPattern}</span>
             </div>
-            <div className="flex justify-between items-center py-1 border-b border-slate-200">
+            <div className="flex justify-between items-center py-1 border-b border-slate-100">
               <span className="text-slate-500">Model Confidence:</span>
               <span className="font-bold font-mono text-slate-800">
                 {classificationResult ? `${topConf.toFixed(1)}%` : 'NO INFERENCE EXECUTED'}
               </span>
             </div>
-            <div className="flex justify-between items-center py-1 border-b border-slate-200">
+            <div className="flex justify-between items-center py-1 border-b border-slate-100">
               <span className="text-slate-500">Output Nature:</span>
               <span className={`font-bold ${isCycloneDetected ? 'text-slate-800' : 'text-amber-800'}`}>
                 {isCycloneDetected 
@@ -338,10 +338,10 @@ const Classification = () => {
               return (
                 <div
                   key={cat.class_id || idx}
-                  className={`w-full text-left p-3 rounded-xl border-2 transition-all ${
+                  className={`w-full text-left p-3 rounded-2xl border-2 transition-all ${
                     isSelected
-                      ? 'border-[#003087] bg-blue-50/70 shadow-xs'
-                      : 'border-slate-200 bg-white'
+                      ? 'border-[#003087] bg-blue-50/70 shadow-sm'
+                      : 'border-slate-100 bg-white'
                   }`}
                 >
                   <div className="flex justify-between items-center mb-1.5">
@@ -363,7 +363,7 @@ const Classification = () => {
             })}
 
             {/* Explicit Notice for Retired Classes */}
-            <div className="mt-4 p-3 bg-amber-50/80 rounded-xl border border-amber-200 space-y-1.5 text-xs text-amber-900">
+            <div className="mt-4 p-3 bg-amber-50/80 rounded-2xl border border-amber-200 space-y-1.5 text-xs text-amber-900">
               <div className="flex items-center gap-1.5 font-bold text-[11px] uppercase tracking-wider text-amber-800">
                 <ShieldAlert className="w-3.5 h-3.5 text-amber-600" />
                 <span>Insufficient Training Representation</span>
@@ -374,7 +374,7 @@ const Classification = () => {
             </div>
           </div>
 
-          <div className="mx-5 mb-5 p-4 bg-[#003087] rounded-xl text-white">
+          <div className="mx-5 mb-5 p-4 bg-[#003087] rounded-2xl text-white">
             <p className="text-[10px] text-blue-200 mb-0.5 uppercase tracking-wider font-mono">
               Predicted Morphology Class
             </p>
@@ -398,7 +398,7 @@ const Classification = () => {
             </div>
 
             <div className="p-4 space-y-3.5 text-xs">
-              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+              <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 space-y-1">
                 <span className="text-slate-500 text-[11px] block">Min Convective Cloud Top Temp</span>
                 <span className="font-mono font-bold text-sm text-sky-800">
                   {radiometric?.min_cloud_temp_c ? `${radiometric.min_cloud_temp_c.toFixed(1)}°C` : '–58.0°C (Baseline)'}
@@ -406,7 +406,7 @@ const Classification = () => {
                 <span className="text-[10px] text-slate-400 block">Thermal IR 10.8µm Equivalent</span>
               </div>
 
-              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+              <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 space-y-1">
                 <span className="text-slate-500 text-[11px] block">Spiral Band Curvature Angle</span>
                 <span className="font-mono font-bold text-sm text-slate-900">
                   {radiometric?.spiral_curvature_deg ? `${radiometric.spiral_curvature_deg.toFixed(0)}°` : '180° Logarithmic Arc'}
@@ -414,7 +414,7 @@ const Classification = () => {
                 <span className="text-[10px] text-slate-400 block">Logarithmic Spiral Fit</span>
               </div>
 
-              <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 space-y-1">
+              <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 space-y-1">
                 <span className="text-slate-500 text-[11px] block">Convective Cloud Ratio</span>
                 <span className="font-mono font-bold text-sm text-emerald-700">
                   {radiometric?.convective_cloud_ratio ? `${(radiometric.convective_cloud_ratio * 100).toFixed(0)}%` : '48% Fraction'}
@@ -423,7 +423,7 @@ const Classification = () => {
               </div>
 
               {/* Intensity Assessment - Scientific Limitation */}
-              <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1 text-xs">
+              <div className="p-3 bg-slate-50 border border-slate-100 rounded-2xl space-y-1 text-xs">
                 <span className="text-[10px] uppercase font-bold font-mono tracking-wider block text-slate-500">
                   Intensity Assessment
                 </span>

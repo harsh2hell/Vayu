@@ -100,7 +100,7 @@ const DemoBadge = ({ type = 'demo', label = 'DEMO BENCHMARK' }) => (
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl p-3 text-xs shadow-lg">
+      <div className="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-700 rounded-2xl p-3 text-xs shadow-lg">
         <p className="font-bold text-slate-700 dark:text-slate-200 mb-1">{label}</p>
         {payload.map((p, i) => (
           <p key={i} style={{ color: p.color }} className="font-medium">{p.name}: {p.value}</p>
@@ -167,7 +167,7 @@ export default function ClimateOceanAnomalies() {
         {/* ── Page Header ─────────────────────────────────────────────── */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-3">
-            <button onClick={() => navigate('/')} className="p-2 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all cursor-pointer">
+            <button onClick={() => navigate('/')} className="p-2 rounded-2xl bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 transition-all cursor-pointer">
               <ArrowLeft className="w-4 h-4 text-slate-600 dark:text-slate-300" />
             </button>
             <div>
@@ -201,7 +201,7 @@ export default function ClimateOceanAnomalies() {
                   <div className="text-3xl font-heading font-black text-rose-600 dark:text-rose-400">{currentNino > 0 ? '+' : ''}{currentNino.toFixed(2)}°C</div>
                   <div className="text-xs font-semibold text-slate-600 dark:text-slate-300 mt-1">Niño 3.4 Index</div>
                   <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Threshold: &gt;+0.5°C = El Niño | &lt;−0.5°C = La Niña</div>
-                  <div className="mt-3 p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-800/60">
+                  <div className="mt-3 p-2.5 rounded-2xl bg-slate-100/80 dark:bg-slate-800/60">
                     <div className="text-[10px] text-slate-500 dark:text-slate-400 mb-1">Seasonal Outlook (CPC/IRI Consensus)</div>
                     <div className="text-xs font-bold text-slate-700 dark:text-slate-200">La Niña possible by Nov–Dec 2026 (60% prob.)</div>
                   </div>
@@ -217,12 +217,12 @@ export default function ClimateOceanAnomalies() {
                 <div className="relative z-10">
                   <div className="flex items-center justify-between mb-3">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-purple-600 dark:text-purple-400">IOD Status</span>
-                    <span className="text-[9px] px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 font-bold">NEUTRAL</span>
+                    <span className="text-[9px] px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-100 dark:border-slate-700 font-bold">NEUTRAL</span>
                   </div>
                   <div className="text-3xl font-heading font-black text-purple-600 dark:text-purple-400">+{currentIOD.toFixed(2)}°C</div>
                   <div className="text-xs font-semibold text-slate-600 dark:text-slate-300 mt-1">Dipole Mode Index (DMI)</div>
                   <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Threshold: &gt;+0.4°C = Positive | &lt;−0.4°C = Negative</div>
-                  <div className="mt-3 p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-800/60">
+                  <div className="mt-3 p-2.5 rounded-2xl bg-slate-100/80 dark:bg-slate-800/60">
                     <div className="text-[10px] text-slate-500 dark:text-slate-400 mb-1">West BoB SSTA vs East BoB SSTA</div>
                     <div className="text-xs font-bold text-slate-700 dark:text-slate-200">WEIO: +0.32°C | EEIO: +0.20°C | DMI: +0.12°C</div>
                   </div>
@@ -243,7 +243,7 @@ export default function ClimateOceanAnomalies() {
                   <div className="text-3xl font-heading font-black text-red-600 dark:text-red-400">{avgSST}°C</div>
                   <div className="text-xs font-semibold text-slate-600 dark:text-slate-300 mt-1">Avg. SST — Indian Ocean</div>
                   <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5">Anomaly: +{avgAnom}°C above 1991–2020 climatology</div>
-                  <div className="mt-3 p-2.5 rounded-xl bg-slate-100/80 dark:bg-slate-800/60">
+                  <div className="mt-3 p-2.5 rounded-2xl bg-slate-100/80 dark:bg-slate-800/60">
                     <div className="text-[10px] text-slate-500 dark:text-slate-400 mb-1">Peak SST — North Bay of Bengal</div>
                     <div className="text-xs font-bold text-red-600 dark:text-red-400">30.8°C (+1.2°C above normal)</div>
                   </div>
@@ -272,7 +272,7 @@ export default function ClimateOceanAnomalies() {
                       <button
                         key={tab.id}
                         onClick={() => setActiveChart(tab.id)}
-                        className={`px-3 py-1.5 rounded-xl text-[10px] font-bold transition-all cursor-pointer ${activeChart === tab.id ? `bg-${tab.color}-600 text-white` : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
+                        className={`px-3 py-1.5 rounded-2xl text-[10px] font-bold transition-all cursor-pointer ${activeChart === tab.id ? `bg-${tab.color}-600 text-white` : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'}`}
                         style={activeChart === tab.id ? { backgroundColor: tab.color === 'rose' ? '#E11D48' : '#9333EA' } : {}}
                       >
                         {tab.label}
@@ -336,7 +336,7 @@ export default function ClimateOceanAnomalies() {
                       {SST_POINTS.map((pt, i) => <SSTMarker key={i} point={pt} />)}
                     </MapContainer>
                   </div>
-                  <div className="p-2.5 border-t border-slate-200 dark:border-slate-700 flex flex-wrap items-center gap-3 text-[10px]">
+                  <div className="p-2.5 border-t border-slate-100 dark:border-slate-700 flex flex-wrap items-center gap-3 text-[10px]">
                     <span className="text-slate-500 dark:text-slate-400 font-medium">SST Anomaly Scale:</span>
                     <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-red-500 inline-block" /> +1.0°C</span>
                     <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-orange-500 inline-block" /> +0.5°C</span>
@@ -378,7 +378,7 @@ export default function ClimateOceanAnomalies() {
                       </div>
                     ))}
                   </div>
-                  <div className="mt-4 p-3 rounded-xl bg-rose-500/10 border border-rose-300/40 dark:border-rose-700/40">
+                  <div className="mt-4 p-3 rounded-2xl bg-rose-500/10 border border-rose-300/40 dark:border-rose-700/40">
                     <div className="text-xs font-bold text-rose-700 dark:text-rose-400 mb-0.5">OHC Summary</div>
                     <p className="text-[10px] text-slate-600 dark:text-slate-300 leading-relaxed">
                       Total OHC: <strong>98 kJ/cm²</strong> (above 26°C isotherm). The 26°C isotherm depth is at <strong>87m</strong> (normal: 72m), indicating elevated energy reservoir that can sustain or rapidly intensify any passing tropical system.
@@ -437,7 +437,7 @@ export default function ClimateOceanAnomalies() {
                     <thead>
                       <tr className="bg-rose-500/10 dark:bg-rose-950/30 border-b border-rose-200 dark:border-rose-900/60">
                         {['ENSO Phase', 'IOD Phase', 'Bay Cyclone Activity', 'India Rainfall', 'Key Note'].map(h => (
-                          <th key={h} className="px-4 py-2.5 text-left text-[10px] font-extrabold uppercase tracking-wider text-rose-700 dark:text-rose-400 whitespace-nowrap">{h}</th>
+                          <th key={h} className="px-4 py-2.5 text-left text-[10px] font-bold uppercase tracking-wider text-rose-700 dark:text-rose-400 whitespace-nowrap">{h}</th>
                         ))}
                       </tr>
                     </thead>
@@ -452,7 +452,7 @@ export default function ClimateOceanAnomalies() {
                           <td className="px-4 py-2.5 text-slate-600 dark:text-slate-300">{row.indiaRainfall}</td>
                           <td className="px-4 py-2.5 text-slate-500 dark:text-slate-400">
                             {row.note}
-                            {row.current && <span className="ml-1.5 text-[9px] font-extrabold px-2 py-0.5 rounded-full bg-rose-500 text-white">CURRENT 2026</span>}
+                            {row.current && <span className="ml-1.5 text-[9px] font-bold px-2 py-0.5 rounded-full bg-rose-500 text-white">CURRENT 2026</span>}
                           </td>
                         </tr>
                       ))}
@@ -476,7 +476,7 @@ export default function ClimateOceanAnomalies() {
                   <IOSGlassCard key={i} className="p-4 rounded-2xl">
                     <div className="flex items-center justify-between mb-2">
                       <h3 className="font-bold text-sm text-slate-800 dark:text-white">{ins.title}</h3>
-                      <span className="text-[10px] font-extrabold text-rose-600 dark:text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded-full">{ins.confidence}%</span>
+                      <span className="text-[10px] font-bold text-rose-600 dark:text-rose-400 bg-rose-500/10 px-2 py-0.5 rounded-full">{ins.confidence}%</span>
                     </div>
                     <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">{ins.detail}</p>
                   </IOSGlassCard>
@@ -492,7 +492,7 @@ export default function ClimateOceanAnomalies() {
               </div>
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
                 {DATA_SOURCES.map((src, i) => (
-                  <IOSGlassCard key={i} className="p-3.5 rounded-xl text-center">
+                  <IOSGlassCard key={i} className="p-3.5 rounded-2xl text-center">
                     <div className="text-2xl mb-1.5">{src.icon}</div>
                     <div className="text-xs font-bold text-slate-800 dark:text-white">{src.name}</div>
                     <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-0.5 leading-tight">{src.desc}</div>

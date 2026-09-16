@@ -771,7 +771,7 @@ const ThreatMap = () => {
         <section className="space-y-4">
           
           {/* Header Bar: Title, Live Status & Quick Storm Selector */}
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-5">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-5">
             <div>
               <div className="flex items-center gap-2 mb-1.5">
                 <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-cyan-100 dark:bg-cyan-950 text-cyan-800 dark:text-cyan-300 border border-cyan-200 dark:border-cyan-800 flex items-center gap-1.5">
@@ -793,7 +793,7 @@ const ThreatMap = () => {
             </div>
 
             {/* Storm Switcher Pills */}
-            <div className="flex items-center gap-1.5 p-1 bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl overflow-x-auto max-w-full">
+            <div className="flex items-center gap-1.5 p-1 bg-slate-100 dark:bg-slate-800 border border-slate-100 dark:border-slate-800 rounded-2xl overflow-x-auto max-w-full">
               {Object.keys(SYSTEMS).map((sysKey) => {
                 const sys = SYSTEMS[sysKey];
                 const isSelected = selectedSystemId === sysKey;
@@ -819,7 +819,7 @@ const ThreatMap = () => {
 
           {/* Share notification toast */}
           {shareToast && (
-            <div className="fixed top-20 right-6 z-[99999] bg-slate-900/95 text-white px-4 py-2.5 rounded-xl shadow-2xl border border-cyan-500/40 text-xs flex items-center gap-2 backdrop-blur-md">
+            <div className="fixed top-20 right-6 z-[99999] bg-slate-800/95 text-white px-4 py-2.5 rounded-2xl shadow-2xl border border-cyan-500/40 text-xs flex items-center gap-2 backdrop-blur-md">
               <Check className="w-4 h-4 text-emerald-400" />
               <span>{isHindi ? 'लाइव कंसोल लिंक कॉपी हो गया!' : 'Live storm console URL copied to clipboard!'}</span>
             </div>
@@ -827,7 +827,7 @@ const ThreatMap = () => {
 
           {/* Measuring notice */}
           {isMeasuring && (
-            <div className="bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-300 p-2.5 rounded-xl text-xs flex items-center justify-between">
+            <div className="bg-amber-500/10 border border-amber-500/30 text-amber-600 dark:text-amber-300 p-2.5 rounded-2xl text-xs flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Ruler className="w-4 h-4 text-amber-500" />
                 <span><strong>Measure Tool Active:</strong> Click any two points or waypoints to estimate radial distance to cyclone eye.</span>
@@ -884,7 +884,7 @@ const ThreatMap = () => {
               <div className="flex items-center gap-1.5 flex-wrap shrink-0">
                 
                 {/* Base Layer Switcher: Satellite / Dark GIS */}
-                <div className="flex items-center bg-black/40 p-0.5 rounded-xl border border-white/10 text-[11px]">
+                <div className="flex items-center bg-black/40 p-0.5 rounded-2xl border border-white/10 text-[11px]">
                   <button
                     onClick={() => setMapBaseLayer('satellite')}
                     className={`px-2.5 py-1 rounded-lg font-medium transition cursor-pointer flex items-center gap-1 ${
@@ -914,7 +914,7 @@ const ThreatMap = () => {
                 {/* IMD Radar Network Toggle */}
                 <button
                   onClick={() => setShowDopplerRadar(!showDopplerRadar)}
-                  className={`px-2.5 py-1 rounded-xl text-[11px] font-semibold transition cursor-pointer flex items-center gap-1.5 border shadow-sm ${
+                  className={`px-2.5 py-1 rounded-2xl text-[11px] font-semibold transition cursor-pointer flex items-center gap-1.5 border shadow-sm ${
                     showDopplerRadar
                       ? 'bg-emerald-500/25 border-emerald-400/50 text-emerald-300 shadow-emerald-500/20'
                       : 'bg-black/30 border-white/10 text-slate-400 hover:text-white'
@@ -929,7 +929,7 @@ const ThreatMap = () => {
                 {/* Tactical Cone Toggle */}
                 <button
                   onClick={() => setShowCone(!showCone)}
-                  className={`px-2 py-1 rounded-xl text-[11px] font-semibold transition cursor-pointer border shadow-sm ${
+                  className={`px-2 py-1 rounded-2xl text-[11px] font-semibold transition cursor-pointer border shadow-sm ${
                     showCone
                       ? 'bg-amber-500/25 border-amber-400/50 text-amber-300'
                       : 'bg-black/30 border-white/10 text-slate-400 hover:text-white'
@@ -942,7 +942,7 @@ const ThreatMap = () => {
                 {/* Wind Radii Toggle */}
                 <button
                   onClick={() => setShowWindRadii(!showWindRadii)}
-                  className={`px-2 py-1 rounded-xl text-[11px] font-semibold transition cursor-pointer border shadow-sm ${
+                  className={`px-2 py-1 rounded-2xl text-[11px] font-semibold transition cursor-pointer border shadow-sm ${
                     showWindRadii
                       ? 'bg-rose-500/25 border-rose-400/50 text-rose-300'
                       : 'bg-black/30 border-white/10 text-slate-400 hover:text-white'
@@ -955,7 +955,7 @@ const ThreatMap = () => {
                 {/* On-Demand Track Table Drawer Toggle Button */}
                 <button
                   onClick={() => setIsRightTableOpen(!isRightTableOpen)}
-                  className={`px-2.5 py-1 rounded-xl text-[11px] font-bold transition cursor-pointer flex items-center gap-1.5 border shadow-sm ${
+                  className={`px-2.5 py-1 rounded-2xl text-[11px] font-bold transition cursor-pointer flex items-center gap-1.5 border shadow-sm ${
                     isRightTableOpen
                       ? 'bg-cyan-500 text-slate-950 border-cyan-300 font-black shadow-cyan-500/40'
                       : 'bg-white/15 hover:bg-white/25 border-white/20 text-white'
@@ -964,7 +964,7 @@ const ThreatMap = () => {
                 >
                   <Activity className="w-3.5 h-3.5" />
                   <span>Track Table</span>
-                  <span className={`text-[9px] px-1 rounded font-mono ${isRightTableOpen ? 'bg-slate-900 text-white' : 'bg-white/20 text-slate-200'}`}>
+                  <span className={`text-[9px] px-1 rounded font-mono ${isRightTableOpen ? 'bg-slate-700 text-white' : 'bg-white/20 text-slate-200'}`}>
                     {(current.waypoints || []).length}
                   </span>
                 </button>
@@ -1084,7 +1084,7 @@ const ThreatMap = () => {
                       const el = document.getElementById('coastal-threat-matrix');
                       if (el) el.scrollIntoView({ behavior: 'smooth' });
                     }}
-                    className="w-full py-1.5 px-3 bg-white/10 hover:bg-white/20 active:bg-white/30 rounded-xl text-xs font-bold text-white flex items-center justify-center gap-1.5 transition cursor-pointer border border-white/10 shadow-sm"
+                    className="w-full py-1.5 px-3 bg-white/10 hover:bg-white/20 active:bg-white/30 rounded-2xl text-xs font-bold text-white flex items-center justify-center gap-1.5 transition cursor-pointer border border-white/10 shadow-sm"
                   >
                     <AlertTriangle className="w-3.5 h-3.5 text-amber-400" />
                     <span>{isHindi ? 'चेतावनी एवं तटीय अलर्ट विवरण' : 'View District Threat Matrix'}</span>
@@ -1100,7 +1100,7 @@ const ThreatMap = () => {
               {/* Share */}
               <button
                 onClick={handleShare}
-                className="zoom-earth-glass rounded-xl p-2 text-white/80 hover:text-white hover:bg-white/20 transition cursor-pointer shadow-lg"
+                className="zoom-earth-glass rounded-2xl p-2 text-white/80 hover:text-white hover:bg-white/20 transition cursor-pointer shadow-lg"
                 title="Share storm tracking view"
               >
                 <Share2 className="w-4 h-4" />
@@ -1109,7 +1109,7 @@ const ThreatMap = () => {
               {/* Measure */}
               <button
                 onClick={() => setIsMeasuring(!isMeasuring)}
-                className={`zoom-earth-glass rounded-xl p-2 transition cursor-pointer shadow-lg ${
+                className={`zoom-earth-glass rounded-2xl p-2 transition cursor-pointer shadow-lg ${
                   isMeasuring ? 'bg-amber-500/40 text-amber-300 border-amber-400' : 'text-white/80 hover:text-white hover:bg-white/20'
                 }`}
                 title="Measure distance to eye"
@@ -1120,7 +1120,7 @@ const ThreatMap = () => {
               {/* Fullscreen */}
               <button
                 onClick={toggleFullscreen}
-                className="zoom-earth-glass rounded-xl p-2 text-white/80 hover:text-white hover:bg-white/20 transition cursor-pointer shadow-lg"
+                className="zoom-earth-glass rounded-2xl p-2 text-white/80 hover:text-white hover:bg-white/20 transition cursor-pointer shadow-lg"
                 title={isFullscreen ? "Exit Fullscreen" : "Toggle Fullscreen"}
               >
                 {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
@@ -1129,7 +1129,7 @@ const ThreatMap = () => {
               {/* Recenter Vortex */}
               <button
                 onClick={() => setMapAction('recenter')}
-                className="zoom-earth-glass rounded-xl p-2 text-cyan-400 hover:text-cyan-200 hover:bg-white/20 transition cursor-pointer shadow-lg"
+                className="zoom-earth-glass rounded-2xl p-2 text-cyan-400 hover:text-cyan-200 hover:bg-white/20 transition cursor-pointer shadow-lg"
                 title="Recenter storm eye"
               >
                 <Crosshair className="w-4 h-4" />
@@ -1138,7 +1138,7 @@ const ThreatMap = () => {
               {/* Zoom In */}
               <button
                 onClick={() => setMapAction('zoomIn')}
-                className="zoom-earth-glass rounded-xl p-2 text-white/80 hover:text-white hover:bg-white/20 transition cursor-pointer shadow-lg"
+                className="zoom-earth-glass rounded-2xl p-2 text-white/80 hover:text-white hover:bg-white/20 transition cursor-pointer shadow-lg"
                 title="Zoom In"
               >
                 <Plus className="w-4 h-4" />
@@ -1147,7 +1147,7 @@ const ThreatMap = () => {
               {/* Zoom Out */}
               <button
                 onClick={() => setMapAction('zoomOut')}
-                className="zoom-earth-glass rounded-xl p-2 text-white/80 hover:text-white hover:bg-white/20 transition cursor-pointer shadow-lg"
+                className="zoom-earth-glass rounded-2xl p-2 text-white/80 hover:text-white hover:bg-white/20 transition cursor-pointer shadow-lg"
                 title="Zoom Out"
               >
                 <Minus className="w-4 h-4" />
@@ -1156,7 +1156,7 @@ const ThreatMap = () => {
               {/* Reset Bearing / North */}
               <button
                 onClick={() => setMapAction('resetNorth')}
-                className="zoom-earth-glass rounded-xl p-2 text-white/80 hover:text-white hover:bg-white/20 transition cursor-pointer shadow-lg"
+                className="zoom-earth-glass rounded-2xl p-2 text-white/80 hover:text-white hover:bg-white/20 transition cursor-pointer shadow-lg"
                 title="Reset North Orientation"
               >
                 <Compass className="w-4 h-4" />
@@ -1166,7 +1166,7 @@ const ThreatMap = () => {
 
             {/* 4. ACTIVE FORECAST SCALE LEGEND (If forecast layer active) */}
             {activeForecastLayer !== 'none' && (
-              <div className="absolute bottom-16 left-4 z-[1000] zoom-earth-glass rounded-xl p-2.5 text-[10px] text-white shadow-xl pointer-events-auto max-w-[220px]">
+              <div className="absolute bottom-16 left-4 z-[1000] zoom-earth-glass rounded-2xl p-2.5 text-[10px] text-white shadow-xl pointer-events-auto max-w-[220px]">
                 <div className="flex items-center justify-between mb-1 font-semibold uppercase tracking-wider text-slate-300">
                   <span>
                     {activeForecastLayer === 'precip' && 'Precipitation (mm/h)'}
@@ -1224,7 +1224,7 @@ const ThreatMap = () => {
                     </button>
 
                     {/* Current Timestamp Display */}
-                    <div className="flex items-center gap-2 px-2 py-0.5 bg-black/40 rounded-xl border border-white/10">
+                    <div className="flex items-center gap-2 px-2 py-0.5 bg-black/40 rounded-2xl border border-white/10">
                       <span className="font-bold text-xs text-white whitespace-nowrap">
                         {activeWp.date || '07 Sept'}
                       </span>
@@ -1586,7 +1586,7 @@ const ThreatMap = () => {
              SECTION 2: SUMMARY COUNTER STATS
              ========================================================================= */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-3.5 rounded-2xl shadow-2xs">
+          <div className="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-800 p-3.5 rounded-2xl shadow-2xs">
             <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block mb-0.5">
               {isHindi ? 'निगरानी किए जा रहे तटीय जिले' : 'Monitored Coastal Districts'}
             </span>
@@ -1640,9 +1640,9 @@ const ThreatMap = () => {
              ========================================================================= */}
         <section className="space-y-4">
           
-          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
+          <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-4">
             <div>
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 mb-2">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-100 dark:border-slate-700 mb-2">
                 <ShieldAlert className="w-3.5 h-3.5 text-red-500" />
                 <span>
                   {isHindi ? 'जिलावार तटीय आपदा प्रारंभिक चेतावनी' : 'District-Level Coastal Threat Multi-Hazard Status'}
@@ -1661,7 +1661,7 @@ const ThreatMap = () => {
                 value={matrixSearchQuery}
                 onChange={(e) => setMatrixSearchQuery(e.target.value)}
                 placeholder={isHindi ? 'जिला, बंदरगाह या शहर खोजें...' : 'Search district, port, or city...'}
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-sky-500 shadow-2xs"
+                className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-sky-500 shadow-2xs"
               />
               {matrixSearchQuery && (
                 <button
@@ -1688,7 +1688,7 @@ const ThreatMap = () => {
                   onClick={() => setStateFilter(st)}
                   className={`px-3 py-1 rounded-lg font-semibold transition-all cursor-pointer ${
                     stateFilter === st
-                      ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-950 shadow-2xs'
+                      ? 'bg-slate-700 text-white dark:bg-white dark:text-slate-950 shadow-2xs'
                       : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                   }`}
                 >
@@ -1710,7 +1710,7 @@ const ThreatMap = () => {
                   onClick={() => setMatrixThreatFilter(lvl)}
                   className={`px-3 py-1 rounded-lg font-semibold transition-all cursor-pointer ${
                     matrixThreatFilter === lvl
-                      ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-950 shadow-2xs'
+                      ? 'bg-slate-700 text-white dark:bg-white dark:text-slate-950 shadow-2xs'
                       : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                   }`}
                 >
@@ -1725,7 +1725,7 @@ const ThreatMap = () => {
 
           {/* Threat Matrix Table */}
           {filteredDistricts.length === 0 ? (
-            <div className="border border-slate-200 dark:border-slate-800 rounded-2xl p-8 text-center bg-white dark:bg-slate-900 space-y-2">
+            <div className="border border-slate-100 dark:border-slate-800 rounded-2xl p-8 text-center bg-white dark:bg-slate-800 space-y-2">
               <p className="text-xs font-semibold text-slate-600 dark:text-slate-400">
                 {isHindi 
                   ? `आपकी खोज "${matrixSearchQuery}" से कोई जिला मेल नहीं खाता।` 
@@ -1737,15 +1737,15 @@ const ThreatMap = () => {
                   setStateFilter('All');
                   setMatrixThreatFilter('All');
                 }}
-                className="px-3 py-1.5 rounded-lg bg-slate-900 text-white dark:bg-white dark:text-slate-900 text-xs font-bold cursor-pointer"
+                className="px-3 py-1.5 rounded-lg bg-slate-700 text-white dark:bg-white dark:text-slate-900 text-xs font-bold cursor-pointer"
               >
                 {isHindi ? 'फ़िल्टर रीसेट करें' : 'Reset Filters'}
               </button>
             </div>
           ) : (
-            <div className="border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-xs bg-white dark:bg-slate-900/90 overflow-x-auto">
+            <div className="border border-slate-100 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm bg-white dark:bg-slate-800/90 overflow-x-auto">
               <table className="w-full text-left text-xs min-w-[850px]">
-                <thead className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-semibold uppercase tracking-wider text-[11px]">
+                <thead className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-100 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-semibold uppercase tracking-wider text-[11px]">
                   <tr>
                     <th className="py-3.5 px-5">{isHindi ? 'जिला एवं तटीय बंदरगाह' : 'District & Coastal Ports'}</th>
                     <th className="py-3.5 px-5">{isHindi ? 'राज्य' : 'State'}</th>
@@ -1757,7 +1757,7 @@ const ThreatMap = () => {
                     <th className="py-3.5 px-5 text-right">{isHindi ? 'कार्रवाई' : 'Action'}</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 bg-white dark:bg-slate-900">
+                <tbody className="divide-y divide-slate-100 dark:divide-slate-800 bg-white dark:bg-slate-800">
                   {filteredDistricts.map((row, idx) => (
                     <tr 
                       key={idx} 
@@ -1862,7 +1862,7 @@ const ThreatMap = () => {
           )}
 
           {/* Public Guidance Tip */}
-          <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
+          <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
             <div className="flex items-center gap-2.5">
               <Info className="w-4 h-4 text-sky-500 shrink-0" />
               <span>
@@ -1881,7 +1881,7 @@ const ThreatMap = () => {
       </main>
 
       {/* Footer */}
-      <footer className="bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 py-10 px-4 sm:px-6 text-xs text-slate-500 dark:text-slate-400 transition-colors mt-12">
+      <footer className="bg-slate-50 dark:bg-slate-950 border-t border-slate-100 dark:border-slate-800 py-10 px-4 sm:px-6 text-xs text-slate-500 dark:text-slate-400 transition-colors mt-12">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
             &copy; 2026 {isHindi ? 'पृथ्वी विज्ञान मंत्रालय, भारत सरकार। सर्वाधिकार सुरक्षित।' : 'Ministry of Earth Sciences, Government of India. All Rights Reserved.'}

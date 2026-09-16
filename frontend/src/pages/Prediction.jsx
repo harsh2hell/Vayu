@@ -141,7 +141,7 @@ const Prediction = () => {
         actions={
           <div className="flex items-center gap-2">
             <span className="text-xs font-semibold text-slate-600 hidden sm:inline">Storm:</span>
-            <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200">
+            <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-2xl border border-slate-100">
               {VERIFIED_STORMS.map((storm) => (
                 <button
                   key={storm.id}
@@ -149,7 +149,7 @@ const Prediction = () => {
                   disabled={isLoading}
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                     selectedStormId === storm.id
-                      ? 'bg-[#003087] text-white shadow-xs'
+                      ? 'bg-[#003087] text-white shadow-sm'
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
@@ -163,7 +163,7 @@ const Prediction = () => {
 
       {/* Uploaded Image Temporal Sequence Scientific Disclosure */}
       {isCustomUpload ? (
-        <div className="p-4 bg-amber-50 border border-amber-300 rounded-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-2xs">
+        <div className="p-4 bg-amber-50 border border-amber-300 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-2xs">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
               <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-200 text-amber-900 uppercase">
@@ -207,7 +207,7 @@ const Prediction = () => {
 
       {/* Error Banner */}
       {errorMsg && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3">
+        <div className="p-4 bg-red-50 border border-red-200 rounded-2xl flex items-start gap-3">
           <AlertTriangle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
           <div className="text-xs">
             <h4 className="font-bold text-red-900">FORECAST GENERATION FAILED</h4>
@@ -317,7 +317,7 @@ const Prediction = () => {
             </div>
           </div>
 
-          <div className="p-3 bg-slate-50 border-t border-slate-200 text-xs text-slate-600 flex items-center justify-between">
+          <div className="p-3 bg-slate-50 border-t border-slate-100 text-xs text-slate-600 flex items-center justify-between">
             <span>
               <strong>Basin:</strong> {activeStorm.basin} • <strong>Storm:</strong> {activeStorm.name}
             </span>
@@ -341,7 +341,7 @@ const Prediction = () => {
             </div>
 
             <div className="grid grid-cols-2 gap-3 text-xs">
-              <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+              <div className="p-3 bg-slate-50 border border-slate-100 rounded-2xl">
                 <span className="text-slate-400 text-[10px] block uppercase font-mono">Initial Fix (NOW)</span>
                 <span className="font-bold text-slate-900 text-xs mt-0.5 block font-mono">
                   {trajectoryList[0] ? `${trajectoryList[0].lat.toFixed(2)}°N, ${trajectoryList[0].lon.toFixed(2)}°E` : `${activeStorm.initial_lat}°N, ${activeStorm.initial_lon}°E`}
@@ -351,7 +351,7 @@ const Prediction = () => {
                 </span>
               </div>
 
-              <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+              <div className="p-3 bg-slate-50 border border-slate-100 rounded-2xl">
                 <span className="text-slate-400 text-[10px] block uppercase font-mono">+72h Predicted Fix</span>
                 <span className="font-bold text-sky-700 text-xs mt-0.5 block font-mono">
                   {trajectoryList.length > 0 ? `${trajectoryList[trajectoryList.length - 1].lat.toFixed(2)}°N, ${trajectoryList[trajectoryList.length - 1].lon.toFixed(2)}°E` : '--'}
@@ -361,7 +361,7 @@ const Prediction = () => {
                 </span>
               </div>
 
-              <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+              <div className="p-3 bg-slate-50 border border-slate-100 rounded-2xl">
                 <span className="text-slate-400 text-[10px] block uppercase font-mono">Epistemic Radius (+72h)</span>
                 <span className="font-bold text-slate-900 text-xs mt-0.5 block font-mono">
                   ±{trajectoryList.length > 0 ? Math.round(trajectoryList[trajectoryList.length - 1].uncertainty_radius_km || 0) : 0} km
@@ -369,7 +369,7 @@ const Prediction = () => {
                 <span className="text-[10px] text-slate-500 font-mono mt-0.5 block">25-Pass MC Dropout</span>
               </div>
 
-              <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl">
+              <div className="p-3 bg-slate-50 border border-slate-100 rounded-2xl">
                 <span className="text-slate-400 text-[10px] block uppercase font-mono">Step Discretization</span>
                 <span className="font-bold text-slate-900 text-xs mt-0.5 block font-mono">3-Hour Intervals</span>
                 <span className="text-[10px] text-slate-500 font-mono mt-0.5 block">24 Timesteps to +72h</span>
@@ -431,7 +431,7 @@ const Prediction = () => {
 
             <button
               onClick={() => navigate('/dashboard/impact')}
-              className="btn-danger w-full text-xs py-2.5 justify-center gap-2 shadow-xs"
+              className="btn-danger w-full text-xs py-2.5 justify-center gap-2 shadow-sm"
             >
               <span>Proceed to Impact & Landfall Studio</span>
               <ArrowRight className="w-4 h-4" />
@@ -456,7 +456,7 @@ const Prediction = () => {
 
         <div className="overflow-x-auto">
           <table className="w-full text-xs text-left">
-            <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 font-mono text-[11px]">
+            <thead className="bg-slate-50 border-b border-slate-100 text-slate-500 font-mono text-[11px]">
               <tr>
                 <th className="py-2.5 px-4 font-semibold">Forecast Horizon</th>
                 <th className="py-2.5 px-4 font-semibold">Lead Time</th>
@@ -506,7 +506,7 @@ const Prediction = () => {
             <button
               onClick={() => setChartMetric('wind')}
               className={`px-3 py-1 rounded font-medium transition-all ${
-                chartMetric === 'wind' ? 'bg-white text-[#003087] shadow-xs' : 'text-slate-600'
+                chartMetric === 'wind' ? 'bg-white text-[#003087] shadow-sm' : 'text-slate-600'
               }`}
             >
               Wind Speed (km/h)
@@ -514,7 +514,7 @@ const Prediction = () => {
             <button
               onClick={() => setChartMetric('pressure')}
               className={`px-3 py-1 rounded font-medium transition-all ${
-                chartMetric === 'pressure' ? 'bg-white text-[#003087] shadow-xs' : 'text-slate-600'
+                chartMetric === 'pressure' ? 'bg-white text-[#003087] shadow-sm' : 'text-slate-600'
               }`}
             >
               Central Pressure (hPa)

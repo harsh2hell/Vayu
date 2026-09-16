@@ -665,7 +665,7 @@ const CityForecast = () => {
             ? 'bg-red-50 dark:bg-red-950/60 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800'
             : item.level === 'orange'
             ? 'bg-orange-50 dark:bg-orange-950/60 text-orange-700 dark:text-orange-300 border-orange-200 dark:border-orange-800'
-            : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700',
+            : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-100 dark:border-slate-700',
           emoji: item.level === 'red' ? '⛈️' : item.level === 'orange' ? '🌧️' : (isPort ? '⚓' : '🌊'),
           temp: item.temp,
           condition: item.condition,
@@ -865,7 +865,7 @@ const CityForecast = () => {
         {/* =========================================================================
              CITY QUICK SWITCHER PILLS (Switch between Mumbai, Chennai, Kolkata, etc.)
              ========================================================================= */}
-        <div className="bg-white/70 dark:bg-slate-900/60 backdrop-blur-xl border border-slate-200/80 dark:border-white/10 p-2 sm:p-2.5 rounded-2xl shadow-xs overflow-x-auto no-scrollbar">
+        <div className="bg-white/70 dark:bg-slate-800/60 backdrop-blur-xl border border-slate-100/80 dark:border-white/10 p-2 sm:p-2.5 rounded-2xl shadow-sm overflow-x-auto no-scrollbar">
           <div className="flex items-center gap-1.5 min-w-max">
             <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 mr-1 flex items-center gap-1 shrink-0">
               <MapPin className="w-3 h-3 text-sky-500" />
@@ -877,9 +877,9 @@ const CityForecast = () => {
                 <button
                   key={c.id}
                   onClick={() => navigate(`/forecast/${c.id}`)}
-                  className={`px-3 py-1 sm:py-1.5 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer flex items-center shrink-0 ${
+                  className={`px-3 py-1 sm:py-1.5 rounded-2xl text-xs font-bold transition-all duration-200 cursor-pointer flex items-center shrink-0 ${
                     isCurrent
-                      ? 'bg-sky-500 text-white shadow-xs scale-[1.03]'
+                      ? 'bg-sky-500 text-white shadow-sm scale-[1.03]'
                       : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 hover:text-slate-950 dark:hover:text-white'
                   }`}
                 >
@@ -899,10 +899,10 @@ const CityForecast = () => {
                 setSearchQuery('');
                 setSelectedIndex(0);
               }}
-              className={`px-3 py-1 sm:py-1.5 rounded-xl text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-1.5 shrink-0 group ${
+              className={`px-3 py-1 sm:py-1.5 rounded-2xl text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-1.5 shrink-0 group ${
                 isCustomLocationActive
-                  ? 'bg-sky-500 text-white shadow-xs scale-[1.03]'
-                  : 'bg-sky-500/10 hover:bg-sky-500 text-sky-700 dark:text-sky-300 hover:text-white dark:hover:text-white border border-sky-300/60 dark:border-sky-500/40 hover:border-transparent hover:scale-[1.03] active:scale-[0.98] shadow-xs'
+                  ? 'bg-sky-500 text-white shadow-sm scale-[1.03]'
+                  : 'bg-sky-500/10 hover:bg-sky-500 text-sky-700 dark:text-sky-300 hover:text-white dark:hover:text-white border border-sky-300/60 dark:border-sky-500/40 hover:border-transparent hover:scale-[1.03] active:scale-[0.98] shadow-sm'
               }`}
               title={isHindi ? 'स्थान खोजें' : 'Search Location'}
             >
@@ -952,7 +952,7 @@ const CityForecast = () => {
                   <span className="text-2xl sm:text-3xl text-sky-600 dark:text-sky-400 ml-1">°C</span>
                 </div>
 
-                <div className="flex items-center gap-3.5 pl-3 border-l border-slate-200 dark:border-slate-800">
+                <div className="flex items-center gap-3.5 pl-3 border-l border-slate-100 dark:border-slate-800">
                   {/* Apple Weather-grade live animated weather status illustration */}
                   <div className="relative group/weather-anim flex items-center justify-center p-1.5 rounded-2xl bg-white/50 dark:bg-slate-800/50 backdrop-blur-md border border-white/80 dark:border-white/10 shadow-[0_4px_16px_rgba(0,0,0,0.06),inset_0_1px_1px_rgba(255,255,255,0.9)] dark:shadow-[0_4px_20px_rgba(0,0,0,0.35),inset_0_1px_1px_rgba(255,255,255,0.06)] transition-all duration-300 hover:scale-105">
                     <WeatherStatusAnimation
@@ -969,7 +969,7 @@ const CityForecast = () => {
                   </div>
 
                   <div>
-                    <div className="font-heading font-extrabold text-base sm:text-lg text-slate-900 dark:text-white flex items-center gap-2">
+                    <div className="font-heading font-bold text-base sm:text-lg text-slate-900 dark:text-white flex items-center gap-2">
                       <span>{isHindi ? activeDay.conditionHindi : activeDay.condition}</span>
                     </div>
                     <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
@@ -1014,7 +1014,7 @@ const CityForecast = () => {
                 <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider block">
                   {isHindi ? 'आर्द्रता' : 'Humidity'}
                 </span>
-                <span className="text-sm font-extrabold text-slate-900 dark:text-white">{activeDay.humidity}%</span>
+                <span className="text-sm font-bold text-slate-900 dark:text-white">{activeDay.humidity}%</span>
               </div>
 
               <div className="bg-white/60 dark:bg-white/[0.04] backdrop-blur-md rounded-2xl p-3 border border-white/80 dark:border-white/10 text-center shadow-2xs">
@@ -1022,7 +1022,7 @@ const CityForecast = () => {
                 <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider block">
                   {isHindi ? 'दबाव' : 'Pressure'}
                 </span>
-                <span className="text-sm font-extrabold text-slate-900 dark:text-white">{activeDay.pressure}</span>
+                <span className="text-sm font-bold text-slate-900 dark:text-white">{activeDay.pressure}</span>
               </div>
 
               <div className="bg-white/60 dark:bg-white/[0.04] backdrop-blur-md rounded-2xl p-3 border border-white/80 dark:border-white/10 text-center shadow-2xs">
@@ -1030,7 +1030,7 @@ const CityForecast = () => {
                 <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider block">
                   {isHindi ? 'दृश्यता' : 'Visibility'}
                 </span>
-                <span className="text-sm font-extrabold text-slate-900 dark:text-white">{activeDay.visibility}</span>
+                <span className="text-sm font-bold text-slate-900 dark:text-white">{activeDay.visibility}</span>
               </div>
 
               <div className="bg-white/60 dark:bg-white/[0.04] backdrop-blur-md rounded-2xl p-3 border border-white/80 dark:border-white/10 text-center shadow-2xs">
@@ -1038,7 +1038,7 @@ const CityForecast = () => {
                 <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider block">
                   {isHindi ? 'यूवी इंडेक्स' : 'UV Index'}
                 </span>
-                <span className="text-sm font-extrabold text-slate-900 dark:text-white">{activeDay.uvIndex} ({activeDay.uvCategory})</span>
+                <span className="text-sm font-bold text-slate-900 dark:text-white">{activeDay.uvIndex} ({activeDay.uvCategory})</span>
               </div>
 
               <div className="bg-white/60 dark:bg-white/[0.04] backdrop-blur-md rounded-2xl p-3 border border-white/80 dark:border-white/10 text-center shadow-2xs">
@@ -1046,7 +1046,7 @@ const CityForecast = () => {
                 <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider block">
                   {isHindi ? 'ओसांक' : 'Dew Point'}
                 </span>
-                <span className="text-sm font-extrabold text-slate-900 dark:text-white">{activeDay.dewPoint}</span>
+                <span className="text-sm font-bold text-slate-900 dark:text-white">{activeDay.dewPoint}</span>
               </div>
 
               <div className="bg-white/60 dark:bg-white/[0.04] backdrop-blur-md rounded-2xl p-3 border border-white/80 dark:border-white/10 text-center shadow-2xs">
@@ -1054,7 +1054,7 @@ const CityForecast = () => {
                 <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider block">
                   {isHindi ? 'बादल' : 'Cloud Cover'}
                 </span>
-                <span className="text-sm font-extrabold text-slate-900 dark:text-white">{activeDay.cloudCover}</span>
+                <span className="text-sm font-bold text-slate-900 dark:text-white">{activeDay.cloudCover}</span>
               </div>
             </div>
 
@@ -1070,7 +1070,7 @@ const CityForecast = () => {
               <span className="w-2.5 h-2.5 rounded-full bg-sky-500 animate-pulse" />
               <span>{isHindi ? 'मौसम व पर्यावरण विश्लेषिकी' : 'KEY METEOROLOGICAL & AIR QUALITY TELEMETRY'}</span>
             </h2>
-            <div className="flex items-center gap-2 px-3 py-1 rounded-xl bg-sky-500/10 dark:bg-sky-400/10 border border-sky-500/25 text-xs text-sky-700 dark:text-sky-300 font-bold">
+            <div className="flex items-center gap-2 px-3 py-1 rounded-2xl bg-sky-500/10 dark:bg-sky-400/10 border border-sky-500/25 text-xs text-sky-700 dark:text-sky-300 font-bold">
               <span>{isHindi ? activeDay.dayHindi : activeDay.day} ({activeDay.date})</span>
               <span className="text-slate-400 dark:text-slate-500">•</span>
               <span>{isHindi ? `दिन ${selectedDayIdx + 1}/7 का पूर्वानुमान` : `Day ${selectedDayIdx + 1} of 7 Outlook`}</span>
@@ -1086,7 +1086,7 @@ const CityForecast = () => {
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <div className="p-2 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400">
+                    <div className="p-2 rounded-2xl bg-amber-500/10 text-amber-600 dark:text-amber-400">
                       <Gauge className="w-4 h-4" />
                     </div>
                     <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
@@ -1132,34 +1132,34 @@ const CityForecast = () => {
                 </div>
 
                 <div className="grid grid-cols-3 gap-1.5 text-xs py-2 text-slate-600 dark:text-slate-300 border-t border-slate-100 dark:border-slate-800/80">
-                  <div className="bg-slate-50/80 dark:bg-slate-900/40 p-1.5 rounded-lg">
+                  <div className="bg-slate-50/80 dark:bg-slate-800/40 p-1.5 rounded-lg">
                     <span className="text-[10px] text-slate-400 block font-bold">PM2.5</span>
                     <strong className="text-slate-800 dark:text-slate-200 text-[11px] truncate block">{activeDay.aqi?.pm25 || 'N/A'}</strong>
                   </div>
-                  <div className="bg-slate-50/80 dark:bg-slate-900/40 p-1.5 rounded-lg">
+                  <div className="bg-slate-50/80 dark:bg-slate-800/40 p-1.5 rounded-lg">
                     <span className="text-[10px] text-slate-400 block font-bold">PM10</span>
                     <strong className="text-slate-800 dark:text-slate-200 text-[11px] truncate block">{activeDay.aqi?.pm10 || 'N/A'}</strong>
                   </div>
-                  <div className="bg-slate-50/80 dark:bg-slate-900/40 p-1.5 rounded-lg">
+                  <div className="bg-slate-50/80 dark:bg-slate-800/40 p-1.5 rounded-lg">
                     <span className="text-[10px] text-slate-400 block font-bold">SO₂</span>
                     <strong className="text-slate-800 dark:text-slate-200 text-[11px] truncate block">{activeDay.aqi?.so2 || 'N/A'}</strong>
                   </div>
-                  <div className="bg-slate-50/80 dark:bg-slate-900/40 p-1.5 rounded-lg">
+                  <div className="bg-slate-50/80 dark:bg-slate-800/40 p-1.5 rounded-lg">
                     <span className="text-[10px] text-slate-400 block font-bold">NO₂</span>
                     <strong className="text-slate-800 dark:text-slate-200 text-[11px] truncate block">{activeDay.aqi?.no2 || 'N/A'}</strong>
                   </div>
-                  <div className="bg-slate-50/80 dark:bg-slate-900/40 p-1.5 rounded-lg">
+                  <div className="bg-slate-50/80 dark:bg-slate-800/40 p-1.5 rounded-lg">
                     <span className="text-[10px] text-slate-400 block font-bold">CO</span>
                     <strong className="text-slate-800 dark:text-slate-200 text-[11px] truncate block">{activeDay.aqi?.co || 'N/A'}</strong>
                   </div>
-                  <div className="bg-slate-50/80 dark:bg-slate-900/40 p-1.5 rounded-lg">
+                  <div className="bg-slate-50/80 dark:bg-slate-800/40 p-1.5 rounded-lg">
                     <span className="text-[10px] text-slate-400 block font-bold">O₃</span>
                     <strong className="text-slate-800 dark:text-slate-200 text-[11px] truncate block">{activeDay.aqi?.o3 || 'N/A'}</strong>
                   </div>
                 </div>
               </div>
 
-              <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug mt-3 bg-slate-50 dark:bg-white/[0.02] p-2 rounded-xl border border-slate-100 dark:border-white/5">
+              <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug mt-3 bg-slate-50 dark:bg-white/[0.02] p-2 rounded-2xl border border-slate-100 dark:border-white/5">
                 {isHindi ? (activeDay.aqi?.advisoryHindi || activeDay.aqi?.advisory) : activeDay.aqi?.advisory}
               </p>
             </IOSGlassCard>
@@ -1171,7 +1171,7 @@ const CityForecast = () => {
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <div className="p-2 rounded-xl bg-sky-500/10 text-sky-600 dark:text-sky-400">
+                    <div className="p-2 rounded-2xl bg-sky-500/10 text-sky-600 dark:text-sky-400">
                       <Thermometer className="w-4 h-4" />
                     </div>
                     <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
@@ -1195,11 +1195,11 @@ const CityForecast = () => {
                 <div className="space-y-2 mt-3 pt-2 border-t border-slate-100 dark:border-slate-800/80 text-xs">
                   <div className="flex justify-between items-center text-slate-600 dark:text-slate-300">
                     <span>{isHindi ? 'दैनिक अधिकतम (Day Max):' : 'Day High:'}</span>
-                    <strong className="text-rose-600 dark:text-rose-400 font-extrabold">{activeDay.tempMax}°C</strong>
+                    <strong className="text-rose-600 dark:text-rose-400 font-bold">{activeDay.tempMax}°C</strong>
                   </div>
                   <div className="flex justify-between items-center text-slate-600 dark:text-slate-300">
                     <span>{isHindi ? 'दैनिक न्यूनतम (Night Low):' : 'Night Low:'}</span>
-                    <strong className="text-cyan-600 dark:text-cyan-400 font-extrabold">{activeDay.tempMin}°C</strong>
+                    <strong className="text-cyan-600 dark:text-cyan-400 font-bold">{activeDay.tempMin}°C</strong>
                   </div>
                   <div className="flex justify-between items-center text-slate-600 dark:text-slate-300">
                     <span>{isHindi ? 'ओसांक (Dew Point):' : 'Dew Point:'}</span>
@@ -1208,7 +1208,7 @@ const CityForecast = () => {
                 </div>
               </div>
 
-              <div className="mt-3 bg-sky-50 dark:bg-sky-950/30 border border-sky-200/60 dark:border-sky-800/40 p-2 rounded-xl text-[11px] text-sky-800 dark:text-sky-300 font-medium">
+              <div className="mt-3 bg-sky-50 dark:bg-sky-950/30 border border-sky-200/60 dark:border-sky-800/40 p-2 rounded-2xl text-[11px] text-sky-800 dark:text-sky-300 font-medium">
                 {activeDay.precipitation.chance >= 60
                   ? (isHindi ? 'सक्रिय मानसूनी बादलों के कारण दिन के तापमान में गिरावट का अनुमान है।' : 'Convective cloud cover and precipitation will moderate daytime temperatures.')
                   : activeDay.tempMax >= 33
@@ -1224,7 +1224,7 @@ const CityForecast = () => {
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <div className="p-2 rounded-xl bg-cyan-500/10 text-cyan-600 dark:text-cyan-400">
+                    <div className="p-2 rounded-2xl bg-cyan-500/10 text-cyan-600 dark:text-cyan-400">
                       <Umbrella className="w-4 h-4" />
                     </div>
                     <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
@@ -1271,7 +1271,7 @@ const CityForecast = () => {
                 </div>
               </div>
 
-              <div className="mt-3 bg-cyan-50 dark:bg-cyan-950/30 border border-cyan-200/60 dark:border-cyan-800/40 p-2 rounded-xl text-[11px] text-cyan-800 dark:text-cyan-300 font-medium">
+              <div className="mt-3 bg-cyan-50 dark:bg-cyan-950/30 border border-cyan-200/60 dark:border-cyan-800/40 p-2 rounded-2xl text-[11px] text-cyan-800 dark:text-cyan-300 font-medium">
                 {activeDay.precipitation.chance >= 70
                   ? (isHindi ? 'डॉपलर रडार तीव्र संवहनीय बादलों व गरज-चमक की निगरानी कर रहा है।' : 'Doppler weather radar tracking active convective thunderstorm cells over the region.')
                   : activeDay.precipitation.chance >= 35
@@ -1287,7 +1287,7 @@ const CityForecast = () => {
               <div>
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center gap-2">
-                    <div className="p-2 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
+                    <div className="p-2 rounded-2xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400">
                       <Wind className="w-4 h-4" />
                     </div>
                     <span className="text-xs font-bold uppercase tracking-wider text-slate-500 dark:text-slate-400">
@@ -1332,7 +1332,7 @@ const CityForecast = () => {
                 </div>
               </div>
 
-              <div className="mt-3 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-800/40 p-2 rounded-xl text-[11px] text-emerald-800 dark:text-emerald-300 font-medium">
+              <div className="mt-3 bg-emerald-50 dark:bg-emerald-950/30 border border-emerald-200/60 dark:border-emerald-800/40 p-2 rounded-2xl text-[11px] text-emerald-800 dark:text-emerald-300 font-medium">
                 {activeDay.wind.speedKmh >= 25
                   ? (isHindi ? 'तटीय जहाजों और मछुआरों के लिए तेज हवाओं की चेतावनी।' : 'Maritime advisory: High wind gusts require extra precaution in exposed coastal zones.')
                   : (isHindi ? 'तटीय जहाजों और सामान्य गतिविधियों के लिए अनुकूल स्थिति।' : 'Maritime advisory: Normal operational status across coastal zones.')}
@@ -1353,10 +1353,10 @@ const CityForecast = () => {
           <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-white/80 dark:via-white/30 to-transparent" />
 
           {/* Card Header */}
-          <div className="relative z-10 flex items-center justify-between gap-3 pb-3 border-b border-slate-200/80 dark:border-white/10 flex-wrap">
+          <div className="relative z-10 flex items-center justify-between gap-3 pb-3 border-b border-slate-100/80 dark:border-white/10 flex-wrap">
             <div className="flex items-center gap-2 flex-wrap">
               <Clock className="w-4 h-4 text-sky-600 dark:text-sky-400 shrink-0" />
-              <h3 className="text-xs sm:text-sm font-heading font-extrabold uppercase tracking-wider text-slate-800 dark:text-slate-200">
+              <h3 className="text-xs sm:text-sm font-heading font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">
                 {selectedDayIdx === 0
                   ? (isHindi ? '48 घंटे का प्रति घंटा पूर्वानुमान (2 घंटे का अंतराल)' : '48-HOUR HOURLY FORECAST (2-HOUR INTERVALS)')
                   : (isHindi
@@ -1381,7 +1381,7 @@ const CityForecast = () => {
                 </span>
               )}
               {cityAstronomy && (
-                <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-100/90 dark:bg-white/5 text-slate-500 dark:text-slate-400 border border-slate-200 dark:border-white/10 hidden md:inline-flex items-center gap-1.5">
+                <span className="text-[10px] font-medium px-2 py-0.5 rounded-full bg-slate-100/90 dark:bg-white/5 text-slate-500 dark:text-slate-400 border border-slate-100 dark:border-white/10 hidden md:inline-flex items-center gap-1.5">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                   <span>{isHindi ? cityAstronomy.stationCadenceHindi : cityAstronomy.stationCadence}</span>
                 </span>
@@ -1396,7 +1396,7 @@ const CityForecast = () => {
                 <button
                   type="button"
                   onClick={() => handleScrollHourly('left')}
-                  className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 active:scale-95 dark:bg-white/5 dark:hover:bg-white/15 text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-all cursor-pointer border border-slate-200/80 dark:border-white/10 shadow-xs"
+                  className="p-1.5 rounded-2xl bg-slate-100 hover:bg-slate-200/80 active:scale-95 dark:bg-white/5 dark:hover:bg-white/15 text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-all cursor-pointer border border-slate-100/80 dark:border-white/10 shadow-sm"
                   aria-label="Scroll left"
                   title="Scroll left"
                 >
@@ -1405,7 +1405,7 @@ const CityForecast = () => {
                 <button
                   type="button"
                   onClick={() => handleScrollHourly('right')}
-                  className="p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 active:scale-95 dark:bg-white/5 dark:hover:bg-white/15 text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-all cursor-pointer border border-slate-200/80 dark:border-white/10 shadow-xs"
+                  className="p-1.5 rounded-2xl bg-slate-100 hover:bg-slate-200/80 active:scale-95 dark:bg-white/5 dark:hover:bg-white/15 text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white transition-all cursor-pointer border border-slate-100/80 dark:border-white/10 shadow-sm"
                   aria-label="Scroll right"
                   title="Scroll right"
                 >
@@ -1431,10 +1431,10 @@ const CityForecast = () => {
                   key={item.key || (item.isNow ? 'hour-now' : `${item.type}-${item.date?.getTime()}`)}
                   className={`min-w-[68px] sm:min-w-[76px] h-[116px] flex flex-col items-center justify-between py-2 px-1.5 rounded-2xl transition-all duration-150 shrink-0 ${
                     item.isNow || item.isStart
-                      ? 'bg-sky-500/15 dark:bg-sky-500/20 border border-sky-400/50 dark:border-sky-400/40 shadow-xs ring-1 ring-sky-400/20'
+                      ? 'bg-sky-500/15 dark:bg-sky-500/20 border border-sky-400/50 dark:border-sky-400/40 shadow-sm ring-1 ring-sky-400/20'
                       : item.type === 'event'
                         ? 'bg-amber-500/10 dark:bg-amber-500/15 border border-amber-300/50 dark:border-amber-400/30'
-                        : 'hover:bg-slate-100/80 dark:hover:bg-white/10 border border-transparent hover:border-slate-200/70 dark:hover:border-white/10'
+                        : 'hover:bg-slate-100/80 dark:hover:bg-white/10 border border-transparent hover:border-slate-100/70 dark:hover:border-white/10'
                   }`}
                 >
                   {/* Top Row: Time label */}
@@ -1521,7 +1521,7 @@ const CityForecast = () => {
                 >
                   {/* Day Title & Date */}
                   <div>
-                    <div className="font-heading font-extrabold text-xs sm:text-sm text-slate-900 dark:text-white">
+                    <div className="font-heading font-bold text-xs sm:text-sm text-slate-900 dark:text-white">
                       {isHindi ? dayItem.dayHindi : dayItem.day}
                     </div>
                     <div className="text-[10px] font-semibold text-slate-400 dark:text-slate-500">
@@ -1540,7 +1540,7 @@ const CityForecast = () => {
                   </div>
 
                   {/* Temperature Range */}
-                  <div className="pt-2 border-t border-slate-200/60 dark:border-slate-800/80 space-y-1 text-xs">
+                  <div className="pt-2 border-t border-slate-100/60 dark:border-slate-800/80 space-y-1 text-xs">
                     <div className="flex items-center justify-center gap-1.5 font-bold">
                       <span className="text-rose-600 dark:text-rose-400">{dayItem.tempMax}°</span>
                       <span className="text-slate-400">/</span>
@@ -1575,11 +1575,11 @@ const CityForecast = () => {
              ========================================================================= */}
         <div className="rounded-2xl bg-gradient-to-r from-amber-500/10 via-sky-500/10 to-emerald-500/10 border border-amber-500/25 p-4 flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-3">
-            <div className="p-2.5 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 shrink-0">
+            <div className="p-2.5 rounded-2xl bg-amber-500/15 text-amber-600 dark:text-amber-400 shrink-0">
               <ShieldAlert className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="font-heading font-extrabold text-sm text-slate-900 dark:text-white">
+              <h4 className="font-heading font-bold text-sm text-slate-900 dark:text-white">
                 {isHindi ? 'आधिकारिक चक्रवात एवं तटीय सुरक्षा चेतावनी' : 'Official Cyclone & Coastal Early Warning Advisory'}
               </h4>
               <p className="text-xs text-slate-600 dark:text-slate-300">
@@ -1593,14 +1593,14 @@ const CityForecast = () => {
           <div className="flex items-center gap-2">
             <Link
               to="/threat-map"
-              className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-slate-900 dark:bg-sky-600 hover:bg-slate-800 dark:hover:bg-sky-500 transition-all shadow-xs flex items-center gap-1.5"
+              className="px-4 py-2 rounded-2xl text-xs font-bold text-white bg-slate-800 dark:bg-sky-600 hover:bg-slate-800 dark:hover:bg-sky-500 transition-all shadow-sm flex items-center gap-1.5"
             >
               <span>{isHindi ? 'खतरा मानचित्र देखें' : 'View Threat Map'}</span>
               <ExternalLink className="w-3.5 h-3.5" />
             </Link>
             <Link
               to="/safety-updates"
-              className="px-4 py-2 rounded-xl text-xs font-bold text-amber-800 dark:text-amber-300 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 transition-all"
+              className="px-4 py-2 rounded-2xl text-xs font-bold text-amber-800 dark:text-amber-300 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 transition-all"
             >
               {isHindi ? 'सुरक्षा व बुलेटिन' : 'Safety & Bulletins'}
             </Link>
@@ -1624,15 +1624,15 @@ const CityForecast = () => {
           {/* Modal Container */}
           <div
             ref={searchModalRef}
-            className="w-full max-w-2xl bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-3xl border border-white/80 dark:border-white/10 shadow-[0_25px_70px_rgba(0,0,0,0.3)] dark:shadow-[0_25px_70px_rgba(0,0,0,0.75)] overflow-hidden flex flex-col max-h-[82vh] animate-in zoom-in-95 duration-200"
+            className="w-full max-w-2xl bg-white/95 dark:bg-slate-800/95 backdrop-blur-2xl rounded-3xl border border-white/80 dark:border-white/10 shadow-[0_25px_70px_rgba(0,0,0,0.3)] dark:shadow-[0_25px_70px_rgba(0,0,0,0.75)] overflow-hidden flex flex-col max-h-[82vh] animate-in zoom-in-95 duration-200"
             onKeyDown={handleSearchKeyDown}
           >
             {/* Top Specular Line */}
             <div className="h-0.5 w-full bg-gradient-to-r from-transparent via-sky-500/40 dark:via-sky-400/40 to-transparent" />
 
             {/* Search Input Bar */}
-            <div className="p-3.5 sm:p-4 border-b border-slate-200/80 dark:border-white/10 flex items-center gap-3">
-              <div className="p-2 rounded-xl bg-sky-500/10 text-sky-600 dark:text-sky-400 shrink-0">
+            <div className="p-3.5 sm:p-4 border-b border-slate-100/80 dark:border-white/10 flex items-center gap-3">
+              <div className="p-2 rounded-2xl bg-sky-500/10 text-sky-600 dark:text-sky-400 shrink-0">
                 <Search className="w-5 h-5" />
               </div>
               <input
@@ -1668,14 +1668,14 @@ const CityForecast = () => {
               <button
                 type="button"
                 onClick={() => setIsSearchModalOpen(false)}
-                className="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white text-xs font-bold transition-colors flex items-center gap-1 shrink-0 cursor-pointer"
+                className="px-2.5 py-1.5 rounded-2xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-white text-xs font-bold transition-colors flex items-center gap-1 shrink-0 cursor-pointer"
               >
                 <span>Esc</span>
               </button>
             </div>
 
             {/* Quick Category Filters */}
-            <div className="px-3.5 sm:px-4 py-2 border-b border-slate-100 dark:border-white/5 flex items-center gap-1.5 overflow-x-auto no-scrollbar bg-slate-50/50 dark:bg-slate-900/50">
+            <div className="px-3.5 sm:px-4 py-2 border-b border-slate-100 dark:border-white/5 flex items-center gap-1.5 overflow-x-auto no-scrollbar bg-slate-50/50 dark:bg-slate-800/50">
               {[
                 { key: 'ALL', label: isHindi ? 'सभी' : 'All', count: allSearchableLocations.length },
                 { key: 'CITIES', label: isHindi ? 'प्रमुख शहर' : 'Major Cities', count: allSearchableLocations.filter(i => i.type === 'city' || i.type === 'coastal').length },
@@ -1692,8 +1692,8 @@ const CityForecast = () => {
                     }}
                     className={`px-2.5 py-1 rounded-lg text-xs font-semibold transition-all duration-150 shrink-0 flex items-center gap-1.5 cursor-pointer ${
                       isActive
-                        ? 'bg-sky-500 text-white shadow-xs'
-                        : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/60 dark:border-slate-700/60'
+                        ? 'bg-sky-500 text-white shadow-sm'
+                        : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-100/60 dark:border-slate-700/60'
                     }`}
                   >
                     <span>{tab.label}</span>
@@ -1718,12 +1718,12 @@ const CityForecast = () => {
                       onMouseEnter={() => setSelectedIndex(idx)}
                       className={`group p-2.5 sm:p-3 rounded-2xl transition-all duration-150 cursor-pointer flex items-center justify-between gap-3 border ${
                         isSelected
-                          ? 'bg-sky-500/10 dark:bg-sky-500/20 border-sky-500/40 shadow-xs scale-[1.005]'
-                          : 'bg-white/50 dark:bg-slate-800/40 border-slate-200/50 dark:border-white/5 hover:bg-slate-100/70 dark:hover:bg-slate-800/70'
+                          ? 'bg-sky-500/10 dark:bg-sky-500/20 border-sky-500/40 shadow-sm scale-[1.005]'
+                          : 'bg-white/50 dark:bg-slate-800/40 border-slate-100/50 dark:border-white/5 hover:bg-slate-100/70 dark:hover:bg-slate-800/70'
                       }`}
                     >
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className="p-2 rounded-xl bg-slate-100 dark:bg-slate-800 shrink-0 group-hover:scale-105 transition-transform text-sky-600 dark:text-sky-400">
+                        <div className="p-2 rounded-2xl bg-slate-100 dark:bg-slate-800 shrink-0 group-hover:scale-105 transition-transform text-sky-600 dark:text-sky-400">
                           {item.type === 'port' ? (
                             <Anchor className="w-4 h-4 text-cyan-600 dark:text-cyan-400" />
                           ) : item.type === 'state' ? (
@@ -1799,7 +1799,7 @@ const CityForecast = () => {
             </div>
 
             {/* Bottom Keyboard & Info Bar */}
-            <div className="p-3 sm:px-4 border-t border-slate-200/80 dark:border-white/10 bg-slate-50/70 dark:bg-slate-900/70 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
+            <div className="p-3 sm:px-4 border-t border-slate-100/80 dark:border-white/10 bg-slate-50/70 dark:bg-slate-800/70 flex items-center justify-between text-xs text-slate-500 dark:text-slate-400">
               <div className="flex items-center gap-3">
                 <span className="flex items-center gap-1">
                   <kbd className="px-1.5 py-0.5 rounded bg-slate-200 dark:bg-slate-800 text-[10px] font-semibold text-slate-700 dark:text-slate-300">↑↓</kbd>

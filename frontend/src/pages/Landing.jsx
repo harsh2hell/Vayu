@@ -334,7 +334,7 @@ const Landing = () => {
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div className="flex items-center gap-2">
                     <span className="text-xs font-medium text-slate-400">Active Basin:</span>
-                    <div className="flex items-center bg-slate-900/90 p-0.5 rounded-lg border border-slate-700/80 text-xs font-mono">
+                    <div className="flex items-center bg-slate-800/90 p-0.5 rounded-lg border border-slate-700/80 text-xs font-mono">
                       <button
                         onClick={() => handleBasinSwitch('Bay of Bengal')}
                         className={`px-3 py-1 rounded-md transition-all ${
@@ -367,7 +367,7 @@ const Landing = () => {
                         className={`px-2 py-0.5 rounded border ${
                           activeBand === band 
                             ? 'bg-slate-800 text-cyan-300 border-cyan-500/40 font-bold' 
-                            : 'bg-slate-900 text-slate-400 border-slate-800 hover:text-slate-200'
+                            : 'bg-slate-800 text-slate-400 border-slate-800 hover:text-slate-200'
                         }`}
                       >
                         {band}
@@ -377,7 +377,7 @@ const Landing = () => {
                 </div>
 
                 {/* Dynamic Telemetry Box */}
-                <div className="bg-[#090E1A] rounded-xl p-4.5 border border-slate-800/90 space-y-4">
+                <div className="bg-[#090E1A] rounded-2xl p-4.5 border border-slate-800/90 space-y-4">
                   {simulating ? (
                     <div className="py-12 flex flex-col items-center justify-center gap-3 text-slate-400">
                       <RefreshCw className="w-7 h-7 animate-spin text-cyan-400" />
@@ -399,19 +399,19 @@ const Landing = () => {
 
                       {/* 4 Metric Stats Grid */}
                       <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-xs font-mono">
-                        <div className="bg-slate-900/90 p-2.5 rounded-lg border border-slate-800">
+                        <div className="bg-slate-800/90 p-2.5 rounded-lg border border-slate-800">
                           <span className="text-[10px] text-slate-400 block uppercase">Sustained Wind</span>
                           <span className="font-bold text-cyan-400 text-sm">{currentSim.intensity}</span>
                         </div>
-                        <div className="bg-slate-900/90 p-2.5 rounded-lg border border-slate-800">
+                        <div className="bg-slate-800/90 p-2.5 rounded-lg border border-slate-800">
                           <span className="text-[10px] text-slate-400 block uppercase">Central Press.</span>
                           <span className="font-bold text-white text-sm">{currentSim.pressure}</span>
                         </div>
-                        <div className="bg-slate-900/90 p-2.5 rounded-lg border border-slate-800">
+                        <div className="bg-slate-800/90 p-2.5 rounded-lg border border-slate-800">
                           <span className="text-[10px] text-slate-400 block uppercase">Storm Motion</span>
                           <span className="font-bold text-amber-400 text-xs truncate block">{currentSim.speed} {currentSim.heading.split(' ')[0]}</span>
                         </div>
-                        <div className="bg-slate-900/90 p-2.5 rounded-lg border border-slate-800">
+                        <div className="bg-slate-800/90 p-2.5 rounded-lg border border-slate-800">
                           <span className="text-[10px] text-slate-400 block uppercase">Landfall ETA</span>
                           <span className="font-bold text-rose-400 text-xs truncate block">{currentSim.eta.split(' ')[0]}</span>
                         </div>
@@ -434,7 +434,7 @@ const Landing = () => {
                               className={`py-1.5 px-1 rounded text-center transition-all border ${
                                 forecastStep === idx
                                   ? 'bg-cyan-500/20 text-cyan-300 border-cyan-400 font-bold'
-                                  : 'bg-slate-900 text-slate-400 border-slate-800 hover:bg-slate-800'
+                                  : 'bg-slate-800 text-slate-400 border-slate-800 hover:bg-slate-800'
                               }`}
                             >
                               {step.time}
@@ -484,7 +484,7 @@ const Landing = () => {
             {benchmarks.map((item, idx) => {
               const Icon = item.icon;
               return (
-                <div key={idx} className="glass-panel-card p-5 rounded-xl border-slate-800 space-y-2 bg-[#0D1527]/60">
+                <div key={idx} className="glass-panel-card p-5 rounded-2xl border-slate-800 space-y-2 bg-[#0D1527]/60">
                   <div className="flex items-center justify-between">
                     <div className="w-9 h-9 rounded-lg bg-cyan-950/80 text-cyan-400 border border-cyan-500/30 flex items-center justify-center">
                       <Icon className="w-4.5 h-4.5" />
@@ -512,7 +512,7 @@ const Landing = () => {
               <Cpu className="w-3.5 h-3.5 text-cyan-400" />
               <span>Multi-Stage Deep Learning Pipeline</span>
             </div>
-            <h2 className="text-2xl sm:text-4xl font-heading font-extrabold text-white tracking-tight">
+            <h2 className="text-2xl sm:text-4xl font-heading font-bold text-white tracking-tight">
               From Raw Satellite Telemetry to Actionable Warnings
             </h2>
             <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
@@ -525,13 +525,13 @@ const Landing = () => {
             {pipelineStages.map((stage, sIdx) => (
               <div 
                 key={sIdx}
-                className="glass-panel-card p-5 rounded-xl border-slate-800/90 relative group hover:border-cyan-500/40 transition-all bg-[#0B1222]"
+                className="glass-panel-card p-5 rounded-2xl border-slate-800/90 relative group hover:border-cyan-500/40 transition-all bg-[#0B1222]"
               >
                 <div className="flex items-center justify-between mb-3">
                   <span className="font-mono text-xl font-black text-cyan-400/60 group-hover:text-cyan-400 transition-colors">
                     {stage.num}
                   </span>
-                  <span className="text-[10px] font-mono bg-slate-900 text-slate-400 px-2 py-0.5 rounded border border-slate-800">
+                  <span className="text-[10px] font-mono bg-slate-800 text-slate-400 px-2 py-0.5 rounded border border-slate-800">
                     {stage.tech}
                   </span>
                 </div>
@@ -558,7 +558,7 @@ const Landing = () => {
                 <Layers className="w-3.5 h-3.5 text-cyan-400" />
                 <span>Operational Modules</span>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-heading font-extrabold text-white tracking-tight">
+              <h2 className="text-2xl sm:text-3xl font-heading font-bold text-white tracking-tight">
                 Complete AI & GIS Intelligence Suite
               </h2>
               <p className="text-xs sm:text-sm text-slate-400 leading-relaxed max-w-xl">
@@ -584,7 +584,7 @@ const Landing = () => {
                   className="glass-panel-card p-6 rounded-2xl cursor-pointer hover:border-cyan-500/50 transition-all group space-y-4 bg-[#0D1527]/80"
                 >
                   <div className="flex items-center justify-between">
-                    <div className="w-11 h-11 rounded-xl bg-cyan-950/90 text-cyan-400 border border-cyan-500/30 flex items-center justify-center group-hover:scale-110 group-hover:bg-cyan-500 group-hover:text-slate-950 transition-all">
+                    <div className="w-11 h-11 rounded-2xl bg-cyan-950/90 text-cyan-400 border border-cyan-500/30 flex items-center justify-center group-hover:scale-110 group-hover:bg-cyan-500 group-hover:text-slate-950 transition-all">
                       <Icon className="w-5 h-5" />
                     </div>
                     <span className="badge badge-cyan text-[10px]">

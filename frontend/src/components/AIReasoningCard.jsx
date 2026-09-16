@@ -119,7 +119,7 @@ export default function AIReasoningCard({
   ];
 
   return (
-    <div className={`rounded-3xl bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 shadow-sm relative overflow-hidden transition-all duration-300 ${className}`}>
+    <div className={`rounded-3xl bg-white dark:bg-slate-900 border border-slate-100/90 dark:border-slate-800 shadow-sm relative overflow-hidden transition-all duration-300 ${className}`}>
       
       {/* Top AI Gradient Hairline Accent */}
       <div className="h-[3px] w-full bg-gradient-to-r from-sky-400 via-blue-500 to-indigo-600 opacity-90" />
@@ -149,12 +149,12 @@ export default function AIReasoningCard({
           {/* AI Model Genuine Confidence Tag */}
           <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
             {confidenceScore ? (
-              <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-sky-50 dark:bg-sky-950/70 border border-sky-200 dark:border-sky-800 text-xs font-mono font-bold text-sky-900 dark:text-sky-300 shadow-2xs">
+              <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-2xl bg-sky-50 dark:bg-sky-950/70 border border-sky-200 dark:border-sky-800 text-xs font-mono font-bold text-sky-900 dark:text-sky-300 shadow-2xs">
                 <Sparkles className="w-3.5 h-3.5 text-sky-500 dark:text-sky-400 animate-pulse" />
                 <span>{confidenceType}: {confidenceScore}</span>
               </div>
             ) : (
-              <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-xs font-mono text-slate-600 dark:text-slate-300">
+              <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 text-xs font-mono text-slate-600 dark:text-slate-300">
                 <AlertCircle className="w-3.5 h-3.5 text-slate-400" />
                 <span>Confidence: Single Deterministic Run</span>
               </div>
@@ -162,7 +162,7 @@ export default function AIReasoningCard({
 
             <button
               onClick={() => setIsExpanded(!isExpanded)}
-              className="p-2 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-200/60 dark:border-slate-700 transition-colors cursor-pointer"
+              className="p-2 rounded-2xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-100/60 dark:border-slate-700 transition-colors cursor-pointer"
               title={isExpanded ? 'Collapse' : 'Expand'}
               aria-label="Toggle Reasoning Details"
             >
@@ -180,13 +180,13 @@ export default function AIReasoningCard({
                 return (
                   <div
                     key={f.id}
-                    className={`p-4.5 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-200/90 dark:border-slate-700/80 space-y-3 ${f.accentBorder} hover:bg-white dark:hover:bg-slate-800/90 hover:shadow-sm transition-all duration-200 group flex flex-col justify-between`}
+                    className={`p-4.5 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-100/90 dark:border-slate-700/80 space-y-3 ${f.accentBorder} hover:bg-white dark:hover:bg-slate-800/90 hover:shadow-sm transition-all duration-200 group flex flex-col justify-between`}
                   >
                     {/* Header of each Factor card */}
                     <div>
                       <div className="flex items-start justify-between gap-3">
                         <div className="flex items-center gap-2.5 min-w-0">
-                          <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 border ${f.iconStyle} shadow-2xs`}>
+                          <div className={`w-8 h-8 rounded-2xl flex items-center justify-center shrink-0 border ${f.iconStyle} shadow-2xs`}>
                             <IconComp className="w-4 h-4" />
                           </div>
                           <div className="min-w-0">
@@ -236,7 +236,7 @@ export default function AIReasoningCard({
                     </div>
 
                     {/* Scientific Explanation Text */}
-                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed pt-1 border-t border-slate-200/60 dark:border-slate-700/60">
+                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed pt-1 border-t border-slate-100/60 dark:border-slate-700/60">
                       {f.reason}
                     </p>
                   </div>
@@ -245,9 +245,9 @@ export default function AIReasoningCard({
             </div>
 
             {/* Model Summary / Synthesis Banner */}
-            <div className="p-4 sm:p-4.5 rounded-2xl bg-gradient-to-r from-sky-50/90 via-blue-50/60 to-indigo-50/80 dark:from-sky-950/60 dark:via-blue-950/40 dark:to-indigo-950/60 border border-sky-200/90 dark:border-sky-800/80 shadow-xs flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div className="p-4 sm:p-4.5 rounded-2xl bg-gradient-to-r from-sky-50/90 via-blue-50/60 to-indigo-50/80 dark:from-sky-950/60 dark:via-blue-950/40 dark:to-indigo-950/60 border border-sky-200/90 dark:border-sky-800/80 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
               <div className="flex items-start gap-3 min-w-0">
-                <div className="w-8 h-8 rounded-xl bg-sky-500 text-white flex items-center justify-center shrink-0 shadow-sm shadow-sky-500/30 mt-0.5 sm:mt-0">
+                <div className="w-8 h-8 rounded-2xl bg-sky-500 text-white flex items-center justify-center shrink-0 shadow-sm shadow-sky-500/30 mt-0.5 sm:mt-0">
                   <Sparkles className="w-4 h-4" />
                 </div>
                 <div className="space-y-1 min-w-0">
@@ -265,7 +265,7 @@ export default function AIReasoningCard({
               </div>
 
               {/* 48h Probability Pill */}
-              <div className="shrink-0 self-end sm:self-center flex items-center gap-2 px-3 py-2 rounded-xl bg-white dark:bg-slate-900 border border-sky-200/90 dark:border-sky-800 shadow-2xs">
+              <div className="shrink-0 self-end sm:self-center flex items-center gap-2 px-3 py-2 rounded-2xl bg-white dark:bg-slate-900 border border-sky-200/90 dark:border-sky-800 shadow-2xs">
                 <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400 font-bold uppercase">48h Risk</span>
                 <span className="text-base font-black font-mono text-sky-600 dark:text-sky-400">{risk48h}</span>
               </div>
