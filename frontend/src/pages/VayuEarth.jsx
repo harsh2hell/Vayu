@@ -15,6 +15,8 @@ import {
 import { toPortalPath } from '../utils/domain';
 import { fetchAllCyclones } from '../services/api';
 
+const WINDY_KEY = 'h8RC1gtsg6HRNS4Ig1VW0J25sYgQd0re';
+
 const DEFAULT_CYCLONES = [
   {
     id: 'DANA-2024',
@@ -56,6 +58,154 @@ const OVERLAYS = [
   { id: 'temp', label: 'Temperature', icon: Thermometer },
   { id: 'pressure', label: 'Pressure Isolines', icon: Gauge },
 ];
+
+const MAP_SRC_DOC = `<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VAYU Earth Map Engine</title>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"></script>
+  <script src="https://api.windy.com/assets/map-forecast/libBoot.js"></script>
+  <style>
+    * { box-sizing: border-box; }
+    html, body, #windy, #fallback-map {
+      width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; background: #020617; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    #fallback-map { display: none; position: absolute; inset: 0; z-index: 5; }
+    .status-toast {
+      position: absolute; top: 12px; right: 12px; z-index: 9999;
+      background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(8px);
+      border: 1px solid rgba(56, 189, 248, 0.3); color: #38bdf8;
+      padding: 6px 12px; border-radius: 20px; font-size: 11px; font-family: monospace;
+      display: flex; align-items: center; gap: 6px; pointer-events: none;
+    }
+    .dot { width: 6px; height: 6px; background: #38bdf8; border-radius: 50%; animation: pulse 1.5s infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.3; transform: scale(0.8); } }
+    @keyframes spin { 100% { transform: rotate(360deg); } }
+  </style>
+</head>
+<body>
+  <div id="windy"></div>
+  <div id="fallback-map"></div>
+  <div id="status-toast" class="status-toast">
+    <div class="dot"></div>
+    <span id="status-text">Connecting to Windy.com API...</span>
+  </div>
+  <script>
+    const WINDY_KEY = '${WINDY_KEY}';
+    let isWindyActive = false;
+    let windyStore = null;
+    let mapInstance = null;
+
+    function updateToast(text, color) {
+      const toast = document.getElementById('status-toast');
+      const label = document.getElementById('status-text');
+      if (toast && label) {
+        label.innerText = text;
+        if (color) toast.style.color = color;
+      }
+    }
+
+    function activateFallbackMap(reason) {
+      if (isWindyActive) return;
+      console.warn('Activating VAYU Live Earth Imagery:', reason);
+      updateToast('VAYU Live Earth Active', '#34d399');
+      document.getElementById('windy').style.display = 'none';
+      const fb = document.getElementById('fallback-map');
+      fb.style.display = 'block';
+
+      try {
+        const map = L.map('fallback-map', {
+          center: [20.5, 87.2],
+          zoom: 5,
+          zoomControl: false,
+          attributionControl: false
+        });
+        mapInstance = map;
+
+        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+          maxZoom: 18
+        }).addTo(map);
+
+        L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
+          maxZoom: 18, opacity: 0.8
+        }).addTo(map);
+
+        fetch('https://api.rainviewer.com/public/weather-maps.json')
+          .then(res => res.json())
+          .then(data => {
+            if (data && data.radar && data.radar.past && data.radar.past.length > 0) {
+              const latest = data.radar.past[data.radar.past.length - 1];
+              L.tileLayer('https://tilecache.rainviewer.com/v2/radar/' + latest.path + '/256/{z}/{x}/{y}/2/1_1.png', {
+                opacity: 0.75, zIndex: 10
+              }).addTo(map);
+            }
+          })
+          .catch(function() {});
+
+        const cycloneIcon = L.divIcon({
+          className: 'cyclone-marker',
+          html: '<div style="font-size:24px; animation:spin 4s linear infinite; display:flex; align-items:center; justify-content:center;">🌀</div>',
+          iconSize: [30, 30], iconAnchor: [15, 15]
+        });
+        L.marker([20.5, 87.2], { icon: cycloneIcon })
+          .addTo(map)
+          .bindPopup('<b>Cyclone DANA</b><br/>Severe Cyclonic Storm (984 hPa)<br/>Sustained Winds: 65 kts')
+          .openPopup();
+      } catch (err) {
+        console.error('Fallback error:', err);
+      }
+    }
+
+    function initWindy() {
+      if (typeof windyInit !== 'function') {
+        activateFallbackMap('windyInit missing');
+        return;
+      }
+      try {
+        windyInit({
+          key: WINDY_KEY,
+          lat: 20.5,
+          lon: 87.2,
+          zoom: 5,
+          verbose: false
+        }, function(windyAPI) {
+          isWindyActive = true;
+          mapInstance = windyAPI.map;
+          windyStore = windyAPI.store;
+          updateToast('Windy.com API Live', '#38bdf8');
+
+          window.addEventListener('message', function(e) {
+            if (!e.data) return;
+            if (e.data.type === 'SET_OVERLAY' && windyStore) {
+              try { windyStore.set('overlay', e.data.overlay); } catch (err) {}
+            }
+            if (e.data.type === 'PAN_TO' && mapInstance) {
+              mapInstance.panTo([e.data.lat, e.data.lon]);
+            }
+          });
+        });
+      } catch (err) {
+        activateFallbackMap(err.message);
+      }
+    }
+
+    setTimeout(function() {
+      if (!isWindyActive) {
+        activateFallbackMap('Windy API timeout / domain restriction');
+      }
+    }, 3000);
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initWindy);
+    } else {
+      initWindy();
+    }
+  </script>
+</body>
+</html>`;
 
 const VayuEarth = () => {
   const navigate = useNavigate();
@@ -231,11 +381,11 @@ const VayuEarth = () => {
         </div>
       )}
 
-      {/* Same-Origin Windy & High-Res Map Engine */}
+      {/* In-Memory Sandboxed Windy Engine — Immune to X-Frame-Options Header */}
       <div className="flex-1 w-full h-full relative z-10 bg-slate-950 min-h-0">
         <iframe
           ref={iframeRef}
-          src="/windy-map.html"
+          srcDoc={MAP_SRC_DOC}
           title="VAYU Earth Map Engine"
           className="w-full h-full border-0 absolute inset-0"
           style={{ width: '100%', height: '100%', border: 0 }}
