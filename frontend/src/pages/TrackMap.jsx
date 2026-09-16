@@ -213,7 +213,7 @@ const TrackMap = () => {
 
         {/* Action Controls & Basin Selector */}
         <div className="flex flex-wrap items-center gap-3">
-          <div className="flex bg-slate-100 p-1 rounded-md border border-slate-100 text-xs">
+          <div className="flex bg-slate-100 p-1 rounded-md border border-slate-200 text-xs">
             {['Bay of Bengal', 'Arabian Sea'].map((b) => (
               <button
                 key={b}
@@ -235,13 +235,13 @@ const TrackMap = () => {
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
         
         {/* Map Canvas (8 Cols) */}
-        <div className="xl:col-span-8 bg-white border border-slate-100 rounded-2xl p-5 space-y-4 shadow-2xs flex flex-col">
+        <div className="xl:col-span-8 bg-white border border-slate-200 rounded-xl p-5 space-y-4 shadow-2xs flex flex-col">
           
           {/* Top Map Toolbar */}
           <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 pb-3">
             
             {/* Tile Layer Switcher including Real NASA GIBS */}
-            <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg border border-slate-100 text-xs font-mono">
+            <div className="flex items-center gap-1 bg-slate-100 p-0.5 rounded-lg border border-slate-200 text-xs font-mono">
               {MAP_LAYERS.map((layer) => (
                 <button
                   key={layer.id}
@@ -260,7 +260,7 @@ const TrackMap = () => {
               <button
                 onClick={() => setShowCone(!showCone)}
                 className={`px-2 py-0.5 rounded border transition-all ${
-                  showCone ? 'bg-amber-100 text-amber-900 border-amber-300 font-bold' : 'bg-slate-50 text-slate-500 border-slate-100'
+                  showCone ? 'bg-amber-100 text-amber-900 border-amber-300 font-bold' : 'bg-slate-50 text-slate-500 border-slate-200'
                 }`}
               >
                 MC Uncertainty Cone
@@ -268,7 +268,7 @@ const TrackMap = () => {
               <button
                 onClick={() => setShowSurge(!showSurge)}
                 className={`px-2 py-0.5 rounded border transition-all ${
-                  showSurge ? 'bg-red-100 text-red-900 border-red-300 font-bold' : 'bg-slate-50 text-slate-500 border-slate-100'
+                  showSurge ? 'bg-red-100 text-red-900 border-red-300 font-bold' : 'bg-slate-50 text-slate-500 border-slate-200'
                 }`}
               >
                 Surge Zone
@@ -276,7 +276,7 @@ const TrackMap = () => {
               <button
                 onClick={() => setShowWindRadii(!showWindRadii)}
                 className={`px-2 py-0.5 rounded border transition-all ${
-                  showWindRadii ? 'bg-sky-100 text-sky-900 border-sky-300 font-bold' : 'bg-slate-50 text-slate-500 border-slate-100'
+                  showWindRadii ? 'bg-sky-100 text-sky-900 border-sky-300 font-bold' : 'bg-slate-50 text-slate-500 border-slate-200'
                 }`}
               >
                 Wind Radii
@@ -284,7 +284,7 @@ const TrackMap = () => {
               <button
                 onClick={() => setShowDopplerRadar(!showDopplerRadar)}
                 className={`px-2 py-0.5 rounded border transition-all flex items-center gap-1 ${
-                  showDopplerRadar ? 'bg-emerald-100 text-emerald-900 border-emerald-300 font-bold' : 'bg-slate-50 text-slate-500 border-slate-100'
+                  showDopplerRadar ? 'bg-emerald-100 text-emerald-900 border-emerald-300 font-bold' : 'bg-slate-50 text-slate-500 border-slate-200'
                 }`}
               >
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping"></span>
@@ -295,7 +295,7 @@ const TrackMap = () => {
           </div>
 
           {/* Interactive Leaflet Map Container */}
-          <div className="h-[460px] w-full rounded-2xl overflow-hidden border border-slate-100 relative shadow-inner">
+          <div className="h-[460px] w-full rounded-xl overflow-hidden border border-slate-200 relative shadow-inner">
             
             <MapContainer
               center={currentSystem.center}
@@ -410,19 +410,19 @@ const TrackMap = () => {
             </MapContainer>
 
             {/* Playback Control Bar Floating at Bottom */}
-            <div className="absolute bottom-3 left-3 right-3 z-[400] bg-white/95 backdrop-blur-md px-4 py-2 rounded-2xl shadow-lg border border-slate-100 flex flex-wrap items-center justify-between gap-3">
+            <div className="absolute bottom-3 left-3 right-3 z-[400] bg-white/95 backdrop-blur-md px-4 py-2 rounded-xl shadow-lg border border-slate-200 flex flex-wrap items-center justify-between gap-3">
               
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => setIsPlaying(!isPlaying)}
-                  className="p-1.5 rounded-lg bg-slate-700 text-white hover:bg-slate-800 transition-colors"
+                  className="p-1.5 rounded-lg bg-slate-900 text-white hover:bg-slate-800 transition-colors"
                   title={isPlaying ? 'Pause' : 'Play 72h Timeline'}
                 >
                   {isPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
                 </button>
                 <button
                   onClick={() => { setActiveStep(0); setIsPlaying(false); }}
-                  className="p-1.5 rounded-lg border border-slate-100 hover:bg-slate-100 text-slate-600 transition-colors"
+                  className="p-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 text-slate-600 transition-colors"
                   title="Reset"
                 >
                   <RotateCcw className="w-3.5 h-3.5" />
@@ -441,7 +441,7 @@ const TrackMap = () => {
                     className={`px-2 py-0.5 rounded transition-all border ${
                       activeStep === idx
                         ? 'bg-sky-600 text-white border-sky-600 font-bold shadow-2xs'
-                        : 'bg-slate-50 text-slate-600 border-slate-100 hover:bg-slate-100'
+                        : 'bg-slate-50 text-slate-600 border-slate-200 hover:bg-slate-100'
                     }`}
                   >
                     {t.time}
@@ -454,7 +454,7 @@ const TrackMap = () => {
           </div>
 
           {/* Environmental Parameter Controls Bar */}
-          <div className="p-3.5 bg-slate-50 border border-slate-100 rounded-2xl grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-sans">
+          <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs font-sans">
             <div className="space-y-1">
               <div className="flex justify-between font-mono text-[11px]">
                 <span className="text-slate-500 font-semibold">Sea Surface Temp (SST):</span>
@@ -496,7 +496,7 @@ const TrackMap = () => {
         <div className="xl:col-span-4 space-y-4">
           
           {/* Active Telemetry Box */}
-          <div className="bg-white border border-slate-100 rounded-2xl p-5 space-y-3 shadow-2xs">
+          <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-3 shadow-2xs">
             <div className="flex items-center justify-between border-b border-slate-100 pb-2">
               <span className="text-[11px] font-mono font-bold text-slate-800 uppercase">// ACTIVE_STORM_FIX</span>
               <span className="badge badge-red">{currentPoint.stage}</span>
@@ -524,7 +524,7 @@ const TrackMap = () => {
           </div>
 
           {/* District Strike Risk Table */}
-          <div className="bg-white border border-slate-100 rounded-2xl p-5 space-y-3 shadow-2xs">
+          <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-3 shadow-2xs">
             <div className="flex items-center justify-between border-b border-slate-100 pb-2">
               <span className="text-[11px] font-mono font-bold text-slate-800 uppercase">// DISTRICT_STRIKE_RISK</span>
               <span className="badge badge-red">CAP v1.2</span>

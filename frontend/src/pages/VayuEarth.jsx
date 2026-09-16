@@ -118,7 +118,7 @@ const MapController = ({ onCoordsChange, onZoomChange, onMapReady }) => {
 
 // ─── LayerRow ─────────────────────────────────────────────────────────────────
 const LayerRow = ({ id, label, badge, checked, onChange, badgeColor = 'sky' }) => (
-  <div className="flex items-center justify-between p-2 rounded-2xl bg-slate-800/60 border border-slate-700/50">
+  <div className="flex items-center justify-between p-2 rounded-xl bg-slate-800/60 border border-slate-700/50">
     <div className="flex items-center gap-2">
       <input type="checkbox" id={id} checked={checked} onChange={onChange}
         className="rounded accent-sky-500 cursor-pointer w-3.5 h-3.5" />
@@ -137,13 +137,13 @@ const LayerRow = ({ id, label, badge, checked, onChange, badgeColor = 'sky' }) =
 // ─── Wind info badge ──────────────────────────────────────────────────────────
 const WindInfoBadge = ({ meta, loading, error }) => {
   if (loading) return (
-    <div className="bg-slate-800/90 backdrop-blur-md px-3 py-1.5 rounded-2xl border border-cyan-500/40 shadow-lg text-[10px] font-mono text-cyan-400 flex items-center gap-1.5">
+    <div className="bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-cyan-500/40 shadow-lg text-[10px] font-mono text-cyan-400 flex items-center gap-1.5">
       <RefreshCw className="w-3 h-3 animate-spin" />
       <span>Fetching wind field…</span>
     </div>
   );
   if (error) return (
-    <div className="bg-slate-800/90 backdrop-blur-md px-3 py-1.5 rounded-2xl border border-red-500/40 shadow-lg text-[10px] font-mono text-red-400 flex items-center gap-1.5">
+    <div className="bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-red-500/40 shadow-lg text-[10px] font-mono text-red-400 flex items-center gap-1.5">
       <AlertTriangle className="w-3 h-3" />
       <span>Wind unavailable</span>
     </div>
@@ -158,7 +158,7 @@ const WindInfoBadge = ({ meta, loading, error }) => {
   } catch (_) { validAt = meta.refTime ?? '—'; }
 
   return (
-    <div className="bg-slate-800/90 backdrop-blur-md px-3 py-1.5 rounded-2xl border border-cyan-500/40 shadow-lg text-[10px] font-mono text-slate-300 flex items-center gap-2 flex-wrap">
+    <div className="bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-cyan-500/40 shadow-lg text-[10px] font-mono text-slate-300 flex items-center gap-2 flex-wrap">
       <div className="flex items-center gap-1 text-cyan-400 font-semibold">
         <Wind className="w-3 h-3" />
         <span>WIND • {meta.source ?? 'NOAA GFS'}</span>
@@ -180,7 +180,7 @@ const WindInfoBadge = ({ meta, loading, error }) => {
 
 // ─── Wind speed legend strip ──────────────────────────────────────────────────
 const WindSpeedLegend = () => (
-  <div className="bg-slate-800/90 backdrop-blur-md px-3 py-2 rounded-2xl border border-slate-700/80 shadow-lg">
+  <div className="bg-slate-900/90 backdrop-blur-md px-3 py-2 rounded-xl border border-slate-700/80 shadow-lg">
     <div className="text-[9px] font-mono text-slate-500 uppercase tracking-wider mb-1.5">
       Wind Speed (m/s)
     </div>
@@ -286,7 +286,7 @@ const VayuEarth = () => {
       <div className="absolute top-3 left-3 right-3 z-[1000] flex items-center justify-between gap-2 pointer-events-none">
 
         {/* Left — brand */}
-        <div className="bg-slate-800/90 backdrop-blur-md px-3 py-2 rounded-2xl border border-slate-700/80 shadow-lg flex items-center gap-2.5 pointer-events-auto">
+        <div className="bg-slate-900/90 backdrop-blur-md px-3 py-2 rounded-xl border border-slate-700/80 shadow-lg flex items-center gap-2.5 pointer-events-auto">
           <div className="w-7 h-7 rounded-lg bg-sky-500/10 border border-sky-500/30 flex items-center justify-center">
             <Globe2 className="w-4 h-4 text-sky-400" style={{ animation: 'vayu-spin 14s linear infinite' }} />
           </div>
@@ -303,7 +303,7 @@ const VayuEarth = () => {
         <div className="flex items-center gap-2 pointer-events-auto">
 
           {/* Map / Satellite switcher */}
-          <div className="flex bg-slate-800/90 backdrop-blur-md border border-slate-700/80 rounded-2xl overflow-hidden shadow-lg">
+          <div className="flex bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-xl overflow-hidden shadow-lg">
             <button type="button" onClick={() => setBaseMode('dark')} title="Dark vector base"
               className={`px-3 py-2 text-xs font-semibold flex items-center gap-1.5 transition-all cursor-pointer ${baseMode === 'dark' ? 'bg-sky-600 text-white' : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/80'}`}>
               <Map className="w-3.5 h-3.5" /><span className="hidden sm:inline">Map</span>
@@ -317,7 +317,7 @@ const VayuEarth = () => {
 
           {/* Layers panel */}
           <button type="button" onClick={() => setLayerPanelOpen((v) => !v)} title="Layer registry"
-            className={`px-3 py-2 rounded-2xl text-xs font-semibold flex items-center gap-1.5 backdrop-blur-md border shadow-lg transition-all cursor-pointer ${layerPanelOpen ? 'bg-sky-600 text-white border-sky-500' : 'bg-slate-800/90 text-slate-300 border-slate-700/80 hover:bg-slate-800/80'}`}>
+            className={`px-3 py-2 rounded-xl text-xs font-semibold flex items-center gap-1.5 backdrop-blur-md border shadow-lg transition-all cursor-pointer ${layerPanelOpen ? 'bg-sky-600 text-white border-sky-500' : 'bg-slate-900/90 text-slate-300 border-slate-700/80 hover:bg-slate-800/80'}`}>
             <Layers className="w-3.5 h-3.5" /><span className="hidden sm:inline">Layers</span>
           </button>
         </div>
@@ -384,16 +384,16 @@ const VayuEarth = () => {
       {/* ══ RIGHT ZOOM CONTROLS ═══════════════════════════════════════════════ */}
       <div className="absolute top-20 right-3 z-[1000] flex flex-col gap-1.5 pointer-events-auto">
         <button type="button" onClick={resetView} title="Reset view"
-          className="w-9 h-9 rounded-2xl bg-slate-800/90 hover:bg-sky-700 text-sky-400 hover:text-white border border-slate-700/80 shadow-xl flex items-center justify-center transition-all cursor-pointer backdrop-blur-md">
+          className="w-9 h-9 rounded-xl bg-slate-900/90 hover:bg-sky-700 text-sky-400 hover:text-white border border-slate-700/80 shadow-xl flex items-center justify-center transition-all cursor-pointer backdrop-blur-md">
           <RotateCcw className="w-4 h-4" />
         </button>
         <div className="h-px bg-slate-700/60 mx-1" />
         <button type="button" onClick={zoomIn} title="Zoom in"
-          className="w-9 h-9 rounded-2xl bg-slate-800/90 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700/80 shadow-xl flex items-center justify-center transition-all cursor-pointer backdrop-blur-md">
+          className="w-9 h-9 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700/80 shadow-xl flex items-center justify-center transition-all cursor-pointer backdrop-blur-md">
           <Plus className="w-4 h-4" />
         </button>
         <button type="button" onClick={zoomOut} title="Zoom out"
-          className="w-9 h-9 rounded-2xl bg-slate-800/90 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700/80 shadow-xl flex items-center justify-center transition-all cursor-pointer backdrop-blur-md">
+          className="w-9 h-9 rounded-xl bg-slate-900/90 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700/80 shadow-xl flex items-center justify-center transition-all cursor-pointer backdrop-blur-md">
           <Minus className="w-4 h-4" />
         </button>
       </div>
@@ -417,7 +417,7 @@ const VayuEarth = () => {
 
         {/* Bottom row: geo-fix + attribution */}
         <div className="w-full flex flex-wrap items-end justify-between gap-2">
-          <div className="bg-slate-800/90 backdrop-blur-md px-3 py-1.5 rounded-2xl border border-slate-700/80 shadow-lg font-mono text-[11px] text-slate-300 flex items-center gap-2.5 pointer-events-auto">
+          <div className="bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700/80 shadow-lg font-mono text-[11px] text-slate-300 flex items-center gap-2.5 pointer-events-auto">
             <div className="flex items-center gap-1 text-sky-400 font-semibold">
               <Compass className="w-3.5 h-3.5" /><span>GEO</span>
             </div>
@@ -425,7 +425,7 @@ const VayuEarth = () => {
             <span className="text-slate-600">|</span>
             <span className="text-slate-400 tabular-nums">Z{typeof currentZoom === 'number' ? currentZoom.toFixed(1) : currentZoom}</span>
           </div>
-          <div className="bg-slate-800/90 backdrop-blur-md px-3 py-1.5 rounded-2xl border border-slate-700/80 shadow-lg text-[10px] text-slate-500 flex items-center gap-1.5 pointer-events-auto">
+          <div className="bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700/80 shadow-lg text-[10px] text-slate-500 flex items-center gap-1.5 pointer-events-auto">
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse shrink-0" />
             <span>{baseAttr}{nasaGibsOn ? ' + NASA GIBS VIIRS NRT' : ''}{windOn && windData ? ' + NOAA GFS Wind' : ''}</span>
           </div>
@@ -434,7 +434,7 @@ const VayuEarth = () => {
 
       {/* ══ LAYER PANEL ══════════════════════════════════════════════════════ */}
       {layerPanelOpen && (
-        <div className="absolute top-16 right-3 w-72 max-w-[calc(100vw-1.5rem)] bg-slate-800/97 backdrop-blur-xl border border-slate-700/80 rounded-2xl shadow-2xl p-4 z-[1001] pointer-events-auto space-y-3 text-white">
+        <div className="absolute top-16 right-3 w-72 max-w-[calc(100vw-1.5rem)] bg-slate-900/97 backdrop-blur-xl border border-slate-700/80 rounded-2xl shadow-2xl p-4 z-[1001] pointer-events-auto space-y-3 text-white">
 
           <div className="flex items-center justify-between pb-2 border-b border-slate-800">
             <div className="flex items-center gap-1.5 text-xs font-bold text-slate-200">
@@ -477,7 +477,7 @@ const VayuEarth = () => {
               Meteorological
             </p>
 
-            <div className="flex items-center justify-between p-2 rounded-2xl bg-slate-800/60 border border-slate-700/50">
+            <div className="flex items-center justify-between p-2 rounded-xl bg-slate-800/60 border border-slate-700/50">
               <div className="flex items-center gap-2">
                 <input type="checkbox" id="layer-wind" checked={windOn}
                   onChange={() => setWindOn((v) => !v)}
@@ -522,7 +522,7 @@ const VayuEarth = () => {
           <div className="space-y-1.5 pt-1 border-t border-slate-800">
             <p className="text-[10px] font-mono text-slate-500 uppercase tracking-wider font-bold">AI Intelligence (Upcoming)</p>
             {['Synoptic Storm Tracks', 'Vortex Eye Fix (MobileNetV3)', 'GRU 72h Track Forecast', 'MC Dropout Probability Cone', 'Impact & Surge Hazard Zone'].map((label) => (
-              <div key={label} className="flex items-center justify-between p-2 rounded-2xl bg-slate-800/30 border border-slate-800">
+              <div key={label} className="flex items-center justify-between p-2 rounded-xl bg-slate-800/30 border border-slate-800">
                 <span className="text-xs text-slate-500">{label}</span>
                 <span className="text-[9px] font-mono bg-slate-800 px-1.5 py-0.5 rounded text-slate-600">STANDBY</span>
               </div>
