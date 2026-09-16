@@ -2,10 +2,10 @@
  * VayuEarth.jsx
  * =============
  * VAYU Earth — Global Geospatial Cyclone & Atmospheric Intelligence Explorer
- * Powered by Windy.com Live Weather Engine & GDACS / IBTrACS Ingestion
+ * Powered by Windy.com Map Engine & GDACS / IBTrACS Live Ingestion
  */
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
   Globe2, Wind, CloudRain, Satellite, Thermometer, Waves,
@@ -14,8 +14,6 @@ import {
 } from 'lucide-react';
 import { toPortalPath } from '../utils/domain';
 import { fetchAllCyclones } from '../services/api';
-
-const WINDY_API_KEY = "h8RC1gtsg6HRNS4Ig1VW0J25sYgQd0re";
 
 const DEFAULT_CYCLONES = [
   {
@@ -61,16 +59,15 @@ const OVERLAYS = [
 
 const VayuEarth = () => {
   const navigate = useNavigate();
+  const iframeRef = useRef(null);
 
   // State
   const [activeOverlay, setActiveOverlay] = useState('wind');
   const [cyclones, setCyclones] = useState(DEFAULT_CYCLONES);
   const [selectedCyclone, setSelectedCyclone] = useState(DEFAULT_CYCLONES[0]);
   const [centerCoords, setCenterCoords] = useState({ lat: 20.5, lon: 87.2 });
-  const [zoomLevel, setZoomLevel] = useState(5);
-  const [isLoading, setIsLoading] = useState(false);
 
-  // Fetch live active cyclones from backend or fallback gracefully
+  // Fetch live active cyclones or fallback cleanly
   useEffect(() => {
     let isMounted = true;
     fetchAllCyclones()
@@ -86,27 +83,39 @@ const VayuEarth = () => {
           }
         }
       })
-      .catch(() => {
-        // Keeps verified DEFAULT_CYCLONES
-      });
+      .catch(() => {});
 
     return () => {
       isMounted = false;
     };
   }, []);
 
-  // Handle cyclone selection to center Windy
+  // Handle layer overlay change
+  const handleOverlayChange = (overlayId) => {
+    setActiveOverlay(overlayId);
+    if (iframeRef.current && iframeRef.current.contentWindow) {
+      iframeRef.current.contentWindow.postMessage({
+        type: 'SET_OVERLAY',
+        overlay: overlayId
+      }, '*');
+    }
+  };
+
+  // Handle cyclone selection
   const handleSelectCyclone = (cyclone) => {
     setSelectedCyclone(cyclone);
     const loc = cyclone.track_forecast?.[0];
     if (loc && loc.lat && loc.lon) {
       setCenterCoords({ lat: loc.lat, lon: loc.lon });
-      setZoomLevel(6);
+      if (iframeRef.current && iframeRef.current.contentWindow) {
+        iframeRef.current.contentWindow.postMessage({
+          type: 'PAN_TO',
+          lat: loc.lat,
+          lon: loc.lon
+        }, '*');
+      }
     }
   };
-
-  // Build Windy Embed URL
-  const windyEmbedUrl = `https://embed.windy.com/embed.html?type=map&location=coordinates&metricRain=default&metricTemp=default&metricWind=default&zoom=${zoomLevel}&overlay=${activeOverlay}&product=ecmwf&level=surface&lat=${centerCoords.lat}&lon=${centerCoords.lon}&detailLat=${centerCoords.lat}&detailLon=${centerCoords.lon}&marker=true&pressure=true&message=true`;
 
   return (
     <div 
@@ -153,7 +162,7 @@ const VayuEarth = () => {
             return (
               <button
                 key={layer.id}
-                onClick={() => setActiveOverlay(layer.id)}
+                onClick={() => handleOverlayChange(layer.id)}
                 className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
                   isActive 
                     ? 'bg-sky-500 text-white shadow-xs' 
@@ -212,12 +221,9 @@ const VayuEarth = () => {
               <ArrowUpRight className="w-3 h-3" />
             </button>
             <button
-              onClick={() => {
-                setCenterCoords({ lat: 20.5, lon: 87.2 });
-                setZoomLevel(5);
-              }}
+              onClick={() => handleSelectCyclone(DEFAULT_CYCLONES[0])}
               className="p-1 text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg transition-colors cursor-pointer"
-              title="Reset View"
+              title="Reset to Cyclone DANA"
             >
               <RefreshCw className="w-3.5 h-3.5" />
             </button>
@@ -225,15 +231,14 @@ const VayuEarth = () => {
         </div>
       )}
 
-      {/* Windy.com Live Embedded Map Engine */}
+      {/* Same-Origin Windy & High-Res Map Engine */}
       <div className="flex-1 w-full h-full relative z-10 bg-slate-950 min-h-0">
         <iframe
-          key={`${activeOverlay}-${centerCoords.lat}-${centerCoords.lon}-${zoomLevel}`}
-          src={windyEmbedUrl}
-          title="Windy.com Global Satellite & Weather Stream"
-          className="w-full h-full border-0 absolute inset-0 bg-slate-950"
+          ref={iframeRef}
+          src="/windy-map.html"
+          title="VAYU Earth Map Engine"
+          className="w-full h-full border-0 absolute inset-0"
           style={{ width: '100%', height: '100%', border: 0 }}
-          allow="geolocation"
         />
       </div>
 
