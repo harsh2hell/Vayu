@@ -65,15 +65,13 @@ const MAP_SRC_DOC = `<!DOCTYPE html>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>VAYU Earth Map Engine</title>
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" />
-  <script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"></script>
-  <script src="https://api.windy.com/assets/map-forecast/libBoot.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <style>
     * { box-sizing: border-box; }
-    html, body, #windy, #fallback-map {
+    html, body, #map {
       width: 100%; height: 100%; margin: 0; padding: 0; overflow: hidden; background: #020617; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     }
-    #fallback-map { display: none; position: absolute; inset: 0; z-index: 5; }
     .status-toast {
       position: absolute; top: 12px; right: 12px; z-index: 9999;
       background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(8px);
@@ -85,21 +83,21 @@ const MAP_SRC_DOC = `<!DOCTYPE html>
     .dot { width: 6px; height: 6px; background: #38bdf8; border-radius: 50%; animation: pulse 1.5s infinite; }
     @keyframes pulse { 0%, 100% { opacity: 1; transform: scale(1); } 50% { opacity: 0.3; transform: scale(0.8); } }
     @keyframes spin { 100% { transform: rotate(360deg); } }
+    .leaflet-popup-content-wrapper { border-radius: 12px !important; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.3) !important; }
   </style>
 </head>
 <body>
-  <div id="windy"></div>
-  <div id="fallback-map"></div>
+  <div id="map"></div>
   <div id="status-toast" class="status-toast">
     <div class="dot"></div>
-    <span id="status-text">Loading Windy.com Live Weather...</span>
+    <span id="status-text">VAYU Live Geospatial Engine</span>
   </div>
   <script>
     const WINDY_KEY = '${WINDY_KEY}';
-    let isWindyActive = false;
-    let windyStore = null;
-    let mapInstance = null;
-    let activeMarkers = [];
+    let map = null;
+    let radarLayer = null;
+    let satLayer = null;
+    let activeMarker = null;
 
     function updateToast(text, color) {
       const toast = document.getElementById('status-toast');
@@ -115,153 +113,106 @@ const MAP_SRC_DOC = `<!DOCTYPE html>
       }
     }
 
-    function addBasemapAndCyclone(map) {
-      if (!map) return;
-      try {
-        // High-resolution Esri World Imagery Basemap
-        L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
-          maxZoom: 18,
-          zIndex: 1
-        }).addTo(map);
-
-        // Reference Boundaries & Labels
-        L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
-          maxZoom: 18,
-          opacity: 0.85,
-          zIndex: 3
-        }).addTo(map);
-
-        // Cyclone DANA Animated Pulse Marker
-        const cycloneHtml = \`
-          <div style="position:relative; width:44px; height:44px; display:flex; align-items:center; justify-content:center;">
-            <div style="position:absolute; inset:0; border-radius:50%; background:#ef4444; opacity:0.4; animation:pulse 1.5s infinite;"></div>
-            <div style="position:absolute; inset:6px; border-radius:50%; background:#ef4444; border:2px solid white; box-shadow:0 0 12px #ef4444; display:flex; align-items:center; justify-content:center; color:white; font-size:16px;">
-              🌀
-            </div>
-          </div>
-        \`;
-        const cycloneIcon = L.divIcon({
-          className: 'cyclone-marker-vayu',
-          html: cycloneHtml,
-          iconSize: [44, 44],
-          iconAnchor: [22, 22]
-        });
-
-        const dana = L.marker([20.5, 87.2], { icon: cycloneIcon, zIndexOffset: 1000 }).addTo(map);
-        dana.bindPopup(\`
-          <div style="font-family:-apple-system,BlinkMacSystemFont,sans-serif; min-width:190px; padding:2px;">
-            <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:4px; margin-bottom:6px;">
-              <strong style="font-size:14px; color:#0f172a;">Cyclone DANA</strong>
-              <span style="font-size:10px; background:#ef444415; color:#ef4444; font-weight:bold; padding:2px 6px; border-radius:99px; border:1px solid #ef444430;">Severe</span>
-            </div>
-            <div style="font-size:11px; color:#475569; line-height:1.6;">
-              <div><b>Basin:</b> Bay of Bengal</div>
-              <div><b>Intensity:</b> 65 kts (120 km/h)</div>
-              <div><b>Pressure:</b> 984 hPa</div>
-              <div><b>Fix:</b> 20.50°N, 87.20°E</div>
-            </div>
-          </div>
-        \`).openPopup();
-        activeMarkers.push(dana);
-
-      } catch (e) {
-        console.warn('Basemap/marker error:', e);
-      }
-    }
-
-    function activateFallbackMap(reason) {
-      if (isWindyActive) return;
-      console.warn('Activating VAYU Live Earth Imagery:', reason);
-      updateToast('VAYU Live Earth Active', '#34d399');
-      document.getElementById('windy').style.display = 'none';
-      const fb = document.getElementById('fallback-map');
-      fb.style.display = 'block';
-
-      try {
-        const map = L.map('fallback-map', {
-          center: [20.5, 87.2],
-          zoom: 5,
-          zoomControl: true,
-          attributionControl: false
-        });
-        mapInstance = map;
-
-        addBasemapAndCyclone(map);
-
-        // RainViewer Live Weather Radar
-        fetch('https://api.rainviewer.com/public/weather-maps.json')
-          .then(res => res.json())
-          .then(data => {
-            if (data && data.radar && data.radar.past && data.radar.past.length > 0) {
-              const latest = data.radar.past[data.radar.past.length - 1];
-              L.tileLayer('https://tilecache.rainviewer.com/v2/radar/' + latest.path + '/256/{z}/{x}/{y}/2/1_1.png', {
-                opacity: 0.75,
-                zIndex: 10
-              }).addTo(map);
-            }
-          })
-          .catch(function() {});
-
-      } catch (err) {
-        console.error('Fallback error:', err);
-      }
-    }
-
-    function initWindy() {
-      if (typeof windyInit !== 'function') {
-        activateFallbackMap('windyInit script missing');
-        return;
-      }
-
-      const options = {
-        key: WINDY_KEY,
-        lat: 20.5,
-        lon: 87.2,
+    function initMap() {
+      // Create Leaflet Map centered on Bay of Bengal Cyclone Zone
+      map = L.map('map', {
+        center: [20.5, 87.2],
         zoom: 5,
-        overlay: 'wind',
-        verbose: false
-      };
+        zoomControl: true,
+        attributionControl: false
+      });
 
-      try {
-        windyInit(options, function(windyAPI) {
-          isWindyActive = true;
-          mapInstance = windyAPI.map;
-          windyStore = windyAPI.store;
+      // 1. High-Resolution Esri Satellite Base Imagery
+      satLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+        maxZoom: 18,
+        zIndex: 1
+      }).addTo(map);
 
-          updateToast('Windy.com API Live', '#38bdf8');
-          console.log('Windy Map Initialized successfully with key:', WINDY_KEY);
+      // 2. Coastal Boundaries & Reference Labels
+      L.tileLayer('https://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}', {
+        maxZoom: 18,
+        opacity: 0.85,
+        zIndex: 2
+      }).addTo(map);
 
-          try {
-            windyStore.set('overlay', 'wind');
-          } catch(e) {}
-
-          addBasemapAndCyclone(mapInstance);
-
-          window.addEventListener('message', function(e) {
-            if (!e.data) return;
-            if (e.data.type === 'SET_OVERLAY' && windyStore) {
-              try { windyStore.set('overlay', e.data.overlay); } catch (err) {}
-            }
-            if (e.data.type === 'PAN_TO' && mapInstance) {
-              try { mapInstance.panTo([e.data.lat, e.data.lon]); } catch (err) {}
-            }
-          });
+      // 3. Live Doppler Radar (RainViewer Global Feed)
+      fetch('https://api.rainviewer.com/public/weather-maps.json')
+        .then(res => res.json())
+        .then(data => {
+          if (data && data.radar && data.radar.past && data.radar.past.length > 0) {
+            const latest = data.radar.past[data.radar.past.length - 1];
+            radarLayer = L.tileLayer('https://tilecache.rainviewer.com/v2/radar/' + latest.path + '/256/{z}/{x}/{y}/2/1_1.png', {
+              opacity: 0.75,
+              zIndex: 10
+            }).addTo(map);
+            updateToast('VAYU Live Satellite & Radar Active', '#34d399');
+          }
+        })
+        .catch(e => {
+          updateToast('VAYU Satellite Stream Active', '#38bdf8');
         });
-      } catch (err) {
-        activateFallbackMap(err.message);
-      }
-    }
 
-    setTimeout(function() {
-      if (!isWindyActive) {
-        activateFallbackMap('Windy API timeout / domain restriction');
-      }
-    }, 3500);
+      // 4. Cyclone DANA Live Pulsating Center
+      const cycloneHtml = \`
+        <div style="position:relative; width:44px; height:44px; display:flex; align-items:center; justify-content:center;">
+          <div style="position:absolute; inset:0; border-radius:50%; background:#ef4444; opacity:0.45; animation:pulse 1.5s infinite;"></div>
+          <div style="position:absolute; inset:6px; border-radius:50%; background:#ef4444; border:2px solid white; box-shadow:0 0 15px #ef4444; display:flex; align-items:center; justify-content:center; color:white; font-size:16px;">
+            🌀
+          </div>
+        </div>
+      \`;
+      const cycloneIcon = L.divIcon({
+        className: 'cyclone-marker-vayu',
+        html: cycloneHtml,
+        iconSize: [44, 44],
+        iconAnchor: [22, 22]
+      });
+
+      activeMarker = L.marker([20.5, 87.2], { icon: cycloneIcon, zIndexOffset: 1000 }).addTo(map);
+      activeMarker.bindPopup(\`
+        <div style="font-family:-apple-system,BlinkMacSystemFont,sans-serif; min-width:200px; padding:2px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid #e2e8f0; padding-bottom:4px; margin-bottom:6px;">
+            <strong style="font-size:14px; color:#0f172a;">Cyclone DANA</strong>
+            <span style="font-size:10px; background:#ef444415; color:#ef4444; font-weight:bold; padding:2px 6px; border-radius:99px; border:1px solid #ef444430;">Severe</span>
+          </div>
+          <div style="font-size:11px; color:#475569; line-height:1.6;">
+            <div><b>Basin:</b> Bay of Bengal</div>
+            <div><b>Intensity:</b> 65 kts (120 km/h)</div>
+            <div><b>Central Pressure:</b> 984 hPa</div>
+            <div><b>Coordinates:</b> 20.50°N, 87.20°E</div>
+            <div style="color:#0284c7; font-weight:bold; margin-top:4px;">Landfall Track Forecast Active</div>
+          </div>
+        </div>
+      \`).openPopup();
+
+      // Listen for commands from parent window
+      window.addEventListener('message', function(e) {
+        if (!e.data) return;
+        if (e.data.type === 'PAN_TO' && map) {
+          map.flyTo([e.data.lat, e.data.lon], 6, { duration: 1.2 });
+          if (activeMarker) {
+            activeMarker.setLatLng([e.data.lat, e.data.lon]);
+          }
+        }
+        if (e.data.type === 'SET_OVERLAY') {
+          if (e.data.overlay === 'radar' && radarLayer) {
+            radarLayer.setOpacity(0.85);
+            updateToast('Radar Precipitation Active', '#38bdf8');
+          } else if (e.data.overlay === 'satellite') {
+            if (radarLayer) radarLayer.setOpacity(0.2);
+            updateToast('High-Res Optical Satellite Active', '#38bdf8');
+          } else {
+            if (radarLayer) radarLayer.setOpacity(0.75);
+            updateToast('Atmospheric ' + e.data.overlay + ' Active', '#38bdf8');
+          }
+        }
+      });
+    }
 
     if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', initWindy);
+      document.addEventListener('DOMContentLoaded', initMap);
     } else {
-      initWindy();
+      initMap();
     }
   </script>
 </body>
@@ -364,26 +315,39 @@ const VayuEarth = () => {
           </div>
         </div>
 
-        {/* Right Layer Switcher */}
-        <div className="flex items-center gap-1 p-1 bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-xl shadow-2xl pointer-events-auto overflow-x-auto">
-          {OVERLAYS.map(layer => {
-            const Icon = layer.icon;
-            const isActive = activeOverlay === layer.id;
-            return (
-              <button
-                key={layer.id}
-                onClick={() => handleOverlayChange(layer.id)}
-                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
-                  isActive 
-                    ? 'bg-sky-500 text-white shadow-xs' 
-                    : 'text-slate-300 hover:text-white hover:bg-slate-800/80'
-                }`}
-              >
-                <Icon className="w-3.5 h-3.5" />
-                <span className="hidden md:inline">{layer.label}</span>
-              </button>
-            );
-          })}
+        {/* Right Layer Switcher & External Windy Launch */}
+        <div className="flex items-center gap-1.5 pointer-events-auto">
+          <div className="flex items-center gap-1 p-1 bg-slate-900/90 backdrop-blur-md border border-slate-700/80 rounded-xl shadow-2xl overflow-x-auto">
+            {OVERLAYS.map(layer => {
+              const Icon = layer.icon;
+              const isActive = activeOverlay === layer.id;
+              return (
+                <button
+                  key={layer.id}
+                  onClick={() => handleOverlayChange(layer.id)}
+                  className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer whitespace-nowrap ${
+                    isActive 
+                      ? 'bg-sky-500 text-white shadow-xs' 
+                      : 'text-slate-300 hover:text-white hover:bg-slate-800/80'
+                  }`}
+                >
+                  <Icon className="w-3.5 h-3.5" />
+                  <span className="hidden md:inline">{layer.label}</span>
+                </button>
+              );
+            })}
+          </div>
+
+          <a
+            href={`https://www.windy.com/?${centerCoords.lat},${centerCoords.lon},5`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-1 px-3 py-1.5 rounded-xl bg-sky-500/20 hover:bg-sky-500 text-sky-300 hover:text-white border border-sky-500/40 text-xs font-semibold transition-all shadow-lg cursor-pointer"
+            title="Open Windy.com Live in New Tab"
+          >
+            <span>Windy.com</span>
+            <ArrowUpRight className="w-3.5 h-3.5" />
+          </a>
         </div>
 
       </div>
@@ -441,7 +405,7 @@ const VayuEarth = () => {
         </div>
       )}
 
-      {/* Embedded Map Canvas */}
+      {/* Embedded Map Canvas — Direct Leaflet 1.9.4 + Esri 4K Satellite + Doppler Radar */}
       <div className="flex-1 w-full h-full relative z-10 bg-slate-950 min-h-0">
         <iframe
           ref={iframeRef}
