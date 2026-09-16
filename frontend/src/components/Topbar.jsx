@@ -1,193 +1,100 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
-  Bell, Clock, ChevronRight, ExternalLink, User, LogOut, Shield
+  Bell, Clock, ChevronRight, ExternalLink, User, LogOut, Search,
+  Sun, History, LayoutSidebar, Sidebar, Menu
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { getWebsiteUrl, isProductionDomain, toPortalPath } from '../utils/domain';
 import { OfficerAccountDisplay, SafeSignOutButton } from './auth/ClerkAuth';
 
 const Topbar = () => {
-  const [time, setTime] = useState(new Date());
-  const [isMobileAccountOpen, setIsMobileAccountOpen] = useState(false);
-  const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
-  const mobileAccountRef = useRef(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
-  useEffect(() => {
-    const t = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(t);
-  }, []);
-
-  // Close mobile account menu when clicking outside
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (mobileAccountRef.current && !mobileAccountRef.current.contains(event.target)) {
-        setIsMobileAccountOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
   const getPageTitle = () => {
-    if (location.pathname.includes('/earth')) return 'VAYU Earth • Geospatial Intelligence';
-    if (location.pathname.includes('/satellite')) return 'Satellite Imagery';
-    if (location.pathname.includes('/detection')) return 'Cyclone Detection';
-    if (location.pathname.includes('/classification')) return 'Morphology Classification';
-    if (location.pathname.includes('/trajectory') || location.pathname.includes('/prediction') || location.pathname.includes('/track')) return 'Trajectory Forecast';
-    if (location.pathname.includes('/impact') || location.pathname.includes('/alerts')) return 'Impact & Landfall';
-    if (location.pathname.includes('/archives') || location.pathname.includes('/analytics')) return 'Storm Archives';
-    if (location.pathname.includes('/models') || location.pathname.includes('/training') || location.pathname.includes('/performance') || location.pathname.includes('/architecture')) return 'AI Model Intelligence';
-    if (location.pathname.includes('/bulletin')) return 'Official Bulletin';
-    return 'Command Overview';
+    if (location.pathname.includes('/earth')) return 'VAYU Earth';
+    if (location.pathname.includes('/satellite')) return 'Satellite Feed';
+    if (location.pathname.includes('/detection')) return 'Cyclone Models';
+    if (location.pathname.includes('/classification')) return 'Morphology';
+    if (location.pathname.includes('/trajectory') || location.pathname.includes('/prediction') || location.pathname.includes('/track')) return 'Trajectory';
+    if (location.pathname.includes('/impact') || location.pathname.includes('/alerts')) return 'Impact & Alerts';
+    if (location.pathname.includes('/archives') || location.pathname.includes('/analytics')) return 'Historical Archives';
+    if (location.pathname.includes('/models') || location.pathname.includes('/training') || location.pathname.includes('/performance') || location.pathname.includes('/architecture')) return 'AI Intelligence';
+    if (location.pathname.includes('/bulletin')) return 'Official Reports';
+    return 'Overview';
   };
-
-  const istDateString = time.toLocaleDateString('en-GB', { timeZone: 'Asia/Kolkata', day: '2-digit', month: 'short' });
-  const istString = time.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour12: false });
+  
+  const getBreadcrumbCategory = () => {
+    if (location.pathname.includes('/trajectory') || location.pathname.includes('/classification') || location.pathname.includes('/archives') || location.pathname.includes('/models') || location.pathname.includes('/bulletin')) {
+      return 'Pages';
+    }
+    return 'Dashboards';
+  }
 
   return (
     <>
-      <header className="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-3 sm:px-6 sticky top-0 z-30 text-slate-800">
+      <header className="h-14 bg-white border-b border-slate-100 flex items-center justify-between px-4 sm:px-6 sticky top-0 z-30 text-slate-800">
         
-        {/* Left Section: Mobile Brand / Desktop Title */}
+        {/* Left Section: Breadcrumbs */}
         <div className="flex items-center gap-3 min-w-0">
-          {/* Mobile Logo on White Background with Continuous Sheen */}
-          <div 
-            className="lg:hidden relative overflow-hidden rounded-lg p-0.5 flex items-center shrink-0 cursor-pointer"
-            onClick={() => navigate(toPortalPath('/dashboard'))}
-          >
-            <img 
-              src="/vayu.png" 
-              alt="VAYU" 
-              className="h-11 sm:h-12 w-auto object-contain" 
-            />
-            <div 
-              className="animate-vayu-sheen absolute inset-y-0 w-20 bg-gradient-to-r from-transparent via-white/85 to-transparent pointer-events-none" 
-            />
-          </div>
-
-          <div className="flex items-center gap-1.5 sm:gap-2 text-xs min-w-0">
-            <span className="text-slate-500 font-medium hidden sm:inline">MoES Command</span>
-            <ChevronRight className="w-3 h-3 text-slate-400 hidden sm:inline" />
-            <span className="text-slate-900 font-bold truncate">{getPageTitle()}</span>
-          </div>
-        </div>
-
-        {/* Right Section: Time, Public Portal Link & Mobile Account */}
-        <div className="flex items-center gap-2 sm:gap-3">
-          {/* Real-time IST Clock */}
-          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-            <Clock className="w-3 h-3 text-slate-400" />
-            <span className="font-mono">{istDateString} • {istString} IST</span>
-          </div>
-
-          {/* Return to Public Portal */}
-          <button
-            onClick={() => {
-              if (isProductionDomain()) {
-                window.location.href = getWebsiteUrl('/');
-              } else {
-                navigate('/');
-              }
-            }}
-            className="hidden md:flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 border border-slate-200 px-3 py-1 rounded-md transition-colors cursor-pointer"
-          >
-            <span>Public Portal</span>
-            <ExternalLink className="w-3 h-3" />
-          </button>
-
-          {/* Alert Bell */}
-          <button
-            onClick={() => navigate(toPortalPath('/dashboard/impact'))}
-            className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors relative cursor-pointer"
-            title="Active Coastal Alerts"
-          >
-            <Bell className="w-4 h-4" />
-            <span className="w-2 h-2 rounded-full bg-red-500 absolute top-1 right-1" />
-          </button>
-
-          {/* Mobile Account Trigger (visible on lg:hidden) */}
-          <div className="lg:hidden relative" ref={mobileAccountRef}>
-            <button
-              onClick={() => setIsMobileAccountOpen(!isMobileAccountOpen)}
-              className="w-8 h-8 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700 cursor-pointer"
-              title="Account"
-            >
-              <User className="w-4 h-4" />
+          <div className="flex items-center gap-2 text-[13px] min-w-0">
+            <button className="hidden sm:flex text-slate-400 hover:text-slate-600 transition-colors cursor-pointer">
+              <LayoutSidebar className="w-4 h-4" />
             </button>
-
-            {isMobileAccountOpen && (
-              <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-slate-200 rounded-2xl shadow-2xl p-2 z-50 animate-in fade-in duration-150">
-                <div className="px-2 py-2 border-b border-slate-100">
-                  <OfficerAccountDisplay />
-                </div>
-                <div className="px-2 py-1.5 border-b border-slate-100 flex items-center gap-1.5 text-[11px] font-mono text-slate-500 font-semibold">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-                  <span>{istDateString} • {istString} IST</span>
-                </div>
-                <div className="pt-1">
-                  <button
-                    onClick={() => {
-                      setIsMobileAccountOpen(false);
-                      setIsLogoutDialogOpen(true);
-                    }}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 rounded-xl transition-all cursor-pointer"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    <span>Logout</span>
-                  </button>
-                </div>
-              </div>
-            )}
+            <div className="hidden sm:flex items-center text-slate-400">
+              <span>{getBreadcrumbCategory()}</span>
+              <span className="mx-2 text-slate-300">/</span>
+              <span className="text-slate-900 font-medium truncate">{getPageTitle()}</span>
+            </div>
+            
+            {/* Mobile Title */}
+            <div className="sm:hidden font-semibold text-slate-900">
+              {getPageTitle()}
+            </div>
           </div>
         </div>
 
+        {/* Right Section: Search & Icons */}
+        <div className="flex items-center gap-2 sm:gap-4">
+          
+          {/* Search Bar (Hidden on small screens) */}
+          <div className="hidden md:flex relative items-center">
+            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5" />
+            <input 
+              type="text"
+              placeholder="Search"
+              className="pl-8 pr-12 py-1.5 w-48 bg-slate-100/50 border border-transparent hover:border-slate-200 focus:bg-white focus:border-sky-500 focus:outline-none rounded-lg text-[13px] text-slate-800 transition-all placeholder:text-slate-400"
+            />
+            <div className="absolute right-2.5 flex items-center">
+              <span className="text-[10px] font-mono text-slate-400 font-medium">⌘/</span>
+            </div>
+          </div>
+
+          {/* Action Icons */}
+          <div className="flex items-center gap-1 sm:gap-1.5">
+            <button className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-md transition-colors cursor-pointer" title="Theme">
+              <Sun className="w-4 h-4" />
+            </button>
+            <button className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-md transition-colors cursor-pointer" title="History">
+              <History className="w-4 h-4" />
+            </button>
+            <button className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-md transition-colors cursor-pointer relative" title="Notifications">
+              <Bell className="w-4 h-4" />
+              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-red-500 rounded-full border border-white" />
+            </button>
+            <button className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-md transition-colors cursor-pointer hidden sm:flex" title="Toggle Right Sidebar">
+              <Sidebar className="w-4 h-4" />
+            </button>
+            
+            {/* Mobile Menu Toggle */}
+            <button className="p-1.5 text-slate-400 hover:text-slate-700 hover:bg-slate-100 rounded-md transition-colors cursor-pointer sm:hidden">
+              <Menu className="w-4 h-4" />
+            </button>
+          </div>
+          
+        </div>
       </header>
-
-      {/* Mobile Logout Confirmation Modal */}
-      {isLogoutDialogOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="w-full max-w-sm bg-white border border-slate-200 rounded-3xl p-6 shadow-2xl space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600 shrink-0">
-                <LogOut className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-base font-bold text-slate-900">Confirm Logout</h3>
-                <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">
-                  Are you sure you want to end your operational session?
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-end gap-2.5 pt-2">
-              <button
-                type="button"
-                onClick={() => setIsLogoutDialogOpen(false)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-100 border border-slate-200 transition-all cursor-pointer"
-              >
-                Cancel
-              </button>
-              <SafeSignOutButton
-                onSignOutComplete={() => {
-                  setIsLogoutDialogOpen(false);
-                  if (isProductionDomain()) {
-                    window.location.href = getWebsiteUrl('/');
-                  } else {
-                    navigate('/');
-                  }
-                }}
-                className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-red-600 hover:bg-red-700 shadow-md transition-all cursor-pointer flex items-center gap-1.5"
-              >
-                <LogOut className="w-3.5 h-3.5" />
-                <span>Logout</span>
-              </SafeSignOutButton>
-            </div>
-          </div>
-        </div>
-      )}
     </>
   );
 };
