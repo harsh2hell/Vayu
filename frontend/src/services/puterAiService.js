@@ -18,6 +18,7 @@
  */
 
 import puter from '@heyputer/puter.js';
+import { buildCyclonePromptContext, buildCycloneContextSummary } from './cycloneContextSerializer.js';
 
 // Default timeout for Puter AI generation (30 seconds)
 const DEFAULT_AI_TIMEOUT_MS = 30000;
@@ -82,9 +83,10 @@ function extractResponseText(response) {
 
 /**
  * Formats a cyclone meteorological context object into a structured textual briefing
- * for context-aware Puter AI prompts.
+ * for context-aware Puter AI prompts. Utilizes buildCyclonePromptContext to filter
+ * out large binaries, credentials, or irrelevant state before presenting to the LLM.
  *
- * @param {Object|string|null} context - Cyclone metadata or model output snapshot
+ * @param {Object|string|null} context - Cyclone metadata, analysis session, or serialized context
  * @returns {string} Formatted context block
  */
 function formatCycloneContext(context) {
@@ -96,50 +98,87 @@ function formatCycloneContext(context) {
     return context.trim();
   }
 
+  // If already formatted or serialized, use buildCyclonePromptContext to guarantee clean structure
+  const serialized = context.platform ? context : buildCyclonePromptContext(context);
   const parts = [];
 
-  if (context.name || context.cyclone_name) {
-    parts.push(`Cyclone Name: ${context.name || context.cyclone_name}`);
-  }
-  if (context.basin) {
-    parts.push(`Basin: ${context.basin}`);
-  }
-  if (context.category || context.intensity_category) {
-    parts.push(`IMD Intensity Classification: ${context.category || context.intensity_category}`);
-  }
-
-  // Coordinates
-  const lat = context.lat ?? context.latitude ?? context.center_lat;
-  const lon = context.lon ?? context.longitude ?? context.center_lon;
-  if (lat !== undefined && lon !== undefined) {
-    parts.push(`Estimated Center Coordinates: ${lat}°N, ${lon}°E`);
+  // Storm identification
+  if (serialized.storm_identification) {
+    const id = serialized.storm_identification;
+    parts.push(`[SYSTEM IDENTIFICATION]`);
+    if (id.name) parts.push(`• Storm Name: ${id.name}`);
+    if (id.basin) parts.push(`• Basin: ${id.basin}`);
+    if (id.observation_time) parts.push(`• Telemetry Timestamp: ${id.observation_time}`);
   }
 
-  // Wind and pressure metrics
-  if (context.wind_speed_kmh !== undefined || context.current_wind !== undefined) {
-    parts.push(`Estimated Sustained Wind Speed: ${context.wind_speed_kmh ?? context.current_wind} km/h`);
-  }
-  if (context.central_mslp_hpa !== undefined || context.current_mslp !== undefined) {
-    parts.push(`Estimated Central Pressure: ${context.central_mslp_hpa ?? context.current_mslp} hPa`);
-  }
-
-  // Dvorak morphology classification
-  if (context.dvorak_pattern || context.pattern_class || context.classification) {
-    parts.push(`Dvorak Morphology Pattern: ${context.dvorak_pattern || context.pattern_class || context.classification}`);
-  }
-  if (context.dvorak_t_number || context.t_number) {
-    parts.push(`Dvorak T-Number: ${context.dvorak_t_number || context.t_number}`);
-  }
-
-  // Landfall / forecast horizon
-  if (context.landfall_hours !== undefined || context.landfall_forecast) {
-    parts.push(`Projected Landfall Horizon: ${context.landfall_hours ? `+${context.landfall_hours} hours` : context.landfall_forecast}`);
-  }
-  if (context.landfall_location || context.target_coast) {
-    parts.push(`Projected Landfall Coast: ${context.landfall_location || context.target_coast}`);
+  // Current observation
+  if (serialized.current_observation) {
+    const obs = serialized.current_observation;
+    parts.push(`\n[SYNOPTIC OBSERVATION]`);
+    if (obs.estimated_center?.formatted) {
+      parts.push(`• Center Coordinates: ${obs.estimated_center.formatted}`);
+    }
+    if (obs.current_wind_speed_kmh !== null) {
+      parts.push(`• Max Sustained Surface Winds: ${obs.current_wind_speed_kmh} km/h`);
+    }
+    if (obs.current_central_pressure_hpa !== null) {
+      parts.push(`• Central MSLP: ${obs.current_central_pressure_hpa} hPa`);
+    }
   }
 
-  return parts.length > 0 ? parts.join('\n') : JSON.stringify(context);
+  // Detection (MobileNetV3)
+  if (serialized.detection && serialized.detection.cyclone_detected) {
+    const det = serialized.detection;
+    parts.push(`\n[AI CENTER DETECTION - MobileNetV3]`);
+    parts.push(`• Eye/Vortex Status: ${det.eye_status}`);
+    if (det.detection_confidence !== null) {
+      parts.push(`• Objectness / Detection Confidence: ${(det.detection_confidence * 100).toFixed(1)}%`);
+    }
+  }
+
+  // Classification (ResNet18 Dvorak)
+  if (serialized.classification) {
+    const cls = serialized.classification;
+    parts.push(`\n[MORPHOLOGY CLASSIFICATION - ResNet18 Dvorak]`);
+    if (cls.primary_pattern) parts.push(`• Primary Pattern: ${cls.primary_pattern}`);
+    if (cls.dvorak_t_number) parts.push(`• Dvorak T-Number: ${cls.dvorak_t_number}`);
+    if (cls.confidence_percentage !== null) parts.push(`• Classifier Confidence: ${cls.confidence_percentage}%`);
+  }
+
+  // Trajectory forecast (GRU)
+  if (serialized.trajectory) {
+    const traj = serialized.trajectory;
+    parts.push(`\n[TRAJECTORY & INTENSITY FORECAST - GRU Seq2Seq]`);
+    if (traj.landfall_projection && traj.landfall_projection.is_landfall_projected) {
+      const lf = traj.landfall_projection;
+      parts.push(`• Projected Landfall Sector: ${lf.target_coast || 'Coastal Sector'}`);
+      if (lf.estimated_time) parts.push(`• Landfall Timeline: ${lf.estimated_time}`);
+      if (lf.expected_wind_at_landfall_kmh !== null) parts.push(`• Crossing Wind Speed: ${lf.expected_wind_at_landfall_kmh} km/h`);
+      if (lf.projected_storm_surge_m) parts.push(`• Estimated Storm Surge: ${lf.projected_storm_surge_m}`);
+    }
+    if (Array.isArray(traj.trajectory_milestones) && traj.trajectory_milestones.length > 0) {
+      parts.push(`• Forecast Waypoints:`);
+      for (const pt of traj.trajectory_milestones) {
+        const wind = pt.expected_wind_kmh !== null ? `${pt.expected_wind_kmh} km/h` : 'N/A';
+        const mslp = pt.central_pressure_hpa !== null ? `${pt.central_pressure_hpa} hPa` : 'N/A';
+        parts.push(`  - ${pt.step_label || `+${pt.hour}h`}: ${pt.latitude}°N, ${pt.longitude}°E | Wind: ${wind} | MSLP: ${mslp}`);
+      }
+    }
+  }
+
+  // Environmental conditions
+  if (serialized.environmental_conditions) {
+    const env = serialized.environmental_conditions;
+    parts.push(`\n[ENVIRONMENTAL THERMODYNAMICS & SHEAR]`);
+    if (env.sea_surface_temperature_c !== null) parts.push(`• Sea Surface Temperature (SST): ${env.sea_surface_temperature_c}°C`);
+    if (env.vertical_wind_shear_knots !== null) parts.push(`• 850-200 hPa Vertical Wind Shear: ${env.vertical_wind_shear_knots} knots`);
+    if (env.mid_level_relative_humidity_pct !== null) parts.push(`• Mid-Level Relative Humidity: ${env.mid_level_relative_humidity_pct}%`);
+    if (env.rapid_intensification) {
+      parts.push(`• Rapid Intensification Risk: ${env.rapid_intensification.threat_level} (${env.rapid_intensification.probability_percentage}%)`);
+    }
+  }
+
+  return parts.join('\n');
 }
 
 /**
@@ -200,6 +239,20 @@ async function callPuterAI(promptOrMessages, options = {}, timeoutMs = DEFAULT_A
 }
 
 /**
+ * Strict Operational AI Grounding Directives:
+ * Injected into all Puter AI prompts to guarantee scientific integrity,
+ * prevent synthetic fact fabrication, and enforce compliance boundaries.
+ */
+const AI_GROUNDING_RULES = `
+CRITICAL SAFETY & GROUNDING RULES:
+1. VAYU model outputs (MobileNetV3, ResNet18, Trajectory-GRU) provided above are the SOLE authoritative source of numerical meteorological metrics.
+2. DO NOT INVENT measurements, observations, warnings, locations, or probabilities not present in the provided context.
+3. DO NOT claim certainty beyond the supplied model outputs. Clearly distinguish between "VAYU MODEL OUTPUT" (the verified numbers/data) and "AI INTERPRETATION" (your meteorological synthesis).
+4. If specific data (e.g. pressure, shear, storm surge) is unavailable in the context, explicitly state: "Data unavailable in current session."
+5. You are an AI meteorological reasoning assistant, NOT the official statutory issuing authority. DO NOT issue independent statutory emergency warnings.
+6. Always advise consulting official India Meteorological Department (IMD / RSMC New Delhi) bulletins and NDMA advisories for actionable civil defense orders.`;
+
+/**
  * Explains a cyclone's current structure, Dvorak morphology, and intensity metrics
  * in professional meteorological language.
  *
@@ -210,17 +263,19 @@ async function callPuterAI(promptOrMessages, options = {}, timeoutMs = DEFAULT_A
 export async function explainCyclone(context, options = {}) {
   const formattedContext = formatCycloneContext(context);
 
-  const prompt = `You are VAYU AI Analyst, an expert senior tropical cyclone meteorologist and numerical forecaster specialized in the North Indian Ocean (Bay of Bengal & Arabian Sea) aligned with India Meteorological Department (IMD) and WMO RSMC standards.
+  const prompt = `You are VAYU AI Analyst, an expert tropical meteorology advisor for the VAYU Cyclone Intelligence Platform.
 
-Analyze and explain the following cyclone observation data:
+ACTIVE CYCLONE DATA:
 ${formattedContext}
 
-Provide a concise, professional, 3-to-4 paragraph meteorological analysis covering:
-1. Current System Status & Synoptic Overview: Analyze the intensity, estimated central pressure, and structural organization.
-2. Dvorak Pattern & Convective Structure: Interpret the morphology (e.g. Curved Band, CDO, Eye, or Shear pattern) and what it indicates about environmental vertical wind shear and upper-level divergence.
-3. Near-Term Hazards & Guidance: Highlight anticipated wind field impact, coastal storm surge, and rainfall intensity recommendations for operational civil defense authorities.
+${AI_GROUNDING_RULES}
 
-Keep your response objective, structured, and in standard meteorological terminology.`;
+Provide a structured, professional, 3-to-4 paragraph operational assessment:
+1. System Status & Synoptic Overview: Synthesize current intensity, location, and central pressure from the model output.
+2. Morphology & Convective Organization: Interpret the Dvorak pattern and what it indicates about vortex health and shear.
+3. Track & Hazard Outlook: Summarize anticipated trajectory, landfall timeline (if projected), and primary hazards (wind, storm surge, rainfall).
+
+Keep your response structured, concise, and professional.`;
 
   return callPuterAI(prompt, options);
 }
@@ -248,15 +303,17 @@ export async function askAnalyst(question, context, options = {}) {
   const messages = [
     {
       role: 'system',
-      content: `You are VAYU AI Analyst, an authoritative operational tropical meteorology advisor for the Government of India (MoES/IMD) cyclone early warning system.
-Current Active Cyclone Context:
+      content: `You are VAYU AI Analyst, an operational tropical meteorology advisor for the VAYU Cyclone Intelligence Platform.
+
+ACTIVE CYCLONE DATA:
 ${formattedContext}
 
-Guidelines:
-- Answer the officer's question directly, accurately, and authoritatively.
-- Ground your answer in the provided cyclone context and established tropical meteorology physics.
-- Clearly distinguish between model prediction estimates and ground-truth observations.
-- If data for a specific aspect is not available in the context, explicitly state that fact.`
+${AI_GROUNDING_RULES}
+
+Instructions:
+- Answer the user's question directly, clearly, and objectively based on the supplied data.
+- Emphasize verified model output vs analytical interpretation.
+- If the question asks about something not in the data, state clearly that it is not in the current session telemetry.`
     },
     {
       role: 'user',

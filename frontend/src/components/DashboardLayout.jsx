@@ -1,14 +1,16 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
+import { Sparkles } from 'lucide-react';
 import Sidebar from './Sidebar';
 import Topbar from './Topbar';
 import { AnalysisSessionProvider } from '../context/AnalysisSessionContext';
-
+import VayuAiAnalystDrawer from './VayuAiAnalystDrawer';
 import ErrorBoundary from './ErrorBoundary';
 
 const DashboardLayout = () => {
   const location = useLocation();
   const isMapFirst = location.pathname.includes('/earth');
+  const [isAiAnalystOpen, setIsAiAnalystOpen] = useState(false);
 
   return (
     <AnalysisSessionProvider>
@@ -19,7 +21,7 @@ const DashboardLayout = () => {
         
         {/* Main Content Area */}
         <div className="flex flex-col min-h-screen ml-56 w-[calc(100%-14rem)] min-w-0 transition-all relative z-10">
-          <Topbar />
+          <Topbar onOpenAiAnalyst={() => setIsAiAnalystOpen(true)} />
           
           <main 
             style={isMapFirst ? { height: 'calc(100vh - 3.5rem)', minHeight: 'calc(100vh - 3.5rem)', width: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative', background: '#020617' } : undefined}
@@ -37,6 +39,23 @@ const DashboardLayout = () => {
             </React.Suspense>
           </main>
         </div>
+
+        {/* Floating Quick Action Trigger for VAYU AI Analyst */}
+        <button
+          type="button"
+          onClick={() => setIsAiAnalystOpen(prev => !prev)}
+          className="fixed bottom-5 right-5 z-40 flex items-center gap-2 px-3.5 py-2.5 rounded-full bg-gradient-to-r from-sky-600 to-cyan-600 hover:from-sky-500 hover:to-cyan-500 text-white font-semibold text-xs shadow-lg shadow-sky-600/30 hover:shadow-sky-600/40 hover:scale-105 active:scale-95 transition-all cursor-pointer border border-white/20"
+          title="Open VAYU AI Operational Analyst"
+        >
+          <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
+          <span className="hidden sm:inline">VAYU AI Analyst</span>
+        </button>
+
+        {/* Operational AI Analyst Drawer */}
+        <VayuAiAnalystDrawer 
+          isOpen={isAiAnalystOpen} 
+          onClose={() => setIsAiAnalystOpen(false)} 
+        />
 
       </div>
     </AnalysisSessionProvider>
