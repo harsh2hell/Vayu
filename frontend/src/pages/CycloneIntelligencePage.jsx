@@ -143,8 +143,7 @@ export default function CycloneIntelligencePage() {
   const navigate = useNavigate();
   const liveClock = useLiveClock(1000);
 
-  const isDarkMode = false;
-  const setIsDarkMode = () => {};
+  const [isDarkMode, setIsDarkMode] = useState(() => document.documentElement.classList.contains('dark'));
   const [fontSizeOffset, setFontSizeOffset] = useState(() => {
     try { return parseInt(localStorage.getItem('vayu_font_offset') ?? '0', 10); } catch { return 0; }
   });
@@ -152,8 +151,9 @@ export default function CycloneIntelligencePage() {
   const [activeSatLayer, setActiveSatLayer] = useState('ir');
 
   useEffect(() => {
-    document.documentElement.classList.remove('dark');
-  }, []);
+    if (isDarkMode) document.documentElement.classList.add('dark');
+    else document.documentElement.classList.remove('dark');
+  }, [isDarkMode]);
 
   useEffect(() => {
     const t = setTimeout(() => setIsLoading(false), 900);

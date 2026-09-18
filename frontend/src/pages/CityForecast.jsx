@@ -421,8 +421,9 @@ const CityForecast = () => {
     return localStorage.getItem('vayu_is_hindi') === 'true';
   });
 
-  const isDarkMode = false;
-  const setIsDarkMode = () => {};
+  const [isDarkMode, setIsDarkMode] = useState(() => {
+    return document.documentElement.classList.contains('dark');
+  });
 
   const liveClock = useLiveClock(1000);
 
@@ -438,7 +439,6 @@ const CityForecast = () => {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
-    document.documentElement.classList.remove('dark');
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
@@ -452,7 +452,15 @@ const CityForecast = () => {
     localStorage.setItem('vayu_is_hindi', String(nextVal));
   };
 
-  const handleSetDarkMode = () => {};
+  const handleSetDarkMode = (val) => {
+    const nextVal = typeof val === 'function' ? val(isDarkMode) : val;
+    setIsDarkMode(nextVal);
+    if (nextVal) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  };
 
   const locationState = useLocation();
 
