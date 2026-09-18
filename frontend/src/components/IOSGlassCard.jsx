@@ -19,8 +19,9 @@ export default function IOSGlassCard({
   as: Component = 'div',
   ...rest
 }) {
+  const isFullHeight = className.includes('h-full') || wrapperClassName.includes('h-full');
   return (
-    <div className={`ios-3d-glass-wrapper ${wrapperClassName}`}>
+    <div className={`ios-3d-glass-wrapper ${isFullHeight ? 'h-full' : ''} ${wrapperClassName}`}>
       <Component
         className={`ios-3d-glass-card ${interactive ? 'ios-3d-glass-interactive' : ''} ${className}`}
         onClick={onClick}

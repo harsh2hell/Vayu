@@ -1238,7 +1238,7 @@ header .header-theme-btn {
    ========================================================================= */
 
 .ios-3d-glass-wrapper {
-  height: 100%;
+  position: relative;
 }
 
 .ios-3d-glass-card {

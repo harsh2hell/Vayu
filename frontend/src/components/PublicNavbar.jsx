@@ -23,7 +23,7 @@ export const applyGlobalFontScale = (offset) => {
   document.documentElement.style.fontSize = `${percent}%`;
   try {
     localStorage.setItem('vayu_font_offset', String(offset));
-  } catch (e) {}
+  } catch (e) { }
 };
 
 // Interactive Nav Option Button (Pure transparent shell sitting over the continuous Apple glass pill)
@@ -33,13 +33,12 @@ const Nav3DGlassButton = React.forwardRef(({ link, isSelected, isHovered, onClic
       ref={ref}
       onClick={onClick}
       onMouseEnter={onMouseEnter}
-      className={`nav-3d-glass-btn group relative z-10 px-3.5 lg:px-4 py-1.5 rounded-full text-xs tracking-wide cursor-pointer whitespace-nowrap shrink-0 flex items-center justify-center select-none transition-colors duration-200 ${
-        isSelected
+      className={`nav-3d-glass-btn group relative z-10 px-3.5 lg:px-4 py-1.5 rounded-full text-xs tracking-wide cursor-pointer whitespace-nowrap shrink-0 flex items-center justify-center select-none transition-colors duration-200 ${isSelected
           ? 'text-slate-950 dark:text-white font-bold'
           : isHovered
-          ? 'text-slate-950 dark:text-white font-semibold'
-          : 'text-slate-600 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white font-medium'
-      }`}
+            ? 'text-slate-950 dark:text-white font-semibold'
+            : 'text-slate-600 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white font-medium'
+        }`}
     >
       {/* Nav Label */}
       <span className="relative z-10 transition-transform duration-200">
@@ -64,14 +63,14 @@ const PublicNavbar = ({
   const liveClock = useLiveClock(1000);
 
   // Read initial offset from prop or localStorage
-  const currentOffset = typeof fontSizeOffset === 'number' 
-    ? fontSizeOffset 
+  const currentOffset = typeof fontSizeOffset === 'number'
+    ? fontSizeOffset
     : (() => {
-        try {
-          const s = localStorage.getItem('vayu_font_offset');
-          return s !== null ? parseInt(s, 10) : 0;
-        } catch(e) { return 0; }
-      })();
+      try {
+        const s = localStorage.getItem('vayu_font_offset');
+        return s !== null ? parseInt(s, 10) : 0;
+      } catch (e) { return 0; }
+    })();
 
   const handleFontChange = (newOffset) => {
     applyGlobalFontScale(newOffset);
@@ -115,7 +114,7 @@ const PublicNavbar = ({
     const checkScroll = () => {
       const currentY = window.scrollY;
       const heroH1 = document.querySelector('#three-globe-hero h1');
-      
+
       let shouldCollapse = false;
       let shouldExpand = false;
 
@@ -165,33 +164,33 @@ const PublicNavbar = ({
   }, [location.pathname]);
 
   const NAV_LINKS = [
-    { 
-      path: '/', 
+    {
+      path: '/',
       label: isHindi ? 'होम' : 'Home',
       match: ['/']
     },
-    { 
-      path: '/ai-cyclone', 
+    {
+      path: '/ai-cyclone',
       label: isHindi ? 'एआई चक्रवात' : 'AI Cyclone',
       match: ['/ai-cyclone', '/ai-intelligence', '/cyclone-ai']
     },
-    { 
-      path: '/city-tracker', 
+    {
+      path: '/city-tracker',
       label: isHindi ? 'शहर व तटीय क्षेत्र (110+)' : 'City & Area Watch',
       match: ['/city-tracker', '/cities']
     },
-    { 
-      path: '/threat-map', 
+    {
+      path: '/threat-map',
       label: isHindi ? 'तटीय खतरा मानचित्र' : 'Threat Map',
       match: ['/threat-map', '/radar', '/gis-radar', '/threat-matrix']
     },
-    { 
-      path: '/live-map', 
+    {
+      path: '/live-map',
       label: isHindi ? 'लाइव मैप' : 'Live Map',
       match: ['/live-map', '/live-earth', '/3d-earth']
     },
-    { 
-      path: '/safety-updates', 
+    {
+      path: '/safety-updates',
       label: isHindi ? 'सुरक्षा व अपडेट' : 'Safety & Updates',
       match: ['/safety-updates', '/bulletins', '/safety-guide', '/safety', '/updates']
     }
@@ -246,25 +245,23 @@ const PublicNavbar = ({
   };
 
   return (
-    <header className={`sticky top-0 z-[1000] w-full transition-all duration-300 header-glass-bar ${
-      isScrolled ? 'is-scrolled' : ''
-    }`}>
+    <header className={`sticky top-0 z-[1000] w-full transition-all duration-300 header-glass-bar ${isScrolled ? 'is-scrolled' : ''
+      }`}>
       {/* Specular Glossy Light Sheen across top half of glass header */}
       <div className="pointer-events-none absolute inset-x-0 top-0 h-[48%] bg-gradient-to-b from-white/35 via-white/12 to-transparent dark:from-white/15 dark:via-white/4 dark:to-transparent select-none z-0" />
-      
+
       {/* 2px National Tricolor Stripe */}
       <div className="h-0.5 bg-gradient-to-r from-[#FF9933] via-slate-300 dark:via-slate-700 to-[#138808] relative z-10" />
-      
+
       <div className="header-inner-row max-w-7xl mx-auto px-2.5 sm:px-4 lg:px-6 h-16 sm:h-[68px] md:h-[72px] flex items-center justify-between gap-2 sm:gap-3 flex-nowrap relative z-10">
-        
+
         {/* VAYU Brand Logo - Collapses smoothly when scrolled past hero section */}
-        <div className={`header-collapsible-item header-collapsible-logo flex items-center shrink-0 ${
-          isPastHero ? 'is-collapsed' : ''
-        }`}>
-          <img 
-            src={isDarkMode ? "/vayu-white.png?v=2" : "/vayu.png"} 
-            alt="VAYU" 
-            className="h-12 sm:h-14 md:h-16 lg:h-[62px] w-auto object-contain filter drop-shadow-sm transition-transform duration-300 hover:scale-105 cursor-pointer select-none shrink-0" 
+        <div className={`header-collapsible-item header-collapsible-logo flex items-center shrink-0 ${isPastHero ? 'is-collapsed' : ''
+          }`}>
+          <img
+            src={isDarkMode ? "/vayu-white.png?v=2" : "/vayu.png"}
+            alt="VAYU"
+            className="h-12 sm:h-14 md:h-16 lg:h-[62px] w-auto object-contain filter drop-shadow-sm transition-transform duration-300 hover:scale-105 cursor-pointer select-none shrink-0"
             style={{ maxHeight: '62px' }}
             onClick={() => {
               if (location.pathname === '/') {
@@ -283,13 +280,11 @@ const PublicNavbar = ({
           onWheel={handleNavWheel}
           onMouseMove={handleNavMouseMove}
           onMouseLeave={handleNavMouseLeave}
-          className={`nav-pill-track-3d hidden md:flex items-center gap-1.5 p-1 rounded-full backdrop-blur-2xl transition-all duration-500 shrink min-w-0 flex-nowrap relative select-none ${
-            isPastHero ? 'mx-auto' : ''
-          } ${
-            isScrolled || isPastHero
+          className={`nav-pill-track-3d hidden md:flex items-center gap-1.5 p-1 rounded-full backdrop-blur-2xl transition-all duration-500 shrink min-w-0 flex-nowrap relative select-none ${isPastHero ? 'mx-auto' : ''
+            } ${isScrolled || isPastHero
               ? 'is-scrolled-3d'
               : 'bg-slate-200/55 dark:bg-neutral-950/45 border border-white/70 dark:border-white/10 shadow-[0_2px_12px_rgba(0,0,0,0.04),inset_0_1px_1px_rgba(255,255,255,0.8)]'
-          }`}
+            }`}
           title={isHindi ? "पेज बदलने के लिए क्लिक या स्क्रॉल करें" : "Click or scroll through options"}
         >
           {/* Ambient chromatic luminous glow orbs inside track for glass refraction */}
@@ -377,8 +372,8 @@ const PublicNavbar = ({
           </div>
 
           {/* National Emergency Hotline */}
-          <a 
-            href="tel:112" 
+          <a
+            href="tel:112"
             className="header-ctrl-btn hidden sm:inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-2xl text-xs font-semibold text-red-700 dark:text-red-300 bg-red-50/90 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 hover:bg-red-100 dark:hover:bg-red-900/60 transition-all shadow-2xs shrink-0"
             title={isHindi ? "राष्ट्रीय आपातकालीन हेल्पलाइन" : "National Emergency Helpline"}
           >
@@ -423,111 +418,139 @@ const PublicNavbar = ({
             </button>
           </div>
 
-          {/* Mobile Menu Hamburger Toggle */}
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            aria-label={isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
-            className="md:hidden p-1.5 rounded-2xl border border-slate-100 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-all cursor-pointer shrink-0"
-          >
-            {isMobileMenuOpen ? (
-              <X className="w-5 h-5 text-slate-900 dark:text-white" />
-            ) : (
-              <Menu className="w-5 h-5 text-slate-900 dark:text-white" />
-            )}
-          </button>
+<<<<<<< HEAD
 
+=======
+          {/* Theme Switcher */}
+          {setIsDarkMode && (
+            <button
+              onClick={() => setIsDarkMode(!isDarkMode)}
+              aria-label="Toggle light/dark theme"
+              className="header-theme-btn relative p-1.5 sm:p-2 rounded-2xl border border-slate-100 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 shadow-sm hover:bg-white dark:hover:bg-slate-700 text-slate-700 dark:text-amber-400 transition-all duration-300 overflow-hidden group cursor-pointer shrink-0"
+              title={isDarkMode ? (isHindi ? "लाइट थीम पर स्विच करें" : "Switch to Light Theme") : (isHindi ? "डार्क थीम पर स्विच करें" : "Switch to Dark Theme")}
+            >
+              <div className="relative w-4 h-4 flex items-center justify-center">
+                <Sun
+                  className={`w-4 h-4 text-amber-500 absolute transition-all duration-500 transform ${
+                    isDarkMode ? 'rotate-90 scale-0 opacity-0' : 'rotate-0 scale-100 opacity-100 group-hover:rotate-45'
+                  }`}
+                />
+                <Moon
+                  className={`w-4 h-4 text-sky-400 dark:text-amber-300 absolute transition-all duration-500 transform ${
+                    isDarkMode ? 'rotate-0 scale-100 opacity-100 group-hover:-rotate-12' : '-rotate-90 scale-0 opacity-0'
+                  }`}
+                />
+              </div>
+            </button>
+          )}
+>>>>>>> f1dd9d8b9f695faeb7830c3fbb6419ecee937b83
+
+  {/* Mobile Menu Hamburger Toggle */ }
+  <button
+    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+    aria-label={isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
+    className="md:hidden p-1.5 rounded-2xl border border-slate-100 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-all cursor-pointer shrink-0"
+  >
+    {isMobileMenuOpen ? (
+      <X className="w-5 h-5 text-slate-900 dark:text-white" />
+    ) : (
+      <Menu className="w-5 h-5 text-slate-900 dark:text-white" />
+    )}
+  </button>
+
+        </div >
+
+      </div >
+
+  {/* Mobile Navigation Drawer */ }
+{
+  isMobileMenuOpen && (
+    <div className="md:hidden border-t border-slate-100/80 dark:border-white/10 bg-white/95 dark:bg-black/95 backdrop-blur-2xl px-4 py-4 space-y-3 shadow-2xl animate-in slide-in-from-top-2 duration-200">
+
+      {/* Mobile Live Clock Display */}
+      <div className="flex items-center justify-between p-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800/90 border border-slate-100 dark:border-slate-700 text-xs font-semibold">
+        <div className="flex items-center gap-2">
+          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
+          <span className="text-slate-700 dark:text-slate-300">
+            {isHindi ? liveClock.dateStrHindi : liveClock.dateStr}
+          </span>
         </div>
-
+        <div className="font-mono font-bold text-sky-600 dark:text-sky-400">
+          {liveClock.timeStr} IST
+        </div>
       </div>
 
-      {/* Mobile Navigation Drawer */}
-      {isMobileMenuOpen && (
-        <div className="md:hidden border-t border-slate-100/80 dark:border-white/10 bg-white/95 dark:bg-black/95 backdrop-blur-2xl px-4 py-4 space-y-3 shadow-2xl animate-in slide-in-from-top-2 duration-200">
-          
-          {/* Mobile Live Clock Display */}
-          <div className="flex items-center justify-between p-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800/90 border border-slate-100 dark:border-slate-700 text-xs font-semibold">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-              <span className="text-slate-700 dark:text-slate-300">
-                {isHindi ? liveClock.dateStrHindi : liveClock.dateStr}
-              </span>
-            </div>
-            <div className="font-mono font-bold text-sky-600 dark:text-sky-400">
-              {liveClock.timeStr} IST
-            </div>
-          </div>
-          
 
-          {/* Emergency Helpline */}
-          <a
-            href="tel:112"
-            className="flex items-center justify-between p-2.5 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 text-red-700 dark:text-red-300 transition-colors"
-          >
-            <div className="flex items-center gap-2">
-              <PhoneCall className="w-4 h-4 text-red-600 dark:text-red-400 shrink-0" />
-              <span className="text-xs font-bold">
-                {isHindi ? 'राष्ट्रीय हेल्पलाइन: 112 / 1078' : 'Emergency Helpline: 112 / 1078'}
-              </span>
-            </div>
-            <span className="text-[10px] font-bold bg-red-600 text-white px-2.5 py-0.5 rounded-full">24x7</span>
-          </a>
+      {/* Emergency Helpline */}
+      <a
+        href="tel:112"
+        className="flex items-center justify-between p-2.5 rounded-2xl bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-900/60 text-red-700 dark:text-red-300 transition-colors"
+      >
+        <div className="flex items-center gap-2">
+          <PhoneCall className="w-4 h-4 text-red-600 dark:text-red-400 shrink-0" />
+          <span className="text-xs font-bold">
+            {isHindi ? 'राष्ट्रीय हेल्पलाइन: 112 / 1078' : 'Emergency Helpline: 112 / 1078'}
+          </span>
+        </div>
+        <span className="text-[10px] font-bold bg-red-600 text-white px-2.5 py-0.5 rounded-full">24x7</span>
+      </a>
 
-          {/* Navigation Pages */}
-          <div className="space-y-1 pt-1 border-t border-slate-100 dark:border-neutral-800">
-            <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 px-2 py-1">
-              {isHindi ? 'नेविगेशन पेज' : 'Navigation'}
-            </div>
+      {/* Navigation Pages */}
+      <div className="space-y-1 pt-1 border-t border-slate-100 dark:border-neutral-800">
+        <div className="text-[10px] font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 px-2 py-1">
+          {isHindi ? 'नेविगेशन पेज' : 'Navigation'}
+        </div>
 
-            {NAV_LINKS.map((link) => {
-              const isSelected = link.match.includes(location.pathname);
-              return (
-                <button
-                  key={link.path}
-                  onClick={() => {
-                    setIsMobileMenuOpen(false);
-                    if (link.path === '/' && location.pathname === '/') {
-                      window.scrollTo({ top: 0, behavior: 'smooth' });
-                    } else {
-                      navigate(link.path);
-                    }
-                  }}
-                  className={`w-full flex items-center justify-between p-2.5 rounded-2xl transition-colors text-left cursor-pointer ${
-                    isSelected
-                      ? 'bg-sky-50 dark:bg-sky-950/50 text-sky-700 dark:text-sky-300 font-bold border border-sky-200/60 dark:border-sky-800/60'
-                      : 'hover:bg-slate-100 dark:hover:bg-neutral-900 text-slate-800 dark:text-slate-200 font-medium'
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    {isSelected && (
-                      <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-                    )}
-                    <span className="text-xs truncate">{link.label}</span>
-                  </div>
-                  <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Mobile Language Switcher */}
-          <div className="pt-2 border-t border-slate-100 dark:border-neutral-800 flex items-center justify-between">
-            <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
-              {isHindi ? 'वेबसाइट भाषा / Language:' : 'Portal Language / भाषा:'}
-            </span>
+        {NAV_LINKS.map((link) => {
+          const isSelected = link.match.includes(location.pathname);
+          return (
             <button
+              key={link.path}
               onClick={() => {
                 setIsMobileMenuOpen(false);
-                setIsHindi(!isHindi);
+                if (link.path === '/' && location.pathname === '/') {
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else {
+                  navigate(link.path);
+                }
               }}
-              className="px-3.5 py-1.5 rounded-2xl text-xs font-bold text-sky-700 dark:text-sky-300 bg-slate-100 dark:bg-neutral-800 border border-slate-100 dark:border-neutral-700 cursor-pointer"
+              className={`w-full flex items-center justify-between p-2.5 rounded-2xl transition-colors text-left cursor-pointer ${isSelected
+                  ? 'bg-sky-50 dark:bg-sky-950/50 text-sky-700 dark:text-sky-300 font-bold border border-sky-200/60 dark:border-sky-800/60'
+                  : 'hover:bg-slate-100 dark:hover:bg-neutral-900 text-slate-800 dark:text-slate-200 font-medium'
+                }`}
             >
-              {isHindi ? 'English में देखें' : 'हिन्दी में देखें'}
+              <div className="flex items-center gap-2">
+                {isSelected && (
+                  <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+                )}
+                <span className="text-xs truncate">{link.label}</span>
+              </div>
+              <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
             </button>
-          </div>
+          );
+        })}
+      </div>
 
-        </div>
-      )}
-    </header>
+      {/* Mobile Language Switcher */}
+      <div className="pt-2 border-t border-slate-100 dark:border-neutral-800 flex items-center justify-between">
+        <span className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+          {isHindi ? 'वेबसाइट भाषा / Language:' : 'Portal Language / भाषा:'}
+        </span>
+        <button
+          onClick={() => {
+            setIsMobileMenuOpen(false);
+            setIsHindi(!isHindi);
+          }}
+          className="px-3.5 py-1.5 rounded-2xl text-xs font-bold text-sky-700 dark:text-sky-300 bg-slate-100 dark:bg-neutral-800 border border-slate-100 dark:border-neutral-700 cursor-pointer"
+        >
+          {isHindi ? 'English में देखें' : 'हिन्दी में देखें'}
+        </button>
+      </div>
+
+    </div>
+  )
+}
+    </header >
   );
 };
 
