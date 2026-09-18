@@ -174,7 +174,8 @@ export default function RainfallIntelligence() {
   const navigate = useNavigate();
   const liveClock = useLiveClock(1000);
 
-  const [isDarkMode, setIsDarkMode] = useState(() => document.documentElement.classList.contains('dark'));
+  const isDarkMode = false;
+  const setIsDarkMode = () => {};
   const [fontSizeOffset, setFontSizeOffset] = useState(() => {
     try { return parseInt(localStorage.getItem('vayu_font_offset') ?? '0', 10); } catch { return 0; }
   });
@@ -183,9 +184,8 @@ export default function RainfallIntelligence() {
   const [selectedStation, setSelectedStation] = useState(null);
 
   useEffect(() => {
-    if (isDarkMode) document.documentElement.classList.add('dark');
-    else document.documentElement.classList.remove('dark');
-  }, [isDarkMode]);
+    document.documentElement.classList.remove('dark');
+  }, []);
 
   useEffect(() => {
     const t = setTimeout(() => setIsLoading(false), 800);

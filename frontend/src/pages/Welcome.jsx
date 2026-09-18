@@ -74,11 +74,8 @@ const SERVICES_DATA = [
     teaser: 'Precipitation estimates & 850+ coastal rain gauges',
     teaserHindi: 'डॉपलर वर्षा एवं 850+ तटीय स्वचालित स्टेशन',
     accent: 'sky',
-    gradient: 'from-cyan-400/20 via-sky-500/5 to-transparent',
-    borderHover: 'hover:border-sky-400/70 dark:hover:border-sky-400/60 hover:shadow-[0_8px_28px_rgba(14,165,233,0.18)]',
-    iconBg: 'bg-sky-500/10 dark:bg-sky-400/15 border-sky-300/60 dark:border-sky-400/30 text-sky-600 dark:text-sky-300 shadow-[0_0_14px_rgba(14,165,233,0.2)] group-hover:scale-105 backdrop-blur-md',
-    tagClass: 'text-sky-800 dark:text-sky-300 bg-sky-500/10 dark:bg-sky-400/15 border-sky-300/60 dark:border-sky-400/30 shadow-[0_0_10px_rgba(14,165,233,0.12)] backdrop-blur-md',
-    topBar: 'bg-sky-500',
+    iconBg: 'bg-sky-50 text-sky-600 dark:bg-sky-950/50 dark:text-sky-400 border border-sky-200/60 dark:border-sky-800/50',
+    tagClass: 'text-sky-700 dark:text-sky-300 bg-sky-50/80 dark:bg-sky-950/40 border border-sky-200/60 dark:border-sky-800/50',
     icon: CloudRain,
     route: '/rainfall-intelligence',
     routeLabel: 'Open Rainfall Intelligence Dashboard',
@@ -102,11 +99,8 @@ const SERVICES_DATA = [
     teaser: 'Seasonal circulation, pressure patterns & environmental conditions',
     teaserHindi: 'मौसमी परिसंचरण, दबाव पैटर्न एवं पर्यावरणीय स्थितियां',
     accent: 'amber',
-    gradient: 'from-amber-400/20 via-amber-500/5 to-transparent',
-    borderHover: 'hover:border-amber-400/70 dark:hover:border-amber-400/60 hover:shadow-[0_8px_28px_rgba(245,158,11,0.18)]',
-    iconBg: 'bg-amber-500/10 dark:bg-amber-400/15 border-amber-300/60 dark:border-amber-400/30 text-amber-600 dark:text-amber-300 shadow-[0_0_14px_rgba(245,158,11,0.2)] group-hover:scale-105 backdrop-blur-md',
-    tagClass: 'text-amber-800 dark:text-amber-300 bg-amber-500/10 dark:bg-amber-400/15 border-amber-300/60 dark:border-amber-400/30 shadow-[0_0_10px_rgba(245,158,11,0.12)] backdrop-blur-md',
-    topBar: 'bg-amber-500',
+    iconBg: 'bg-amber-50 text-amber-600 dark:bg-amber-950/50 dark:text-amber-400 border border-amber-200/60 dark:border-amber-800/50',
+    tagClass: 'text-amber-700 dark:text-amber-300 bg-amber-50/80 dark:bg-amber-950/40 border border-amber-200/60 dark:border-amber-800/50',
     icon: Wind,
     route: '/atmospheric-patterns',
     routeLabel: 'Open Atmospheric & Monsoon Dashboard',
@@ -130,11 +124,8 @@ const SERVICES_DATA = [
     teaser: 'Multi-spectral satellite tracks & storm surge hydrodynamics',
     teaserHindi: 'उपग्रह तूफान ट्रैक, ज्वार एवं लैंडफॉल मैट्रिक्स',
     accent: 'emerald',
-    gradient: 'from-emerald-400/20 via-teal-500/5 to-transparent',
-    borderHover: 'hover:border-emerald-400/70 dark:hover:border-emerald-400/60 hover:shadow-[0_8px_28px_rgba(16,185,129,0.18)]',
-    iconBg: 'bg-emerald-500/10 dark:bg-emerald-400/15 border-emerald-300/60 dark:border-emerald-400/30 text-emerald-600 dark:text-emerald-300 shadow-[0_0_14px_rgba(16,185,129,0.2)] group-hover:scale-105 backdrop-blur-md',
-    tagClass: 'text-emerald-800 dark:text-emerald-300 bg-emerald-500/10 dark:bg-emerald-400/15 border-emerald-300/60 dark:border-emerald-400/30 shadow-[0_0_10px_rgba(16,185,129,0.12)] backdrop-blur-md',
-    topBar: 'bg-emerald-500',
+    iconBg: 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/50 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/50',
+    tagClass: 'text-emerald-700 dark:text-emerald-300 bg-emerald-50/80 dark:bg-emerald-950/40 border border-emerald-200/60 dark:border-emerald-800/50',
     icon: 'cyclone',
     route: '/cyclone-intelligence',
     routeLabel: 'Open Cyclone Intelligence Dashboard',
@@ -158,11 +149,8 @@ const SERVICES_DATA = [
     teaser: 'ENSO, IOD, sea surface temperature and other climate factors influencing cyclone formation',
     teaserHindi: 'ईएनएसओ, आईओडी, समुद्री सतह तापमान एवं चक्रवात निर्माण को प्रभावित करने वाले जलवायु कारक',
     accent: 'rose',
-    gradient: 'from-rose-400/20 via-purple-500/5 to-transparent',
-    borderHover: 'hover:border-rose-400/70 dark:hover:border-rose-400/60 hover:shadow-[0_8px_28px_rgba(244,63,94,0.18)]',
-    iconBg: 'bg-rose-500/10 dark:bg-rose-400/15 border-rose-300/60 dark:border-rose-400/30 text-rose-600 dark:text-rose-300 shadow-[0_0_14px_rgba(244,63,94,0.2)] group-hover:scale-105 backdrop-blur-md',
-    tagClass: 'text-rose-800 dark:text-rose-300 bg-rose-500/10 dark:bg-rose-400/15 border-rose-300/60 dark:border-rose-400/30 shadow-[0_0_10px_rgba(244,63,94,0.12)] backdrop-blur-md',
-    topBar: 'bg-rose-500',
+    iconBg: 'bg-rose-50 text-rose-600 dark:bg-rose-950/50 dark:text-rose-400 border border-rose-200/60 dark:border-rose-800/50',
+    tagClass: 'text-rose-700 dark:text-rose-300 bg-rose-50/80 dark:bg-rose-950/40 border border-rose-200/60 dark:border-rose-800/50',
     icon: SunMedium,
     route: '/climate-ocean-anomalies',
     routeLabel: 'Open Climate & Ocean Anomalies Dashboard',
@@ -1150,9 +1138,8 @@ const Welcome = () => {
     setAnimState(prev => ({ ...prev, isOpen: false }));
   }, []);
 
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    return document.documentElement.classList.contains('dark') || localStorage.getItem('theme') === 'dark';
-  });
+  const isDarkMode = false;
+  const setIsDarkMode = () => {};
   const [fontSizeOffset, setFontSizeOffset] = useState(() => {
     try {
       const saved = localStorage.getItem('vayu_font_offset');
@@ -1377,29 +1364,12 @@ const Welcome = () => {
     return () => clearInterval(interval);
   }, []);
 
-  // Sync dark mode class and colorScheme with root html element and localStorage
+  // Enforce light mode and strip any legacy dark class
   useEffect(() => {
     const root = document.documentElement;
-    if (isDarkMode) {
-      root.classList.add('dark');
-      root.style.colorScheme = 'dark';
-      localStorage.setItem('theme', 'dark');
-    } else {
-      root.classList.remove('dark');
-      root.style.colorScheme = 'light';
-      localStorage.setItem('theme', 'light');
-    }
-  }, [isDarkMode]);
-
-  // Keep dark mode state in sync if changed across tabs or navigation
-  useEffect(() => {
-    const handleStorage = (e) => {
-      if (e.key === 'theme') {
-        setIsDarkMode(e.newValue === 'dark');
-      }
-    };
-    window.addEventListener('storage', handleStorage);
-    return () => window.removeEventListener('storage', handleStorage);
+    root.classList.remove('dark');
+    root.style.colorScheme = 'light';
+    try { localStorage.removeItem('theme'); } catch (e) {}
   }, []);
 
   // Dynamically scale root document font-size so all rem-based typography scales with A- / A+
@@ -1661,15 +1631,15 @@ const Welcome = () => {
           {/* 4 Playful & Interactive Metric Blocks */}
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
             {/* Card 1: Sustained Wind */}
-            <div className="group p-4 rounded-3xl cursor-default transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.02] hover:shadow-[0_14px_32px_rgba(14,165,233,0.18)] dark:hover:shadow-[0_16px_36px_rgba(14,165,233,0.25)] border border-slate-200/80 dark:border-white/10 hover:border-sky-400 dark:hover:border-sky-400/60 bg-white/90 dark:!bg-[#0c1322]/90 relative overflow-hidden flex flex-col justify-between select-none">
-              <div className="pointer-events-none absolute inset-x-4 top-0 h-0.5 bg-gradient-to-r from-transparent via-sky-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="group p-4 rounded-3xl cursor-default transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.02] hover:shadow-[0_14px_32px_rgba(14,165,233,0.18)] dark:hover:shadow-[0_16px_36px_rgba(14,165,233,0.25)] border border-slate-200/80 dark:border-white/10 hover:border-sky-400 dark:hover:border-sky-400/60 bg-white/90 dark:bg-slate-900/80 dark:bg-gradient-to-b dark:from-sky-500/[0.08] dark:to-slate-900/80 backdrop-blur-xl relative overflow-hidden flex flex-col justify-between select-none">
+              <div className="pointer-events-none absolute inset-x-4 top-0 h-0.5 bg-gradient-to-r from-transparent via-sky-400 to-transparent opacity-0 dark:opacity-40 group-hover:opacity-100 transition-opacity" />
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <div className="flex items-center gap-1.5">
                     <div className="p-1.5 rounded-xl bg-sky-500/10 dark:bg-sky-400/15 border border-sky-300/60 dark:border-sky-400/30 text-sky-600 dark:text-sky-400 group-hover:rotate-45 group-hover:scale-110 transition-transform duration-500 shadow-2xs">
                       <Wind className="w-3.5 h-3.5" />
                     </div>
-                    <span className="text-xs font-bold text-slate-600 dark:text-slate-300">
+                    <span className="text-xs font-bold text-slate-700 dark:text-slate-200">
                       {isHindi ? 'सतत पवन गति' : 'Sustained Wind'}
                     </span>
                   </div>
@@ -1680,26 +1650,26 @@ const Welcome = () => {
                   <span className="text-xs font-mono font-bold text-sky-600 dark:text-sky-400">{isHindi ? 'किमी/घंटा' : 'km/h'}</span>
                 </div>
               </div>
-              <div className="mt-3 pt-2 border-t border-slate-100 dark:border-white/5 flex items-center justify-between text-[11px]">
-                <span className="font-mono font-semibold text-slate-500 dark:text-slate-400">
+              <div className="mt-3 pt-2 border-t border-slate-100 dark:border-white/[0.08] flex items-center justify-between text-[11px]">
+                <span className="font-mono font-medium text-slate-500 dark:text-slate-400">
                   {isHindi ? `झोंके ${current.gusts} किमी/घं` : `Gusts ${current.gusts} km/h`}
                 </span>
-                <span className="inline-flex items-center gap-0.5 text-[9px] font-mono font-bold text-sky-700 dark:text-sky-300 bg-sky-500/10 dark:bg-sky-400/15 px-1.5 py-0.5 rounded-md">
+                <span className="inline-flex items-center gap-0.5 text-[9px] font-mono font-bold text-sky-700 dark:text-sky-300 bg-sky-500/10 dark:bg-sky-400/15 border border-sky-300/40 dark:border-sky-400/25 px-1.5 py-0.5 rounded-md">
                   T{Math.min(6, Math.max(1, Math.round((current.wind || 40) / 20)))} Beaufort
                 </span>
               </div>
             </div>
 
             {/* Card 2: Central Pressure */}
-            <div className="group p-4 rounded-3xl cursor-default transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.02] hover:shadow-[0_14px_32px_rgba(99,102,241,0.18)] dark:hover:shadow-[0_16px_36px_rgba(99,102,241,0.25)] border border-slate-200/80 dark:border-white/10 hover:border-indigo-400 dark:hover:border-indigo-400/60 bg-white/90 dark:!bg-[#0f1124]/90 relative overflow-hidden flex flex-col justify-between select-none">
-              <div className="pointer-events-none absolute inset-x-4 top-0 h-0.5 bg-gradient-to-r from-transparent via-indigo-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="group p-4 rounded-3xl cursor-default transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.02] hover:shadow-[0_14px_32px_rgba(99,102,241,0.18)] dark:hover:shadow-[0_16px_36px_rgba(99,102,241,0.25)] border border-slate-200/80 dark:border-white/10 hover:border-indigo-400 dark:hover:border-indigo-400/60 bg-white/90 dark:bg-slate-900/80 dark:bg-gradient-to-b dark:from-indigo-500/[0.08] dark:to-slate-900/80 backdrop-blur-xl relative overflow-hidden flex flex-col justify-between select-none">
+              <div className="pointer-events-none absolute inset-x-4 top-0 h-0.5 bg-gradient-to-r from-transparent via-indigo-400 to-transparent opacity-0 dark:opacity-40 group-hover:opacity-100 transition-opacity" />
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <div className="flex items-center gap-1.5">
                     <div className="p-1.5 rounded-xl bg-indigo-500/10 dark:bg-indigo-400/15 border border-indigo-300/60 dark:border-indigo-400/30 text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform duration-300 shadow-2xs">
                       <Gauge className="w-3.5 h-3.5" />
                     </div>
-                    <span className="text-xs font-bold text-slate-600 dark:text-slate-300">
+                    <span className="text-xs font-bold text-slate-700 dark:text-slate-200">
                       {isHindi ? 'केंद्रीय दबाव' : 'Central Pressure'}
                     </span>
                   </div>
@@ -1710,48 +1680,48 @@ const Welcome = () => {
                   <span className="text-xs font-mono font-bold text-indigo-600 dark:text-indigo-400">{isHindi ? 'एचपीए' : 'hPa'}</span>
                 </div>
               </div>
-              <div className="mt-3 pt-2 border-t border-slate-100 dark:border-white/5 flex items-center justify-between text-[11px]">
+              <div className="mt-3 pt-2 border-t border-slate-100 dark:border-white/[0.08] flex items-center justify-between text-[11px]">
                 <span className="font-medium text-slate-500 dark:text-slate-400">
                   {isHindi ? 'बैरोमीटर रीडिंग' : 'Barometric Fix'}
                 </span>
-                <span className="inline-flex items-center gap-0.5 text-[9px] font-mono font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-500/10 dark:bg-indigo-400/15 px-1.5 py-0.5 rounded-md">
+                <span className="inline-flex items-center gap-0.5 text-[9px] font-mono font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-500/10 dark:bg-indigo-400/15 border border-indigo-300/40 dark:border-indigo-400/25 px-1.5 py-0.5 rounded-md">
                   {current.pressure < 990 ? 'Deep Eye' : 'Low Core'}
                 </span>
               </div>
             </div>
 
             {/* Card 3: Next 48h Formation Risk */}
-            <div className="group p-4 rounded-3xl cursor-default transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.02] hover:shadow-[0_14px_32px_rgba(245,158,11,0.2)] dark:hover:shadow-[0_16px_36px_rgba(245,158,11,0.28)] border border-slate-200/80 dark:border-white/10 hover:border-amber-400 dark:hover:border-amber-400/60 bg-white/90 dark:!bg-[#191209]/90 relative overflow-hidden flex flex-col justify-between select-none">
-              <div className="pointer-events-none absolute inset-x-4 top-0 h-0.5 bg-gradient-to-r from-transparent via-amber-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="group p-4 rounded-3xl cursor-default transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.02] hover:shadow-[0_14px_32px_rgba(245,158,11,0.2)] dark:hover:shadow-[0_16px_36px_rgba(245,158,11,0.28)] border border-slate-200/80 dark:border-white/10 hover:border-amber-400 dark:hover:border-amber-400/60 bg-white/90 dark:bg-slate-900/80 dark:bg-gradient-to-b dark:from-amber-500/[0.08] dark:to-slate-900/80 backdrop-blur-xl relative overflow-hidden flex flex-col justify-between select-none">
+              <div className="pointer-events-none absolute inset-x-4 top-0 h-0.5 bg-gradient-to-r from-transparent via-amber-400 to-transparent opacity-0 dark:opacity-40 group-hover:opacity-100 transition-opacity" />
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <div className="flex items-center gap-1.5">
                     <div className="p-1.5 rounded-xl bg-amber-500/10 dark:bg-amber-400/15 border border-amber-300/60 dark:border-amber-400/30 text-amber-600 dark:text-amber-400 group-hover:scale-125 transition-transform duration-300 shadow-2xs">
                       <Activity className="w-3.5 h-3.5 animate-pulse" />
                     </div>
-                    <span className="text-xs font-bold text-slate-600 dark:text-slate-300">
+                    <span className="text-xs font-bold text-slate-700 dark:text-slate-200">
                       {isHindi ? 'अगले 48h संभावना' : 'Next 48h Formation'}
                     </span>
                   </div>
                   <InfoTooltip term="formation_probability" isHindi={isHindi} />
                 </div>
-                <div className="text-2xl sm:text-3xl font-heading font-black bg-gradient-to-r from-amber-600 via-orange-500 to-amber-500 dark:from-amber-400 dark:via-orange-400 dark:to-amber-300 bg-clip-text text-transparent mt-1">
+                <div className="text-2xl sm:text-3xl font-heading font-black bg-gradient-to-r from-amber-500 via-amber-400 to-amber-300 dark:from-amber-400 dark:via-amber-300 dark:to-yellow-200 bg-clip-text text-transparent mt-1">
                   {current.risk48h}
                 </div>
               </div>
-              <div className="mt-3 pt-2 border-t border-slate-100 dark:border-white/5 space-y-1.5">
+              <div className="mt-3 pt-2 border-t border-slate-100 dark:border-white/[0.08] space-y-1.5">
                 <div className="flex items-center justify-between text-[11px]">
                   <span className="font-medium text-slate-500 dark:text-slate-400">
                     {isHindi ? 'ResNet18 प्रायिकता' : 'ResNet18 Confidence'}
                   </span>
-                  <span className="font-mono text-[9px] font-bold text-amber-700 dark:text-amber-300 bg-amber-500/10 dark:bg-amber-400/15 px-1.5 py-0.5 rounded-md">
+                  <span className="font-mono text-[9px] font-bold text-amber-700 dark:text-amber-300 bg-amber-500/10 dark:bg-amber-400/15 border border-amber-300/40 dark:border-amber-400/25 px-1.5 py-0.5 rounded-md">
                     HIGH PROB
                   </span>
                 </div>
                 {/* Playful mini progress bar */}
-                <div className="h-1.5 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                <div className="h-1.5 w-full bg-slate-100 dark:bg-white/[0.08] rounded-full overflow-hidden">
                   <div 
-                    className="h-full bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500 rounded-full transition-all duration-700" 
+                    className="h-full bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500 rounded-full transition-all duration-700 shadow-[0_0_8px_rgba(245,158,11,0.35)]" 
                     style={{ width: current.risk48h ? (current.risk48h.includes('%') ? current.risk48h : `${parseInt(current.risk48h) || 68}%`) : '68%' }}
                   />
                 </div>
@@ -1759,32 +1729,32 @@ const Welcome = () => {
             </div>
 
             {/* Card 4: Movement & Direction */}
-            <div className="group p-4 rounded-3xl cursor-default transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.02] hover:shadow-[0_14px_32px_rgba(16,185,129,0.18)] dark:hover:shadow-[0_16px_36px_rgba(16,185,129,0.25)] border border-slate-200/80 dark:border-white/10 hover:border-emerald-400 dark:hover:border-emerald-400/60 bg-white/90 dark:!bg-[#0a1815]/90 relative overflow-hidden flex flex-col justify-between select-none">
-              <div className="pointer-events-none absolute inset-x-4 top-0 h-0.5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="group p-4 rounded-3xl cursor-default transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.02] hover:shadow-[0_14px_32px_rgba(16,185,129,0.18)] dark:hover:shadow-[0_16px_36px_rgba(16,185,129,0.25)] border border-slate-200/80 dark:border-white/10 hover:border-emerald-400 dark:hover:border-emerald-400/60 bg-white/90 dark:bg-slate-900/80 dark:bg-gradient-to-b dark:from-emerald-500/[0.08] dark:to-slate-900/80 backdrop-blur-xl relative overflow-hidden flex flex-col justify-between select-none">
+              <div className="pointer-events-none absolute inset-x-4 top-0 h-0.5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent opacity-0 dark:opacity-40 group-hover:opacity-100 transition-opacity" />
               <div>
                 <div className="flex items-center justify-between mb-1.5">
                   <div className="flex items-center gap-1.5">
                     <div className="p-1.5 rounded-xl bg-emerald-500/10 dark:bg-emerald-400/15 border border-emerald-300/60 dark:border-emerald-400/30 text-emerald-600 dark:text-emerald-400 group-hover:rotate-180 transition-transform duration-700 shadow-2xs">
                       <Compass className="w-3.5 h-3.5" />
                     </div>
-                    <span className="text-xs font-bold text-slate-600 dark:text-slate-300">
+                    <span className="text-xs font-bold text-slate-700 dark:text-slate-200">
                       {isHindi ? 'गति एवं दिशा' : 'Movement'}
                     </span>
                   </div>
                   <InfoTooltip term="movement" isHindi={isHindi} />
                 </div>
                 <div className="text-xl sm:text-2xl font-heading font-black text-slate-950 dark:text-white flex items-center gap-1.5 mt-1">
-                  <Navigation2 className="w-4 h-4 text-emerald-500 -rotate-45 group-hover:-rotate-90 transition-transform duration-500 shrink-0" />
+                  <Navigation2 className="w-4 h-4 text-emerald-500 dark:text-emerald-400 -rotate-45 group-hover:-rotate-90 transition-transform duration-500 shrink-0" />
                   <span className="truncate">
                     {isHindi ? (current.directionHindi || getDirectionName(current.direction, isHindi)) : current.direction}
                   </span>
                 </div>
               </div>
-              <div className="mt-3 pt-2 border-t border-slate-100 dark:border-white/5 flex items-center justify-between text-[11px]">
-                <span className="font-mono font-semibold text-slate-500 dark:text-slate-400">
+              <div className="mt-3 pt-2 border-t border-slate-100 dark:border-white/[0.08] flex items-center justify-between text-[11px]">
+                <span className="font-mono font-medium text-slate-500 dark:text-slate-400">
                   {isHindi ? `गति ${current.speed} किमी/घं` : `Speed ${current.speed} km/h`}
                 </span>
-                <span className="inline-flex items-center gap-0.5 text-[9px] font-mono font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 dark:bg-emerald-400/15 px-1.5 py-0.5 rounded-md">
+                <span className="inline-flex items-center gap-0.5 text-[9px] font-mono font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 dark:bg-emerald-400/15 border border-emerald-300/40 dark:border-emerald-400/25 px-1.5 py-0.5 rounded-md">
                   Active Track
                 </span>
               </div>
@@ -1939,69 +1909,55 @@ const Welcome = () => {
                OUR SERVICES SECTION (RAINFALL, MONSOON, CYCLONE, CLIMATE SERVICES)
                ========================================================================= */}
           <div className="pt-2 sm:pt-2.5 relative">
-            {/* Ambient luminous color orbs - subtle and balanced, without dirty color spill */}
-            <div className="pointer-events-none absolute -top-16 left-12 w-96 h-96 bg-sky-500/10 dark:bg-sky-500/5 rounded-full blur-3xl" />
-            <div className="pointer-events-none absolute -bottom-16 right-12 w-96 h-96 bg-indigo-500/10 dark:bg-indigo-500/5 rounded-full blur-3xl" />
-
-            <div className="border-b border-slate-200/80 dark:border-white/10 pb-1.5 mb-3 flex items-center justify-between relative z-10">
-              <h2 className="text-xs sm:text-sm font-black tracking-wider uppercase text-slate-950 dark:text-white font-heading flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+            <div className="border-b border-slate-200 dark:border-slate-800 pb-2 mb-3.5 flex items-center justify-between">
+              <h2 className="text-xs sm:text-sm font-bold tracking-wider uppercase text-slate-900 dark:text-white font-heading flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-500" />
                 <span>{isHindi ? 'हमारी सेवाएं (OUR SERVICES)' : 'OUR SERVICES'}</span>
               </h2>
-              <span className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-medium hidden sm:inline">
+              <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium hidden sm:inline">
                 {isHindi ? 'भारत मौसम विज्ञान विभाग (IMD) अधिकृत मौसम सेवाएं' : 'National Meteorological & Early Warning Portals'}
               </span>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-3.5 relative z-10">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               {SERVICES_DATA.map((srv) => {
                 const IconComponent = srv.icon === 'cyclone' ? CycloneSwirlIcon : srv.icon;
                 return (
-                  <IOSGlassCard
+                  <div
                     key={srv.id}
                     onClick={() => navigate(srv.route)}
-                    wrapperClassName="h-full"
-                    className={`p-4 sm:p-4.5 rounded-2xl sm:rounded-3xl cursor-pointer group flex flex-col justify-between h-full dark:!bg-slate-900/85 dark:hover:!bg-slate-900/95 dark:border-white/10 ${srv.borderHover} transition-all duration-300`}
+                    className="p-4 sm:p-5 rounded-xl cursor-pointer group flex flex-col justify-between h-full bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-xs transition-colors duration-150"
                   >
-                    {/* Ambient corner jewel glow - crisp and subtle */}
-                    <div className={`absolute -right-8 -top-8 w-36 h-36 rounded-full bg-gradient-to-br ${srv.gradient} blur-xl pointer-events-none opacity-40 group-hover:opacity-90 group-hover:scale-125 transition-all duration-500`} />
-                    <div className="pointer-events-none absolute -bottom-10 -left-10 w-28 h-28 rounded-full bg-slate-200/30 dark:bg-white/[0.015] blur-xl" />
-
-                    {/* Top colored accent line on hover */}
-                    <div className={`absolute top-0 inset-x-0 h-0.5 ${srv.topBar} opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10`} />
-
-                    <div className="relative z-10">
+                    <div>
                       {/* Card Header: Icon Badge + Pill Tag */}
                       <div className="flex items-center justify-between gap-2 mb-3">
-                        <div className={`p-2.5 rounded-2xl border ${srv.iconBg} transition-all duration-300 shadow-xs flex items-center justify-center`}>
-                          <IconComponent className="w-5 h-5 sm:w-6 sm:h-6 group-hover:scale-110 transition-transform duration-300" />
+                        <div className={`w-9 h-9 rounded-lg border ${srv.iconBg} flex items-center justify-center shrink-0`}>
+                          <IconComponent className="w-5 h-5" />
                         </div>
-                        <span className={`text-[9.5px] sm:text-[10px] font-bold uppercase tracking-wider px-2.5 py-0.5 rounded-full border ${srv.tagClass} shrink-0`}>
+                        <span className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-md border ${srv.tagClass} shrink-0`}>
                           {isHindi ? srv.tagHindi : srv.tag}
                         </span>
                       </div>
 
                       {/* Service Title */}
-                      <h3 className="font-heading font-black text-xs sm:text-[13px] uppercase tracking-wide leading-tight text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-300 transition-colors">
+                      <h3 className="font-heading font-bold text-xs sm:text-[13px] uppercase tracking-wide leading-snug text-slate-900 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-sky-400 transition-colors">
                         {isHindi ? srv.titleHindi : srv.title}
                       </h3>
 
                       {/* Teaser Description */}
-                      <p className="text-[11px] text-slate-500 dark:text-slate-400 font-medium leading-relaxed mt-1.5 line-clamp-2">
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 font-normal leading-relaxed mt-1.5 line-clamp-2">
                         {isHindi ? srv.teaserHindi : srv.teaser}
                       </p>
                     </div>
 
-                    {/* Card Bottom: Read More Action with animated arrow */}
-                    <div className="pt-3 mt-3 border-t border-slate-200/60 dark:border-white/10 flex items-center justify-between text-slate-600 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors relative z-10">
-                      <span className="text-[11px] font-bold">
+                    {/* Card Bottom: Read More Action with subtle arrow */}
+                    <div className="pt-3 mt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-100 transition-colors">
+                      <span className="text-[11px] font-medium">
                         {isHindi ? 'विवरण देखें' : 'Explore Service'}
                       </span>
-                      <div className="p-1 rounded-xl bg-white/80 dark:bg-slate-800/80 group-hover:bg-slate-900 group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-slate-950 border border-slate-200/80 dark:border-white/15 backdrop-blur-md shadow-2xs transition-all">
-                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                      </div>
+                      <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-700 dark:group-hover:text-slate-200 group-hover:translate-x-0.5 transition-transform duration-150" />
                     </div>
-                  </IOSGlassCard>
+                  </div>
                 );
               })}
             </div>

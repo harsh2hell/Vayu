@@ -66,20 +66,13 @@ const CityTracker = () => {
     setAnimState(prev => ({ ...prev, isOpen: false }));
   }, []);
 
-  // Dark mode state
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    return document.documentElement.classList.contains('dark') || localStorage.getItem('theme') === 'dark';
-  });
+  // Dark mode state (permanently disabled)
+  const isDarkMode = false;
+  const setIsDarkMode = () => {};
 
   useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-    }
-  }, [isDarkMode]);
+    document.documentElement.classList.remove('dark');
+  }, []);
 
   // Font size offset
   const [fontSizeOffset, setFontSizeOffset] = useState(0);

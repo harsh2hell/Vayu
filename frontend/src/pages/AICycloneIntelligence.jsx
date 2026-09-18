@@ -38,9 +38,8 @@ const AICycloneIntelligence = () => {
   const liveClock = useLiveClock(1000);
 
   // Global Theme & Preferences
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    return document.documentElement.classList.contains('dark');
-  });
+  const isDarkMode = false;
+  const setIsDarkMode = () => {};
   const [isHindi, setIsHindi] = useState(false);
   const [fontSizeOffset, setFontSizeOffset] = useState(() => {
     try {
@@ -51,14 +50,10 @@ const AICycloneIntelligence = () => {
     }
   });
 
-  // Sync Dark Mode class with root document
+  // Enforce Light Mode
   useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [isDarkMode]);
+    document.documentElement.classList.remove('dark');
+  }, []);
 
   // Active Module Tab State
   // 'identification' | 'classification' | 'multisource' | 'prediction' | 'benchmarks'
