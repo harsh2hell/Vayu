@@ -303,7 +303,7 @@ const SafetyUpdates = ({ initialTab }) => {
                 </IOSGlassCard>
 
                 {/* Special Tropical Weather Outlook */}
-                <div className="border border-slate-100 dark:border-slate-800 rounded-2xl sm:rounded-3xl bg-white dark:bg-slate-800/90 p-5 sm:p-6 shadow-sm space-y-3.5 transition-all">
+                <IOSGlassCard className="rounded-2xl sm:rounded-3xl p-5 sm:p-6 shadow-sm space-y-3.5">
                   <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
                     <div className="flex items-center gap-2">
                       <span className="font-bold text-slate-950 dark:text-white px-2.5 py-0.5 rounded-lg bg-slate-100 dark:bg-slate-800 border border-slate-100 dark:border-slate-700">
@@ -340,7 +340,7 @@ const SafetyUpdates = ({ initialTab }) => {
                       <span>{isHindi ? '5-दिवसीय दृष्टिकोण डाउनलोड करें (PDF)' : 'Download 5-Day Outlook (PDF)'}</span>
                     </button>
                   </div>
-                </div>
+                </IOSGlassCard>
 
               </div>
 

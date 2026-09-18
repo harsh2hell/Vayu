@@ -1625,137 +1625,6 @@ const Welcome = () => {
             </div>
           </div>
 
-<<<<<<< HEAD
-          {/* 4 Playful & Interactive Metric Blocks */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
-            {/* Card 1: Sustained Wind */}
-            <div className="group p-4 rounded-3xl cursor-default transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.02] hover:shadow-[0_14px_32px_rgba(14,165,233,0.18)] dark:hover:shadow-[0_16px_36px_rgba(14,165,233,0.25)] border border-slate-200/80 dark:border-white/10 hover:border-sky-400 dark:hover:border-sky-400/60 bg-white/90 dark:bg-slate-900/80 dark:bg-gradient-to-b dark:from-sky-500/[0.08] dark:to-slate-900/80 backdrop-blur-xl relative overflow-hidden flex flex-col justify-between select-none">
-              <div className="pointer-events-none absolute inset-x-4 top-0 h-0.5 bg-gradient-to-r from-transparent via-sky-400 to-transparent opacity-0 dark:opacity-40 group-hover:opacity-100 transition-opacity" />
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <div className="flex items-center gap-1.5">
-                    <div className="p-1.5 rounded-xl bg-sky-500/10 dark:bg-sky-400/15 border border-sky-300/60 dark:border-sky-400/30 text-sky-600 dark:text-sky-400 group-hover:rotate-45 group-hover:scale-110 transition-transform duration-500 shadow-2xs">
-                      <Wind className="w-3.5 h-3.5" />
-                    </div>
-                    <span className="text-xs font-bold text-slate-700 dark:text-slate-200">
-                      {isHindi ? 'सतत पवन गति' : 'Sustained Wind'}
-                    </span>
-                  </div>
-                  <InfoTooltip term="sustained_wind" isHindi={isHindi} />
-                </div>
-                <div className="text-2xl sm:text-3xl font-heading font-black text-slate-950 dark:text-white flex items-baseline gap-1 mt-1">
-                  <span>{current.wind}</span>
-                  <span className="text-xs font-mono font-bold text-sky-600 dark:text-sky-400">{isHindi ? 'किमी/घंटा' : 'km/h'}</span>
-                </div>
-              </div>
-              <div className="mt-3 pt-2 border-t border-slate-100 dark:border-white/[0.08] flex items-center justify-between text-[11px]">
-                <span className="font-mono font-medium text-slate-500 dark:text-slate-400">
-                  {isHindi ? `झोंके ${current.gusts} किमी/घं` : `Gusts ${current.gusts} km/h`}
-                </span>
-                <span className="inline-flex items-center gap-0.5 text-[9px] font-mono font-bold text-sky-700 dark:text-sky-300 bg-sky-500/10 dark:bg-sky-400/15 border border-sky-300/40 dark:border-sky-400/25 px-1.5 py-0.5 rounded-md">
-                  T{Math.min(6, Math.max(1, Math.round((current.wind || 40) / 20)))} Beaufort
-                </span>
-              </div>
-            </div>
-
-            {/* Card 2: Central Pressure */}
-            <div className="group p-4 rounded-3xl cursor-default transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.02] hover:shadow-[0_14px_32px_rgba(99,102,241,0.18)] dark:hover:shadow-[0_16px_36px_rgba(99,102,241,0.25)] border border-slate-200/80 dark:border-white/10 hover:border-indigo-400 dark:hover:border-indigo-400/60 bg-white/90 dark:bg-slate-900/80 dark:bg-gradient-to-b dark:from-indigo-500/[0.08] dark:to-slate-900/80 backdrop-blur-xl relative overflow-hidden flex flex-col justify-between select-none">
-              <div className="pointer-events-none absolute inset-x-4 top-0 h-0.5 bg-gradient-to-r from-transparent via-indigo-400 to-transparent opacity-0 dark:opacity-40 group-hover:opacity-100 transition-opacity" />
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <div className="flex items-center gap-1.5">
-                    <div className="p-1.5 rounded-xl bg-indigo-500/10 dark:bg-indigo-400/15 border border-indigo-300/60 dark:border-indigo-400/30 text-indigo-600 dark:text-indigo-400 group-hover:scale-110 transition-transform duration-300 shadow-2xs">
-                      <Gauge className="w-3.5 h-3.5" />
-                    </div>
-                    <span className="text-xs font-bold text-slate-700 dark:text-slate-200">
-                      {isHindi ? 'केंद्रीय दबाव' : 'Central Pressure'}
-                    </span>
-                  </div>
-                  <InfoTooltip term="central_pressure" isHindi={isHindi} />
-                </div>
-                <div className="text-2xl sm:text-3xl font-heading font-black text-slate-950 dark:text-white flex items-baseline gap-1 mt-1">
-                  <span>{current.pressure}</span>
-                  <span className="text-xs font-mono font-bold text-indigo-600 dark:text-indigo-400">{isHindi ? 'एचपीए' : 'hPa'}</span>
-                </div>
-              </div>
-              <div className="mt-3 pt-2 border-t border-slate-100 dark:border-white/[0.08] flex items-center justify-between text-[11px]">
-                <span className="font-medium text-slate-500 dark:text-slate-400">
-                  {isHindi ? 'बैरोमीटर रीडिंग' : 'Barometric Fix'}
-                </span>
-                <span className="inline-flex items-center gap-0.5 text-[9px] font-mono font-bold text-indigo-700 dark:text-indigo-300 bg-indigo-500/10 dark:bg-indigo-400/15 border border-indigo-300/40 dark:border-indigo-400/25 px-1.5 py-0.5 rounded-md">
-                  {current.pressure < 990 ? 'Deep Eye' : 'Low Core'}
-                </span>
-              </div>
-            </div>
-
-            {/* Card 3: Next 48h Formation Risk */}
-            <div className="group p-4 rounded-3xl cursor-default transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.02] hover:shadow-[0_14px_32px_rgba(245,158,11,0.2)] dark:hover:shadow-[0_16px_36px_rgba(245,158,11,0.28)] border border-slate-200/80 dark:border-white/10 hover:border-amber-400 dark:hover:border-amber-400/60 bg-white/90 dark:bg-slate-900/80 dark:bg-gradient-to-b dark:from-amber-500/[0.08] dark:to-slate-900/80 backdrop-blur-xl relative overflow-hidden flex flex-col justify-between select-none">
-              <div className="pointer-events-none absolute inset-x-4 top-0 h-0.5 bg-gradient-to-r from-transparent via-amber-400 to-transparent opacity-0 dark:opacity-40 group-hover:opacity-100 transition-opacity" />
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <div className="flex items-center gap-1.5">
-                    <div className="p-1.5 rounded-xl bg-amber-500/10 dark:bg-amber-400/15 border border-amber-300/60 dark:border-amber-400/30 text-amber-600 dark:text-amber-400 group-hover:scale-125 transition-transform duration-300 shadow-2xs">
-                      <Activity className="w-3.5 h-3.5 animate-pulse" />
-                    </div>
-                    <span className="text-xs font-bold text-slate-700 dark:text-slate-200">
-                      {isHindi ? 'अगले 48h संभावना' : 'Next 48h Formation'}
-                    </span>
-                  </div>
-                  <InfoTooltip term="formation_probability" isHindi={isHindi} />
-                </div>
-                <div className="text-2xl sm:text-3xl font-heading font-black bg-gradient-to-r from-amber-500 via-amber-400 to-amber-300 dark:from-amber-400 dark:via-amber-300 dark:to-yellow-200 bg-clip-text text-transparent mt-1">
-                  {current.risk48h}
-                </div>
-              </div>
-              <div className="mt-3 pt-2 border-t border-slate-100 dark:border-white/[0.08] space-y-1.5">
-                <div className="flex items-center justify-between text-[11px]">
-                  <span className="font-medium text-slate-500 dark:text-slate-400">
-                    {isHindi ? 'ResNet18 प्रायिकता' : 'ResNet18 Confidence'}
-                  </span>
-                  <span className="font-mono text-[9px] font-bold text-amber-700 dark:text-amber-300 bg-amber-500/10 dark:bg-amber-400/15 border border-amber-300/40 dark:border-amber-400/25 px-1.5 py-0.5 rounded-md">
-                    HIGH PROB
-                  </span>
-                </div>
-                {/* Playful mini progress bar */}
-                <div className="h-1.5 w-full bg-slate-100 dark:bg-white/[0.08] rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-gradient-to-r from-amber-400 via-orange-500 to-rose-500 rounded-full transition-all duration-700 shadow-[0_0_8px_rgba(245,158,11,0.35)]" 
-                    style={{ width: current.risk48h ? (current.risk48h.includes('%') ? current.risk48h : `${parseInt(current.risk48h) || 68}%`) : '68%' }}
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Card 4: Movement & Direction */}
-            <div className="group p-4 rounded-3xl cursor-default transition-all duration-300 hover:-translate-y-1.5 hover:scale-[1.02] hover:shadow-[0_14px_32px_rgba(16,185,129,0.18)] dark:hover:shadow-[0_16px_36px_rgba(16,185,129,0.25)] border border-slate-200/80 dark:border-white/10 hover:border-emerald-400 dark:hover:border-emerald-400/60 bg-white/90 dark:bg-slate-900/80 dark:bg-gradient-to-b dark:from-emerald-500/[0.08] dark:to-slate-900/80 backdrop-blur-xl relative overflow-hidden flex flex-col justify-between select-none">
-              <div className="pointer-events-none absolute inset-x-4 top-0 h-0.5 bg-gradient-to-r from-transparent via-emerald-400 to-transparent opacity-0 dark:opacity-40 group-hover:opacity-100 transition-opacity" />
-              <div>
-                <div className="flex items-center justify-between mb-1.5">
-                  <div className="flex items-center gap-1.5">
-                    <div className="p-1.5 rounded-xl bg-emerald-500/10 dark:bg-emerald-400/15 border border-emerald-300/60 dark:border-emerald-400/30 text-emerald-600 dark:text-emerald-400 group-hover:rotate-180 transition-transform duration-700 shadow-2xs">
-                      <Compass className="w-3.5 h-3.5" />
-                    </div>
-                    <span className="text-xs font-bold text-slate-700 dark:text-slate-200">
-                      {isHindi ? 'गति एवं दिशा' : 'Movement'}
-                    </span>
-                  </div>
-                  <InfoTooltip term="movement" isHindi={isHindi} />
-                </div>
-                <div className="text-xl sm:text-2xl font-heading font-black text-slate-950 dark:text-white flex items-center gap-1.5 mt-1">
-                  <Navigation2 className="w-4 h-4 text-emerald-500 dark:text-emerald-400 -rotate-45 group-hover:-rotate-90 transition-transform duration-500 shrink-0" />
-                  <span className="truncate">
-                    {isHindi ? (current.directionHindi || getDirectionName(current.direction, isHindi)) : current.direction}
-                  </span>
-                </div>
-              </div>
-              <div className="mt-3 pt-2 border-t border-slate-100 dark:border-white/[0.08] flex items-center justify-between text-[11px]">
-                <span className="font-mono font-medium text-slate-500 dark:text-slate-400">
-                  {isHindi ? `गति ${current.speed} किमी/घं` : `Speed ${current.speed} km/h`}
-                </span>
-                <span className="inline-flex items-center gap-0.5 text-[9px] font-mono font-bold text-emerald-700 dark:text-emerald-300 bg-emerald-500/10 dark:bg-emerald-400/15 border border-emerald-300/40 dark:border-emerald-400/25 px-1.5 py-0.5 rounded-md">
-                  Active Track
-                </span>
-=======
           {/* Snow UI 4 Metric Cards Grid */}
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
             {/* Card 1: Active Cyclones / Sustained Wind */}
@@ -1831,7 +1700,6 @@ const Welcome = () => {
               <div className="mt-2.5 pt-2 border-t border-slate-100 dark:border-slate-800/60 flex items-center justify-between text-[11px] text-slate-500 dark:text-slate-400">
                 <span>{isHindi ? 'गति:' : 'Speed:'} <strong className="text-slate-800 dark:text-slate-200">{current.speed} km/h {current.direction}</strong></span>
                 <span className="font-mono text-emerald-600 dark:text-emerald-400">Active</span>
->>>>>>> f1dd9d8b9f695faeb7830c3fbb6419ecee937b83
               </div>
             </div>
           </div>
@@ -2202,19 +2070,9 @@ const Welcome = () => {
                OUR SERVICES SECTION (RAINFALL, MONSOON, CYCLONE, CLIMATE SERVICES)
                ========================================================================= */}
           <div className="pt-2 sm:pt-2.5 relative">
-<<<<<<< HEAD
             <div className="border-b border-slate-200 dark:border-slate-800 pb-2 mb-3.5 flex items-center justify-between">
               <h2 className="text-xs sm:text-sm font-bold tracking-wider uppercase text-slate-900 dark:text-white font-heading flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-emerald-500" />
-=======
-            {/* Ambient luminous color orbs - subtle and balanced, without dirty color spill */}
-            <div className="pointer-events-none absolute -top-16 left-12 w-96 h-96 bg-sky-500/10 dark:bg-sky-500/5 rounded-full blur-3xl" />
-            <div className="pointer-events-none absolute -bottom-16 right-12 w-96 h-96 bg-indigo-500/10 dark:bg-indigo-500/5 rounded-full blur-3xl" />
-
-            <div className="border-b border-slate-100/80 dark:border-white/10 pb-1.5 mb-3 flex items-center justify-between relative z-10">
-              <h2 className="text-xs sm:text-sm font-black tracking-wider uppercase text-slate-950 dark:text-white font-heading flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
->>>>>>> f1dd9d8b9f695faeb7830c3fbb6419ecee937b83
                 <span>{isHindi ? 'हमारी सेवाएं (OUR SERVICES)' : 'OUR SERVICES'}</span>
               </h2>
               <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium hidden sm:inline">
@@ -2229,23 +2087,13 @@ const Welcome = () => {
                   <div
                     key={srv.id}
                     onClick={() => navigate(srv.route)}
-<<<<<<< HEAD
                     className="p-4 sm:p-5 rounded-xl cursor-pointer group flex flex-col justify-between h-full bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 hover:shadow-xs transition-colors duration-150"
-=======
-                    wrapperClassName="h-full"
-                    className={`p-4 sm:p-4.5 rounded-2xl sm:rounded-3xl cursor-pointer group flex flex-col justify-between h-full dark:!bg-slate-800/85 dark:hover:!bg-slate-800/95 dark:border-white/10 ${srv.borderHover} transition-all duration-300`}
->>>>>>> f1dd9d8b9f695faeb7830c3fbb6419ecee937b83
                   >
                     <div>
                       {/* Card Header: Icon Badge + Pill Tag */}
                       <div className="flex items-center justify-between gap-2 mb-3">
-<<<<<<< HEAD
                         <div className={`w-9 h-9 rounded-lg border ${srv.iconBg} flex items-center justify-center shrink-0`}>
                           <IconComponent className="w-5 h-5" />
-=======
-                        <div className={`p-2.5 rounded-2xl border ${srv.iconBg} transition-all duration-300 shadow-sm flex items-center justify-center`}>
-                          <IconComponent className="w-5 h-5 sm:w-6 sm:h-6 group-hover:scale-110 transition-transform duration-300" />
->>>>>>> f1dd9d8b9f695faeb7830c3fbb6419ecee937b83
                         </div>
                         <span className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-md border ${srv.tagClass} shrink-0`}>
                           {isHindi ? srv.tagHindi : srv.tag}
@@ -2263,23 +2111,12 @@ const Welcome = () => {
                       </p>
                     </div>
 
-<<<<<<< HEAD
                     {/* Card Bottom: Read More Action with subtle arrow */}
                     <div className="pt-3 mt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-100 transition-colors">
                       <span className="text-[11px] font-medium">
                         {isHindi ? 'विवरण देखें' : 'Explore Service'}
                       </span>
                       <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-700 dark:group-hover:text-slate-200 group-hover:translate-x-0.5 transition-transform duration-150" />
-=======
-                    {/* Card Bottom: Read More Action with animated arrow */}
-                    <div className="pt-3 mt-3 border-t border-slate-100/60 dark:border-white/10 flex items-center justify-between text-slate-600 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white transition-colors relative z-10">
-                      <span className="text-[11px] font-bold">
-                        {isHindi ? 'विवरण देखें' : 'Explore Service'}
-                      </span>
-                      <div className="p-1 rounded-2xl bg-white/80 dark:bg-slate-800/80 group-hover:bg-slate-800 group-hover:text-white dark:group-hover:bg-white dark:group-hover:text-slate-950 border border-slate-100/80 dark:border-white/15 backdrop-blur-md shadow-2xs transition-all">
-                        <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-                      </div>
->>>>>>> f1dd9d8b9f695faeb7830c3fbb6419ecee937b83
                     </div>
                   </div>
                 );
