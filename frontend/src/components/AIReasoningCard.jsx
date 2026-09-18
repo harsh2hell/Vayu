@@ -42,18 +42,17 @@ export default function AIReasoningCard({
       metric: `${pressNum}`,
       unit: 'hPa',
       status: pressNum < 1000 ? 'Deepening Vortex' : 'Depression Stage',
-      badgeStyle: pressNum < 990 
-        ? 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-800' 
-        : 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800',
-      iconStyle: 'bg-rose-50 text-rose-600 border-rose-200 dark:bg-rose-950/60 dark:text-rose-400 dark:border-rose-800',
-      accentBorder: 'hover:border-rose-300 dark:hover:border-rose-700',
+      pastelBg: 'bg-[#F3F4F6] dark:bg-slate-900/90',
+      pastelBorder: 'border-slate-200/80 dark:border-slate-800',
+      badgeStyle: 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700',
+      iconStyle: 'bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-700',
       reason: isHindi
         ? `केंद्रीय दबाव ${pressNum} hPa पर स्थिर या गिर रहा है, जिससे तटीय क्षेत्र और चक्रवात केंद्र के बीच गहरा दबाव अंतर बन रहा है जो निम्न-स्तरीय हवाओं को तेजी से खींचता है।`
         : `Central pressure at ${pressNum} hPa creates a steep horizontal barometric gradient that accelerates low-level inflow into the vortex core.`,
       tooltipTerm: 'central_pressure',
       gaugePct: Math.min(100, Math.max(15, ((1016 - pressNum) / 36) * 100)),
       gaugeLabel: `Current: ${pressNum} hPa (Normal: 1013)`,
-      gaugeColor: 'from-amber-400 to-rose-500'
+      gaugeColor: 'bg-slate-700 dark:bg-slate-300'
     },
     {
       id: 'sst',
@@ -63,18 +62,17 @@ export default function AIReasoningCard({
       metric: `${sstNum}`,
       unit: '°C',
       status: sstNum >= 28.5 ? 'Highly Favorable' : 'Moderate Heat',
-      badgeStyle: sstNum >= 28.5 
-        ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800' 
-        : 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800',
-      iconStyle: 'bg-amber-50 text-amber-600 border-amber-200 dark:bg-amber-950/60 dark:text-amber-400 dark:border-amber-800',
-      accentBorder: 'hover:border-amber-300 dark:hover:border-amber-700',
+      pastelBg: 'bg-[#EBF5FF] dark:bg-sky-950/30',
+      pastelBorder: 'border-sky-200/80 dark:border-sky-900/50',
+      badgeStyle: 'bg-white dark:bg-slate-900 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800',
+      iconStyle: 'bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 border border-sky-200 dark:border-sky-800',
       reason: isHindi
         ? `समुद्र की सतह का तापमान ${sstNum}°C है, जो चक्रवात बनने के लिए आवश्यक 28.0°C की सीमा से काफी अधिक है। यह निरंतर जलवाष्प और गुप्त ऊष्मा प्रदान करता है।`
         : `Ocean temperature of ${sstNum}°C exceeds the 28.0°C tropical cyclogenesis threshold, supplying strong moisture flux and latent heat energy.`,
       tooltipTerm: 'sst',
       gaugePct: Math.min(100, Math.max(15, ((sstNum - 26) / 6) * 100)),
       gaugeLabel: `Current: ${sstNum}°C (Threshold: 28.0°C)`,
-      gaugeColor: 'from-amber-400 to-emerald-500'
+      gaugeColor: 'bg-sky-600 dark:bg-sky-400'
     },
     {
       id: 'shear',
@@ -84,18 +82,17 @@ export default function AIReasoningCard({
       metric: `${shearNum}`,
       unit: 'kts',
       status: shearNum < 15 ? 'Low / Favorable' : 'Moderate Shear',
-      badgeStyle: shearNum < 15 
-        ? 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800' 
-        : 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-800',
-      iconStyle: 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-400 dark:border-emerald-800',
-      accentBorder: 'hover:border-emerald-300 dark:hover:border-emerald-700',
+      pastelBg: 'bg-[#F0FDF4] dark:bg-emerald-950/30',
+      pastelBorder: 'border-emerald-200/80 dark:border-emerald-900/50',
+      badgeStyle: 'bg-white dark:bg-slate-900 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800',
+      iconStyle: 'bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800',
       reason: isHindi
         ? `पवन अपरूपण केवल ${shearNum} नॉट है (15 से कम)। कम शीयर के कारण तूफान का ऊर्ध्वाधर स्तंभ बिना झुके या बिखरे सीधा और संगठित रहता है।`
         : `Low vertical shear (${shearNum} kts < 15 kt threshold) prevents convective tilting and allows vertical latent heat stacking in the column.`,
       tooltipTerm: 'shear',
       gaugePct: Math.min(100, Math.max(15, (1 - (shearNum / 30)) * 100)),
       gaugeLabel: `Shear: ${shearNum} kts (Safe: <15 kts)`,
-      gaugeColor: 'from-emerald-400 to-teal-500'
+      gaugeColor: 'bg-emerald-600 dark:bg-emerald-400'
     },
     {
       id: 'morphology',
@@ -105,175 +102,169 @@ export default function AIReasoningCard({
       metric: 'ResNet18',
       unit: 'Pattern',
       status: 'Curved Banding',
-      badgeStyle: 'bg-purple-50 text-purple-700 border-purple-200 dark:bg-purple-950/60 dark:text-purple-300 dark:border-purple-800',
-      iconStyle: 'bg-purple-50 text-purple-600 border-purple-200 dark:bg-purple-950/60 dark:text-purple-400 dark:border-purple-800',
-      accentBorder: 'hover:border-purple-300 dark:hover:border-purple-700',
+      pastelBg: 'bg-[#F3F0FF] dark:bg-purple-950/30',
+      pastelBorder: 'border-purple-200/80 dark:border-purple-900/50',
+      badgeStyle: 'bg-white dark:bg-slate-900 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800',
+      iconStyle: 'bg-white dark:bg-slate-900 text-purple-600 dark:text-purple-400 border border-purple-200 dark:border-purple-800',
       reason: isHindi
         ? `इन्फ्रारेड सैटेलाइट चैनलों में ${vitPattern} देखा गया है, जो प्राथमिक चक्रवाती परिसंचरण केंद्र (LLCC) की पुष्टि करता है।`
         : `ResNet18 Grad-CAM attention detects ${vitPattern}, indicating organized low-level cyclonic vorticity.`,
       tooltipTerm: 'dvorak',
       gaugePct: 88,
       gaugeLabel: 'Grad-CAM Attention: 88% Match',
-      gaugeColor: 'from-purple-500 to-indigo-600'
+      gaugeColor: 'bg-purple-600 dark:bg-purple-400'
     }
   ];
 
   return (
-    <div className={`rounded-3xl bg-white dark:bg-slate-900 border border-slate-100/90 dark:border-slate-800 shadow-sm relative overflow-hidden transition-all duration-300 ${className}`}>
-      
-      {/* Top AI Gradient Hairline Accent */}
-      <div className="h-[3px] w-full bg-gradient-to-r from-sky-400 via-blue-500 to-indigo-600 opacity-90" />
-
-      <div className="p-5 sm:p-6 space-y-5">
-        {/* Card Header with Confidence Score */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800/80 pb-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-br from-sky-500 to-blue-600 text-white flex items-center justify-center shadow-md shadow-sky-500/20 shrink-0">
-              <Brain className="w-5 h-5" />
-            </div>
-            <div>
-              <div className="flex items-center gap-2.5 flex-wrap">
-                <h3 className="font-heading font-black text-base text-slate-950 dark:text-white tracking-tight">
-                  {isHindi ? 'एआई विश्लेषण: यह पूर्वानुमान क्यों?' : 'AI REASONING: WHY THIS PREDICTION?'}
-                </h3>
-                <DataTypeBadge type={isHistorical ? 'historical' : 'ai'} isHindi={isHindi} size="sm" />
-              </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
-                {isHindi
-                  ? 'मौसम विज्ञान कारकों और भौतिक मापदंडों का पारदर्शी न्यूरल मॉडल विश्लेषण'
-                  : 'Meteorological indicators and physical drivers underpinning the model forecast'}
-              </p>
-            </div>
+    <div className={`rounded-[32px] bg-[#FAFAFA] dark:bg-slate-900/80 border border-slate-100/60 dark:border-slate-800/80 p-5 sm:p-6 space-y-4 transition-colors ${className}`}>
+      {/* Card Header with Confidence Score */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-3.5">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center shrink-0">
+            <Brain className="w-4.5 h-4.5" />
           </div>
-
-          {/* AI Model Genuine Confidence Tag */}
-          <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
-            {confidenceScore ? (
-              <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-2xl bg-sky-50 dark:bg-sky-950/70 border border-sky-200 dark:border-sky-800 text-xs font-mono font-bold text-sky-900 dark:text-sky-300 shadow-2xs">
-                <Sparkles className="w-3.5 h-3.5 text-sky-500 dark:text-sky-400 animate-pulse" />
-                <span>{confidenceType}: {confidenceScore}</span>
-              </div>
-            ) : (
-              <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-2xl bg-slate-100 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 text-xs font-mono text-slate-600 dark:text-slate-300">
-                <AlertCircle className="w-3.5 h-3.5 text-slate-400" />
-                <span>Confidence: Single Deterministic Run</span>
-              </div>
-            )}
-
-            <button
-              onClick={() => setIsExpanded(!isExpanded)}
-              className="p-2 rounded-2xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 border border-slate-100/60 dark:border-slate-700 transition-colors cursor-pointer"
-              title={isExpanded ? 'Collapse' : 'Expand'}
-              aria-label="Toggle Reasoning Details"
-            >
-              {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
-            </button>
+          <div>
+            <div className="flex items-center gap-2.5 flex-wrap">
+              <h3 className="font-heading font-bold text-sm sm:text-base text-slate-900 dark:text-white tracking-tight">
+                {isHindi ? 'एआई विश्लेषण: यह पूर्वानुमान क्यों?' : 'AI REASONING: WHY THIS PREDICTION?'}
+              </h3>
+              <DataTypeBadge type={isHistorical ? 'historical' : 'ai'} isHindi={isHindi} size="sm" />
+            </div>
+            <p className="text-xs text-slate-500 dark:text-slate-400 font-normal mt-0.5">
+              {isHindi
+                ? 'मौसम विज्ञान कारकों और भौतिक मापदंडों का पारदर्शी न्यूरल मॉडल विश्लेषण'
+                : 'Meteorological indicators and physical drivers underpinning the model forecast'}
+            </p>
           </div>
         </div>
 
-        {/* Expandable Factor Breakdown */}
-        {isExpanded && (
-          <div className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {factors.map((f) => {
-                const IconComp = f.icon;
-                return (
-                  <div
-                    key={f.id}
-                    className={`p-4.5 rounded-2xl bg-slate-50/70 dark:bg-slate-800/50 border border-slate-100/90 dark:border-slate-700/80 space-y-3 ${f.accentBorder} hover:bg-white dark:hover:bg-slate-800/90 hover:shadow-sm transition-all duration-200 group flex flex-col justify-between`}
-                  >
-                    {/* Header of each Factor card */}
-                    <div>
-                      <div className="flex items-start justify-between gap-3">
-                        <div className="flex items-center gap-2.5 min-w-0">
-                          <div className={`w-8 h-8 rounded-2xl flex items-center justify-center shrink-0 border ${f.iconStyle} shadow-2xs`}>
-                            <IconComp className="w-4 h-4" />
-                          </div>
-                          <div className="min-w-0">
-                            <span className="text-[10px] uppercase font-bold tracking-wider font-mono text-slate-400 dark:text-slate-500 block">
-                              {f.category}
-                            </span>
-                            <div className="flex items-center gap-1.5">
-                              <h4 className="font-heading font-black text-xs text-slate-900 dark:text-white truncate">
-                                {f.title}
-                              </h4>
-                              <InfoTooltip term={f.tooltipTerm} isHindi={isHindi} />
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Status Badge */}
-                        <span className={`text-[10px] font-mono font-bold px-2.5 py-1 rounded-lg border shadow-2xs shrink-0 ${f.badgeStyle}`}>
-                          {f.status}
-                        </span>
-                      </div>
-
-                      {/* Primary Reading Display */}
-                      <div className="flex items-baseline gap-1.5 mt-2.5">
-                        <span className="text-2xl font-black tracking-tight text-slate-950 dark:text-white font-mono">
-                          {f.metric}
-                        </span>
-                        {f.unit && (
-                          <span className="text-xs font-bold text-slate-500 dark:text-slate-400 font-mono">
-                            {f.unit}
-                          </span>
-                        )}
-                      </div>
-
-                      {/* Visual Mini-Gauge */}
-                      <div className="mt-2 space-y-1">
-                        <div className="h-1.5 w-full bg-slate-200/70 dark:bg-slate-700/60 rounded-full overflow-hidden">
-                          <div
-                            className={`h-full rounded-full bg-gradient-to-r ${f.gaugeColor} transition-all duration-700 ease-out`}
-                            style={{ width: `${f.gaugePct}%` }}
-                          />
-                        </div>
-                        <div className="flex justify-between items-center text-[10px] font-mono font-medium text-slate-500 dark:text-slate-400">
-                          <span>{f.gaugeLabel}</span>
-                          <span className="font-semibold">{f.gaugePct.toFixed(0)}% Intensity</span>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Scientific Explanation Text */}
-                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed pt-1 border-t border-slate-100/60 dark:border-slate-700/60">
-                      {f.reason}
-                    </p>
-                  </div>
-                );
-              })}
+        {/* AI Model Confidence Tag */}
+        <div className="flex items-center gap-2 self-start sm:self-auto shrink-0">
+          {confidenceScore ? (
+            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 text-xs font-mono text-slate-700 dark:text-slate-300 shadow-2xs">
+              <Sparkles className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />
+              <span>{confidenceType}: {confidenceScore}</span>
             </div>
-
-            {/* Model Summary / Synthesis Banner */}
-            <div className="p-4 sm:p-4.5 rounded-2xl bg-gradient-to-r from-sky-50/90 via-blue-50/60 to-indigo-50/80 dark:from-sky-950/60 dark:via-blue-950/40 dark:to-indigo-950/60 border border-sky-200/90 dark:border-sky-800/80 shadow-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
-              <div className="flex items-start gap-3 min-w-0">
-                <div className="w-8 h-8 rounded-2xl bg-sky-500 text-white flex items-center justify-center shrink-0 shadow-sm shadow-sky-500/30 mt-0.5 sm:mt-0">
-                  <Sparkles className="w-4 h-4" />
-                </div>
-                <div className="space-y-1 min-w-0">
-                  <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-[10px] font-mono uppercase font-black tracking-wider text-sky-800 dark:text-sky-300 bg-white/80 dark:bg-sky-900/60 px-2 py-0.5 rounded-md border border-sky-200 dark:border-sky-800">
-                      {isHindi ? 'एआई निष्कर्ष एवं तर्क' : 'MODEL INFERENCE RATIONALE'}
-                    </span>
-                  </div>
-                  <p className="text-xs text-slate-700 dark:text-slate-200 leading-relaxed font-normal">
-                    {isHindi
-                      ? `अनुकूल समुद्री तापमान (${sstNum}°C) और कम पवन अपरूपण (${shearNum} kts) के संयोजन से ${systemName} के अगले 48 घंटों में चक्रवात के रूप में विकसित होने की संभावना ${risk48h} आंकी गई है।`
-                      : `Coupled thermodynamics of warm waters (${sstNum}°C) with weak tropospheric shear (${shearNum} kts) support continuous vortex intensification, yielding a ${risk48h} 48h cyclogenesis probability for ${systemName}.`}
-                  </p>
-                </div>
-              </div>
-
-              {/* 48h Probability Pill */}
-              <div className="shrink-0 self-end sm:self-center flex items-center gap-2 px-3 py-2 rounded-2xl bg-white dark:bg-slate-900 border border-sky-200/90 dark:border-sky-800 shadow-2xs">
-                <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400 font-bold uppercase">48h Risk</span>
-                <span className="text-base font-black font-mono text-sky-600 dark:text-sky-400">{risk48h}</span>
-              </div>
+          ) : (
+            <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-white dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700/80 text-xs font-mono text-slate-600 dark:text-slate-300">
+              <AlertCircle className="w-3.5 h-3.5 text-slate-400" />
+              <span>Confidence: Single Deterministic Run</span>
             </div>
-          </div>
-        )}
+          )}
+
+          <button
+            onClick={() => setIsExpanded(!isExpanded)}
+            className="p-1.5 rounded-xl text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-white dark:hover:bg-slate-800 border border-slate-200/80 dark:border-slate-700 transition-colors cursor-pointer"
+            title={isExpanded ? 'Collapse' : 'Expand'}
+            aria-label="Toggle Reasoning Details"
+          >
+            {isExpanded ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </button>
+        </div>
       </div>
 
+      {/* Expandable Factor Breakdown with 4 Distinct Pastel Cards */}
+      {isExpanded && (
+        <div className="space-y-3.5 pt-1">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+            {factors.map((f) => {
+              const IconComp = f.icon;
+              return (
+                <div
+                  key={f.id}
+                  className={`p-4.5 rounded-2xl border ${f.pastelBg} ${f.pastelBorder} flex flex-col justify-between space-y-3 transition-all`}
+                >
+                  {/* Header of each Factor card */}
+                  <div>
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 ${f.iconStyle} shadow-2xs`}>
+                          <IconComp className="w-4 h-4" />
+                        </div>
+                        <div className="min-w-0">
+                          <span className="text-[10px] uppercase font-bold tracking-wider font-mono text-slate-500 dark:text-slate-400 block">
+                            {f.category}
+                          </span>
+                          <div className="flex items-center gap-1.5">
+                            <h4 className="font-heading font-bold text-xs sm:text-[13px] text-slate-900 dark:text-white truncate">
+                              {f.title}
+                            </h4>
+                            <InfoTooltip term={f.tooltipTerm} isHindi={isHindi} />
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Status Badge */}
+                      <span className={`text-[10px] font-mono font-semibold px-2.5 py-1 rounded-full shadow-2xs shrink-0 ${f.badgeStyle}`}>
+                        {f.status}
+                      </span>
+                    </div>
+
+                    {/* Primary Reading Display */}
+                    <div className="flex items-baseline gap-1.5 mt-2.5">
+                      <span className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white font-mono">
+                        {f.metric}
+                      </span>
+                      {f.unit && (
+                        <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 font-mono">
+                          {f.unit}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Visual Mini-Gauge */}
+                    <div className="mt-2 space-y-1">
+                      <div className="h-1.5 w-full bg-slate-200/80 dark:bg-slate-700/80 rounded-full overflow-hidden">
+                        <div
+                          className={`h-full rounded-full ${f.gaugeColor} transition-all duration-700`}
+                          style={{ width: `${f.gaugePct}%` }}
+                        />
+                      </div>
+                      <div className="flex justify-between items-center text-[10px] font-mono text-slate-500 dark:text-slate-400">
+                        <span>{f.gaugeLabel}</span>
+                        <span className="font-semibold">{f.gaugePct.toFixed(0)}% Intensity</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Scientific Explanation Text */}
+                  <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed pt-2 border-t border-slate-200/50 dark:border-slate-700/50 font-normal">
+                    {f.reason}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+
+          {/* Model Summary / Synthesis Banner in Soft Pastel Sky */}
+          <div className="p-4 sm:p-4.5 rounded-2xl bg-[#EBF5FF] dark:bg-sky-950/30 border border-sky-100 dark:border-sky-900/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div className="flex items-start gap-3 min-w-0">
+              <div className="w-8 h-8 rounded-xl bg-sky-100 dark:bg-sky-900/60 text-sky-600 dark:text-sky-400 flex items-center justify-center shrink-0 mt-0.5 sm:mt-0">
+                <Sparkles className="w-4 h-4" />
+              </div>
+              <div className="space-y-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-[10px] font-mono uppercase font-bold tracking-wider text-sky-800 dark:text-sky-300 bg-white/80 dark:bg-slate-900/80 px-2 py-0.5 rounded-md border border-sky-200 dark:border-sky-800">
+                    {isHindi ? 'एआई निष्कर्ष एवं तर्क' : 'MODEL INFERENCE RATIONALE'}
+                  </span>
+                </div>
+                <p className="text-xs text-slate-700 dark:text-slate-200 leading-relaxed font-normal">
+                  {isHindi
+                    ? `अनुकूल समुद्री तापमान (${sstNum}°C) और कम पवन अपरूपण (${shearNum} kts) के संयोजन से ${systemName} के अगले 48 घंटों में चक्रवात के रूप में विकसित होने की संभावना ${risk48h} आंकी गई है।`
+                    : `Coupled thermodynamics of warm waters (${sstNum}°C) with weak tropospheric shear (${shearNum} kts) support continuous vortex intensification, yielding a ${risk48h} 48h cyclogenesis probability for ${systemName}.`}
+                </p>
+              </div>
+            </div>
+
+            {/* 48h Probability Pill */}
+            <div className="shrink-0 self-end sm:self-center flex items-center gap-2 px-3 py-1.5 rounded-xl bg-white dark:bg-slate-900 border border-sky-200/80 dark:border-sky-800 shadow-2xs">
+              <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400 font-bold uppercase">48h Risk</span>
+              <span className="text-base font-bold font-mono text-sky-600 dark:text-sky-400">{risk48h}</span>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

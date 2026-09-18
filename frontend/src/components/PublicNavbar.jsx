@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { PhoneCall, Menu, X, ChevronRight, Clock } from 'lucide-react';
+import { PhoneCall, Menu, X, ChevronRight, Clock, Sun, Moon } from 'lucide-react';
 import { useLiveClock } from '../utils/liveDateTime';
 
 export const FONT_SCALE_MAP = {
@@ -26,22 +26,21 @@ export const applyGlobalFontScale = (offset) => {
   } catch (e) { }
 };
 
-// Interactive Nav Option Button (Pure transparent shell sitting over the continuous Apple glass pill)
+// Clean Rounded Nav Button matching Dashboard aesthetic
 const Nav3DGlassButton = React.forwardRef(({ link, isSelected, isHovered, onClick, onMouseEnter }, ref) => {
   return (
     <button
       ref={ref}
       onClick={onClick}
       onMouseEnter={onMouseEnter}
-      className={`nav-3d-glass-btn group relative z-10 px-3.5 lg:px-4 py-1.5 rounded-full text-xs tracking-wide cursor-pointer whitespace-nowrap shrink-0 flex items-center justify-center select-none transition-colors duration-200 ${isSelected
-          ? 'text-slate-950 dark:text-white font-bold'
+      className={`relative z-10 px-3.5 lg:px-4 py-1.5 rounded-full text-xs tracking-wide cursor-pointer whitespace-nowrap shrink-0 flex items-center justify-center select-none transition-all duration-150 ${isSelected
+          ? 'text-slate-950 dark:text-white font-bold bg-white dark:bg-slate-900 shadow-xs'
           : isHovered
             ? 'text-slate-950 dark:text-white font-semibold'
-            : 'text-slate-600 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white font-medium'
+            : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-medium'
         }`}
     >
-      {/* Nav Label */}
-      <span className="relative z-10 transition-transform duration-200">
+      <span className="relative z-10">
         {link.label}
       </span>
     </button>
@@ -245,23 +244,18 @@ const PublicNavbar = ({
   };
 
   return (
-    <header className={`sticky top-0 z-[1000] w-full transition-all duration-300 header-glass-bar ${isScrolled ? 'is-scrolled' : ''
-      }`}>
-      {/* Specular Glossy Light Sheen across top half of glass header */}
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-[48%] bg-gradient-to-b from-white/35 via-white/12 to-transparent dark:from-white/15 dark:via-white/4 dark:to-transparent select-none z-0" />
-
+    <header className="sticky top-0 z-[1000] w-full transition-colors duration-200 bg-white/90 dark:bg-black/90 backdrop-blur-md border-b border-slate-100 dark:border-slate-800/80">
       {/* 2px National Tricolor Stripe */}
       <div className="h-0.5 bg-gradient-to-r from-[#FF9933] via-slate-300 dark:via-slate-700 to-[#138808] relative z-10" />
 
       <div className="header-inner-row max-w-7xl mx-auto px-2.5 sm:px-4 lg:px-6 h-16 sm:h-[68px] md:h-[72px] flex items-center justify-between gap-2 sm:gap-3 flex-nowrap relative z-10">
 
-        {/* VAYU Brand Logo - Collapses smoothly when scrolled past hero section */}
-        <div className={`header-collapsible-item header-collapsible-logo flex items-center shrink-0 ${isPastHero ? 'is-collapsed' : ''
-          }`}>
+        {/* VAYU Brand Logo */}
+        <div className="flex items-center shrink-0">
           <img
             src={isDarkMode ? "/vayu-white.png?v=2" : "/vayu.png"}
             alt="VAYU"
-            className="h-12 sm:h-14 md:h-16 lg:h-[62px] w-auto object-contain filter drop-shadow-sm transition-transform duration-300 hover:scale-105 cursor-pointer select-none shrink-0"
+            className="h-12 sm:h-14 md:h-16 lg:h-[62px] w-auto object-contain filter drop-shadow-sm transition-transform duration-200 hover:scale-105 cursor-pointer select-none shrink-0"
             style={{ maxHeight: '62px' }}
             onClick={() => {
               if (location.pathname === '/') {
@@ -274,60 +268,25 @@ const PublicNavbar = ({
           />
         </div>
 
-        {/* Ultra-Glossy 3D Clear Glass Pill Track with Continuous Apple Motion Animation */}
+        {/* Clean Rounded Nav Pill Track matching Dashboard */}
         <nav
           ref={navTrackRef}
           onWheel={handleNavWheel}
           onMouseMove={handleNavMouseMove}
           onMouseLeave={handleNavMouseLeave}
-          className={`nav-pill-track-3d hidden md:flex items-center gap-1.5 p-1 rounded-full backdrop-blur-2xl transition-all duration-500 shrink min-w-0 flex-nowrap relative select-none ${isPastHero ? 'mx-auto' : ''
-            } ${isScrolled || isPastHero
-              ? 'is-scrolled-3d'
-              : 'bg-slate-200/55 dark:bg-neutral-950/45 border border-white/70 dark:border-white/10 shadow-[0_2px_12px_rgba(0,0,0,0.04),inset_0_1px_1px_rgba(255,255,255,0.8)]'
-            }`}
+          className="hidden md:flex items-center gap-1 p-1 rounded-full bg-slate-100/90 dark:bg-slate-900/90 border border-slate-200/70 dark:border-slate-800 shrink min-w-0 relative select-none"
           title={isHindi ? "पेज बदलने के लिए क्लिक या स्क्रॉल करें" : "Click or scroll through options"}
         >
-          {/* Ambient chromatic luminous glow orbs inside track for glass refraction */}
-          <div className="pointer-events-none absolute -inset-1 bg-gradient-to-r from-sky-400/15 via-cyan-400/10 to-indigo-400/15 rounded-full blur-md opacity-60" />
-          {/* Specular top rim highlight */}
-          <div className="pointer-events-none absolute inset-x-3 top-0 h-[1px] bg-gradient-to-r from-transparent via-white/90 dark:via-white/30 to-transparent" />
-
-          {/* Continuous Motion Apple Liquid 3D Clear Glass Sliding Pill */}
           {pillRect.ready && (
             <div
-              className="nav-sliding-glass-pill overflow-hidden"
+              className="absolute rounded-full bg-white dark:bg-slate-800 shadow-xs transition-all duration-200 pointer-events-none"
               style={{
                 transform: `translate3d(${pillRect.left}px, ${pillRect.top}px, 0)`,
                 width: `${pillRect.width}px`,
                 height: `${pillRect.height}px`,
                 opacity: pillRect.ready ? 1 : 0
               }}
-            >
-              {/* 3D Convex Top Curved Specular Lens Reflection */}
-              <span className="absolute inset-x-1.5 top-[1px] h-[46%] rounded-t-full bg-gradient-to-b from-white/95 via-white/28 to-transparent pointer-events-none" />
-
-              {/* Specular Top-Center Glass Glint */}
-              <span className="absolute left-1/4 top-[2px] w-1/2 h-[1px] bg-gradient-to-r from-transparent via-white to-transparent pointer-events-none opacity-90" />
-
-              {/* Prismatic Lateral Refractions (Left & Right Edge Bevels) */}
-              <span className="absolute inset-y-1.5 left-[1px] w-[1.5px] bg-gradient-to-b from-white/85 via-white/20 to-transparent pointer-events-none rounded-l-full" />
-              <span className="absolute inset-y-1.5 right-[1px] w-[1.5px] bg-gradient-to-b from-white/85 via-white/20 to-transparent pointer-events-none rounded-r-full" />
-
-              {/* Lower Rim Cyan Specular Refractive Line */}
-              <span className="absolute inset-x-3 bottom-0 h-[1.5px] bg-gradient-to-r from-transparent via-sky-400/90 dark:via-cyan-300/90 to-transparent pointer-events-none" />
-
-              {/* Interactive Dynamic Cursor Specular Flare inside Glass */}
-              {glassMouse.isHovered && (
-                <span
-                  className="absolute w-24 h-12 rounded-full pointer-events-none transition-opacity duration-200 -translate-x-1/2 -translate-y-1/2 blur-xs opacity-50 dark:opacity-40"
-                  style={{
-                    left: `${glassMouse.x}px`,
-                    top: `${glassMouse.y}px`,
-                    background: 'radial-gradient(ellipse at center, rgba(255,255,255,0.95) 0%, rgba(56,189,248,0.25) 55%, transparent 75%)'
-                  }}
-                />
-              )}
-            </div>
+            />
           )}
 
           {NAV_LINKS.map((link, idx) => {
@@ -418,9 +377,6 @@ const PublicNavbar = ({
             </button>
           </div>
 
-<<<<<<< HEAD
-
-=======
           {/* Theme Switcher */}
           {setIsDarkMode && (
             <button
@@ -443,7 +399,6 @@ const PublicNavbar = ({
               </div>
             </button>
           )}
->>>>>>> f1dd9d8b9f695faeb7830c3fbb6419ecee937b83
 
   {/* Mobile Menu Hamburger Toggle */ }
   <button
