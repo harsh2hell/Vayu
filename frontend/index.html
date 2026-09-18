@@ -35,9 +35,14 @@
     <script>
       (function() {
         try {
-          localStorage.removeItem('theme');
-          document.documentElement.classList.remove('dark');
-          document.documentElement.style.colorScheme = 'light';
+          var saved = localStorage.getItem('theme');
+          if (saved === 'dark') {
+            document.documentElement.classList.add('dark');
+            document.documentElement.style.colorScheme = 'dark';
+          } else {
+            document.documentElement.classList.remove('dark');
+            document.documentElement.style.colorScheme = 'light';
+          }
           var savedFont = localStorage.getItem('vayu_font_offset');
           if (savedFont !== null) {
             var map = { '-3': 75, '-2': 85, '-1': 92, '0': 100, '1': 110, '2': 125, '3': 140, '4': 155 };
