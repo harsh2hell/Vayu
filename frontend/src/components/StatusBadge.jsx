@@ -62,7 +62,7 @@ const StatusBadge = ({
       case 'REFERENCE':
       default:
         return {
-          bg: 'bg-slate-100 text-slate-700 border-slate-200',
+          bg: 'bg-slate-100 text-slate-700 border-slate-100',
           dot: 'bg-slate-400'
         };
     }

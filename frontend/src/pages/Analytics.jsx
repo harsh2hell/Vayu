@@ -118,7 +118,7 @@ const Analytics = () => {
                     key={b}
                     onClick={() => setBasinFilter(b)}
                     className={`px-2.5 py-1 rounded font-medium transition-all ${
-                      basinFilter === b ? 'bg-white text-[#003087] shadow-xs' : 'text-slate-500 hover:text-slate-800'
+                      basinFilter === b ? 'bg-white text-[#003087] shadow-sm' : 'text-slate-500 hover:text-slate-800'
                     }`}
                   >
                     {b === 'ALL' ? 'All Basins' : b}
@@ -134,7 +134,7 @@ const Analytics = () => {
                   placeholder="Search name, season..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="text-xs pl-8 pr-3 py-1.5 rounded-lg border border-slate-200 bg-white focus:outline-none focus:ring-1 focus:ring-[#003087] w-40"
+                  className="text-xs pl-8 pr-3 py-1.5 rounded-lg border border-slate-100 bg-white focus:outline-none focus:ring-1 focus:ring-[#003087] w-40"
                 />
               </div>
             </div>
@@ -151,7 +151,7 @@ const Analytics = () => {
               </div>
             ) : (
               <table className="w-full text-xs text-left">
-                <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 font-mono text-[11px]">
+                <thead className="bg-slate-50 border-b border-slate-100 text-slate-500 font-mono text-[11px]">
                   <tr>
                     <th className="py-2.5 px-4 font-semibold">Cyclone Name</th>
                     <th className="py-2.5 px-4 font-semibold">Season</th>
@@ -221,7 +221,7 @@ const Analytics = () => {
                   <p className="text-xs text-slate-500">{selectedStorm.season} • {selectedStorm.basin}</p>
                 </div>
 
-                <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2 text-xs">
+                <div className="p-3 bg-slate-50 border border-slate-100 rounded-2xl space-y-2 text-xs">
                   <span className="text-[10px] uppercase font-bold font-mono tracking-wider block text-emerald-800 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 w-fit">
                     OBSERVED / BEST TRACK REFERENCE DATA
                   </span>
@@ -285,7 +285,7 @@ const Analytics = () => {
             )}
           </div>
 
-          <div className="card p-4 bg-slate-50 border-slate-200 text-xs text-slate-600 space-y-1.5">
+          <div className="card p-4 bg-slate-50 border-slate-100 text-xs text-slate-600 space-y-1.5">
             <h4 className="font-bold text-slate-800 uppercase tracking-wider text-[11px]">
               Ground Truth Data Source
             </h4>

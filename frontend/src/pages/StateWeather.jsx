@@ -493,7 +493,7 @@ const StateWeather = () => {
       {/* =========================================================================
            TOP NAVIGATION BAR (ALWAYS AT TOP)
            ========================================================================= */}
-      <header className="sticky top-0 z-[1000] w-full bg-white/80 dark:bg-black/90 backdrop-blur-xl border-b border-slate-200/80 dark:border-neutral-800/80 transition-colors duration-500">
+      <header className="sticky top-0 z-[1000] w-full bg-white/80 dark:bg-black/90 backdrop-blur-xl border-b border-slate-100/80 dark:border-neutral-800/80 transition-colors duration-500">
         {/* 2px National Tricolor Stripe */}
         <div className="h-0.5 bg-gradient-to-r from-[#FF9933] via-slate-300 dark:via-slate-700 to-[#138808]" />
         <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between gap-2 sm:gap-4">
@@ -501,7 +501,7 @@ const StateWeather = () => {
           <div className="flex items-center gap-2 sm:gap-4 min-w-0">
             <button
               onClick={() => navigate('/')}
-              className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-slate-950 hover:text-white dark:hover:bg-white dark:hover:text-slate-950 transition-all text-xs font-semibold cursor-pointer shadow-2xs shrink-0"
+              className="inline-flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 rounded-2xl border border-slate-100 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-slate-950 hover:text-white dark:hover:bg-white dark:hover:text-slate-950 transition-all text-xs font-semibold cursor-pointer shadow-2xs shrink-0"
               title="Return to National Cyclone Portal"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
@@ -529,7 +529,7 @@ const StateWeather = () => {
                     }}
                     className={`px-2 sm:px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer whitespace-nowrap shrink-0 ${
                       currentSlug === st.slug
-                        ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-xs'
+                        ? 'bg-slate-700 text-white dark:bg-white dark:text-slate-900 shadow-sm'
                         : 'text-slate-600 dark:text-slate-400 hover:text-slate-950 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800'
                     }`}
                   >
@@ -565,7 +565,7 @@ const StateWeather = () => {
       {/* =========================================================================
            STATE HERO SECTION & EXECUTIVE METEOROLOGICAL BRIEF
            ========================================================================= */}
-      <section className="py-8 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-slate-100/50 to-transparent dark:from-slate-900/40 dark:to-transparent border-b border-slate-200/60 dark:border-slate-800/60">
+      <section className="py-8 px-4 sm:px-6 lg:px-8 bg-gradient-to-b from-slate-100/50 to-transparent dark:from-slate-900/40 dark:to-transparent border-b border-slate-100/60 dark:border-slate-800/60">
         <div className="max-w-7xl mx-auto space-y-6">
           
           {/* Breadcrumb & Live Threat Badge */}
@@ -605,7 +605,7 @@ const StateWeather = () => {
           {/* Key Meteorological Parameters Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5 pt-2">
             
-            <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 p-3.5 rounded-2xl shadow-2xs">
+            <div className="bg-white dark:bg-slate-800/90 border border-slate-100 dark:border-slate-800 p-3.5 rounded-2xl shadow-2xs">
               <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 font-medium mb-1">
                 <Wind className="w-3.5 h-3.5 text-sky-500" />
                 <span>Peak Wind</span>
@@ -616,7 +616,7 @@ const StateWeather = () => {
               <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 block">Gusts: {stateInfo.peakGusts}</span>
             </div>
 
-            <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 p-3.5 rounded-2xl shadow-2xs">
+            <div className="bg-white dark:bg-slate-800/90 border border-slate-100 dark:border-slate-800 p-3.5 rounded-2xl shadow-2xs">
               <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 font-medium mb-1">
                 <Waves className="w-3.5 h-3.5 text-cyan-500" />
                 <span>Storm Surge</span>
@@ -627,7 +627,7 @@ const StateWeather = () => {
               <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 block">Above High Tide</span>
             </div>
 
-            <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 p-3.5 rounded-2xl shadow-2xs">
+            <div className="bg-white dark:bg-slate-800/90 border border-slate-100 dark:border-slate-800 p-3.5 rounded-2xl shadow-2xs">
               <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 font-medium mb-1">
                 <CloudRain className="w-3.5 h-3.5 text-blue-500" />
                 <span>Rainfall Intensity</span>
@@ -638,7 +638,7 @@ const StateWeather = () => {
               <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 block">24h Cumulative</span>
             </div>
 
-            <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 p-3.5 rounded-2xl shadow-2xs">
+            <div className="bg-white dark:bg-slate-800/90 border border-slate-100 dark:border-slate-800 p-3.5 rounded-2xl shadow-2xs">
               <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 font-medium mb-1">
                 <Compass className="w-3.5 h-3.5 text-amber-500" />
                 <span>Vortex Distance</span>
@@ -649,7 +649,7 @@ const StateWeather = () => {
               <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 block">Estimated Bearing</span>
             </div>
 
-            <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 p-3.5 rounded-2xl shadow-2xs">
+            <div className="bg-white dark:bg-slate-800/90 border border-slate-100 dark:border-slate-800 p-3.5 rounded-2xl shadow-2xs">
               <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 font-medium mb-1">
                 <Building2 className="w-3.5 h-3.5 text-emerald-500" />
                 <span>Cyclone Shelters</span>
@@ -660,7 +660,7 @@ const StateWeather = () => {
               <span className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 block">{stateInfo.evacuationCount}</span>
             </div>
 
-            <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 p-3.5 rounded-2xl shadow-2xs">
+            <div className="bg-white dark:bg-slate-800/90 border border-slate-100 dark:border-slate-800 p-3.5 rounded-2xl shadow-2xs">
               <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 font-medium mb-1">
                 <Radio className="w-3.5 h-3.5 text-red-500" />
                 <span>Port Warning</span>
@@ -674,9 +674,9 @@ const StateWeather = () => {
           </div>
 
           {/* State Disaster Management Authority Helpline Banner */}
-          <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs text-xs">
+          <div className="bg-white dark:bg-slate-800/90 border border-slate-100 dark:border-slate-800 rounded-2xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-2xs text-xs">
             <div className="flex items-center gap-2.5">
-              <div className="p-2 rounded-xl bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
+              <div className="p-2 rounded-2xl bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
                 <ShieldAlert className="w-5 h-5" />
               </div>
               <div>
@@ -689,7 +689,7 @@ const StateWeather = () => {
               <span className="text-slate-500 dark:text-slate-400 font-medium">Toll-Free Control Room:</span>
               <a
                 href={`tel:${stateInfo.helpline.split('/')[0].trim()}`}
-                className="px-3.5 py-1.5 rounded-xl font-bold text-xs bg-slate-950 text-white dark:bg-white dark:text-slate-950 hover:bg-slate-800 dark:hover:bg-slate-100 transition-all flex items-center gap-1.5 shadow-2xs cursor-pointer"
+                className="px-3.5 py-1.5 rounded-2xl font-bold text-xs bg-slate-950 text-white dark:bg-white dark:text-slate-950 hover:bg-slate-800 dark:hover:bg-slate-100 transition-all flex items-center gap-1.5 shadow-2xs cursor-pointer"
               >
                 <PhoneCall className="w-3.5 h-3.5 text-red-500" />
                 <span>{stateInfo.helpline}</span>
@@ -706,7 +706,7 @@ const StateWeather = () => {
       <section className="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full space-y-6 flex-1">
         
         {/* Section Title & Live Interactive Search Filter Bar */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-5">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-5">
           <div>
             <h2 className="text-xl sm:text-2xl font-heading font-bold text-slate-950 dark:text-white">
               District Weather & Cyclone Impact Directory
@@ -724,7 +724,7 @@ const StateWeather = () => {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder={`Search in ${stateInfo.name} (e.g., ${stateInfo.districts[0]?.name}, ${stateInfo.districts[1]?.name || 'Port'})...`}
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-sky-500 shadow-2xs"
+              className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-sky-500 shadow-2xs"
             />
             {searchQuery && (
               <button
@@ -752,8 +752,8 @@ const StateWeather = () => {
                 onClick={() => setSelectedFilter(f.id)}
                 className={`px-3 py-1 rounded-lg font-semibold transition-all cursor-pointer ${
                   selectedFilter === f.id
-                    ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-2xs'
-                    : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'
+                    ? 'bg-slate-700 text-white dark:bg-white dark:text-slate-900 shadow-2xs'
+                    : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-100 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'
                 }`}
               >
                 {f.label}
@@ -777,7 +777,7 @@ const StateWeather = () => {
                 ? 'border-red-200 dark:border-red-900/60 hover:border-red-300 dark:hover:border-red-800'
                 : isOrange
                 ? 'border-orange-200 dark:border-orange-900/60 hover:border-orange-300 dark:hover:border-orange-800'
-                : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700';
+                : 'border-slate-100 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700';
 
               const badgeTheme = isRed
                 ? 'bg-red-50 dark:bg-red-950/60 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800'
@@ -788,7 +788,7 @@ const StateWeather = () => {
               return (
                 <div
                   key={dist.id}
-                  className={`bg-white dark:bg-slate-900/90 border rounded-2xl p-5 shadow-xs transition-all hover:shadow-md flex flex-col justify-between gap-4 ${borderTheme}`}
+                  className={`bg-white dark:bg-slate-800/90 border rounded-2xl p-5 shadow-sm transition-all hover:shadow-md flex flex-col justify-between gap-4 ${borderTheme}`}
                 >
                   
                   {/* Card Header: District Name & Severity Badge */}
@@ -809,7 +809,7 @@ const StateWeather = () => {
                   </div>
 
                   {/* 4 Micro Weather Telemetry Metrics */}
-                  <div className="grid grid-cols-2 gap-2 text-xs bg-slate-50 dark:bg-slate-800/60 p-3 rounded-xl border border-slate-100 dark:border-slate-800">
+                  <div className="grid grid-cols-2 gap-2 text-xs bg-slate-50 dark:bg-slate-800/60 p-3 rounded-2xl border border-slate-100 dark:border-slate-800">
                     <div>
                       <span className="text-[11px] text-slate-500 dark:text-slate-400 block font-medium">Sustained Wind</span>
                       <strong className="text-slate-900 dark:text-white font-bold">{dist.wind}</strong>
@@ -844,7 +844,7 @@ const StateWeather = () => {
                       {dist.stations.map((st, idx) => (
                         <span
                           key={idx}
-                          className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[11px] font-medium border border-slate-200/60 dark:border-slate-700/60"
+                          className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[11px] font-medium border border-slate-100/60 dark:border-slate-700/60"
                         >
                           {st}
                         </span>
@@ -853,7 +853,7 @@ const StateWeather = () => {
                   </div>
 
                   {/* Specific Action Directive */}
-                  <div className="text-xs text-slate-600 dark:text-slate-300 bg-amber-50/70 dark:bg-amber-950/30 p-2.5 rounded-xl border border-amber-200/60 dark:border-amber-900/40">
+                  <div className="text-xs text-slate-600 dark:text-slate-300 bg-amber-50/70 dark:bg-amber-950/30 p-2.5 rounded-2xl border border-amber-200/60 dark:border-amber-900/40">
                     <span className="font-bold text-amber-950 dark:text-amber-200 block text-[11px] mb-0.5">
                       Operational Directive:
                     </span>
@@ -881,7 +881,7 @@ const StateWeather = () => {
             })}
           </div>
         ) : (
-          <div className="bg-white dark:bg-slate-900/90 border border-slate-200 dark:border-slate-800 rounded-2xl p-12 text-center space-y-3 shadow-xs">
+          <div className="bg-white dark:bg-slate-800/90 border border-slate-100 dark:border-slate-800 rounded-2xl p-12 text-center space-y-3 shadow-sm">
             <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto text-slate-400">
               <Search className="w-6 h-6" />
             </div>
@@ -896,7 +896,7 @@ const StateWeather = () => {
                 setSearchQuery('');
                 setSelectedFilter('ALL');
               }}
-              className="px-4 py-2 rounded-xl bg-slate-950 text-white dark:bg-white dark:text-slate-950 text-xs font-semibold hover:bg-slate-800 dark:hover:bg-slate-100 transition-all cursor-pointer shadow-xs"
+              className="px-4 py-2 rounded-2xl bg-slate-950 text-white dark:bg-white dark:text-slate-950 text-xs font-semibold hover:bg-slate-800 dark:hover:bg-slate-100 transition-all cursor-pointer shadow-sm"
             >
               Reset Search & Filters
             </button>
@@ -908,7 +908,7 @@ const StateWeather = () => {
       {/* =========================================================================
            PUBLIC SAFETY PROTOCOLS & ACTION GUIDELINES
            ========================================================================= */}
-      <footer className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-8 px-4 sm:px-6 lg:px-8 mt-12 transition-colors">
+      <footer className="bg-white dark:bg-slate-800 border-t border-slate-100 dark:border-slate-800 py-8 px-4 sm:px-6 lg:px-8 mt-12 transition-colors">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
           <div>
             <strong className="text-slate-900 dark:text-white font-bold block">{stateInfo.name} State Disaster Management Authority</strong>

@@ -152,15 +152,15 @@ export default function CycloneLifecycleBar({
   const TrendIcon = currentTrend.icon;
 
   return (
-    <div className={`relative overflow-hidden p-4 sm:p-5 sm:px-6 rounded-3xl bg-gradient-to-br from-white/95 via-slate-50/70 to-white/90 dark:from-[#0b0f19]/95 dark:via-[#070a12]/95 dark:to-[#04060a]/98 backdrop-blur-2xl border border-slate-200/80 dark:border-white/10 shadow-[0_16px_40px_rgba(0,0,0,0.04)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.85)] space-y-4 transition-all duration-300 ${className}`}>
+    <div className={`relative overflow-hidden p-4 sm:p-5 sm:px-6 rounded-3xl bg-gradient-to-br from-white/95 via-slate-50/70 to-white/90 dark:from-[#0b0f19]/95 dark:via-[#070a12]/95 dark:to-[#04060a]/98 backdrop-blur-2xl border border-slate-100/80 dark:border-white/10 shadow-[0_16px_40px_rgba(0,0,0,0.04)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.85)] space-y-4 transition-all duration-300 ${className}`}>
       {/* Top Specular Sheen */}
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-400/40 dark:via-white/20 to-transparent" />
 
       {/* Top Header Row: Stage Badge + Trend and Change Deltas */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/70 dark:border-white/10 pb-3.5">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100/70 dark:border-white/10 pb-3.5">
         <div className="flex items-center gap-2.5 flex-wrap">
           <div className="flex items-center gap-2">
-            <div className="p-1.5 rounded-xl bg-gradient-to-tr from-sky-500 to-indigo-500 text-white shadow-[0_0_12px_rgba(14,165,233,0.25)]">
+            <div className="p-1.5 rounded-2xl bg-gradient-to-tr from-sky-500 to-indigo-500 text-white shadow-[0_0_12px_rgba(14,165,233,0.25)]">
               <ShieldAlert className="w-4 h-4" />
             </div>
             <span className="font-heading font-black text-xs sm:text-sm uppercase tracking-wider text-slate-900 dark:text-white">
@@ -186,7 +186,7 @@ export default function CycloneLifecycleBar({
 
           {/* Genuine Telemetry Change Badge */}
           {hasDelta && (
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/80 dark:bg-slate-900/80 border border-slate-200/80 dark:border-white/10 text-[11px] font-mono text-slate-700 dark:text-slate-300 shadow-xs">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/80 dark:bg-slate-900/80 border border-slate-100/80 dark:border-white/10 text-[11px] font-mono text-slate-700 dark:text-slate-300 shadow-sm">
               <span className="text-slate-500 dark:text-slate-400 font-sans font-medium">
                 {isForecastTrend 
                   ? (isHindi ? `अनुमानित ${trendIntervalHours}h:` : `Forecast ${trendIntervalHours}h:`) 
@@ -234,8 +234,8 @@ export default function CycloneLifecycleBar({
                   isCurrent
                     ? 'bg-white dark:bg-slate-900 border border-rose-400 dark:border-rose-500/70 shadow-[0_8px_24px_rgba(244,63,94,0.1)] ring-1 ring-rose-500/20 scale-[1.02] -translate-y-0.5 z-20'
                     : isPast
-                    ? 'bg-white/60 dark:bg-slate-900/40 border border-slate-200/70 dark:border-white/5 opacity-85 hover:opacity-100'
-                    : 'bg-white/80 dark:bg-slate-900/60 border border-slate-200/80 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20'
+                    ? 'bg-white/60 dark:bg-slate-900/40 border border-slate-100/70 dark:border-white/5 opacity-85 hover:opacity-100'
+                    : 'bg-white/80 dark:bg-slate-900/60 border border-slate-100/80 dark:border-white/10 hover:border-slate-300 dark:hover:border-white/20'
                 }`}
               >
                 {/* Subtle Top Accent Color Line (Color Grading) */}
@@ -250,7 +250,7 @@ export default function CycloneLifecycleBar({
                   {isCurrent ? (
                     <>
                       <span className="absolute -inset-1 rounded-full bg-rose-500/20 animate-pulse" />
-                      <div className="relative w-7 h-7 rounded-full bg-rose-500 text-white font-mono font-bold text-xs flex items-center justify-center shadow-xs ring-2 ring-white dark:ring-slate-900">
+                      <div className="relative w-7 h-7 rounded-full bg-rose-500 text-white font-mono font-bold text-xs flex items-center justify-center shadow-sm ring-2 ring-white dark:ring-slate-900">
                         {idx + 1}
                       </div>
                     </>
@@ -259,7 +259,7 @@ export default function CycloneLifecycleBar({
                       <Check className="w-3 h-3 stroke-[2.5]" />
                     </div>
                   ) : (
-                    <div className="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-200/80 dark:border-slate-700/80 flex items-center justify-center text-[10.5px] font-mono font-semibold ring-2 ring-white dark:ring-slate-900">
+                    <div className="w-6 h-6 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 border border-slate-100/80 dark:border-slate-700/80 flex items-center justify-center text-[10.5px] font-mono font-semibold ring-2 ring-white dark:ring-slate-900">
                       {idx + 1}
                     </div>
                   )}
@@ -281,7 +281,7 @@ export default function CycloneLifecycleBar({
 
                 {/* Minimal Status Tag */}
                 {isCurrent ? (
-                  <span className="mt-2 px-2 py-0.5 rounded-full text-[9px] font-mono font-bold tracking-wider uppercase bg-rose-500 text-white shadow-xs flex items-center gap-1">
+                  <span className="mt-2 px-2 py-0.5 rounded-full text-[9px] font-mono font-bold tracking-wider uppercase bg-rose-500 text-white shadow-sm flex items-center gap-1">
                     <span className="w-1.5 h-1.5 rounded-full bg-white animate-ping shrink-0" />
                     <span className="whitespace-nowrap">{isHindi ? 'तूफान स्थिति' : 'STORM POSITION'}</span>
                   </span>
@@ -303,7 +303,7 @@ export default function CycloneLifecycleBar({
       </div>
 
       {/* Footnote Context */}
-      <div className="flex flex-wrap items-center justify-between gap-2.5 text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 pt-3 border-t border-slate-200/70 dark:border-white/10 font-sans">
+      <div className="flex flex-wrap items-center justify-between gap-2.5 text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 pt-3 border-t border-slate-100/70 dark:border-white/10 font-sans">
         <div className="flex items-center gap-2">
           <span className="relative flex h-2 w-2">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75" />

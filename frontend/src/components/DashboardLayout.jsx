@@ -12,18 +12,18 @@ const DashboardLayout = () => {
 
   return (
     <AnalysisSessionProvider>
-      <div className="min-h-screen bg-[#F8FAFC] text-slate-900 font-sans antialiased selection:bg-sky-500 selection:text-white relative">
+      <div className="min-h-screen bg-[#F8FAFC] dark:bg-black text-slate-900 dark:text-slate-100 font-sans antialiased selection:bg-sky-500 selection:text-white relative transition-colors duration-200">
         
-        {/* Left Column: Fixed White Sidebar (width 14rem / 56) */}
+        {/* Left Column: Sidebar */}
         <Sidebar />
         
-        {/* Main Content Area (strictly constrained to remaining screen width) */}
-        <div className="flex flex-col min-h-screen ml-0 lg:ml-56 w-full lg:w-[calc(100%-14rem)] min-w-0 transition-all relative z-10">
+        {/* Main Content Area */}
+        <div className="flex flex-col min-h-screen ml-56 w-[calc(100%-14rem)] min-w-0 transition-all relative z-10">
           <Topbar />
           
           <main 
             style={isMapFirst ? { height: 'calc(100vh - 3.5rem)', minHeight: 'calc(100vh - 3.5rem)', width: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative', background: '#020617' } : undefined}
-            className={isMapFirst ? "flex-1 flex flex-col overflow-hidden relative bg-slate-950 min-h-0" : "flex-1 p-3 sm:p-5 lg:p-8 bg-slate-50/70 pb-12 min-w-0"}
+            className={isMapFirst ? "flex-1 flex flex-col overflow-hidden relative bg-slate-950 min-h-0" : "flex-1 p-4 sm:p-6 lg:p-8 bg-slate-50/50 dark:bg-black/90 pb-12 min-w-0 transition-colors duration-200"}
           >
             <React.Suspense fallback={
               <div className="flex-1 flex flex-col items-center justify-center p-8 bg-slate-950 text-slate-400 font-mono text-xs" style={{ minHeight: 'calc(100vh - 3.5rem)' }}>
@@ -31,7 +31,7 @@ const DashboardLayout = () => {
                 <span>Loading Geospatial Intelligence...</span>
               </div>
             }>
-              <ErrorBoundary>
+              <ErrorBoundary key={location.pathname}>
                 <Outlet />
               </ErrorBoundary>
             </React.Suspense>

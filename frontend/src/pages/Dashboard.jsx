@@ -1,539 +1,586 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  Activity, CheckCircle, BrainCircuit, Compass, 
-  ShieldAlert, FileText, Satellite, Layers, 
-  ArrowRight, ExternalLink, Gauge, Wind, 
-  Check, AlertTriangle, Cpu, Database, 
-  Eye, RefreshCw, Radio, Sparkles, MapPin,
-  ShieldCheck, AlertCircle, Clock
-} from 'lucide-react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { checkBackendHealth } from '../services/api';
-import PageHeader from '../components/PageHeader';
-import StatusBadge from '../components/StatusBadge';
-import InfoCallout from '../components/InfoCallout';
+import { 
+  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  BarChart, Bar, PieChart, Pie, Cell
+} from 'recharts';
+import { 
+  TrendingUp, TrendingDown,
+  Bug, UserPlus, Radio, Edit3, Trash2, ShieldCheck,
+  ChevronDown, Check, ArrowRight, ShieldAlert, Sparkles, MapPin
+} from 'lucide-react';
+import { toPortalPath } from '../utils/domain';
 
-export function getImdIntensityMeta(windKmh = 85) {
-  if (windKmh >= 222) {
-    return { category: 'Super Cyclonic Storm', color: '#A855F7', bg: 'bg-purple-600', text: 'text-purple-600', tag: 'SuCS' };
-  } else if (windKmh >= 167) {
-    return { category: 'Extremely Severe Cyclonic Storm', color: '#EF4444', bg: 'bg-red-600', text: 'text-red-600', tag: 'ESCS' };
-  } else if (windKmh >= 118) {
-    return { category: 'Very Severe Cyclonic Storm', color: '#F97316', bg: 'bg-orange-500', text: 'text-orange-500', tag: 'VSCS' };
-  } else if (windKmh >= 89) {
-    return { category: 'Severe Cyclonic Storm', color: '#F59E0B', bg: 'bg-amber-500', text: 'text-amber-500', tag: 'SCS' };
-  } else if (windKmh >= 62) {
-    return { category: 'Cyclonic Storm', color: '#10B981', bg: 'bg-emerald-500', text: 'text-emerald-500', tag: 'CS' };
-  } else {
-    return { category: 'Deep Depression', color: '#06B6D4', bg: 'bg-cyan-500', text: 'text-cyan-500', tag: 'DD' };
-  }
-}
-
-export function generateSmoothSpline(points, numInterpolations = 8) {
-  if (!points || points.length < 2) return points || [];
-  const smooth = [];
-  for (let i = 0; i < points.length - 1; i++) {
-    const p0 = i > 0 ? points[i - 1] : points[i];
-    const p1 = points[i];
-    const p2 = points[i + 1];
-    const p3 = i < points.length - 2 ? points[i + 2] : p2;
-
-    for (let t = 0; t < numInterpolations; t++) {
-      const u = t / numInterpolations;
-      const u2 = u * u;
-      const u3 = u2 * u;
-
-      const lat = 0.5 * (
-        (2 * p1[0]) +
-        (-p0[0] + p2[0]) * u +
-        (2 * p0[0] - 5 * p1[0] + 4 * p2[0] - p3[0]) * u2 +
-        (-p0[0] + 3 * p1[0] - 3 * p2[0] + p3[0]) * u3
-      );
-      const lon = 0.5 * (
-        (2 * p1[1]) +
-        (-p0[1] + p2[1]) * u +
-        (2 * p0[1] - 5 * p1[1] + 4 * p2[1] - p3[1]) * u2 +
-        (-p0[1] + 3 * p1[1] - 3 * p2[1] + p3[1]) * u3
-      );
-      smooth.push([parseFloat(lat.toFixed(3)), parseFloat(lon.toFixed(3))]);
-    }
-  }
-  smooth.push(points[points.length - 1]);
-  return smooth;
-}
-
-const BENCHMARK_CASES = {
-  DANA: {
-    id: 'DANA',
-    name: 'Cyclone DANA (2024)',
-    year: '2024',
-    basin: 'Bay of Bengal',
-    current_lat: 20.4,
-    current_lon: 87.2,
-    intensity_stage: 'Severe Cyclonic Storm (SCS)',
-    wind_kmh: 110,
-    wind_kt: 60,
-    pressure_hpa: 984,
-    landfall_corridor: 'Dhamra / Bhadrak Coast, Odisha',
-    status: 'Verified Historical Benchmark',
-    val_cle_km: 25.6,
-    description: 'Post-monsoon Severe Cyclonic Storm in the North Bay of Bengal. Validated 72-hour forecast sequence with northern recurvature and coastal landfall.'
-  },
-  BIPARJOY: {
-    id: 'BIPARJOY',
-    name: 'Cyclone BIPARJOY (2023)',
-    year: '2023',
-    basin: 'Arabian Sea',
-    current_lat: 22.8,
-    current_lon: 67.1,
-    intensity_stage: 'Very Severe Cyclonic Storm (VSCS)',
-    wind_kmh: 140,
-    wind_kt: 75,
-    pressure_hpa: 968,
-    landfall_corridor: 'Jakhau Port, Kutch, Gujarat',
-    status: 'Verified Historical Benchmark',
-    val_cle_km: 38.2,
-    description: 'Extremely Severe Cyclonic Storm in the East-Central Arabian Sea with anomalous northward translation and northeastward recurvature toward Gujarat.'
-  }
+// Datasets for line chart metric tabs
+const METRIC_DATASETS = {
+  wind: [
+    { month: 'Jan', currentYear: 10, lastYear: 5 },
+    { month: 'Feb', currentYear: 5, lastYear: 12 },
+    { month: 'Mar', currentYear: 12, lastYear: 11 },
+    { month: 'Apr', currentYear: 23, lastYear: 10 },
+    { month: 'May', currentYear: 26, lastYear: 18 },
+    { month: 'Jun', currentYear: 16, lastYear: 23 },
+    { month: 'Jul', currentYear: 22, lastYear: 25 },
+  ],
+  pressure: [
+    { month: 'Jan', currentYear: 1008, lastYear: 1012 },
+    { month: 'Feb', currentYear: 1004, lastYear: 1009 },
+    { month: 'Mar', currentYear: 998, lastYear: 1005 },
+    { month: 'Apr', currentYear: 988, lastYear: 996 },
+    { month: 'May', currentYear: 982, lastYear: 990 },
+    { month: 'Jun', currentYear: 992, lastYear: 988 },
+    { month: 'Jul', currentYear: 986, lastYear: 994 },
+  ],
+  rainfall: [
+    { month: 'Jan', currentYear: 15, lastYear: 10 },
+    { month: 'Feb', currentYear: 25, lastYear: 18 },
+    { month: 'Mar', currentYear: 45, lastYear: 32 },
+    { month: 'Apr', currentYear: 120, lastYear: 85 },
+    { month: 'May', currentYear: 240, lastYear: 190 },
+    { month: 'Jun', currentYear: 180, lastYear: 210 },
+    { month: 'Jul', currentYear: 290, lastYear: 245 },
+  ],
 };
 
-const PIPELINE_STAGES = [
-  { id: 'gibs', name: 'NASA GIBS', role: 'Multi-spectral Frame Ingestion', model: 'MODIS / VIIRS Terra-Aqua' },
-  { id: 'detector', name: 'MobileNetV3', role: 'Objectness & Center Fix', model: '1,075,431 Params' },
-  { id: 'classifier', name: 'ResNet18', role: 'Morphology Classification', model: '11,246,436 Params' },
-  { id: 'gradcam', name: 'Grad-CAM', role: 'Visual Attention Heatmap', model: 'Layer-4 Target Act.' },
-  { id: 'gru', name: '2-Layer GRU', role: 'Spatiotemporal Seq2Seq Track', model: '41,764 Params' },
-  { id: 'mcdropout', name: 'MC Dropout', role: 'Epistemic Uncertainty Cone', model: '25 Stochastic Passes' },
-  { id: 'impact', name: 'Impact Engine', role: 'Coastal Strike Probability', model: 'GIS Hazard Polygon' },
-  { id: 'bulletin', name: 'Official Bulletin', role: 'Automated Synoptic PDF', model: 'ReportLab IMD Schema' }
+const KPI_CONFIGS = {
+  Today: {
+    cyclones: '7',
+    cyclonesTrend: '+11.01%',
+    regions: '3,671',
+    regionsTrend: '-0.03%',
+    alerts: '156',
+    alertsTrend: '+15.03%',
+    dataPoints: '2,318',
+    dataPointsTrend: '+6.08%',
+  },
+  'This Week': {
+    cyclones: '12',
+    cyclonesTrend: '+18.4%',
+    regions: '8,920',
+    regionsTrend: '+4.20%',
+    alerts: '412',
+    alertsTrend: '+22.5%',
+    dataPoints: '9,840',
+    dataPointsTrend: '+12.1%',
+  },
+  'This Month': {
+    cyclones: '28',
+    cyclonesTrend: '+5.7%',
+    regions: '18,450',
+    regionsTrend: '+1.15%',
+    alerts: '1,240',
+    alertsTrend: '+8.3%',
+    dataPoints: '34,100',
+    dataPointsTrend: '+14.9%',
+  },
+  'Season 2026': {
+    cyclones: '45',
+    cyclonesTrend: '+14.2%',
+    regions: '42,100',
+    regionsTrend: '+7.80%',
+    alerts: '3,890',
+    alertsTrend: '+19.6%',
+    dataPoints: '112,400',
+    dataPointsTrend: '+28.4%',
+  },
+};
+
+const warningsRegionData = [
+  { name: 'OD', val: 18, fill: '#93C5FD' },
+  { name: 'WB', val: 28, fill: '#6EE7B7' },
+  { name: 'AP', val: 22, fill: '#0F172A' },
+  { name: 'GJ', val: 32, fill: '#93C5FD' },
+  { name: 'MH', val: 13, fill: '#C4B5FD' },
+  { name: 'TN', val: 26, fill: '#6EE7B7' },
+];
+
+const severityData = [
+  { name: 'Severe', value: 52.1, color: '#60A5FA' },
+  { name: 'Very Severe', value: 22.8, color: '#34D399' },
+  { name: 'Super', value: 13.9, color: '#C084FC' },
+  { name: 'Depression', value: 11.2, color: '#475569' },
+];
+
+const topRegions = [
+  { name: 'Odisha Coast', val: '28%', risk: 'High' },
+  { name: 'West Bengal', val: '22%', risk: 'High' },
+  { name: 'Andhra Pradesh', val: '18%', risk: 'Moderate' },
+  { name: 'Gujarat', val: '12%', risk: 'Watch' },
+  { name: 'Maharashtra', val: '10%', risk: 'Watch' },
+  { name: 'Tamil Nadu', val: '10%', risk: 'Watch' },
 ];
 
 const Dashboard = () => {
   const navigate = useNavigate();
-  const [selectedCaseId, setSelectedCaseId] = useState('DANA');
-  const [systemHealth, setSystemHealth] = useState({ status: 'CHECKING', models_active: {} });
-  const [isRefreshing, setIsRefreshing] = useState(false);
-  const [lastChecked, setLastChecked] = useState(new Date());
 
-  const activeCase = BENCHMARK_CASES[selectedCaseId] || BENCHMARK_CASES.DANA;
-  const intensityMeta = getImdIntensityMeta(activeCase.wind_kmh);
+  // Interactive UI state
+  const [selectedTimeRange, setSelectedTimeRange] = useState('Today');
+  const [isTimeRangeOpen, setIsTimeRangeOpen] = useState(false);
+  const [activeMetricTab, setActiveMetricTab] = useState('wind');
+  const [activeOfficerModal, setActiveOfficerModal] = useState(null);
 
-  const fetchHealth = async () => {
-    setIsRefreshing(true);
-    try {
-      const data = await checkBackendHealth();
-      setSystemHealth(data || { status: 'OFFLINE' });
-    } catch {
-      setSystemHealth({ status: 'OFFLINE' });
-    } finally {
-      setIsRefreshing(false);
-      setLastChecked(new Date());
-    }
-  };
-
-  useEffect(() => {
-    fetchHealth();
-  }, []);
-
-  const isOnline = systemHealth.status === 'ONLINE';
+  const kpis = KPI_CONFIGS[selectedTimeRange] || KPI_CONFIGS.Today;
+  const currentChartData = METRIC_DATASETS[activeMetricTab] || METRIC_DATASETS.wind;
 
   return (
-    <div className="space-y-6 max-w-[1600px] w-full min-w-0 mx-auto pb-12 font-sans">
+    <div className="w-full flex flex-col xl:flex-row gap-8 bg-white dark:bg-black min-h-[calc(100vh-3.5rem)] text-slate-800 dark:text-slate-200 p-4 sm:p-6 lg:p-8 font-sans transition-colors duration-200">
+      
+      {/* MAIN LEFT COLUMN */}
+      <div className="flex-1 flex flex-col gap-8 min-w-0">
+        
+        {/* Header with Interactive Time Range Dropdown */}
+        <div className="flex justify-between items-end relative">
+          <div>
+            <h1 className="text-[22px] font-bold text-slate-900 dark:text-white tracking-tight">Overview</h1>
+            <p className="text-xs text-slate-400 dark:text-slate-500 mt-0.5">MoES Operational Meteorological Telemetry</p>
+          </div>
 
-      {/* 1. Header & Active Benchmark Switcher */}
-      <PageHeader
-        categoryBadge="COMMAND CENTER"
-        categoryColor="navy"
-        title="Command Overview"
-        subtitle="Single executive summary of verified benchmark cases, operational pipeline status, and validated empirical metrics."
-        modelBadge="N=1,148 SYNOPTIC CYCLES"
-        actions={
-          <>
-            <div className="storm-pill-track-3d">
-              {Object.values(BENCHMARK_CASES).map((storm) => {
-                const isActive = selectedCaseId === storm.id;
-                return (
-                  <button
-                    key={storm.id}
-                    onClick={() => setSelectedCaseId(storm.id)}
-                    className={`storm-pill-3d-btn ${isActive ? 'is-active' : ''}`}
-                  >
-                    {isActive && (
-                      <span className="absolute inset-0 rounded-full overflow-hidden pointer-events-none">
-                        <span className="animate-vayu-sheen absolute inset-y-0 w-20 bg-gradient-to-r from-transparent via-white/35 to-transparent pointer-events-none" />
-                      </span>
-                    )}
-                    <span className="relative z-10">{storm.name}</span>
-                  </button>
-                );
-              })}
-            </div>
-
-            <button
-              onClick={fetchHealth}
-              disabled={isRefreshing}
-              title="Refresh System Health"
-              className="p-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded-xl text-slate-600 transition-colors cursor-pointer"
+          <div className="relative">
+            <button 
+              onClick={() => setIsTimeRangeOpen(prev => !prev)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 text-[13px] font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-white dark:bg-slate-900 shadow-xs transition-colors cursor-pointer"
             >
-              <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin text-[#003087]' : ''}`} />
+              <span>{selectedTimeRange}</span>
+              <ChevronDown className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500" />
             </button>
-          </>
-        }
-      />
 
-      {/* 2. System Status Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Backend Gateway */}
-        <div className="vayu-glass-3d-card-interactive p-4.5 flex items-center gap-3.5 rounded-2xl cursor-default">
-          <div className={`w-11 h-11 rounded-2xl flex items-center justify-center shrink-0 border shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_2px_6px_rgba(0,0,0,0.04)] ${
-            isOnline 
-              ? 'bg-emerald-50/90 text-emerald-700 border-emerald-200 dark:bg-emerald-950/70 dark:text-emerald-300 dark:border-emerald-800/80' 
-              : 'bg-rose-50/90 text-rose-700 border-rose-200 dark:bg-rose-950/70 dark:text-rose-300 dark:border-rose-800/80'
-          }`}>
-            <Activity className="w-5 h-5" />
-          </div>
-          <div className="min-w-0">
-            <span className="text-[10px] uppercase font-bold tracking-wider font-mono text-slate-500 dark:text-slate-400 block">FastAPI Gateway</span>
-            <span className="text-sm font-black text-slate-950 dark:text-white flex items-center gap-2 tracking-tight">
-              {isOnline ? 'ONLINE' : 'UNAVAILABLE'}
-              <span className={`w-2 h-2 rounded-full shrink-0 ${isOnline ? 'bg-emerald-500 shadow-xs shadow-emerald-500/50' : 'bg-red-500 shadow-xs shadow-red-500/50'}`} />
-            </span>
-            <span className="text-[11px] font-semibold font-mono text-slate-600 dark:text-slate-300 block truncate mt-0.5">v4.0.0 • Port 8000</span>
+            {isTimeRangeOpen && (
+              <div className="absolute right-0 mt-1.5 w-40 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-xl shadow-xl z-30 py-1 animate-in fade-in duration-100">
+                {['Today', 'This Week', 'This Month', 'Season 2026'].map((range) => (
+                  <button
+                    key={range}
+                    onClick={() => {
+                      setSelectedTimeRange(range);
+                      setIsTimeRangeOpen(false);
+                    }}
+                    className={`w-full flex items-center justify-between px-3 py-2 text-xs font-medium text-left transition-colors cursor-pointer ${
+                      selectedTimeRange === range
+                        ? 'bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 font-semibold'
+                        : 'text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                  >
+                    <span>{range}</span>
+                    {selectedTimeRange === range && <Check className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400" />}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </div>
 
-        {/* AI Checkpoints */}
-        <div className="vayu-glass-3d-card-interactive p-4.5 flex items-center gap-3.5 rounded-2xl cursor-default">
-          <div className="w-11 h-11 rounded-2xl bg-blue-50/90 text-[#003087] dark:bg-blue-950/70 dark:text-blue-300 border border-blue-200 dark:border-blue-800/80 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_2px_6px_rgba(0,0,0,0.04)] flex items-center justify-center shrink-0">
-            <Cpu className="w-5 h-5" />
-          </div>
-          <div className="min-w-0">
-            <span className="text-[10px] uppercase font-bold tracking-wider font-mono text-slate-500 dark:text-slate-400 block">Model Checkpoints</span>
-            <span className="text-sm font-black text-slate-950 dark:text-white block tracking-tight">3 Neural Models Active</span>
-            <span className="text-[11px] font-semibold font-mono text-slate-600 dark:text-slate-300 block truncate mt-0.5">PyTorch 2.0 • CPU/MPS</span>
-          </div>
-        </div>
-
-        {/* Satellite Service */}
-        <div className="vayu-glass-3d-card-interactive p-4.5 flex items-center gap-3.5 rounded-2xl cursor-default">
-          <div className="w-11 h-11 rounded-2xl bg-sky-50/90 text-sky-700 dark:bg-sky-950/70 dark:text-sky-300 border border-sky-200 dark:border-sky-800/80 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_2px_6px_rgba(0,0,0,0.04)] flex items-center justify-center shrink-0">
-            <Satellite className="w-5 h-5" />
-          </div>
-          <div className="min-w-0">
-            <span className="text-[10px] uppercase font-bold tracking-wider font-mono text-slate-500 dark:text-slate-400 block">Satellite Feed</span>
-            <span className="text-sm font-black text-slate-950 dark:text-white block tracking-tight">NASA GIBS / EOSDIS</span>
-            <span className="text-[11px] font-semibold font-mono text-slate-600 dark:text-slate-300 block truncate mt-0.5">MODIS & VIIRS Tiles</span>
-          </div>
-        </div>
-
-        {/* Telemetry Database */}
-        <div className="vayu-glass-3d-card-interactive p-4.5 flex items-center gap-3.5 rounded-2xl cursor-default">
-          <div className="w-11 h-11 rounded-2xl bg-purple-50/90 text-purple-700 dark:bg-purple-950/70 dark:text-purple-300 border border-purple-200 dark:border-purple-800/80 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_2px_6px_rgba(0,0,0,0.04)] flex items-center justify-center shrink-0">
-            <Database className="w-5 h-5" />
-          </div>
-          <div className="min-w-0">
-            <span className="text-[10px] uppercase font-bold tracking-wider font-mono text-slate-500 dark:text-slate-400 block">Historical Database</span>
-            <span className="text-sm font-black text-slate-950 dark:text-white block tracking-tight">SQLite (9 Tables)</span>
-            <span className="text-[11px] font-semibold font-mono text-slate-600 dark:text-slate-300 block truncate mt-0.5">1,148 Synoptic Cycles</span>
-          </div>
-        </div>
-      </div>
-
-      {/* 3. 8-Stage Real AI Pipeline Orchestration Tracker */}
-      <div className="vayu-glass-3d-card overflow-hidden rounded-3xl">
-        <div className="p-4 px-5 border-b border-white/70 dark:border-slate-800/80 bg-white/40 dark:bg-slate-900/40 backdrop-blur-xs flex items-center justify-between gap-4">
-          <div className="flex items-center gap-2.5">
-            <div className="w-7 h-7 rounded-lg bg-blue-50 dark:bg-blue-950/60 text-[#003087] dark:text-blue-400 border border-blue-200/60 dark:border-blue-800/60 shadow-2xs flex items-center justify-center shrink-0">
-              <Layers className="w-4 h-4" />
+        {/* 4 KPI Cards (Dynamic values reacting to timeRange) */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div 
+            onClick={() => navigate(toPortalPath('/dashboard/trajectory'))}
+            className="bg-[#F3F4F6] dark:bg-slate-900/90 border border-transparent dark:border-slate-800/80 p-5 rounded-2xl flex flex-col justify-between h-32 cursor-pointer hover:shadow-md transition-all group"
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Active Cyclones</span>
+              <ArrowRight className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity" />
             </div>
-            <h3 className="text-xs font-black text-slate-900 dark:text-white uppercase tracking-wider">
-              8-Stage Operational AI Vision & Forecasting Pipeline
-            </h3>
+            <div className="flex items-end gap-3">
+              <span className="text-[28px] leading-none font-bold text-slate-900 dark:text-white">{kpis.cyclones}</span>
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center pb-1">
+                {kpis.cyclonesTrend} <TrendingUp className="w-3 h-3 ml-0.5 text-emerald-600 dark:text-emerald-400" />
+              </span>
+            </div>
           </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <span className="text-xs font-mono font-medium text-slate-500 dark:text-slate-400">Status:</span>
-            <StatusBadge status={isOnline ? 'READY' : 'UNAVAILABLE'} size="xs" />
+
+          <div 
+            onClick={() => navigate(toPortalPath('/dashboard/impact'))}
+            className="bg-[#EBF5FF] dark:bg-slate-900/90 border border-transparent dark:border-sky-900/40 p-5 rounded-2xl flex flex-col justify-between h-32 cursor-pointer hover:shadow-md transition-all group"
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Affected Regions</span>
+              <ArrowRight className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+            </div>
+            <div className="flex items-end gap-3">
+              <span className="text-[28px] leading-none font-bold text-slate-900 dark:text-white">{kpis.regions}</span>
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center pb-1">
+                {kpis.regionsTrend} <TrendingDown className="w-3 h-3 ml-0.5 text-slate-400 dark:text-slate-500" />
+              </span>
+            </div>
+          </div>
+
+          <div 
+            onClick={() => navigate(toPortalPath('/dashboard/impact'))}
+            className="bg-[#F3F0FF] dark:bg-slate-900/90 border border-transparent dark:border-purple-900/40 p-5 rounded-2xl flex flex-col justify-between h-32 cursor-pointer hover:shadow-md transition-all group"
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Alerts Issued</span>
+              <ArrowRight className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+            </div>
+            <div className="flex items-end gap-3">
+              <span className="text-[28px] leading-none font-bold text-slate-900 dark:text-white">{kpis.alerts}</span>
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center pb-1">
+                {kpis.alertsTrend} <TrendingUp className="w-3 h-3 ml-0.5 text-emerald-600 dark:text-emerald-400" />
+              </span>
+            </div>
+          </div>
+
+          <div 
+            onClick={() => navigate(toPortalPath('/dashboard/earth'))}
+            className="bg-[#F0FDF4] dark:bg-slate-900/90 border border-transparent dark:border-emerald-900/40 p-5 rounded-2xl flex flex-col justify-between h-32 cursor-pointer hover:shadow-md transition-all group"
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-semibold text-slate-700 dark:text-slate-300">Data Points</span>
+              <ArrowRight className="w-3.5 h-3.5 text-slate-400 dark:text-slate-500 opacity-0 group-hover:opacity-100 transition-opacity" />
+            </div>
+            <div className="flex items-end gap-3">
+              <span className="text-[28px] leading-none font-bold text-slate-900 dark:text-white">{kpis.dataPoints}</span>
+              <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 flex items-center pb-1">
+                {kpis.dataPointsTrend} <TrendingUp className="w-3 h-3 ml-0.5 text-emerald-600 dark:text-emerald-400" />
+              </span>
+            </div>
           </div>
         </div>
 
-        <div className="p-4.5 overflow-x-auto">
-          <div className="flex items-center gap-2.5 min-w-[960px]">
-            {PIPELINE_STAGES.map((stage, idx) => (
-              <React.Fragment key={stage.id}>
-                <div className="vayu-glass-3d-step flex-1 min-w-[130px] rounded-2xl p-3.5 group cursor-default">
-                  <div className="flex items-center justify-between mb-1.5">
-                    <span className="text-[11px] font-bold font-mono text-slate-500 dark:text-slate-400">0{idx + 1}</span>
-                    <StatusBadge status={isOnline ? 'READY' : 'OFFLINE'} size="xs" />
-                  </div>
-                  <h4 className="text-xs font-black text-slate-950 dark:text-white tracking-tight group-hover:text-[#003087] dark:group-hover:text-sky-300 transition-colors">{stage.name}</h4>
-                  <p className="text-[11px] font-medium text-slate-700 dark:text-slate-300 mt-1 leading-snug">{stage.role}</p>
-                  <div className="mt-2 pt-1.5 border-t border-slate-200/60 dark:border-slate-700/60">
-                    <span className="text-[10px] font-mono font-semibold text-slate-500 dark:text-slate-400 block truncate" title={stage.model}>{stage.model}</span>
+        {/* Middle Row: Interactive Line Chart Tabs + Regions List */}
+        <div className="flex flex-col lg:flex-row gap-6 bg-[#FAFAFA] dark:bg-slate-900/80 rounded-[32px] p-6 border border-slate-100/60 dark:border-slate-800/80 transition-colors">
+          
+          <div className="flex-1 flex flex-col min-w-0 pr-0 lg:pr-6 lg:border-r border-slate-100/50 dark:border-slate-800/60">
+            {/* Interactive Metric Switcher Tabs */}
+            <div className="flex flex-wrap items-center gap-6 mb-8">
+              <button 
+                onClick={() => setActiveMetricTab('wind')}
+                className={`text-sm cursor-pointer transition-all ${
+                  activeMetricTab === 'wind'
+                    ? 'font-bold text-slate-900 dark:text-white relative after:absolute after:-bottom-2 after:left-0 after:w-full after:h-0.5 after:bg-slate-800 dark:after:bg-sky-400'
+                    : 'font-medium text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                }`}
+              >
+                Wind Speed Trends
+              </button>
+
+              <button 
+                onClick={() => setActiveMetricTab('pressure')}
+                className={`text-sm cursor-pointer transition-all ${
+                  activeMetricTab === 'pressure'
+                    ? 'font-bold text-slate-900 dark:text-white relative after:absolute after:-bottom-2 after:left-0 after:w-full after:h-0.5 after:bg-slate-800 dark:after:bg-sky-400'
+                    : 'font-medium text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                }`}
+              >
+                Pressure Anomalies
+              </button>
+
+              <button 
+                onClick={() => setActiveMetricTab('rainfall')}
+                className={`text-sm cursor-pointer transition-all ${
+                  activeMetricTab === 'rainfall'
+                    ? 'font-bold text-slate-900 dark:text-white relative after:absolute after:-bottom-2 after:left-0 after:w-full after:h-0.5 after:bg-slate-800 dark:after:bg-sky-400'
+                    : 'font-medium text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                }`}
+              >
+                Rainfall
+              </button>
+
+              <div className="ml-auto flex gap-5 text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-slate-800 dark:bg-sky-400"></span> 2026 Season</span>
+                <span className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-blue-300 dark:bg-blue-500"></span> 2025 Benchmark</span>
+              </div>
+            </div>
+            
+            <div className="h-[240px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={currentChartData} margin={{ top: 5, right: 0, left: -25, bottom: 0 }}>
+                  <CartesianGrid vertical={false} stroke="#E2E8F0" strokeDasharray="4 4" className="stroke-slate-200 dark:stroke-slate-800" />
+                  <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#94A3B8' }} dy={10} />
+                  <YAxis 
+                    axisLine={false} 
+                    tickLine={false} 
+                    tick={{ fontSize: 11, fill: '#94A3B8' }} 
+                    domain={activeMetricTab === 'pressure' ? [970, 1020] : ['auto', 'auto']}
+                    tickFormatter={(val) => {
+                      if (activeMetricTab === 'pressure') return `${val}`;
+                      if (activeMetricTab === 'rainfall') return `${val}mm`;
+                      return val > 0 ? `${val}k` : '0';
+                    }} 
+                  />
+                  <Tooltip 
+                    contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 20px -2px rgba(0,0,0,0.2)' }}
+                    itemStyle={{ fontSize: '13px', fontWeight: 600 }}
+                  />
+                  <Line type="monotone" dataKey="currentYear" name="Current Season" stroke="#0F172A" strokeWidth={2} dot={false} activeDot={{ r: 5, fill: '#0EA5E9', stroke: '#fff', strokeWidth: 2 }} />
+                  <Line type="monotone" dataKey="lastYear" name="Historical" stroke="#93C5FD" strokeWidth={2} strokeDasharray="4 4" dot={false} />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+
+          <div className="w-full lg:w-[220px] shrink-0 pt-2">
+            <h3 className="text-[13px] font-bold text-slate-900 dark:text-white mb-6">Top Affected Regions</h3>
+            <div className="space-y-4">
+              {topRegions.map((region, idx) => (
+                <div 
+                  key={idx} 
+                  onClick={() => navigate(toPortalPath('/dashboard/impact'))}
+                  className="flex items-center gap-4 cursor-pointer group"
+                >
+                  <span className="text-[13px] font-medium text-slate-700 dark:text-slate-300 group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors w-24 truncate">{region.name}</span>
+                  <div className="flex-1 flex items-center gap-3">
+                    <div className="flex-1 h-[3px] bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                      <div className="h-full bg-slate-800 dark:bg-sky-500 group-hover:bg-sky-500 rounded-full transition-colors" style={{ width: region.val }}></div>
+                    </div>
                   </div>
                 </div>
-                {idx < PIPELINE_STAGES.length - 1 && (
-                  <ArrowRight className="w-4 h-4 text-slate-400 dark:text-slate-500 shrink-0" />
-                )}
-              </React.Fragment>
+              ))}
+            </div>
+          </div>
+
+        </div>
+
+        {/* Bottom 2 charts */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="bg-[#FAFAFA] dark:bg-slate-900/80 rounded-[32px] p-6 border border-slate-100/60 dark:border-slate-800/80 transition-colors">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-6">Warnings by Region</h3>
+            <div className="h-[200px] w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <BarChart data={warningsRegionData} barSize={28} margin={{ top: 0, right: 0, left: -20, bottom: 0 }}>
+                  <CartesianGrid vertical={false} stroke="#E2E8F0" strokeDasharray="3 3" className="stroke-slate-200 dark:stroke-slate-800" />
+                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#94A3B8' }} dy={10} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#94A3B8' }} tickFormatter={(val) => val > 0 ? `${val}k` : '0'} />
+                  <Tooltip cursor={{ fill: 'transparent' }} contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px -2px rgba(0,0,0,0.2)' }} />
+                  <Bar dataKey="val" radius={[6, 6, 6, 6]}>
+                    {warningsRegionData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.fill} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+          </div>
+          
+          <div className="bg-[#FAFAFA] dark:bg-slate-900/80 rounded-[32px] p-6 border border-slate-100/60 dark:border-slate-800/80 flex flex-col transition-colors">
+            <h3 className="text-sm font-bold text-slate-900 dark:text-white mb-2">Severity Distribution</h3>
+            <div className="flex-1 flex flex-row items-center justify-between px-4">
+              <div className="w-[160px] h-[160px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <PieChart>
+                    <Pie
+                      data={severityData}
+                      innerRadius={45}
+                      outerRadius={80}
+                      paddingAngle={0}
+                      dataKey="value"
+                      stroke="none"
+                    >
+                      {severityData.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={entry.color} />
+                      ))}
+                    </Pie>
+                  </PieChart>
+                </ResponsiveContainer>
+              </div>
+              <div className="flex flex-col gap-3 justify-center">
+                {severityData.map((item, idx) => (
+                  <div key={idx} className="flex items-center gap-2">
+                    <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 w-20">{item.name}</span>
+                    <span className="text-xs font-bold text-slate-900 dark:text-white">{item.value}%</span>
+                    <span className="w-1.5 h-1.5 rounded-full ml-1" style={{ backgroundColor: item.color }}></span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      {/* RIGHT COLUMN */}
+      <div className="w-full xl:w-[280px] shrink-0 flex flex-col gap-10 xl:pl-2">
+        
+        {/* System Alerts */}
+        <div>
+          <h3 className="text-[13px] font-bold text-slate-900 dark:text-white mb-5">System Alerts</h3>
+          <div className="space-y-4">
+            <div 
+              onClick={() => navigate(toPortalPath('/dashboard/detection'))}
+              className="flex gap-3 items-start p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer group"
+            >
+              <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 group-hover:bg-slate-200 dark:group-hover:bg-slate-700">
+                <ShieldCheck className="w-4 h-4 text-slate-700 dark:text-slate-300" />
+              </div>
+              <div>
+                <p className="text-[13px] font-semibold text-slate-800 dark:text-slate-200 leading-tight group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">Anomaly detection active.</p>
+                <p className="text-[11px] font-medium text-slate-400 dark:text-slate-500 mt-1">Just now</p>
+              </div>
+            </div>
+
+            <div 
+              onClick={() => navigate(toPortalPath('/dashboard/trajectory'))}
+              className="flex gap-3 items-start p-2 rounded-xl hover:bg-sky-50/50 dark:hover:bg-sky-950/30 transition-colors cursor-pointer group"
+            >
+              <div className="w-8 h-8 rounded-full bg-sky-50 dark:bg-sky-950/60 flex items-center justify-center shrink-0 group-hover:bg-sky-100 dark:group-hover:bg-sky-900/60">
+                <UserPlus className="w-4 h-4 text-sky-600 dark:text-sky-400" />
+              </div>
+              <div>
+                <p className="text-[13px] font-semibold text-slate-800 dark:text-slate-200 leading-tight group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">Windy.com telemetry active.</p>
+                <p className="text-[11px] font-medium text-slate-400 dark:text-slate-500 mt-1">Live Model Ingestion</p>
+              </div>
+            </div>
+
+            <div 
+              onClick={() => navigate(toPortalPath('/dashboard/trajectory'))}
+              className="flex gap-3 items-start p-2 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer group"
+            >
+              <div className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center shrink-0 group-hover:bg-slate-200 dark:group-hover:bg-slate-700">
+                <ShieldCheck className="w-4 h-4 text-slate-700 dark:text-slate-300" />
+              </div>
+              <div>
+                <p className="text-[13px] font-semibold text-slate-800 dark:text-slate-200 leading-tight group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors">Backend sync complete.</p>
+                <p className="text-[11px] font-medium text-slate-400 dark:text-slate-500 mt-1">12 hours ago</p>
+              </div>
+            </div>
+
+            <div 
+              onClick={() => navigate(toPortalPath('/dashboard/bulletin'))}
+              className="flex gap-3 items-start p-2 rounded-xl hover:bg-emerald-50/50 dark:hover:bg-emerald-950/30 transition-colors cursor-pointer group"
+            >
+              <div className="w-8 h-8 rounded-full bg-emerald-50 dark:bg-emerald-950/60 flex items-center justify-center shrink-0 group-hover:bg-emerald-100 dark:group-hover:bg-emerald-900/60">
+                <Radio className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+              </div>
+              <div>
+                <p className="text-[13px] font-semibold text-slate-800 dark:text-slate-200 leading-tight group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors">MoES Bulletin Dispatched.</p>
+                <p className="text-[11px] font-medium text-slate-400 dark:text-slate-500 mt-1">Today, 11:59 AM</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Recent Updates */}
+        <div>
+          <h3 className="text-[13px] font-bold text-slate-900 dark:text-white mb-5">Recent Updates</h3>
+          <div className="space-y-4 relative before:absolute before:inset-0 before:ml-[15px] before:w-0.5 before:bg-slate-100 dark:before:bg-slate-800">
+            
+            <div 
+              onClick={() => navigate(toPortalPath('/dashboard/trajectory'))}
+              className="relative flex items-start gap-4 p-1.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer"
+            >
+              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-white dark:bg-slate-900 relative z-10 shrink-0 border border-slate-100 dark:border-slate-800">
+                <div className="w-6 h-6 rounded-full overflow-hidden shadow-sm">
+                  <img src="https://ui-avatars.com/api/?name=TC&background=E0E7FF&color=4F46E5" alt="TC" className="w-full h-full object-cover" />
+                </div>
+              </div>
+              <div className="pt-0.5">
+                 <p className="text-[13px] font-semibold text-slate-800 dark:text-slate-200 leading-tight">Trajectory modified.</p>
+                 <p className="text-[11px] font-medium text-slate-400 dark:text-slate-500 mt-0.5">Just now</p>
+              </div>
+            </div>
+
+            <div 
+              onClick={() => navigate(toPortalPath('/dashboard/impact'))}
+              className="relative flex items-start gap-4 p-1.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer"
+            >
+              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-white dark:bg-slate-900 relative z-10 shrink-0 border border-slate-100 dark:border-slate-800">
+                <div className="w-6 h-6 rounded-full overflow-hidden shadow-sm">
+                  <img src="https://ui-avatars.com/api/?name=NS&background=FFEDD5&color=C2410C" alt="NS" className="w-full h-full object-cover" />
+                </div>
+              </div>
+              <div className="pt-0.5">
+                 <p className="text-[13px] font-semibold text-slate-800 dark:text-slate-200 leading-tight">Released a new forecast.</p>
+                 <p className="text-[11px] font-medium text-slate-400 dark:text-slate-500 mt-0.5">59 minutes ago</p>
+              </div>
+            </div>
+
+            <div 
+              onClick={() => navigate(toPortalPath('/dashboard/models'))}
+              className="relative flex items-start gap-4 p-1.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer"
+            >
+              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-white dark:bg-slate-900 relative z-10 shrink-0 border border-slate-100 dark:border-slate-800">
+                <div className="w-6 h-6 rounded-full overflow-hidden shadow-sm">
+                  <img src="https://ui-avatars.com/api/?name=MD&background=E0F2FE&color=0369A1" alt="MD" className="w-full h-full object-cover" />
+                </div>
+              </div>
+              <div className="pt-0.5">
+                 <p className="text-[13px] font-semibold text-slate-800 dark:text-slate-200 leading-tight">Modified telemetry data.</p>
+                 <p className="text-[11px] font-medium text-slate-400 dark:text-slate-500 mt-0.5">Today, 11:59 AM</p>
+              </div>
+            </div>
+            
+          </div>
+        </div>
+
+        {/* Field Units */}
+        <div>
+          <h3 className="text-[13px] font-bold text-slate-900 dark:text-white mb-5">Field Units</h3>
+          <div className="space-y-3">
+            {[
+              { name: 'Natali Craig', role: 'Radar Operations', status: 'Active on Site', bg: 'bg-indigo-100 dark:bg-indigo-950/60', text: 'text-indigo-700 dark:text-indigo-300' },
+              { name: 'Drew Cano', role: 'Telemetry Ingestion', status: 'Standby', bg: 'bg-emerald-100 dark:bg-emerald-950/60', text: 'text-emerald-700 dark:text-emerald-300' },
+              { name: 'Andi Lane', role: 'Disaster Coordination', status: 'In Field', bg: 'bg-amber-100 dark:bg-amber-950/60', text: 'text-amber-700 dark:text-amber-300' },
+              { name: 'Koray Okumus', role: 'AI Inference', status: 'Online', bg: 'bg-sky-100 dark:bg-sky-950/60', text: 'text-sky-700 dark:text-sky-300' },
+              { name: 'Kate Morrison', role: 'Satellite Analyst', status: 'Active', bg: 'bg-rose-100 dark:bg-rose-950/60', text: 'text-rose-700 dark:text-rose-300' },
+            ].map((unit) => (
+              <div 
+                key={unit.name} 
+                onClick={() => setActiveOfficerModal(unit)}
+                className="flex items-center justify-between p-1.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer group"
+              >
+                <div className="flex items-center gap-3">
+                  <div className={`w-7 h-7 rounded-full flex items-center justify-center font-bold text-[10px] ${unit.bg} ${unit.text}`}>
+                    {unit.name.split(' ').map(n => n[0]).join('')}
+                  </div>
+                  <div>
+                    <span className="text-[13px] font-medium text-slate-700 dark:text-slate-300 group-hover:text-slate-900 dark:group-hover:text-white block leading-tight">{unit.name}</span>
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500">{unit.role}</span>
+                  </div>
+                </div>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-medium">
+                  {unit.status}
+                </span>
+              </div>
             ))}
           </div>
         </div>
+
       </div>
 
-      {/* 4. Empirical Benchmark Cards (Verified Metrics) */}
-      <div className="w-full min-w-0">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 mb-3">
-          <div className="flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
-            <h2 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-              Empirical Benchmark Performance (N=1,148 Synoptic Cycles)
-            </h2>
-          </div>
-          <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono font-semibold">Held-Out Test Partition Verification</span>
-        </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="card p-4.5 border-l-4 border-l-emerald-500 border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-2xl shadow-xs">
-            <span className="text-[10px] uppercase font-bold font-mono tracking-wider text-slate-500 dark:text-slate-400 block">MobileNetV3 Objectness</span>
-            <div className="text-2xl font-black text-slate-950 dark:text-white mt-1 tracking-tight">100%</div>
-            <p className="text-xs text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">Detection accuracy on held-out cyclone satellite frames.</p>
-            <span className="text-[10px] text-emerald-700 dark:text-emerald-400 font-mono mt-2.5 block font-semibold">1,075,431 Parameters</span>
-          </div>
-
-          <div className="card p-4.5 border-l-4 border-l-sky-500 border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-2xl shadow-xs">
-            <span className="text-[10px] uppercase font-bold font-mono tracking-wider text-slate-500 dark:text-slate-400 block">Validation CLE (72h)</span>
-            <div className="text-2xl font-black text-sky-700 dark:text-sky-400 mt-1 tracking-tight">25.6 km</div>
-            <p className="text-xs text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">Mean Center Location Error at +72h horizon on validation set.</p>
-            <span className="text-[10px] text-sky-700 dark:text-sky-400 font-mono mt-2.5 block font-semibold">Cyclone DANA (2024)</span>
-          </div>
-
-          <div className="card p-4.5 border-l-4 border-l-[#003087] border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-2xl shadow-xs">
-            <span className="text-[10px] uppercase font-bold font-mono tracking-wider text-slate-500 dark:text-slate-400 block">Test CLE (72h)</span>
-            <div className="text-2xl font-black text-[#003087] dark:text-blue-400 mt-1 tracking-tight">38.2 km</div>
-            <p className="text-xs text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">Generalization Center Location Error across cross-basin test tracks.</p>
-            <span className="text-[10px] text-[#003087] dark:text-blue-400 font-mono mt-2.5 block font-semibold">Cyclone BIPARJOY (2023)</span>
-          </div>
-
-          <div className="card p-4.5 border-l-4 border-l-purple-500 border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 rounded-2xl shadow-xs">
-            <span className="text-[10px] uppercase font-bold font-mono tracking-wider text-slate-500 dark:text-slate-400 block">+72h vs Persistence</span>
-            <div className="text-2xl font-black text-purple-700 dark:text-purple-400 mt-1 tracking-tight">+86.0 km</div>
-            <p className="text-xs text-slate-600 dark:text-slate-300 mt-1 leading-relaxed">Lower mean track error at +72h compared to operational persistence.</p>
-            <span className="text-[10px] text-purple-700 dark:text-purple-400 font-mono mt-2.5 block font-semibold">Statistically Significant (p &lt; 0.001)</span>
-          </div>
-        </div>
-      </div>
-
-      {/* 5. Active Benchmark Case Synopsis */}
-      <div className="card p-5 border border-slate-200/90 dark:border-slate-800 bg-white dark:bg-slate-900 shadow-xs rounded-2xl">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-4">
-          <div className="space-y-1.5">
-            <div className="flex items-center gap-2">
-              <span className="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase tracking-wider bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800/80 font-mono">
-                Active Benchmark Case
-              </span>
-              <span className="text-xs text-slate-500 dark:text-slate-400 font-mono font-medium">{activeCase.basin} Basin</span>
-            </div>
-            <h3 className="text-xl sm:text-2xl font-black text-slate-950 dark:text-white tracking-tight">{activeCase.name}</h3>
-            <p className="text-xs text-slate-600 dark:text-slate-300 max-w-3xl leading-relaxed">{activeCase.description}</p>
-          </div>
-
-          <div className="flex items-center gap-2 shrink-0">
-            <span className="px-3 py-1.5 rounded-lg text-xs font-bold text-white shadow-xs" style={{ backgroundColor: intensityMeta.color }}>
-              {activeCase.intensity_stage}
-            </span>
-            <span className="px-2.5 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800/80 text-xs font-bold font-mono flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-600 dark:bg-emerald-400" />
-              72h Sequence Verified
-            </span>
-          </div>
-        </div>
-
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 text-xs font-mono">
-          <div>
-            <span className="text-slate-500 dark:text-slate-400 text-[10px] uppercase font-bold tracking-wider block font-mono">Benchmark Position</span>
-            <span className="text-slate-900 dark:text-white font-extrabold text-sm sm:text-base mt-1 block font-mono">{activeCase.current_lat}°N, {activeCase.current_lon}°E</span>
-          </div>
-          <div>
-            <span className="text-slate-500 dark:text-slate-400 text-[10px] uppercase font-bold tracking-wider block font-mono">Sustained Wind Speed</span>
-            <span className="text-red-600 dark:text-red-400 font-extrabold text-sm sm:text-base mt-1 block font-mono">{activeCase.wind_kmh} km/h ({activeCase.wind_kt} kt)</span>
-          </div>
-          <div>
-            <span className="text-slate-500 dark:text-slate-400 text-[10px] uppercase font-bold tracking-wider block font-mono">Central MSLP</span>
-            <span className="text-sky-700 dark:text-sky-400 font-extrabold text-sm sm:text-base mt-1 block font-mono">{activeCase.pressure_hpa} hPa</span>
-          </div>
-          <div>
-            <span className="text-slate-500 dark:text-slate-400 text-[10px] uppercase font-bold tracking-wider block font-mono">Target Landfall Sector</span>
-            <span className="text-amber-700 dark:text-amber-400 font-bold text-xs sm:text-sm mt-1 block truncate">{activeCase.landfall_corridor}</span>
-          </div>
-        </div>
-
-        <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-600 dark:text-slate-400">
-          <div className="flex items-center gap-2">
-            <ShieldAlert className="w-4 h-4 text-amber-500 shrink-0" />
-            <span><strong className="text-slate-900 dark:text-slate-200 font-bold">Strict State Isolation:</strong> In-session satellite uploads on other pages remain isolated and do not alter this benchmark state.</span>
-          </div>
-          <span className="font-mono text-[11px] font-semibold text-sky-700 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/60 px-2.5 py-1 rounded-md border border-sky-100 dark:border-sky-800/60 hidden md:inline">Ground Truth Fix: 00:00 UTC</span>
-        </div>
-      </div>
-
-      {/* 6. Operational Navigation Launch Matrix */}
-      <div className="w-full min-w-0">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 mb-3">
-          <div className="flex items-center gap-2">
-            <ArrowRight className="w-4 h-4 text-[#003087] shrink-0" />
-            <h2 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-              Operational Subsystems & Dedicated Analysis Studios
-            </h2>
-          </div>
-          <span className="text-[11px] text-slate-500 dark:text-slate-400 font-mono font-semibold">Select a dedicated workspace</span>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {/* Satellite Analysis */}
-          <div className="vayu-glass-3d-card-interactive p-5.5 rounded-3xl flex flex-col justify-between group">
-            <div className="space-y-2.5">
-              <div className="w-11 h-11 rounded-2xl bg-sky-50 text-sky-700 border border-sky-200 dark:bg-sky-950/70 dark:text-sky-300 dark:border-sky-800 flex items-center justify-center shrink-0 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_2px_6px_rgba(0,0,0,0.04)]">
-                <Satellite className="w-5 h-5" />
+      {/* Field Officer Detail Modal */}
+      {activeOfficerModal && (
+        <div 
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150"
+          onClick={() => setActiveOfficerModal(null)}
+        >
+          <div 
+            className="w-full max-w-sm bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-5 shadow-2xl space-y-4"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="flex items-center gap-3">
+              <div className={`w-10 h-10 rounded-full flex items-center justify-center font-bold text-sm ${activeOfficerModal.bg} ${activeOfficerModal.text}`}>
+                {activeOfficerModal.name.split(' ').map(n => n[0]).join('')}
               </div>
-              <h3 className="text-sm font-black text-slate-900 dark:text-white group-hover:text-[#003087] dark:group-hover:text-sky-300 transition-colors tracking-tight">
-                Satellite Imagery Studio
-              </h3>
-              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                NASA GIBS MODIS/VIIRS multi-spectral ingestion, custom image upload, and integrated single-frame AI vision assessment.
-              </p>
-            </div>
-            <div className="pt-4 mt-3 border-t border-slate-200/60 dark:border-slate-800/80 flex items-center justify-between">
-              <span className="text-[10px] font-mono font-semibold text-slate-400 dark:text-slate-500">/dashboard/satellite</span>
-              <button
-                onClick={() => navigate('/dashboard/satellite')}
-                className="btn-secondary text-xs py-1.5 px-3.5 rounded-xl backdrop-blur-md bg-white/90 dark:bg-slate-800/90 hover:bg-[#003087] hover:text-white border border-slate-200/90 dark:border-slate-700 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_2px_5px_rgba(0,0,0,0.04)] group-hover:bg-[#003087] group-hover:text-white transition-all cursor-pointer font-bold"
-              >
-                Open Satellite Analysis
-              </button>
-            </div>
-          </div>
-
-          {/* Cyclone Detection */}
-          <div className="vayu-glass-3d-card-interactive p-5.5 rounded-3xl flex flex-col justify-between group">
-            <div className="space-y-2.5">
-              <div className="w-11 h-11 rounded-2xl bg-emerald-50 text-emerald-700 border border-emerald-200 dark:bg-emerald-950/70 dark:text-emerald-300 dark:border-emerald-800 flex items-center justify-center shrink-0 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_2px_6px_rgba(0,0,0,0.04)]">
-                <Compass className="w-5 h-5" />
+              <div>
+                <h4 className="text-sm font-bold text-slate-900 dark:text-white">{activeOfficerModal.name}</h4>
+                <p className="text-xs text-slate-400 dark:text-slate-500">{activeOfficerModal.role} • {activeOfficerModal.status}</p>
               </div>
-              <h3 className="text-sm font-black text-slate-900 dark:text-white group-hover:text-[#003087] dark:group-hover:text-sky-300 transition-colors tracking-tight">
-                Cyclone Detection & Center Localization
-              </h3>
-              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                MobileNetV3-Small deep detector (1,075,431 params) executing objectness scoring, bounding box, and center coordinate fixes.
-              </p>
             </div>
-            <div className="pt-4 mt-3 border-t border-slate-200/60 dark:border-slate-800/80 flex items-center justify-between">
-              <span className="text-[10px] font-mono font-semibold text-slate-400 dark:text-slate-500">/dashboard/detection</span>
-              <button
-                onClick={() => navigate('/dashboard/detection')}
-                className="btn-secondary text-xs py-1.5 px-3.5 rounded-xl backdrop-blur-md bg-white/90 dark:bg-slate-800/90 hover:bg-[#003087] hover:text-white border border-slate-200/90 dark:border-slate-700 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_2px_5px_rgba(0,0,0,0.04)] group-hover:bg-[#003087] group-hover:text-white transition-all cursor-pointer font-bold"
-              >
-                Open Detection
-              </button>
-            </div>
-          </div>
 
-          {/* Morphology Classification */}
-          <div className="vayu-glass-3d-card-interactive p-5.5 rounded-3xl flex flex-col justify-between group">
-            <div className="space-y-2.5">
-              <div className="w-11 h-11 rounded-2xl bg-purple-50 text-purple-700 border border-purple-200 dark:bg-purple-950/70 dark:text-purple-300 dark:border-purple-800 flex items-center justify-center shrink-0 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_2px_6px_rgba(0,0,0,0.04)]">
-                <Eye className="w-5 h-5" />
+            <div className="bg-slate-50 dark:bg-slate-800/60 rounded-xl p-3 text-xs space-y-1.5 text-slate-600 dark:text-slate-300 border border-transparent dark:border-slate-700/50">
+              <div className="flex justify-between">
+                <span className="text-slate-400 dark:text-slate-500">Station:</span>
+                <span className="font-semibold text-slate-800 dark:text-white">Bhubaneswar IMD Radar</span>
               </div>
-              <h3 className="text-sm font-black text-slate-900 dark:text-white group-hover:text-[#003087] dark:group-hover:text-sky-300 transition-colors tracking-tight">
-                Morphology Classification & Grad-CAM
-              </h3>
-              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                ResNet18 morphological pattern classifier (11,246,436 params) with Layer-4 Grad-CAM spatial visual explanations.
-              </p>
+              <div className="flex justify-between">
+                <span className="text-slate-400 dark:text-slate-500">Emergency Channel:</span>
+                <span className="font-mono font-semibold text-sky-600 dark:text-sky-400">CH-08 (MoES)</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-slate-400 dark:text-slate-500">Response Status:</span>
+                <span className="font-semibold text-emerald-600 dark:text-emerald-400">De-escalation Active</span>
+              </div>
             </div>
-            <div className="pt-4 mt-3 border-t border-slate-200/60 dark:border-slate-800/80 flex items-center justify-between">
-              <span className="text-[10px] font-mono font-semibold text-slate-400 dark:text-slate-500">/dashboard/classification</span>
-              <button
-                onClick={() => navigate('/dashboard/classification')}
-                className="btn-secondary text-xs py-1.5 px-3.5 rounded-xl backdrop-blur-md bg-white/90 dark:bg-slate-800/90 hover:bg-[#003087] hover:text-white border border-slate-200/90 dark:border-slate-700 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_2px_5px_rgba(0,0,0,0.04)] group-hover:bg-[#003087] group-hover:text-white transition-all cursor-pointer font-bold"
-              >
-                Open Morphology
-              </button>
-            </div>
-          </div>
 
-          {/* Trajectory Forecast */}
-          <div className="vayu-glass-3d-card-interactive p-5.5 rounded-3xl flex flex-col justify-between group">
-            <div className="space-y-2.5">
-              <div className="w-11 h-11 rounded-2xl bg-blue-50 text-[#003087] border border-blue-200 dark:bg-blue-950/70 dark:text-blue-300 dark:border-blue-800 flex items-center justify-center shrink-0 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_2px_6px_rgba(0,0,0,0.04)]">
-                <BrainCircuit className="w-5 h-5" />
-              </div>
-              <h3 className="text-sm font-black text-slate-900 dark:text-white group-hover:text-[#003087] dark:group-hover:text-sky-300 transition-colors tracking-tight">
-                Trajectory Forecast (72h Horizon)
-              </h3>
-              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                2-Layer GRU Seq2Seq temporal model (41,764 params) autoregressively predicting +6h to +72h track with 25-pass MC Dropout cone.
-              </p>
-            </div>
-            <div className="pt-4 mt-3 border-t border-slate-200/60 dark:border-slate-800/80 flex items-center justify-between">
-              <span className="text-[10px] font-mono font-semibold text-slate-400 dark:text-slate-500">/dashboard/trajectory</span>
+            <div className="flex justify-end pt-1">
               <button
-                onClick={() => navigate('/dashboard/trajectory')}
-                className="btn-secondary text-xs py-1.5 px-3.5 rounded-xl backdrop-blur-md bg-white/90 dark:bg-slate-800/90 hover:bg-[#003087] hover:text-white border border-slate-200/90 dark:border-slate-700 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_2px_5px_rgba(0,0,0,0.04)] group-hover:bg-[#003087] group-hover:text-white transition-all cursor-pointer font-bold"
+                onClick={() => setActiveOfficerModal(null)}
+                className="px-3.5 py-1.5 rounded-lg text-xs font-semibold text-white dark:text-slate-900 bg-slate-900 dark:bg-white hover:bg-slate-800 dark:hover:bg-slate-100 transition-colors cursor-pointer"
               >
-                Open Trajectory
-              </button>
-            </div>
-          </div>
-
-          {/* Impact & Landfall */}
-          <div className="vayu-glass-3d-card-interactive p-5.5 rounded-3xl flex flex-col justify-between group">
-            <div className="space-y-2.5">
-              <div className="w-11 h-11 rounded-2xl bg-red-50 text-red-700 border border-red-200 dark:bg-red-950/70 dark:text-red-300 dark:border-red-800 flex items-center justify-center shrink-0 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_2px_6px_rgba(0,0,0,0.04)]">
-                <ShieldAlert className="w-5 h-5" />
-              </div>
-              <h3 className="text-sm font-black text-slate-900 dark:text-white group-hover:text-[#003087] dark:group-hover:text-sky-300 transition-colors tracking-tight">
-                Impact & Landfall Assessment
-              </h3>
-              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                High-resolution GIS impact analysis with 60km/120km hazard radii, storm surge estimates, and coastal district strike matrix.
-              </p>
-            </div>
-            <div className="pt-4 mt-3 border-t border-slate-200/60 dark:border-slate-800/80 flex items-center justify-between">
-              <span className="text-[10px] font-mono font-semibold text-slate-400 dark:text-slate-500">/dashboard/impact</span>
-              <button
-                onClick={() => navigate('/dashboard/impact')}
-                className="btn-secondary text-xs py-1.5 px-3.5 rounded-xl backdrop-blur-md bg-white/90 dark:bg-slate-800/90 hover:bg-[#003087] hover:text-white border border-slate-200/90 dark:border-slate-700 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_2px_5px_rgba(0,0,0,0.04)] group-hover:bg-[#003087] group-hover:text-white transition-all cursor-pointer font-bold"
-              >
-                Open Impact
-              </button>
-            </div>
-          </div>
-
-          {/* Official Bulletin */}
-          <div className="vayu-glass-3d-card-interactive p-5.5 rounded-3xl flex flex-col justify-between group">
-            <div className="space-y-2.5">
-              <div className="w-11 h-11 rounded-2xl bg-amber-50 text-amber-700 border border-amber-200 dark:bg-amber-950/70 dark:text-amber-300 dark:border-amber-800 flex items-center justify-center shrink-0 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_2px_6px_rgba(0,0,0,0.04)]">
-                <FileText className="w-5 h-5" />
-              </div>
-              <h3 className="text-sm font-black text-slate-900 dark:text-white group-hover:text-[#003087] dark:group-hover:text-sky-300 transition-colors tracking-tight">
-                Official Advisory Bulletin (PDF)
-              </h3>
-              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                Automated generation of official IMD-standard synoptic advisory bulletin PDFs via ReportLab backend compilation.
-              </p>
-            </div>
-            <div className="pt-4 mt-3 border-t border-slate-200/60 dark:border-slate-800/80 flex items-center justify-between">
-              <span className="text-[10px] font-mono font-semibold text-slate-400 dark:text-slate-500">/dashboard/bulletin</span>
-              <button
-                onClick={() => navigate('/dashboard/bulletin')}
-                className="btn-secondary text-xs py-1.5 px-3.5 rounded-xl backdrop-blur-md bg-white/90 dark:bg-slate-800/90 hover:bg-[#003087] hover:text-white border border-slate-200/90 dark:border-slate-700 shadow-[inset_0_1px_1px_rgba(255,255,255,0.9),0_2px_5px_rgba(0,0,0,0.04)] group-hover:bg-[#003087] group-hover:text-white transition-all cursor-pointer font-bold"
-              >
-                Generate Bulletin
+                Close
               </button>
             </div>
           </div>
         </div>
-      </div>
+      )}
 
     </div>
   );

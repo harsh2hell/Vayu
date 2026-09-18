@@ -160,7 +160,7 @@ const CityTracker = () => {
       <section className="py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full space-y-6 flex-1">
         
         {/* Search & State Selector Controls Bar */}
-        <div className="bg-white dark:bg-slate-900 p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-4">
+        <div className="bg-white dark:bg-slate-800 p-5 rounded-3xl border border-slate-100 dark:border-slate-800 shadow-sm space-y-4">
           
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
@@ -186,7 +186,7 @@ const CityTracker = () => {
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={isHindi ? "शहर, बंदरगाह, समुद्र तट खोजें (उदा. बालेश्वर, दीघा, पुरी)..." : "Search city, port, beach (e.g. Balasore, Digha, Mundra, Puri)..."}
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-sky-500 shadow-2xs"
+                className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-sky-500 shadow-2xs"
               />
               {searchQuery && (
                 <button
@@ -209,9 +209,9 @@ const CityTracker = () => {
               <button
                 key={st.id}
                 onClick={() => setSelectedState(st.id)}
-                className={`px-3 py-1.5 rounded-xl font-semibold transition-all cursor-pointer whitespace-nowrap shrink-0 ${
+                className={`px-3 py-1.5 rounded-2xl font-semibold transition-all cursor-pointer whitespace-nowrap shrink-0 ${
                   selectedState === st.id
-                    ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-900 shadow-2xs'
+                    ? 'bg-slate-700 text-white dark:bg-white dark:text-slate-900 shadow-2xs'
                     : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                 }`}
               >
@@ -268,7 +268,7 @@ const CityTracker = () => {
                 ? 'border-red-200 dark:border-red-900/60 hover:border-red-300 dark:hover:border-red-700'
                 : isOrange
                 ? 'border-orange-200 dark:border-orange-900/60 hover:border-orange-300 dark:hover:border-orange-700'
-                : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700';
+                : 'border-slate-100 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700';
 
               const badgeTheme = isRed
                 ? 'bg-red-50 dark:bg-red-950/60 text-red-700 dark:text-red-300 border-red-200 dark:border-red-800'
@@ -309,7 +309,7 @@ const CityTracker = () => {
                   </div>
 
                   {/* Micro Weather Bar */}
-                  <div className="grid grid-cols-3 gap-2 bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800 text-xs">
+                  <div className="grid grid-cols-3 gap-2 bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-2xl border border-slate-100 dark:border-slate-800 text-xs">
                     <div>
                       <span className="text-[10px] text-slate-400 block font-medium">{isHindi ? 'हवा' : 'Wind'}</span>
                       <strong className="text-slate-900 dark:text-white font-bold">{item.wind}</strong>
@@ -355,7 +355,7 @@ const CityTracker = () => {
             })}
           </div>
         ) : (
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-12 text-center space-y-3 shadow-xs">
+          <div className="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-800 rounded-2xl p-12 text-center space-y-3 shadow-sm">
             <div className="w-12 h-12 rounded-full bg-slate-100 dark:bg-slate-800 flex items-center justify-center mx-auto text-slate-400">
               <Search className="w-6 h-6" />
             </div>
@@ -373,7 +373,7 @@ const CityTracker = () => {
                 setSelectedState('ALL');
                 setActiveCategoryFilter('ALL');
               }}
-              className="px-4 py-2 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-950 text-xs font-semibold hover:bg-slate-800 transition-all cursor-pointer shadow-xs"
+              className="px-4 py-2 rounded-2xl bg-slate-700 text-white dark:bg-white dark:text-slate-950 text-xs font-semibold hover:bg-slate-800 transition-all cursor-pointer shadow-sm"
             >
               {isHindi ? 'सभी फ़िल्टर रीसेट करें' : 'Reset All Filters'}
             </button>
@@ -385,7 +385,7 @@ const CityTracker = () => {
       {/* =========================================================================
            PUBLIC FOOTER
            ========================================================================= */}
-      <footer className="bg-white dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-8 px-4 sm:px-6 lg:px-8 mt-12 transition-colors">
+      <footer className="bg-white dark:bg-slate-800 border-t border-slate-100 dark:border-slate-800 py-8 px-4 sm:px-6 lg:px-8 mt-12 transition-colors">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
           <div>
             <strong className="text-slate-900 dark:text-white font-bold block">

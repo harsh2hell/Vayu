@@ -21,32 +21,32 @@ const PageHeader = ({
       case 'red': return 'bg-red-50 text-red-700 border-red-200';
       case 'navy':
       default:
-        return 'bg-slate-100 text-slate-800 border-slate-200';
+        return 'bg-slate-100 text-slate-800 border-slate-100';
     }
   };
 
   return (
-    <div className="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 shadow-xs flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-      <div className="space-y-1.5 min-w-0">
-        <div className="flex items-center gap-2 flex-wrap">
+    <div className="bg-white rounded-2xl p-4 sm:p-6 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <div className="space-y-2 min-w-0">
+        <div className="flex items-center gap-2 flex-wrap mb-1">
           {categoryBadge && (
-            <span className={`inline-flex items-center px-2.5 py-0.5 rounded-md text-[10px] font-bold font-mono tracking-wider uppercase border ${getBadgeClass()}`}>
+            <span className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold tracking-wider uppercase ${getBadgeClass()}`}>
               {categoryBadge}
             </span>
           )}
           {modelBadge && (
-            <span className="inline-flex items-center px-2.5 py-0.5 rounded-md text-[10px] font-semibold font-mono tracking-tight bg-blue-50/70 text-[#003087] border border-blue-200">
+            <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-medium tracking-tight bg-slate-100 text-slate-600">
               {modelBadge}
             </span>
           )}
         </div>
 
-        <h1 className="text-xl sm:text-2xl font-extrabold text-slate-900 tracking-tight">
+        <h1 className="text-xl sm:text-[22px] font-bold text-slate-900 tracking-tight">
           {title}
         </h1>
 
         {subtitle && (
-          <p className="text-xs sm:text-sm text-slate-600 font-normal leading-relaxed max-w-3xl">
+          <p className="text-[13px] sm:text-sm text-slate-500 font-normal leading-relaxed max-w-3xl">
             {subtitle}
           </p>
         )}

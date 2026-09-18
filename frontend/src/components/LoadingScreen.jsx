@@ -43,10 +43,10 @@ const LoadingScreen = () => {
       <div className="h-1.5 w-full bg-gradient-to-r from-[#FF9933] via-white to-[#138808]" />
 
       {/* Official Government Portal Header */}
-      <header className="bg-white border-b border-slate-200 py-3 px-6 shadow-xs">
+      <header className="bg-white border-b border-slate-100 py-3 px-6 shadow-sm">
         <div className="max-w-6xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-lg bg-[#003087] flex items-center justify-center text-white font-bold text-xs shadow-xs">
+            <div className="w-8 h-8 rounded-lg bg-[#003087] flex items-center justify-center text-white font-bold text-xs shadow-sm">
               GOI
             </div>
             <div>
@@ -64,11 +64,11 @@ const LoadingScreen = () => {
 
       {/* Central Institutional Portal Card */}
       <main className="flex-1 flex items-center justify-center px-4 py-8">
-        <div className="bg-white border border-slate-200 rounded-2xl shadow-xl max-w-xl w-full p-8 space-y-6">
+        <div className="bg-white border border-slate-100 rounded-2xl shadow-xl max-w-xl w-full p-8 space-y-6">
           
           {/* Platform Identity */}
           <div className="flex items-start gap-4 border-b border-slate-100 pb-6">
-            <div className="w-14 h-14 rounded-2xl bg-white border border-slate-200 shadow-sm flex items-center justify-center p-1.5 flex-shrink-0">
+            <div className="w-14 h-14 rounded-2xl bg-white border border-slate-100 shadow-sm flex items-center justify-center p-1.5 flex-shrink-0">
               <img src="/vayu-icon.png" alt="VAYU Logo" className="w-full h-full object-contain" />
             </div>
             <div className="space-y-1 flex-1">
@@ -99,7 +99,7 @@ const LoadingScreen = () => {
               <span className="font-bold text-[#003087]">{progress}%</span>
             </div>
             
-            <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
+            <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-100">
               <div 
                 className="h-full bg-gradient-to-r from-[#003087] to-blue-600 rounded-full transition-all duration-300 ease-out"
                 style={{ width: `${progress}%` }}
@@ -108,7 +108,7 @@ const LoadingScreen = () => {
           </div>
 
           {/* Real Diagnostic Checks List */}
-          <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 space-y-2.5">
+          <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4 space-y-2.5">
             <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">
               Diagnostic Telemetry Verification
             </p>
@@ -142,7 +142,7 @@ const LoadingScreen = () => {
             <span className="text-[11px] text-slate-400">Secure IMD / MoES AI Architecture</span>
             <button
               onClick={() => navigate('/landing')}
-              className="btn-primary text-xs py-2 px-4 gap-1.5 shadow-xs"
+              className="btn-primary text-xs py-2 px-4 gap-1.5 shadow-sm"
             >
               <span>Enter Portal Directly</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -153,7 +153,7 @@ const LoadingScreen = () => {
       </main>
 
       {/* Official Institutional Footer */}
-      <footer className="bg-white border-t border-slate-200 py-3 px-6 text-center text-xs text-slate-500">
+      <footer className="bg-white border-t border-slate-100 py-3 px-6 text-center text-xs text-slate-500">
         <p className="max-w-4xl mx-auto text-[11px] text-slate-400">
           © 2026 VAYU — Smart India Hackathon Prototype | Ministry of Earth Sciences, Government of India | IMD RSMC Gateway
         </p>

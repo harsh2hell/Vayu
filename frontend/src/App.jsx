@@ -86,8 +86,8 @@ function App() {
         >
           {/* 1. COMMAND OVERVIEW & GEOSPATIAL EARTH */}
           <Route index element={<Dashboard />} />
-          <Route path="earth" element={<VayuEarth />} />
-          <Route path="vayu-earth" element={<VayuEarth />} />
+          <Route path="earth" element={<Navigate to="/trajectory" replace />} />
+          <Route path="vayu-earth" element={<Navigate to="/trajectory" replace />} />
 
           {/* 2. AI VISION */}
           <Route path="satellite" element={<Satellite />} />
@@ -110,8 +110,8 @@ function App() {
           {/* Seamless backward compatibility for /dashboard prefix on portal subdomain */}
           <Route path="dashboard">
             <Route index element={<Dashboard />} />
-            <Route path="earth" element={<VayuEarth />} />
-            <Route path="vayu-earth" element={<VayuEarth />} />
+            <Route path="earth" element={<Navigate to="/trajectory" replace />} />
+            <Route path="vayu-earth" element={<Navigate to="/trajectory" replace />} />
             <Route path="satellite" element={<Satellite />} />
             <Route path="detection" element={<Detection />} />
             <Route path="classification" element={<Classification />} />
@@ -172,12 +172,12 @@ function App() {
       <Route path="/gis-radar" element={<ThreatMap />} />
       <Route path="/threat-matrix" element={<ThreatMap />} />
 
-      {/* 3D Live Earth Interactive Simulation Console — needs explicit height anchor */}
-      <Route path="/live-map"   element={<div style={{ width:'100%', height:'100dvh' }}><VayuEarth /></div>} />
-      <Route path="/live-earth" element={<div style={{ width:'100%', height:'100dvh' }}><VayuEarth /></div>} />
-      <Route path="/3d-earth"   element={<div style={{ width:'100%', height:'100dvh' }}><VayuEarth /></div>} />
-      <Route path="/earth"      element={<div style={{ width:'100%', height:'100dvh' }}><VayuEarth /></div>} />
-      <Route path="/vayu-earth" element={<div style={{ width:'100%', height:'100dvh' }}><VayuEarth /></div>} />
+      {/* Live Interactive Earth & Threat Matrix Console */}
+      <Route path="/live-map"   element={<Navigate to="/threat-map" replace />} />
+      <Route path="/live-earth" element={<Navigate to="/threat-map" replace />} />
+      <Route path="/3d-earth"   element={<Navigate to="/threat-map" replace />} />
+      <Route path="/earth"      element={<Navigate to="/threat-map" replace />} />
+      <Route path="/vayu-earth" element={<Navigate to="/threat-map" replace />} />
 
       {/* Unified Safety & Updates (IMD Bulletins & NDMA Safety Protocol) */}
       <Route path="/safety-updates" element={<SafetyUpdates />} />

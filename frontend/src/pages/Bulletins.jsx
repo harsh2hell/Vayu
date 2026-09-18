@@ -70,7 +70,7 @@ const Bulletins = () => {
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         
         {/* Header */}
-        <div className="border-b border-slate-200 dark:border-slate-800 pb-5">
+        <div className="border-b border-slate-100 dark:border-slate-800 pb-5">
           <div className="flex items-center gap-2 mb-1.5">
             <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-sky-100 dark:bg-sky-950 text-sky-800 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
               {isHindi ? 'राष्ट्रीय चक्रवात चेतावनी केंद्र (NCWC), नई दिल्ली' : 'National Cyclone Warning Centre (NCWC), New Delhi'}
@@ -96,10 +96,10 @@ const Bulletins = () => {
           <div className="lg:col-span-2 space-y-4">
             
             {/* Bulletin 14 Card */}
-            <div className="border border-slate-200 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-900/90 p-6 shadow-xs space-y-3">
+            <div className="border border-slate-100 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-800/90 p-6 shadow-sm space-y-3">
               <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
                 <div className="flex items-center gap-2">
-                  <span className="font-extrabold text-slate-950 dark:text-white px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                  <span className="font-bold text-slate-950 dark:text-white px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 border border-slate-100 dark:border-slate-700">
                     {isHindi ? 'बुलेटिन संख्या 14' : 'BULLETIN NO. 14'}
                   </span>
                   <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1">
@@ -127,7 +127,7 @@ const Bulletins = () => {
               <div className="pt-2 flex items-center gap-3">
                 <button 
                   onClick={() => handleDownloadPdf('Bulletin No. 14 - Cyclone DANA')}
-                  className="inline-flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-white hover:text-black dark:hover:text-white border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer shadow-2xs"
+                  className="inline-flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-white hover:text-black dark:hover:text-white border border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-2 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer shadow-2xs"
                 >
                   <Download className="w-3.5 h-3.5 text-sky-500" />
                   <span>{isHindi ? 'आधिकारिक सलाह डाउनलोड करें (PDF)' : 'Download Official Advisory (PDF)'}</span>
@@ -136,10 +136,10 @@ const Bulletins = () => {
             </div>
 
             {/* Genesis Advisory 03 Card */}
-            <div className="border border-slate-200 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-900/90 p-6 shadow-xs space-y-3">
+            <div className="border border-slate-100 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-800/90 p-6 shadow-sm space-y-3">
               <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
                 <div className="flex items-center gap-2">
-                  <span className="font-extrabold text-slate-950 dark:text-white px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                  <span className="font-bold text-slate-950 dark:text-white px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 border border-slate-100 dark:border-slate-700">
                     {isHindi ? 'उत्पत्ति सलाह संख्या 03' : 'GENESIS ADVISORY NO. 03'}
                   </span>
                   <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1">
@@ -167,7 +167,7 @@ const Bulletins = () => {
               <div className="pt-2 flex items-center gap-3">
                 <button 
                   onClick={() => handleDownloadPdf('Genesis Advisory No. 03 - Invest 92B')}
-                  className="inline-flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-white hover:text-black dark:hover:text-white border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer shadow-2xs"
+                  className="inline-flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-white hover:text-black dark:hover:text-white border border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-2 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer shadow-2xs"
                 >
                   <Download className="w-3.5 h-3.5 text-amber-500" />
                   <span>{isHindi ? 'उत्पत्ति सलाह डाउनलोड करें (PDF)' : 'Download Genesis Advisory (PDF)'}</span>
@@ -176,10 +176,10 @@ const Bulletins = () => {
             </div>
 
             {/* Special Tropical Weather Outlook */}
-            <div className="border border-slate-200 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-900/90 p-6 shadow-xs space-y-3">
+            <div className="border border-slate-100 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-800/90 p-6 shadow-sm space-y-3">
               <div className="flex flex-wrap items-center justify-between gap-2 text-xs">
                 <div className="flex items-center gap-2">
-                  <span className="font-extrabold text-slate-950 dark:text-white px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                  <span className="font-bold text-slate-950 dark:text-white px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 border border-slate-100 dark:border-slate-700">
                     {isHindi ? 'विशेष उष्णकटिबंधीय दृष्टिकोण' : 'SPECIAL TROPICAL WEATHER OUTLOOK'}
                   </span>
                   <span className="text-slate-500 dark:text-slate-400 flex items-center gap-1">
@@ -207,7 +207,7 @@ const Bulletins = () => {
               <div className="pt-2 flex items-center gap-3">
                 <button 
                   onClick={() => handleDownloadPdf('RSMC 5-Day Cyclogenesis Outlook')}
-                  className="inline-flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-white hover:text-black dark:hover:text-white border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer shadow-2xs"
+                  className="inline-flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-white hover:text-black dark:hover:text-white border border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 px-4 py-2 rounded-2xl hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer shadow-2xs"
                 >
                   <Download className="w-3.5 h-3.5 text-emerald-500" />
                   <span>{isHindi ? '5-दिवसीय दृष्टिकोण डाउनलोड करें (PDF)' : 'Download 5-Day Outlook (PDF)'}</span>
@@ -221,7 +221,7 @@ const Bulletins = () => {
           <div className="space-y-6">
             
             {/* Maritime Sea Warning Box */}
-            <div className="border border-red-200 dark:border-red-900/60 rounded-2xl bg-red-50/40 dark:bg-red-950/20 p-6 shadow-xs space-y-4">
+            <div className="border border-red-200 dark:border-red-900/60 rounded-2xl bg-red-50/40 dark:bg-red-950/20 p-6 shadow-sm space-y-4">
               <div>
                 <h3 className="text-sm font-bold text-red-950 dark:text-red-200 flex items-center gap-2">
                   <AlertTriangle className="w-4 h-4 text-red-600 dark:text-red-400" />
@@ -264,7 +264,7 @@ const Bulletins = () => {
             </div>
 
             {/* Port Warning Signals Guide */}
-            <div className="border border-slate-200 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-900/90 p-5 shadow-xs space-y-3">
+            <div className="border border-slate-100 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-800/90 p-5 shadow-sm space-y-3">
               <div className="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-2.5">
                 <Anchor className="w-4 h-4 text-sky-600 dark:text-sky-400" />
                 <h3 className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
@@ -274,7 +274,7 @@ const Bulletins = () => {
 
               <div className="space-y-2.5 text-xs">
                 {PORT_SIGNALS.map((ps, idx) => (
-                  <div key={idx} className="p-2.5 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
+                  <div key={idx} className="p-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-100 dark:border-slate-800">
                     <div className="flex items-center justify-between font-bold text-slate-900 dark:text-white mb-0.5">
                       <span>{ps.signal}</span>
                       <span className="text-[10px] text-sky-600 dark:text-sky-400">{ps.name}</span>
@@ -294,7 +294,7 @@ const Bulletins = () => {
       </main>
 
       {/* Footer */}
-      <footer className="bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 py-10 px-4 sm:px-6 text-xs text-slate-500 dark:text-slate-400 transition-colors mt-12">
+      <footer className="bg-slate-50 dark:bg-slate-950 border-t border-slate-100 dark:border-slate-800 py-10 px-4 sm:px-6 text-xs text-slate-500 dark:text-slate-400 transition-colors mt-12">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
             &copy; 2026 {isHindi ? 'पृथ्वी विज्ञान मंत्रालय, भारत सरकार। सर्वाधिकार सुरक्षित।' : 'Ministry of Earth Sciences, Government of India. All Rights Reserved.'}

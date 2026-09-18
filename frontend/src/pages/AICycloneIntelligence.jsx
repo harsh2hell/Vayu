@@ -148,7 +148,7 @@ const AICycloneIntelligence = () => {
       />
 
       {/* 2. SIH PROBLEM STATEMENT & MISSION TELEMETRY HEADER */}
-      <div className="bg-gradient-to-br from-slate-50 via-sky-50/30 to-slate-100/60 dark:from-[#060a15] dark:via-[#090e1f] dark:to-[#04060d] text-slate-900 dark:text-white border-b border-slate-200/80 dark:border-white/10 py-5 px-4 sm:px-6 lg:px-8 relative overflow-hidden transition-colors duration-300">
+      <div className="bg-gradient-to-br from-slate-50 via-sky-50/30 to-slate-100/60 dark:from-[#060a15] dark:via-[#090e1f] dark:to-[#04060d] text-slate-900 dark:text-white border-b border-slate-100/80 dark:border-white/10 py-5 px-4 sm:px-6 lg:px-8 relative overflow-hidden transition-colors duration-300">
         {/* Subtle decorative aerospace telemetry background watermark */}
         <div className="pointer-events-none absolute -top-16 -right-16 w-80 h-80 rounded-full border border-sky-500/10 dark:border-sky-400/10 opacity-60" />
         <div className="pointer-events-none absolute -top-28 -right-28 w-[420px] h-[420px] rounded-full border border-indigo-500/10 dark:border-indigo-400/10 opacity-40" />
@@ -192,15 +192,15 @@ const AICycloneIntelligence = () => {
 
             {/* Interactive Model Pipeline Chips */}
             <div className="flex flex-wrap items-center gap-2 pt-0.5">
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[10px] font-mono font-semibold bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-sky-500/30 text-slate-800 dark:text-sky-200 shadow-2xs">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-2xl text-[10px] font-mono font-semibold bg-white/90 dark:bg-slate-800/90 border border-slate-100/80 dark:border-sky-500/30 text-slate-800 dark:text-sky-200 shadow-2xs">
                 <Target className="w-3 h-3 text-sky-500" />
                 <strong className="text-sky-600 dark:text-sky-400">MobileNetV3:</strong> Center Fix (RMSE 0.003°)
               </span>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[10px] font-mono font-semibold bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-purple-500/30 text-slate-800 dark:text-purple-200 shadow-2xs">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-2xl text-[10px] font-mono font-semibold bg-white/90 dark:bg-slate-800/90 border border-slate-100/80 dark:border-purple-500/30 text-slate-800 dark:text-purple-200 shadow-2xs">
                 <Layers className="w-3 h-3 text-purple-500" />
                 <strong className="text-purple-600 dark:text-purple-400">ResNet18:</strong> 4-Pattern + Grad-CAM
               </span>
-              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-xl text-[10px] font-mono font-semibold bg-white/90 dark:bg-slate-900/90 border border-slate-200/80 dark:border-emerald-500/30 text-slate-800 dark:text-emerald-200 shadow-2xs">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-2xl text-[10px] font-mono font-semibold bg-white/90 dark:bg-slate-800/90 border border-slate-100/80 dark:border-emerald-500/30 text-slate-800 dark:text-emerald-200 shadow-2xs">
                 <TrendingUp className="w-3 h-3 text-emerald-500" />
                 <strong className="text-emerald-600 dark:text-emerald-400">GRU Seq2Seq:</strong> 72h Spatiotemporal Cone
               </span>
@@ -208,9 +208,9 @@ const AICycloneIntelligence = () => {
           </div>
 
           {/* Mission Telemetry & Data Provenance HUD Console */}
-          <div className="bg-white/90 dark:bg-[#0c1322]/90 backdrop-blur-2xl border border-slate-200/90 dark:border-cyan-500/20 rounded-2xl sm:rounded-3xl p-3.5 sm:p-4 space-y-2.5 shrink-0 lg:max-w-sm shadow-[0_8px_30px_rgba(0,0,0,0.06)] dark:shadow-[0_16px_40px_rgba(0,0,0,0.7)] relative overflow-hidden transition-all duration-300">
+          <div className="bg-white/90 dark:bg-[#0c1322]/90 backdrop-blur-2xl border border-slate-100/90 dark:border-cyan-500/20 rounded-2xl sm:rounded-3xl p-3.5 sm:p-4 space-y-2.5 shrink-0 lg:max-w-sm shadow-[0_8px_30px_rgba(0,0,0,0.06)] dark:shadow-[0_16px_40px_rgba(0,0,0,0.7)] relative overflow-hidden transition-all duration-300">
             {/* HUD Console Header */}
-            <div className="flex items-center justify-between text-[11px] font-bold text-slate-800 dark:text-slate-200 border-b border-slate-200/80 dark:border-white/10 pb-2">
+            <div className="flex items-center justify-between text-[11px] font-bold text-slate-800 dark:text-slate-200 border-b border-slate-100/80 dark:border-white/10 pb-2">
               <div className="flex items-center gap-1.5">
                 <Radio className="w-3.5 h-3.5 text-cyan-600 dark:text-cyan-400 animate-pulse" />
                 <span className="font-heading font-black tracking-wider text-[10.5px] uppercase">
@@ -226,7 +226,7 @@ const AICycloneIntelligence = () => {
             {/* 3 Telemetry Channels */}
             <div className="space-y-2 text-[10px]">
               {/* Channel 1: Satellite Feed */}
-              <div className="flex items-center justify-between gap-2 p-1.5 rounded-xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-200/60 dark:border-white/5">
+              <div className="flex items-center justify-between gap-2 p-1.5 rounded-2xl bg-slate-50/80 dark:bg-slate-800/60 border border-slate-100/60 dark:border-white/5">
                 <div className="flex items-center gap-2 min-w-0">
                   <div className="p-1 rounded-lg bg-emerald-500/10 dark:bg-emerald-400/15 text-emerald-600 dark:text-emerald-400 border border-emerald-300/50 dark:border-emerald-400/30 shrink-0">
                     <Satellite className="w-3 h-3" />
@@ -242,7 +242,7 @@ const AICycloneIntelligence = () => {
               </div>
 
               {/* Channel 2: AI Neural Engine */}
-              <div className="flex items-center justify-between gap-2 p-1.5 rounded-xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-200/60 dark:border-white/5">
+              <div className="flex items-center justify-between gap-2 p-1.5 rounded-2xl bg-slate-50/80 dark:bg-slate-800/60 border border-slate-100/60 dark:border-white/5">
                 <div className="flex items-center gap-2 min-w-0">
                   <div className="p-1 rounded-lg bg-sky-500/10 dark:bg-sky-400/15 text-sky-600 dark:text-sky-400 border border-sky-300/50 dark:border-sky-400/30 shrink-0">
                     <Cpu className="w-3 h-3" />
@@ -258,7 +258,7 @@ const AICycloneIntelligence = () => {
               </div>
 
               {/* Channel 3: IMD Ground Truth */}
-              <div className="flex items-center justify-between gap-2 p-1.5 rounded-xl bg-slate-50/80 dark:bg-slate-900/60 border border-slate-200/60 dark:border-white/5">
+              <div className="flex items-center justify-between gap-2 p-1.5 rounded-2xl bg-slate-50/80 dark:bg-slate-800/60 border border-slate-100/60 dark:border-white/5">
                 <div className="flex items-center gap-2 min-w-0">
                   <div className="p-1 rounded-lg bg-amber-500/10 dark:bg-amber-400/15 text-amber-600 dark:text-amber-400 border border-amber-300/50 dark:border-amber-400/30 shrink-0">
                     <Database className="w-3 h-3" />
@@ -278,7 +278,7 @@ const AICycloneIntelligence = () => {
       </div>
 
       {/* 3. INTERACTIVE 5-MODULE TAB NAVIGATION BAR */}
-      <div className="sticky top-16 z-40 bg-white/85 dark:bg-black/90 backdrop-blur-2xl border-b border-slate-200/80 dark:border-white/10 shadow-xs">
+      <div className="sticky top-16 z-40 bg-white/85 dark:bg-black/90 backdrop-blur-2xl border-b border-slate-100/80 dark:border-white/10 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center gap-2 overflow-x-auto py-2.5 no-scrollbar">
             {[
@@ -327,8 +327,8 @@ const AICycloneIntelligence = () => {
                   onClick={() => setActiveTab(tab.id)}
                   className={`flex items-center gap-2 px-3.5 py-2 rounded-2xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap shrink-0 border ${
                     isActive
-                      ? 'bg-sky-500/15 dark:bg-sky-400/15 border-sky-500 dark:border-sky-400 text-sky-700 dark:text-sky-300 shadow-xs'
-                      : 'bg-white/60 dark:bg-white/[0.04] border-slate-200/80 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:text-slate-950 dark:hover:text-white hover:bg-white dark:hover:bg-white/[0.08]'
+                      ? 'bg-sky-500/15 dark:bg-sky-400/15 border-sky-500 dark:border-sky-400 text-sky-700 dark:text-sky-300 shadow-sm'
+                      : 'bg-white/60 dark:bg-white/[0.04] border-slate-100/80 dark:border-white/10 text-slate-600 dark:text-slate-400 hover:text-slate-950 dark:hover:text-white hover:bg-white dark:hover:bg-white/[0.08]'
                   }`}
                 >
                   <Icon className={`w-4 h-4 ${isActive ? 'text-sky-600 dark:text-sky-400' : 'text-slate-400'}`} />
@@ -352,7 +352,7 @@ const AICycloneIntelligence = () => {
         {activeTab === 'identification' && (
           <div className="space-y-6 animate-in fade-in duration-300">
             {/* Module Top Bar */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
               <div>
                 <div className="flex items-center gap-2.5 flex-wrap">
                   <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-indigo-500/15 text-indigo-700 dark:text-indigo-300 border border-indigo-400/30">
@@ -382,7 +382,7 @@ const AICycloneIntelligence = () => {
                     setTimeout(() => setIsRefreshingVortex(false), 800);
                   }}
                   disabled={isRefreshingVortex}
-                  className="px-3.5 py-2 rounded-xl text-xs font-bold bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white shadow-xs flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                  className="px-3.5 py-2 rounded-2xl text-xs font-bold bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:text-slate-950 dark:hover:text-white shadow-sm flex items-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                   <RefreshCw className={`w-3.5 h-3.5 ${isRefreshingVortex ? 'animate-spin' : ''}`} />
                   <span>{isHindi ? 'मॉडल अनुमान रीफ्रेश' : 'Rerun CNN Inference'}</span>
@@ -394,7 +394,7 @@ const AICycloneIntelligence = () => {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
               
               {/* Left Column: Satellite Frame & AI Layer Overlay (7 Cols) */}
-              <div className="lg:col-span-7 bg-white dark:bg-slate-900/90 rounded-3xl border border-slate-200 dark:border-slate-800 p-4 sm:p-5 shadow-xs flex flex-col justify-between space-y-4">
+              <div className="lg:col-span-7 bg-white dark:bg-slate-800/90 rounded-3xl border border-slate-100 dark:border-slate-800 p-4 sm:p-5 shadow-sm flex flex-col justify-between space-y-4">
                 {/* Stock Cyclone Dataset Selector Bar */}
                 <div className="flex items-center justify-between gap-2 flex-wrap pb-2 border-b border-slate-100 dark:border-slate-800/80">
                   <div className="flex items-center gap-1.5 text-xs font-bold text-slate-800 dark:text-slate-200">
@@ -409,10 +409,10 @@ const AICycloneIntelligence = () => {
                           key={sc.id}
                           type="button"
                           onClick={() => setSelectedStockCycloneId(sc.id)}
-                          className={`px-2.5 py-1 rounded-xl text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap border flex items-center gap-1.5 ${
+                          className={`px-2.5 py-1 rounded-2xl text-[11px] font-bold transition-all cursor-pointer whitespace-nowrap border flex items-center gap-1.5 ${
                             isSelected
-                              ? 'bg-sky-500 text-white border-sky-400 shadow-xs ring-1 ring-sky-300 dark:ring-sky-600'
-                              : 'bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700'
+                              ? 'bg-sky-500 text-white border-sky-400 shadow-sm ring-1 ring-sky-300 dark:ring-sky-600'
+                              : 'bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-300 border-slate-100 dark:border-slate-700 hover:bg-slate-200 dark:hover:bg-slate-700'
                           }`}
                         >
                           <span className={`w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-white animate-ping' : 'bg-sky-400'}`} />
@@ -434,13 +434,13 @@ const AICycloneIntelligence = () => {
                   </div>
 
                   {/* Layer Switching Buttons */}
-                  <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl text-[11px] font-semibold">
+                  <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-2xl text-[11px] font-semibold">
                     <button
                       type="button"
                       onClick={() => setImageLayer('raw')}
                       className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
                         imageLayer === 'raw'
-                          ? 'bg-white dark:bg-slate-900 text-slate-950 dark:text-white shadow-2xs font-bold'
+                          ? 'bg-white dark:bg-slate-800 text-slate-950 dark:text-white shadow-2xs font-bold'
                           : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
                       }`}
                     >
@@ -451,7 +451,7 @@ const AICycloneIntelligence = () => {
                       onClick={() => setImageLayer('gradcam')}
                       className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
                         imageLayer === 'gradcam'
-                          ? 'bg-white dark:bg-slate-900 text-slate-950 dark:text-white shadow-2xs font-bold'
+                          ? 'bg-white dark:bg-slate-800 text-slate-950 dark:text-white shadow-2xs font-bold'
                           : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
                       }`}
                     >
@@ -462,7 +462,7 @@ const AICycloneIntelligence = () => {
                       onClick={() => setImageLayer('bbox')}
                       className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
                         imageLayer === 'bbox'
-                          ? 'bg-white dark:bg-slate-900 text-slate-950 dark:text-white shadow-2xs font-bold'
+                          ? 'bg-white dark:bg-slate-800 text-slate-950 dark:text-white shadow-2xs font-bold'
                           : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
                       }`}
                     >
@@ -473,7 +473,7 @@ const AICycloneIntelligence = () => {
                       onClick={() => setImageLayer('radar')}
                       className={`px-2.5 py-1 rounded-lg transition-all cursor-pointer ${
                         imageLayer === 'radar'
-                          ? 'bg-white dark:bg-slate-900 text-slate-950 dark:text-white shadow-2xs font-bold'
+                          ? 'bg-white dark:bg-slate-800 text-slate-950 dark:text-white shadow-2xs font-bold'
                           : 'text-slate-500 hover:text-slate-900 dark:hover:text-white'
                       }`}
                     >
@@ -497,7 +497,7 @@ const AICycloneIntelligence = () => {
 
                   {/* Top Overlay Badge with Stock Cyclone Telemetry */}
                   <div className="absolute top-3 left-3 z-20 flex items-center gap-2">
-                    <span className="px-2.5 py-1 rounded-lg text-[10px] font-black bg-black/80 backdrop-blur-md text-cyan-300 border border-cyan-400/40 font-mono shadow-xs flex items-center gap-1.5">
+                    <span className="px-2.5 py-1 rounded-lg text-[10px] font-black bg-black/80 backdrop-blur-md text-cyan-300 border border-cyan-400/40 font-mono shadow-sm flex items-center gap-1.5">
                       <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
                       {activeStockCyclone.name} ({activeStockCyclone.basin})
                     </span>
@@ -567,7 +567,7 @@ const AICycloneIntelligence = () => {
                   )}
 
                   {/* Bottom HUD Data Overlay on Frame */}
-                  <div className="absolute bottom-3 inset-x-3 bg-black/85 backdrop-blur-md rounded-xl p-2.5 border border-white/10 flex items-center justify-between text-white text-xs flex-wrap gap-2 z-20">
+                  <div className="absolute bottom-3 inset-x-3 bg-black/85 backdrop-blur-md rounded-2xl p-2.5 border border-white/10 flex items-center justify-between text-white text-xs flex-wrap gap-2 z-20">
                     <div className="flex items-center gap-2">
                       <Target className="w-4 h-4 text-sky-400 shrink-0" />
                       <span className="font-mono font-bold text-sky-300">
@@ -604,7 +604,7 @@ const AICycloneIntelligence = () => {
               <div className="lg:col-span-5 space-y-4">
                 
                 {/* Confidence Card */}
-                <div className="bg-white dark:bg-slate-900/90 rounded-3xl border border-slate-200 dark:border-slate-800 p-4 sm:p-5 shadow-xs space-y-3">
+                <div className="bg-white dark:bg-slate-800/90 rounded-3xl border border-slate-100 dark:border-slate-800 p-4 sm:p-5 shadow-sm space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
                       {isHindi ? 'चक्रवात पहचान निश्चितता' : 'Cyclone Identification Confidence'}
@@ -640,7 +640,7 @@ const AICycloneIntelligence = () => {
 
                 {/* Radiometric Feature Extractor Cards */}
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-white dark:bg-slate-900/90 rounded-2xl border border-slate-200 dark:border-slate-800 p-3.5 shadow-2xs">
+                  <div className="bg-white dark:bg-slate-800/90 rounded-2xl border border-slate-100 dark:border-slate-800 p-3.5 shadow-2xs">
                     <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 mb-1">
                       <Thermometer className="w-3.5 h-3.5 text-rose-500" />
                       <span>{isHindi ? 'न्यूनतम बादल तापमान' : 'Min Cloud-Top Temp'}</span>
@@ -653,7 +653,7 @@ const AICycloneIntelligence = () => {
                     </span>
                   </div>
 
-                  <div className="bg-white dark:bg-slate-900/90 rounded-2xl border border-slate-200 dark:border-slate-800 p-3.5 shadow-2xs">
+                  <div className="bg-white dark:bg-slate-800/90 rounded-2xl border border-slate-100 dark:border-slate-800 p-3.5 shadow-2xs">
                     <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 mb-1">
                       <Gauge className="w-3.5 h-3.5 text-sky-500" />
                       <span>{isHindi ? 'सीडीओ व्यास' : 'CDO Diameter'}</span>
@@ -666,7 +666,7 @@ const AICycloneIntelligence = () => {
                     </span>
                   </div>
 
-                  <div className="bg-white dark:bg-slate-900/90 rounded-2xl border border-slate-200 dark:border-slate-800 p-3.5 shadow-2xs">
+                  <div className="bg-white dark:bg-slate-800/90 rounded-2xl border border-slate-100 dark:border-slate-800 p-3.5 shadow-2xs">
                     <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 mb-1">
                       <Wind className="w-3.5 h-3.5 text-amber-500" />
                       <span>{isHindi ? 'अनुमानित हवा' : 'Est. Wind Speed'}</span>
@@ -679,7 +679,7 @@ const AICycloneIntelligence = () => {
                     </span>
                   </div>
 
-                  <div className="bg-white dark:bg-slate-900/90 rounded-2xl border border-slate-200 dark:border-slate-800 p-3.5 shadow-2xs">
+                  <div className="bg-white dark:bg-slate-800/90 rounded-2xl border border-slate-100 dark:border-slate-800 p-3.5 shadow-2xs">
                     <div className="flex items-center gap-1.5 text-xs text-slate-500 dark:text-slate-400 mb-1">
                       <Compass className="w-3.5 h-3.5 text-indigo-500" />
                       <span>{isHindi ? 'सर्पिल घुमाव' : 'Spiral Curvature'}</span>
@@ -694,7 +694,7 @@ const AICycloneIntelligence = () => {
                 </div>
 
                 {/* Model Metadata Box */}
-                <div className="bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 p-3.5 text-xs space-y-1.5">
+                <div className="bg-slate-50 dark:bg-slate-800/50 rounded-2xl border border-slate-100 dark:border-slate-800 p-3.5 text-xs space-y-1.5">
                   <div className="flex justify-between text-slate-600 dark:text-slate-400">
                     <span>Backbone Architecture:</span>
                     <strong className="text-slate-900 dark:text-white font-mono">MobileNetV3-Small Dual-Head</strong>
@@ -721,7 +721,7 @@ const AICycloneIntelligence = () => {
         {activeTab === 'classification' && (
           <div className="space-y-6 animate-in fade-in duration-300">
             {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
               <div>
                 <div className="flex items-center gap-2.5 flex-wrap">
                   <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-blue-500/15 text-blue-700 dark:text-blue-300 border border-blue-400/30">
@@ -788,7 +788,7 @@ const AICycloneIntelligence = () => {
                       </p>
                     </div>
 
-                    <div className="pt-3 mt-3 border-t border-slate-200/60 dark:border-slate-800/80 space-y-1 text-[11px]">
+                    <div className="pt-3 mt-3 border-t border-slate-100/60 dark:border-slate-800/80 space-y-1 text-[11px]">
                       <div className="flex justify-between text-slate-500 dark:text-slate-400">
                         <span>Dvorak:</span>
                         <strong className="text-slate-900 dark:text-white">{pattern.dvorakRange}</strong>
@@ -804,7 +804,7 @@ const AICycloneIntelligence = () => {
             </div>
 
             {/* Selected Pattern Detailed Inspection Card */}
-            <div className="bg-white dark:bg-slate-900/90 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-xs grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+            <div className="bg-white dark:bg-slate-800/90 rounded-3xl border border-slate-100 dark:border-slate-800 p-5 sm:p-6 shadow-sm grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
               <div className="lg:col-span-8 space-y-3">
                 <div className="flex items-center gap-2">
                   <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-sky-500/15 text-sky-700 dark:text-sky-300 border border-sky-400/30">
@@ -829,7 +829,7 @@ const AICycloneIntelligence = () => {
                   </span>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
                     {(isHindi ? selectedPattern.featuresHindi : selectedPattern.keyFeatures).map((feat, idx) => (
-                      <div key={idx} className="bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 text-xs font-medium text-slate-800 dark:text-slate-200 flex items-start gap-2">
+                      <div key={idx} className="bg-slate-50 dark:bg-slate-800/60 p-2.5 rounded-2xl border border-slate-100/80 dark:border-slate-700/80 text-xs font-medium text-slate-800 dark:text-slate-200 flex items-start gap-2">
                         <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0 mt-0.5" />
                         <span>{feat}</span>
                       </div>
@@ -839,7 +839,7 @@ const AICycloneIntelligence = () => {
               </div>
 
               {/* Class Probability Distribution Chart (4 Cols) */}
-              <div className="lg:col-span-4 bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl border border-slate-200 dark:border-slate-800">
+              <div className="lg:col-span-4 bg-slate-50 dark:bg-slate-950 p-4 rounded-2xl border border-slate-100 dark:border-slate-800">
                 <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 block mb-2 uppercase tracking-wider">
                   Morphology Prediction Distribution (ResNet18)
                 </span>
@@ -876,7 +876,7 @@ const AICycloneIntelligence = () => {
             </div>
 
             {/* Lifecycle Stages Step Progression Timeline */}
-            <div className="bg-white dark:bg-slate-900/90 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-xs space-y-4">
+            <div className="bg-white dark:bg-slate-800/90 rounded-3xl border border-slate-100 dark:border-slate-800 p-5 sm:p-6 shadow-sm space-y-4">
               <div className="flex items-center justify-between">
                 <div>
                   <h3 className="text-sm sm:text-base font-black font-heading text-slate-950 dark:text-white uppercase tracking-wide">
@@ -902,10 +902,10 @@ const AICycloneIntelligence = () => {
                       key={stage.id}
                       className={`p-3 rounded-2xl border transition-all flex flex-col justify-between ${
                         isActiveStage
-                          ? 'bg-amber-500/15 dark:bg-amber-400/15 border-amber-400 ring-2 ring-amber-400/40 shadow-xs'
+                          ? 'bg-amber-500/15 dark:bg-amber-400/15 border-amber-400 ring-2 ring-amber-400/40 shadow-sm'
                           : isCompleted
                           ? 'bg-emerald-500/5 dark:bg-emerald-500/10 border-emerald-300 dark:border-emerald-800/60'
-                          : 'bg-slate-50 dark:bg-slate-800/40 border-slate-200 dark:border-slate-800 opacity-75'
+                          : 'bg-slate-50 dark:bg-slate-800/40 border-slate-100 dark:border-slate-800 opacity-75'
                       }`}
                     >
                       <div>
@@ -934,7 +934,7 @@ const AICycloneIntelligence = () => {
                         </span>
                       </div>
 
-                      <div className="pt-2 mt-2 border-t border-slate-200/60 dark:border-slate-800 text-[10px] text-slate-500">
+                      <div className="pt-2 mt-2 border-t border-slate-100/60 dark:border-slate-800 text-[10px] text-slate-500">
                         {stage.detectedAt}
                       </div>
                     </div>
@@ -952,7 +952,7 @@ const AICycloneIntelligence = () => {
         {activeTab === 'multisource' && (
           <div className="space-y-6 animate-in fade-in duration-300">
             {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
               <div>
                 <div className="flex items-center gap-2.5 flex-wrap">
                   <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-emerald-500/15 text-emerald-700 dark:text-emerald-300 border border-emerald-400/30">
@@ -975,7 +975,7 @@ const AICycloneIntelligence = () => {
               </div>
 
               <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5 bg-emerald-50 dark:bg-emerald-950/40 px-3 py-1.5 rounded-xl border border-emerald-200 dark:border-emerald-800">
+                <span className="text-xs font-bold text-emerald-600 dark:text-emerald-400 flex items-center gap-1.5 bg-emerald-50 dark:bg-emerald-950/40 px-3 py-1.5 rounded-2xl border border-emerald-200 dark:border-emerald-800">
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                   <span>ALL CONSTELLATIONS ONLINE</span>
                 </span>
@@ -988,7 +988,7 @@ const AICycloneIntelligence = () => {
                 <IOSGlassCard
                   key={feed.id}
                   wrapperClassName="h-full"
-                  className="rounded-3xl p-4.5 shadow-xs space-y-3.5 h-full flex flex-col justify-between"
+                  className="rounded-3xl p-4.5 shadow-sm space-y-3.5 h-full flex flex-col justify-between"
                 >
                   <div className="flex items-start justify-between">
                     <div>
@@ -1046,7 +1046,7 @@ const AICycloneIntelligence = () => {
             </div>
 
             {/* AI Multi-Source Data Fusion Engine Architecture Diagram */}
-            <div className="bg-gradient-to-br from-sky-50/90 via-indigo-50/60 to-slate-100/80 dark:from-slate-950 dark:via-black dark:to-slate-950 text-slate-900 dark:text-white border border-slate-200/80 dark:border-white/10 rounded-3xl p-6 sm:p-8 shadow-sm dark:shadow-2xl relative overflow-hidden space-y-6 transition-colors duration-300">
+            <div className="bg-gradient-to-br from-sky-50/90 via-indigo-50/60 to-slate-100/80 dark:from-slate-950 dark:via-black dark:to-slate-950 text-slate-900 dark:text-white border border-slate-100/80 dark:border-white/10 rounded-3xl p-6 sm:p-8 shadow-sm dark:shadow-2xl relative overflow-hidden space-y-6 transition-colors duration-300">
               {/* Background ambient auras - transparent in dark mode to prevent blue glare */}
               <div className="pointer-events-none absolute -top-24 right-10 w-80 h-80 bg-sky-400/10 dark:bg-transparent rounded-full blur-3xl" />
               <div className="pointer-events-none absolute -bottom-24 left-10 w-80 h-80 bg-indigo-400/10 dark:bg-transparent rounded-full blur-3xl" />
@@ -1067,11 +1067,11 @@ const AICycloneIntelligence = () => {
 
               {/* Interactive Pipeline Diagram */}
               <div className="grid grid-cols-1 md:grid-cols-4 gap-3 relative z-10">
-                <div className="bg-white/80 dark:bg-slate-900/75 dark:hover:bg-slate-850/80 backdrop-blur-xl rounded-2xl p-4 border border-slate-200/80 dark:border-white/10 text-center space-y-1.5 shadow-xs dark:shadow-[0_4px_20px_rgba(0,0,0,0.35)] transition-all hover:scale-[1.02]">
+                <div className="bg-white/80 dark:bg-slate-800/75 dark:hover:bg-slate-850/80 backdrop-blur-xl rounded-2xl p-4 border border-slate-100/80 dark:border-white/10 text-center space-y-1.5 shadow-sm dark:shadow-[0_4px_20px_rgba(0,0,0,0.35)] transition-all hover:scale-[1.02]">
                   <span className="text-[10px] text-sky-600 dark:text-sky-400 font-mono uppercase font-bold block tracking-wider">
                     {isHindi ? 'चरण 1' : 'Stage 1'}
                   </span>
-                  <strong className="text-xs sm:text-sm font-extrabold block text-slate-900 dark:text-white">
+                  <strong className="text-xs sm:text-sm font-bold block text-slate-900 dark:text-white">
                     {isHindi ? '1. कैलिब्रेटेड अंतर्ग्रहण' : '1. Calibrated Ingestion'}
                   </strong>
                   <p className="text-[10px] text-slate-600 dark:text-slate-300 font-normal leading-relaxed">
@@ -1081,11 +1081,11 @@ const AICycloneIntelligence = () => {
                   </p>
                 </div>
 
-                <div className="bg-white/80 dark:bg-slate-900/75 dark:hover:bg-slate-850/80 backdrop-blur-xl rounded-2xl p-4 border border-slate-200/80 dark:border-white/10 text-center space-y-1.5 shadow-xs dark:shadow-[0_4px_20px_rgba(0,0,0,0.35)] transition-all hover:scale-[1.02]">
+                <div className="bg-white/80 dark:bg-slate-800/75 dark:hover:bg-slate-850/80 backdrop-blur-xl rounded-2xl p-4 border border-slate-100/80 dark:border-white/10 text-center space-y-1.5 shadow-sm dark:shadow-[0_4px_20px_rgba(0,0,0,0.35)] transition-all hover:scale-[1.02]">
                   <span className="text-[10px] text-sky-600 dark:text-sky-400 font-mono uppercase font-bold block tracking-wider">
                     {isHindi ? 'चरण 2' : 'Stage 2'}
                   </span>
-                  <strong className="text-xs sm:text-sm font-extrabold block text-slate-900 dark:text-white">
+                  <strong className="text-xs sm:text-sm font-bold block text-slate-900 dark:text-white">
                     {isHindi ? '2. स्थानिक संरेखण' : '2. Spatial Alignment'}
                   </strong>
                   <p className="text-[10px] text-slate-600 dark:text-slate-300 font-normal leading-relaxed">
@@ -1095,11 +1095,11 @@ const AICycloneIntelligence = () => {
                   </p>
                 </div>
 
-                <div className="bg-white/80 dark:bg-slate-900/75 dark:hover:bg-slate-850/80 backdrop-blur-xl rounded-2xl p-4 border border-slate-200/80 dark:border-white/10 text-center space-y-1.5 shadow-xs dark:shadow-[0_4px_20px_rgba(0,0,0,0.35)] transition-all hover:scale-[1.02]">
+                <div className="bg-white/80 dark:bg-slate-800/75 dark:hover:bg-slate-850/80 backdrop-blur-xl rounded-2xl p-4 border border-slate-100/80 dark:border-white/10 text-center space-y-1.5 shadow-sm dark:shadow-[0_4px_20px_rgba(0,0,0,0.35)] transition-all hover:scale-[1.02]">
                   <span className="text-[10px] text-sky-600 dark:text-sky-400 font-mono uppercase font-bold block tracking-wider">
                     {isHindi ? 'चरण 3' : 'Stage 3'}
                   </span>
-                  <strong className="text-xs sm:text-sm font-extrabold block text-slate-900 dark:text-white">
+                  <strong className="text-xs sm:text-sm font-bold block text-slate-900 dark:text-white">
                     {isHindi ? '3. बहु-चैनल संलयन' : '3. Multi-Channel Fusion'}
                   </strong>
                   <p className="text-[10px] text-slate-600 dark:text-slate-300 font-normal leading-relaxed">
@@ -1109,11 +1109,11 @@ const AICycloneIntelligence = () => {
                   </p>
                 </div>
 
-                <div className="bg-white/80 dark:bg-slate-900/75 dark:hover:bg-slate-850/80 backdrop-blur-xl rounded-2xl p-4 border border-slate-200/80 dark:border-white/10 text-center space-y-1.5 shadow-xs dark:shadow-[0_4px_20px_rgba(0,0,0,0.35)] transition-all hover:scale-[1.02]">
+                <div className="bg-white/80 dark:bg-slate-800/75 dark:hover:bg-slate-850/80 backdrop-blur-xl rounded-2xl p-4 border border-slate-100/80 dark:border-white/10 text-center space-y-1.5 shadow-sm dark:shadow-[0_4px_20px_rgba(0,0,0,0.35)] transition-all hover:scale-[1.02]">
                   <span className="text-[10px] text-sky-600 dark:text-sky-400 font-mono uppercase font-bold block tracking-wider">
                     {isHindi ? 'चरण 4' : 'Stage 4'}
                   </span>
-                  <strong className="text-xs sm:text-sm font-extrabold block text-slate-900 dark:text-white">
+                  <strong className="text-xs sm:text-sm font-bold block text-slate-900 dark:text-white">
                     {isHindi ? '4. न्यूरल इनफेरेंस' : '4. Neural Inference'}
                   </strong>
                   <p className="text-[10px] text-slate-600 dark:text-slate-300 font-normal leading-relaxed">
@@ -1134,7 +1134,7 @@ const AICycloneIntelligence = () => {
         {activeTab === 'prediction' && (
           <div className="space-y-6 animate-in fade-in duration-300">
             {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
               <div>
                 <div className="flex items-center gap-2.5 flex-wrap">
                   <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-purple-500/15 text-purple-700 dark:text-purple-300 border border-purple-400/30">
@@ -1168,7 +1168,7 @@ const AICycloneIntelligence = () => {
             </div>
 
             {/* Interactive "What-If" Sensitivity Simulator */}
-            <div className="bg-white dark:bg-slate-900/90 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-xs space-y-4">
+            <div className="bg-white dark:bg-slate-800/90 rounded-3xl border border-slate-100 dark:border-slate-800 p-5 sm:p-6 shadow-sm space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800/80 pb-3">
                 <div className="flex items-center gap-2">
                   <Sliders className="w-4 h-4 text-sky-500" />
@@ -1265,7 +1265,7 @@ const AICycloneIntelligence = () => {
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               
               {/* Chart 1: Wind Speed Forecast & MC-Dropout Epistemic Spread */}
-              <div className="bg-white dark:bg-slate-900/90 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs space-y-3">
+              <div className="bg-white dark:bg-slate-800/90 rounded-3xl border border-slate-100 dark:border-slate-800 p-5 shadow-sm space-y-3">
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">
@@ -1324,7 +1324,7 @@ const AICycloneIntelligence = () => {
               </div>
 
               {/* Chart 2: Central Barometric Pressure Drop (hPa) */}
-              <div className="bg-white dark:bg-slate-900/90 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs space-y-3">
+              <div className="bg-white dark:bg-slate-800/90 rounded-3xl border border-slate-100 dark:border-slate-800 p-5 shadow-sm space-y-3">
                 <div className="flex items-center justify-between">
                   <div>
                     <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">
@@ -1371,7 +1371,7 @@ const AICycloneIntelligence = () => {
             </div>
 
             {/* Spatiotemporal Waypoint Forecast Table */}
-            <div className="bg-white dark:bg-slate-900/90 rounded-3xl border border-slate-200 dark:border-slate-800 overflow-hidden shadow-xs">
+            <div className="bg-white dark:bg-slate-800/90 rounded-3xl border border-slate-100 dark:border-slate-800 overflow-hidden shadow-sm">
               <div className="p-4 sm:p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
                 <div>
                   <h4 className="text-xs sm:text-sm font-black font-heading text-slate-900 dark:text-white uppercase tracking-wider">
@@ -1388,7 +1388,7 @@ const AICycloneIntelligence = () => {
 
               <div className="overflow-x-auto">
                 <table className="w-full text-left text-xs">
-                  <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-600 dark:text-slate-400 font-semibold border-b border-slate-200 dark:border-slate-800">
+                  <thead className="bg-slate-50 dark:bg-slate-800/60 text-slate-600 dark:text-slate-400 font-semibold border-b border-slate-100 dark:border-slate-800">
                     <tr>
                       <th className="py-3 px-4">Lead Time</th>
                       <th className="py-3 px-4">Valid Timestamp</th>
@@ -1451,7 +1451,7 @@ const AICycloneIntelligence = () => {
         {activeTab === 'benchmarks' && (
           <div className="space-y-6 animate-in fade-in duration-300">
             {/* Header */}
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200 dark:border-slate-800 pb-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 dark:border-slate-800 pb-4">
               <div>
                 <div className="flex items-center gap-2.5 flex-wrap">
                   <span className="px-2.5 py-0.5 rounded-full text-[10px] font-black uppercase tracking-wider bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-400/30">
@@ -1473,7 +1473,7 @@ const AICycloneIntelligence = () => {
                 </p>
               </div>
 
-              <span className="text-xs font-bold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 px-3 py-1.5 rounded-xl border border-amber-200 dark:border-amber-800">
+              <span className="text-xs font-bold text-amber-700 dark:text-amber-300 bg-amber-50 dark:bg-amber-950/40 px-3 py-1.5 rounded-2xl border border-amber-200 dark:border-amber-800">
                 OFFICIAL RSMC ARCHIVE DATA
               </span>
             </div>
@@ -1510,7 +1510,7 @@ const AICycloneIntelligence = () => {
                       </span>
                     </div>
 
-                    <div className="pt-3 mt-3 border-t border-slate-200/60 dark:border-slate-800 text-xs flex items-center justify-between">
+                    <div className="pt-3 mt-3 border-t border-slate-100/60 dark:border-slate-800 text-xs flex items-center justify-between">
                       <span className="text-slate-400 font-medium">Peak Wind:</span>
                       <strong className="text-rose-600 dark:text-rose-400 font-black">{storm.peakWindKmh} km/h</strong>
                     </div>
@@ -1520,7 +1520,7 @@ const AICycloneIntelligence = () => {
             </div>
 
             {/* Selected Storm Detailed Case Study */}
-            <div className="bg-white dark:bg-slate-900/90 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 shadow-xs space-y-4">
+            <div className="bg-white dark:bg-slate-800/90 rounded-3xl border border-slate-100 dark:border-slate-800 p-5 sm:p-6 shadow-sm space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
                 <div>
                   <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 uppercase tracking-wider block font-mono">
@@ -1532,7 +1532,7 @@ const AICycloneIntelligence = () => {
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-xs text-slate-500">Pattern:</span>
-                  <span className="font-bold text-xs text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-xl">
+                  <span className="font-bold text-xs text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800 px-3 py-1 rounded-2xl">
                     {selectedBenchmark.morphologyPattern}
                   </span>
                 </div>
@@ -1544,7 +1544,7 @@ const AICycloneIntelligence = () => {
 
               {/* Error Metrics Highlights */}
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
-                <div className="bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 text-center">
+                <div className="bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-2xl border border-slate-100/80 dark:border-slate-700/80 text-center">
                   <span className="text-[10px] text-slate-500 block uppercase font-medium">12h Track Error</span>
                   <span className="text-xl font-heading font-black text-emerald-600 dark:text-emerald-400 block mt-0.5">
                     {selectedBenchmark.aiAccuracy.lead12hTrackErrorKm} km
@@ -1552,7 +1552,7 @@ const AICycloneIntelligence = () => {
                   <span className="text-[10px] text-slate-400">vs 24.5 km IMD Baseline</span>
                 </div>
 
-                <div className="bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 text-center">
+                <div className="bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-2xl border border-slate-100/80 dark:border-slate-700/80 text-center">
                   <span className="text-[10px] text-slate-500 block uppercase font-medium">24h Track Error</span>
                   <span className="text-xl font-heading font-black text-emerald-600 dark:text-emerald-400 block mt-0.5">
                     {selectedBenchmark.aiAccuracy.lead24hTrackErrorKm} km
@@ -1560,7 +1560,7 @@ const AICycloneIntelligence = () => {
                   <span className="text-[10px] text-slate-400">vs 48.0 km IMD Baseline</span>
                 </div>
 
-                <div className="bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 text-center">
+                <div className="bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-2xl border border-slate-100/80 dark:border-slate-700/80 text-center">
                   <span className="text-[10px] text-slate-500 block uppercase font-medium">48h Track Error</span>
                   <span className="text-xl font-heading font-black text-emerald-600 dark:text-emerald-400 block mt-0.5">
                     {selectedBenchmark.aiAccuracy.lead48hTrackErrorKm} km
@@ -1568,7 +1568,7 @@ const AICycloneIntelligence = () => {
                   <span className="text-[10px] text-slate-400">vs 86.2 km IMD Baseline</span>
                 </div>
 
-                <div className="bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-2xl border border-slate-200/80 dark:border-slate-700/80 text-center">
+                <div className="bg-slate-50 dark:bg-slate-800/60 p-3.5 rounded-2xl border border-slate-100/80 dark:border-slate-700/80 text-center">
                   <span className="text-[10px] text-slate-500 block uppercase font-medium">Intensity Error (MAE)</span>
                   <span className="text-xl font-heading font-black text-sky-600 dark:text-sky-400 block mt-0.5">
                     {selectedBenchmark.aiAccuracy.intensityErrorKmh} km/h
@@ -1579,7 +1579,7 @@ const AICycloneIntelligence = () => {
             </div>
 
             {/* Benchmark Lead-Time Error Comparison Chart */}
-            <div className="bg-white dark:bg-slate-900/90 rounded-3xl border border-slate-200 dark:border-slate-800 p-5 shadow-xs space-y-3">
+            <div className="bg-white dark:bg-slate-800/90 rounded-3xl border border-slate-100 dark:border-slate-800 p-5 shadow-sm space-y-3">
               <div className="flex items-center justify-between">
                 <div>
                   <h4 className="text-xs sm:text-sm font-bold text-slate-900 dark:text-white uppercase tracking-wider">

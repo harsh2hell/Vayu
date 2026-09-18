@@ -117,6 +117,7 @@ class TrackPredictionRequest(BaseModel):
     basin: str = "Bay of Bengal"
     past_track: Optional[List[Dict[str, Any]]] = None
     storm_id: Optional[str] = None
+    use_live_telemetry: bool = False
 
 class BulletinGenerationRequest(BaseModel):
     cyclone_name: str = "Severe Cyclonic Storm DANA"
@@ -197,11 +198,29 @@ async def legacy_classify(file: Optional[UploadFile] = File(None), basin: str = 
 
 @app.post("/api/predict-track")
 def legacy_predict_track(req: TrackPredictionRequest):
+    wind = req.current_wind
+    mslp = req.current_mslp
+    sst = req.sst
+    shear = req.vertical_shear_knots
+    live_telemetry = None
+
+    if req.use_live_telemetry:
+        from .routers.wind import fetch_live_cyclone_wind_telemetry
+        live = fetch_live_cyclone_wind_telemetry(req.current_lat, req.current_lon)
+        if live.get("success"):
+            wind = live.get("wind_speed_kmh", wind)
+            mslp = live.get("mslp_hpa", mslp)
+            sst = live.get("sst_celsius", sst)
+            shear = live.get("vertical_shear_knots", shear)
+            live_telemetry = live
+
     prediction = cyclone_forecast_engine.predict_trajectory(
-        current_lat=req.current_lat, current_lon=req.current_lon, current_wind=req.current_wind,
-        current_mslp=req.current_mslp, sst=req.sst, vertical_shear_knots=req.vertical_shear_knots, basin=req.basin,
+        current_lat=req.current_lat, current_lon=req.current_lon, current_wind=wind,
+        current_mslp=mslp, sst=sst, vertical_shear_knots=shear, basin=req.basin,
         past_track=req.past_track, storm_id=req.storm_id
     )
+    if live_telemetry:
+        prediction["live_telemetry"] = live_telemetry
     if not prediction.get("success", False) or prediction.get("forecast_status") == "INSUFFICIENT_HISTORY":
         return {
             "success": False,

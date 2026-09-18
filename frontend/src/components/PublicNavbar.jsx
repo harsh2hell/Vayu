@@ -264,7 +264,7 @@ const PublicNavbar = ({
           <img 
             src={isDarkMode ? "/vayu-white.png?v=2" : "/vayu.png"} 
             alt="VAYU" 
-            className="h-12 sm:h-14 md:h-16 lg:h-[62px] w-auto object-contain filter drop-shadow-xs transition-transform duration-300 hover:scale-105 cursor-pointer select-none shrink-0" 
+            className="h-12 sm:h-14 md:h-16 lg:h-[62px] w-auto object-contain filter drop-shadow-sm transition-transform duration-300 hover:scale-105 cursor-pointer select-none shrink-0" 
             style={{ maxHeight: '62px' }}
             onClick={() => {
               if (location.pathname === '/') {
@@ -364,7 +364,7 @@ const PublicNavbar = ({
 
           {/* Real-time Live Clock with Seconds & Pulsing Dot */}
           <div
-            className="header-ctrl-btn hidden md:inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-mono font-bold text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 shrink-0 select-none shadow-2xs"
+            className="header-ctrl-btn hidden md:inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-2xl text-xs font-mono font-bold text-slate-700 dark:text-slate-200 border border-slate-100 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 shrink-0 select-none shadow-2xs"
             title={isHindi ? "लाइव भारतीय मानक समय (IST) व दिनांक" : "Live Real-Time Indian Standard Time (IST) & Date"}
           >
             <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
@@ -379,7 +379,7 @@ const PublicNavbar = ({
           {/* National Emergency Hotline */}
           <a 
             href="tel:112" 
-            className="header-ctrl-btn hidden sm:inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold text-red-700 dark:text-red-300 bg-red-50/90 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 hover:bg-red-100 dark:hover:bg-red-900/60 transition-all shadow-2xs shrink-0"
+            className="header-ctrl-btn hidden sm:inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-2xl text-xs font-semibold text-red-700 dark:text-red-300 bg-red-50/90 dark:bg-red-950/40 border border-red-200 dark:border-red-900/50 hover:bg-red-100 dark:hover:bg-red-900/60 transition-all shadow-2xs shrink-0"
             title={isHindi ? "राष्ट्रीय आपातकालीन हेल्पलाइन" : "National Emergency Helpline"}
           >
             <PhoneCall className="w-3.5 h-3.5 text-red-600 dark:text-red-400 shrink-0" />
@@ -390,14 +390,14 @@ const PublicNavbar = ({
           {/* Language Switcher */}
           <button
             onClick={() => setIsHindi(!isHindi)}
-            className="header-ctrl-btn px-2.5 sm:px-3 py-1.5 rounded-xl text-xs font-semibold text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-700 transition-all cursor-pointer shrink-0"
+            className="header-ctrl-btn px-2.5 sm:px-3 py-1.5 rounded-2xl text-xs font-semibold text-slate-700 dark:text-slate-300 border border-slate-100 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-700 transition-all cursor-pointer shrink-0"
             title={isHindi ? "Switch to English" : "हिन्दी में बदलें"}
           >
             {isHindi ? 'English' : 'हिन्दी'}
           </button>
 
           {/* Font Size Scaling Controls */}
-          <div className="header-font-box flex items-center rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 p-0.5 shrink-0">
+          <div className="header-font-box flex items-center rounded-2xl border border-slate-100 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 p-0.5 shrink-0">
             <button
               onClick={() => handleFontChange(Math.max(-3, currentOffset - 1))}
               disabled={currentOffset <= -3}
@@ -423,13 +423,38 @@ const PublicNavbar = ({
             </button>
           </div>
 
+<<<<<<< HEAD
 
+=======
+          {/* Theme Switcher */}
+          {setIsDarkMode && (
+            <button
+              onClick={() => setIsDarkMode(!isDarkMode)}
+              aria-label="Toggle light/dark theme"
+              className="header-theme-btn relative p-1.5 sm:p-2 rounded-2xl border border-slate-100 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 shadow-sm hover:bg-white dark:hover:bg-slate-700 text-slate-700 dark:text-amber-400 transition-all duration-300 overflow-hidden group cursor-pointer shrink-0"
+              title={isDarkMode ? (isHindi ? "लाइट थीम पर स्विच करें" : "Switch to Light Theme") : (isHindi ? "डार्क थीम पर स्विच करें" : "Switch to Dark Theme")}
+            >
+              <div className="relative w-4 h-4 flex items-center justify-center">
+                <Sun
+                  className={`w-4 h-4 text-amber-500 absolute transition-all duration-500 transform ${
+                    isDarkMode ? 'rotate-90 scale-0 opacity-0' : 'rotate-0 scale-100 opacity-100 group-hover:rotate-45'
+                  }`}
+                />
+                <Moon
+                  className={`w-4 h-4 text-sky-400 dark:text-amber-300 absolute transition-all duration-500 transform ${
+                    isDarkMode ? 'rotate-0 scale-100 opacity-100 group-hover:-rotate-12' : '-rotate-90 scale-0 opacity-0'
+                  }`}
+                />
+              </div>
+            </button>
+          )}
+>>>>>>> f1dd9d8b9f695faeb7830c3fbb6419ecee937b83
 
           {/* Mobile Menu Hamburger Toggle */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             aria-label={isMobileMenuOpen ? "Close navigation menu" : "Open navigation menu"}
-            className="md:hidden p-1.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-all cursor-pointer shrink-0"
+            className="md:hidden p-1.5 rounded-2xl border border-slate-100 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 hover:bg-white dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 transition-all cursor-pointer shrink-0"
           >
             {isMobileMenuOpen ? (
               <X className="w-5 h-5 text-slate-900 dark:text-white" />
@@ -444,10 +469,10 @@ const PublicNavbar = ({
 
       {/* Mobile Navigation Drawer */}
       {isMobileMenuOpen && (
-        <div className="md:hidden border-t border-slate-200/80 dark:border-white/10 bg-white/95 dark:bg-black/95 backdrop-blur-2xl px-4 py-4 space-y-3 shadow-2xl animate-in slide-in-from-top-2 duration-200">
+        <div className="md:hidden border-t border-slate-100/80 dark:border-white/10 bg-white/95 dark:bg-black/95 backdrop-blur-2xl px-4 py-4 space-y-3 shadow-2xl animate-in slide-in-from-top-2 duration-200">
           
           {/* Mobile Live Clock Display */}
-          <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700 text-xs font-semibold">
+          <div className="flex items-center justify-between p-2.5 rounded-2xl bg-slate-100 dark:bg-slate-800/90 border border-slate-100 dark:border-slate-700 text-xs font-semibold">
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
               <span className="text-slate-700 dark:text-slate-300">
@@ -521,7 +546,7 @@ const PublicNavbar = ({
                 setIsMobileMenuOpen(false);
                 setIsHindi(!isHindi);
               }}
-              className="px-3.5 py-1.5 rounded-xl text-xs font-bold text-sky-700 dark:text-sky-300 bg-slate-100 dark:bg-neutral-800 border border-slate-200 dark:border-neutral-700 cursor-pointer"
+              className="px-3.5 py-1.5 rounded-2xl text-xs font-bold text-sky-700 dark:text-sky-300 bg-slate-100 dark:bg-neutral-800 border border-slate-100 dark:border-neutral-700 cursor-pointer"
             >
               {isHindi ? 'English में देखें' : 'हिन्दी में देखें'}
             </button>

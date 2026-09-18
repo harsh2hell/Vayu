@@ -13,7 +13,7 @@ const InfoCallout = ({
   className = ''
 }) => {
   return (
-    <div className={`bg-blue-50/70 border border-blue-200 rounded-xl p-3.5 sm:p-4 text-xs text-blue-950 flex items-start justify-between gap-3 ${className}`}>
+    <div className={`bg-blue-50/70 border border-blue-200 rounded-2xl p-3.5 sm:p-4 text-xs text-blue-950 flex items-start justify-between gap-3 ${className}`}>
       <div className="flex items-start gap-2.5 min-w-0">
         <Icon className="w-4 h-4 text-[#003087] shrink-0 mt-0.5" />
         <div className="space-y-0.5 leading-relaxed">

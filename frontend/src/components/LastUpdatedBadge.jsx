@@ -26,7 +26,7 @@ export default function LastUpdatedBadge({
 
   return (
     <div
-      className={`inline-flex items-center rounded-full border border-slate-200/80 dark:border-slate-800/80 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md text-slate-600 dark:text-slate-300 font-mono shadow-2xs ${sizeClasses} ${className}`}
+      className={`inline-flex items-center rounded-full border border-slate-100/80 dark:border-slate-800/80 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md text-slate-600 dark:text-slate-300 font-mono shadow-2xs ${sizeClasses} ${className}`}
     >
       <span className="flex items-center gap-1">
         <span

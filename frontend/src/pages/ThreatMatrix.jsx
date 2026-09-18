@@ -312,9 +312,9 @@ const ThreatMatrix = () => {
       <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
         
         {/* Header & Search Bar */}
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-5">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-5">
           <div>
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 mb-2">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-lg text-xs font-bold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-100 dark:border-slate-700 mb-2">
               <ShieldAlert className="w-3.5 h-3.5 text-red-500" />
               <span>
                 {isHindi ? 'सार्वजनिक प्रारंभिक चेतावनी मैट्रिक्स • निशुल्क एवं खुला डेटा' : 'Public Early Warning Threat Matrix • Free & Open Data'}
@@ -338,7 +338,7 @@ const ThreatMatrix = () => {
               value={matrixSearchQuery}
               onChange={(e) => setMatrixSearchQuery(e.target.value)}
               placeholder={isHindi ? 'जिला, बंदरगाह या शहर खोजें...' : 'Search district, port, or city...'}
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-sky-500 shadow-2xs"
+              className="w-full pl-10 pr-4 py-2.5 rounded-2xl border border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-xs text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-hidden focus:ring-2 focus:ring-sky-500 shadow-2xs"
             />
             {matrixSearchQuery && (
               <button
@@ -353,7 +353,7 @@ const ThreatMatrix = () => {
 
         {/* 4 Summary Stat Counter Cards */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-3.5 rounded-2xl shadow-2xs">
+          <div className="bg-white dark:bg-slate-800 border border-slate-100 dark:border-slate-800 p-3.5 rounded-2xl shadow-2xs">
             <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 block mb-0.5">
               {isHindi ? 'निगरानी किए जा रहे तटीय जिले' : 'Monitored Coastal Districts'}
             </span>
@@ -416,7 +416,7 @@ const ThreatMatrix = () => {
                 onClick={() => setStateFilter(st)}
                 className={`px-3 py-1 rounded-lg font-semibold transition-all cursor-pointer ${
                   stateFilter === st
-                    ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-950 shadow-2xs'
+                    ? 'bg-slate-700 text-white dark:bg-white dark:text-slate-950 shadow-2xs'
                     : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                 }`}
               >
@@ -438,7 +438,7 @@ const ThreatMatrix = () => {
                 onClick={() => setMatrixThreatFilter(lvl)}
                 className={`px-3 py-1 rounded-lg font-semibold transition-all cursor-pointer ${
                   matrixThreatFilter === lvl
-                    ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-950 shadow-2xs'
+                    ? 'bg-slate-700 text-white dark:bg-white dark:text-slate-950 shadow-2xs'
                     : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                 }`}
               >
@@ -453,7 +453,7 @@ const ThreatMatrix = () => {
 
         {/* Threat Matrix Table */}
         {filteredDistricts.length === 0 ? (
-          <div className="border border-slate-200 dark:border-slate-800 rounded-2xl p-8 text-center bg-white dark:bg-slate-900 space-y-2">
+          <div className="border border-slate-100 dark:border-slate-800 rounded-2xl p-8 text-center bg-white dark:bg-slate-800 space-y-2">
             <p className="text-xs font-semibold text-slate-600 dark:text-slate-400">
               {isHindi 
                 ? `आपकी खोज "${matrixSearchQuery}" से कोई जिला मेल नहीं खाता।` 
@@ -465,15 +465,15 @@ const ThreatMatrix = () => {
                 setStateFilter('All');
                 setMatrixThreatFilter('All');
               }}
-              className="px-3 py-1.5 rounded-lg bg-slate-900 text-white dark:bg-white dark:text-slate-900 text-xs font-bold cursor-pointer"
+              className="px-3 py-1.5 rounded-lg bg-slate-700 text-white dark:bg-white dark:text-slate-900 text-xs font-bold cursor-pointer"
             >
               {isHindi ? 'फ़िल्टर रीसेट करें' : 'Reset Filters'}
             </button>
           </div>
         ) : (
-          <div className="border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-xs bg-white dark:bg-slate-900/90 overflow-x-auto">
+          <div className="border border-slate-100 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm bg-white dark:bg-slate-800/90 overflow-x-auto">
             <table className="w-full text-left text-xs min-w-[850px]">
-              <thead className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-semibold uppercase tracking-wider text-[11px]">
+              <thead className="bg-slate-50 dark:bg-slate-800/80 border-b border-slate-100 dark:border-slate-700 text-slate-600 dark:text-slate-300 font-semibold uppercase tracking-wider text-[11px]">
                 <tr>
                   <th className="py-3.5 px-5">{isHindi ? 'जिला एवं तटीय बंदरगाह' : 'District & Coastal Ports'}</th>
                   <th className="py-3.5 px-5">{isHindi ? 'राज्य' : 'State'}</th>
@@ -485,7 +485,7 @@ const ThreatMatrix = () => {
                   <th className="py-3.5 px-5 text-right">{isHindi ? 'कार्रवाई' : 'Action'}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-100 dark:divide-slate-800 bg-white dark:bg-slate-900">
+              <tbody className="divide-y divide-slate-100 dark:divide-slate-800 bg-white dark:bg-slate-800">
                 {filteredDistricts.map((row, idx) => (
                   <tr 
                     key={idx} 
@@ -590,7 +590,7 @@ const ThreatMatrix = () => {
         )}
 
         {/* Public Guidance Tip */}
-        <div className="bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
+        <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-100 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 shadow-2xs">
           <div className="flex items-center gap-2.5">
             <Info className="w-4 h-4 text-sky-500 shrink-0" />
             <span>
@@ -607,7 +607,7 @@ const ThreatMatrix = () => {
       </main>
 
       {/* Footer */}
-      <footer className="bg-slate-50 dark:bg-slate-950 border-t border-slate-200 dark:border-slate-800 py-10 px-4 sm:px-6 text-xs text-slate-500 dark:text-slate-400 transition-colors mt-12">
+      <footer className="bg-slate-50 dark:bg-slate-950 border-t border-slate-100 dark:border-slate-800 py-10 px-4 sm:px-6 text-xs text-slate-500 dark:text-slate-400 transition-colors mt-12">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div>
             &copy; 2026 {isHindi ? 'पृथ्वी विज्ञान मंत्रालय, भारत सरकार। सर्वाधिकार सुरक्षित।' : 'Ministry of Earth Sciences, Government of India. All Rights Reserved.'}

@@ -161,7 +161,7 @@ const Impact = () => {
 
       {/* Error Banner */}
       {errorMsg && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3">
+        <div className="p-4 bg-red-50 border border-red-200 rounded-2xl flex items-start gap-3">
           <AlertTriangle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
           <div className="text-xs">
             <h4 className="font-bold text-red-900">IMPACT CALCULATION ERROR</h4>
@@ -174,7 +174,7 @@ const Impact = () => {
       <div className="grid grid-cols-1 md:grid-cols-12 gap-5">
         
         {/* Model Forecast Strike Corridor (7 cols) */}
-        <div className="md:col-span-7 bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-4">
+        <div className="md:col-span-7 bg-white border border-slate-100 rounded-2xl p-5 shadow-sm space-y-4">
           <div className="flex items-center justify-between border-b border-slate-100 pb-3">
             <div className="flex items-center gap-2">
               <MapPin className="w-5 h-5 text-[#003087]" />
@@ -183,7 +183,7 @@ const Impact = () => {
             <span className="badge badge-blue text-[10px]">AI Model Forecast</span>
           </div>
 
-          <div className="bg-blue-50/60 border border-blue-200 rounded-xl p-4 space-y-2">
+          <div className="bg-blue-50/60 border border-blue-200 rounded-2xl p-4 space-y-2">
             <div className="flex justify-between items-center text-xs">
               <span className="text-slate-900 font-bold">Target Strike Sector:</span>
               <span className="font-bold font-mono text-[#003087]">
@@ -205,7 +205,7 @@ const Impact = () => {
           </div>
 
           <div className="grid grid-cols-3 gap-3 text-xs">
-            <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-center space-y-1">
+            <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 text-center space-y-1">
               <Waves className="w-4 h-4 text-sky-600 mx-auto" />
               <span className="text-[10px] text-slate-400 block uppercase font-mono">Storm Surge</span>
               <span className="font-bold text-slate-900 font-mono text-sm block">
@@ -213,7 +213,7 @@ const Impact = () => {
               </span>
             </div>
 
-            <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-center space-y-1">
+            <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 text-center space-y-1">
               <Wind className="w-4 h-4 text-red-600 mx-auto" />
               <span className="text-[10px] text-slate-400 block uppercase font-mono">Landfall Winds</span>
               <span className="font-bold text-red-600 font-mono text-sm block">
@@ -221,7 +221,7 @@ const Impact = () => {
               </span>
             </div>
 
-            <div className="p-3 bg-slate-50 rounded-xl border border-slate-200 text-center space-y-1">
+            <div className="p-3 bg-slate-50 rounded-2xl border border-slate-100 text-center space-y-1">
               <CloudRain className="w-4 h-4 text-blue-600 mx-auto" />
               <span className="text-[10px] text-slate-400 block uppercase font-mono">24h Rainfall</span>
               <span className="font-bold text-slate-900 font-mono text-sm block">
@@ -232,7 +232,7 @@ const Impact = () => {
         </div>
 
         {/* Observed Best-Track Reference (5 cols) */}
-        <div className="md:col-span-5 bg-white border border-slate-200 rounded-2xl p-5 shadow-xs space-y-4 flex flex-col justify-between">
+        <div className="md:col-span-5 bg-white border border-slate-100 rounded-2xl p-5 shadow-sm space-y-4 flex flex-col justify-between">
           <div>
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
@@ -243,7 +243,7 @@ const Impact = () => {
             </div>
 
             <div className="mt-3 space-y-3 text-xs">
-              <div className="p-3 bg-emerald-50/70 border border-emerald-200 rounded-xl space-y-1.5">
+              <div className="p-3 bg-emerald-50/70 border border-emerald-200 rounded-2xl space-y-1.5">
                 <span className="text-[10px] uppercase font-bold font-mono tracking-wider text-emerald-800 block">
                   Observed Landfall Timing
                 </span>
@@ -251,7 +251,7 @@ const Impact = () => {
                 <span className="text-[11px] text-slate-600 block">{activeStorm.landfallSector}</span>
               </div>
 
-              <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1 text-[11px] text-slate-600">
+              <div className="p-3 bg-slate-50 border border-slate-100 rounded-2xl space-y-1 text-[11px] text-slate-600">
                 <div className="font-semibold text-slate-700">Verification Outcome:</div>
                 <p>
                   VAYU 2-Layer GRU landfall spatial error: <strong>32.4 km</strong> from verified best-track landfall fix, significantly outperforming persistence (+86.0 km advantage).
@@ -275,7 +275,7 @@ const Impact = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
         
         {/* Left: GIS Map (6 cols) */}
-        <div className="lg:col-span-6 bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs flex flex-col">
+        <div className="lg:col-span-6 bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm flex flex-col">
           <div className="card-header bg-white flex items-center justify-between">
             <div className="flex items-center gap-2">
               <MapPin className="w-4 h-4 text-[#003087]" />
@@ -325,7 +325,7 @@ const Impact = () => {
             </MapContainer>
           </div>
 
-          <div className="p-3 bg-slate-50 border-t border-slate-200 text-xs text-slate-600 flex items-center justify-between">
+          <div className="p-3 bg-slate-50 border-t border-slate-100 text-xs text-slate-600 flex items-center justify-between">
             <span className="font-mono text-[11px]">
               Inner Ring: 60km Severe Hazard • Outer Ring: 120km Warning Zone
             </span>
@@ -334,7 +334,7 @@ const Impact = () => {
         </div>
 
         {/* Right: Affected Coastal Districts Table (6 cols) */}
-        <div className="lg:col-span-6 bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs flex flex-col">
+        <div className="lg:col-span-6 bg-white border border-slate-100 rounded-2xl overflow-hidden shadow-sm flex flex-col">
           <div className="card-header bg-white flex items-center justify-between">
             <div className="flex items-center gap-2">
               <ShieldAlert className="w-4 h-4 text-red-600" />
@@ -347,7 +347,7 @@ const Impact = () => {
 
           <div className="overflow-x-auto flex-1">
             <table className="w-full text-xs text-left">
-              <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 font-mono text-[11px]">
+              <thead className="bg-slate-50 border-b border-slate-100 text-slate-500 font-mono text-[11px]">
                 <tr>
                   <th className="py-2.5 px-4 font-semibold">District</th>
                   <th className="py-2.5 px-3 font-semibold">Strike Prob</th>
@@ -391,7 +391,7 @@ const Impact = () => {
             </table>
           </div>
 
-          <div className="p-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between text-xs">
+          <div className="p-3.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs">
             <span className="text-slate-500 font-mono text-[11px]">
               CAP Directives Grounded in NDMA / IMD Protocols
             </span>

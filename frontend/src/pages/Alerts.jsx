@@ -131,7 +131,7 @@ const Alerts = () => {
     <div className="space-y-6 max-w-7xl mx-auto pb-10">
 
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-white p-5 rounded-2xl border border-slate-100 shadow-sm">
         <div>
           <div className="flex items-center gap-2 mb-1.5 flex-wrap">
             <DataTypeBadge type="ai" label="OPERATIONAL DIRECTIVE" />
@@ -151,7 +151,7 @@ const Alerts = () => {
         <div className="flex items-center gap-2">
           <button
             onClick={() => downloadOfficialBulletinPdf({ name: 'Severe Cyclonic Storm DANA', basin: 'Bay of Bengal' })}
-            className="btn-primary text-xs py-2 px-4 shadow-xs gap-2"
+            className="btn-primary text-xs py-2 px-4 shadow-sm gap-2"
           >
             <Download className="w-4 h-4" />
             <span>Download Official Bulletin PDF</span>
@@ -160,7 +160,7 @@ const Alerts = () => {
       </div>
 
       {/* Geospatial Coastal Warning GIS Map */}
-      <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-4 shadow-2xs">
+      <div className="bg-white border border-slate-100 rounded-2xl p-5 space-y-4 shadow-2xs">
         <div className="flex items-center justify-between border-b border-slate-100 pb-3">
           <div>
             <span className="text-[11px] font-mono font-bold text-slate-800 uppercase">// GEOSPATIAL_WARNING_MAP</span>
@@ -173,7 +173,7 @@ const Alerts = () => {
           </div>
         </div>
 
-        <div className="h-72 w-full rounded-lg overflow-hidden border border-slate-200 relative">
+        <div className="h-72 w-full rounded-lg overflow-hidden border border-slate-100 relative">
           <MapContainer
             center={[20.5, 86.5]}
             zoom={6}
@@ -239,8 +239,8 @@ const Alerts = () => {
                 key={f}
                 onClick={() => setFilter(f)}
                 className={`px-3 py-1 rounded text-xs font-mono font-medium transition-all border ${filter === f
-                    ? 'bg-slate-900 text-white border-slate-900 font-bold shadow-2xs'
-                    : 'bg-white text-slate-600 border-slate-200 hover:bg-slate-50'
+                    ? 'bg-slate-700 text-white border-slate-900 font-bold shadow-2xs'
+                    : 'bg-white text-slate-600 border-slate-100 hover:bg-slate-50'
                   }`}
               >
                 {f}
@@ -251,7 +251,7 @@ const Alerts = () => {
           {/* Alert Cards */}
           <div className="space-y-4">
             {isLoading ? (
-              <div className="p-8 text-center text-slate-500 text-xs bg-white rounded-xl border border-slate-200">
+              <div className="p-8 text-center text-slate-500 text-xs bg-white rounded-2xl border border-slate-100">
                 Loading active alerts from backend database...
               </div>
             ) : filtered.length === 0 ? (
@@ -264,7 +264,7 @@ const Alerts = () => {
               filtered.map((alert, idx) => (
                 <div
                   key={alert.id || idx}
-                  className={`bg-white border rounded-xl p-5 space-y-3.5 shadow-2xs transition-all ${(alert.alert_level || '').includes('RED') ? 'border-red-200' :
+                  className={`bg-white border rounded-2xl p-5 space-y-3.5 shadow-2xs transition-all ${(alert.alert_level || '').includes('RED') ? 'border-red-200' :
                       (alert.alert_level || '').includes('ORANGE') ? 'border-orange-200' : 'border-amber-200'
                     }`}
                 >
@@ -352,7 +352,7 @@ const Alerts = () => {
         {/* Right Column: Multi-Agency Broadcast & Ingestion Activity (4 Cols) */}
         <div className="xl:col-span-4 space-y-4">
 
-          <div className="bg-white border border-slate-200 rounded-xl p-5 space-y-4 shadow-2xs">
+          <div className="bg-white border border-slate-100 rounded-2xl p-5 space-y-4 shadow-2xs">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
                 <Radio className="w-4 h-4 text-sky-600" />
@@ -392,7 +392,7 @@ const Alerts = () => {
       {/* CAP v1.2 XML / JSON Modal */}
       {selectedCapAlert && (
         <div className="fixed inset-0 z-[1000] bg-black/60 backdrop-blur-xs flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 space-y-4 shadow-2xl border border-slate-200">
+          <div className="bg-white rounded-2xl max-w-2xl w-full p-6 space-y-4 shadow-2xl border border-slate-100">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
                 <Code className="w-5 h-5 text-[#003087]" />
@@ -403,7 +403,7 @@ const Alerts = () => {
               </button>
             </div>
 
-            <pre className="bg-slate-950 text-emerald-400 p-4 rounded-xl text-xs font-mono overflow-x-auto max-h-96">
+            <pre className="bg-slate-950 text-emerald-400 p-4 rounded-2xl text-xs font-mono overflow-x-auto max-h-96">
               {generateCapXmlString(selectedCapAlert)}
             </pre>
 

@@ -1,189 +1,498 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
-  Bell, Clock, ChevronRight, ExternalLink, User, LogOut, Shield
+  Bell, Clock, ChevronRight, ExternalLink, User, LogOut, Search,
+  Sun, Moon, History, Sidebar, Menu, X, Check, ShieldAlert,
+  AlertTriangle, Info, ArrowRight, Sparkles, Compass
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { getWebsiteUrl, isProductionDomain, toPortalPath } from '../utils/domain';
-import { OfficerAccountDisplay, SafeSignOutButton } from './auth/ClerkAuth';
+import { toPortalPath } from '../utils/domain';
+
+const SEARCH_ITEMS = [
+  { id: 'overview', title: 'Command Overview', category: 'Dashboards', path: '/dashboard', icon: '📊', desc: 'Real-time cyclone metrics, active alerts & regional distribution' },
+  { id: 'satellite', title: 'Satellite Feed', category: 'Dashboards', path: '/dashboard/satellite', icon: '🛰️', desc: 'INSAT-3D & NASA GIBS multispectral infrared & visible imagery' },
+  { id: 'detection', title: 'Cyclone Models', category: 'Dashboards', path: '/dashboard/detection', icon: '🎯', desc: 'MobileNetV3 center detection & confidence bounding boxes' },
+  { id: 'trajectory', title: 'Forecast Data — Trajectory', category: 'Pages', path: '/dashboard/trajectory', icon: '📈', desc: 'Deep GRU Seq2Seq 72-hour track predictions vs persistence' },
+  { id: 'impact', title: 'Forecast Data — Impact & Alerts', category: 'Pages', path: '/dashboard/impact', icon: '⚠️', desc: 'Landfall estimation, coastal inundation & red alert zones' },
+  { id: 'morphology', title: 'Morphology', category: 'Pages', path: '/dashboard/classification', icon: '🌀', desc: 'ResNet-18 Dvorak T-number & CDO convective cloud analysis' },
+  { id: 'archives', title: 'Historical Archives', category: 'Pages', path: '/dashboard/archives', icon: '📚', desc: 'Historical North Indian Ocean cyclonic storm database' },
+  { id: 'models', title: 'AI Intelligence', category: 'Pages', path: '/dashboard/models', icon: '🧠', desc: 'Model architecture, loss convergence curves & benchmark evaluations' },
+  { id: 'bulletin', title: 'Official Reports', category: 'Pages', path: '/dashboard/bulletin', icon: '📄', desc: 'MoES / IMD standard formatted operational cyclone bulletins' },
+  { id: 'action-theme', title: 'Toggle Dark Theme', category: 'Quick Action', isAction: true, action: 'toggleTheme', icon: '🌓', desc: 'Switch interface between light and dark modes' },
+  { id: 'action-dana', title: 'View Cyclone DANA Analysis', category: 'Active Cyclones', path: '/dashboard/trajectory', icon: '🌪️', desc: 'Severe Cyclonic storm active in Bay of Bengal' },
+];
+
+const INITIAL_NOTIFICATIONS = [
+  { id: 1, title: 'Severe Cyclone DANA Tracking Active', desc: 'Estimated central pressure 988 hPa, sustained winds 65 kts.', time: '5m ago', unread: true, type: 'critical', path: '/dashboard/trajectory' },
+  { id: 2, title: 'Red Warning: Odisha & West Bengal Coast', desc: 'Heavy precipitation and storm surge alert issued for 4 districts.', time: '28m ago', unread: true, type: 'warning', path: '/dashboard/impact' },
+  { id: 3, title: 'Windy.com Live Telemetry Stream Active', desc: 'Real-time wind vectors and cyclone models data feed active.', time: '1h ago', unread: false, type: 'info', path: '/dashboard/trajectory' },
+  { id: 4, title: 'AI Model Inference Updated', desc: 'Landfall prediction error calibrated to 32.4 km from target.', time: '2h ago', unread: false, type: 'info', path: '/dashboard/models' },
+];
+
+const INITIAL_HISTORY = [
+  { id: 1, action: 'Calculated 72h forecast trajectory for Cyclone DANA', time: '12 mins ago', path: '/dashboard/trajectory' },
+  { id: 2, action: 'Synchronized live wind particles and storm vectors for Cyclone models', time: '34 mins ago', path: '/dashboard/trajectory' },
+  { id: 3, action: 'Generated Official Advisory Bulletin ADV-08 for disaster authorities', time: '1 hour ago', path: '/dashboard/bulletin' },
+  { id: 4, action: 'Analyzed INSAT-3D thermal IR convective band morphology', time: '3 hours ago', path: '/dashboard/classification' },
+  { id: 5, action: 'Synchronized GDACS real-time cyclone database', time: '5 hours ago', path: '/dashboard' },
+];
 
 const Topbar = () => {
-  const [time, setTime] = useState(new Date());
-  const [isMobileAccountOpen, setIsMobileAccountOpen] = useState(false);
-  const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false);
-  const mobileAccountRef = useRef(null);
   const navigate = useNavigate();
   const location = useLocation();
 
+  // Theme state
+  const [isDark, setIsDark] = useState(() => {
+    return document.documentElement.classList.contains('dark') || localStorage.getItem('theme') === 'dark';
+  });
+
+  // Modals & Panels state
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchSelectedIndex, setSearchSelectedIndex] = useState(0);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
+  const [isHistoryOpen, setIsHistoryOpen] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const [notifications, setNotifications] = useState(INITIAL_NOTIFICATIONS);
+  const [historyItems, setHistoryItems] = useState(INITIAL_HISTORY);
+
+  const searchInputRef = useRef(null);
+  const notificationsRef = useRef(null);
+  const historyRef = useRef(null);
+
+  // Sync theme
   useEffect(() => {
-    const t = setInterval(() => setTime(new Date()), 1000);
-    return () => clearInterval(t);
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+      document.documentElement.style.colorScheme = 'dark';
+      localStorage.setItem('theme', 'dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+      document.documentElement.style.colorScheme = 'light';
+      localStorage.setItem('theme', 'light');
+    }
+  }, [isDark]);
+
+  const toggleTheme = () => {
+    setIsDark(prev => !prev);
+  };
+
+  // Keyboard shortcut for Cmd+/ or Ctrl+/ or Escape
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === '/') {
+        e.preventDefault();
+        setIsSearchOpen(prev => !prev);
+      } else if (e.key === 'Escape') {
+        setIsSearchOpen(false);
+        setIsNotificationsOpen(false);
+        setIsHistoryOpen(false);
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  // Close mobile account menu when clicking outside
+  // Close dropdowns on outside click
   useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (mobileAccountRef.current && !mobileAccountRef.current.contains(event.target)) {
-        setIsMobileAccountOpen(false);
+    const handleClickOutside = (e) => {
+      if (notificationsRef.current && !notificationsRef.current.contains(e.target)) {
+        setIsNotificationsOpen(false);
+      }
+      if (historyRef.current && !historyRef.current.contains(e.target)) {
+        setIsHistoryOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  // Focus search input when modal opens
+  useEffect(() => {
+    if (isSearchOpen) {
+      setTimeout(() => searchInputRef.current?.focus(), 50);
+    }
+  }, [isSearchOpen]);
+
   const getPageTitle = () => {
-    if (location.pathname.includes('/earth')) return 'VAYU Earth • Geospatial Intelligence';
-    if (location.pathname.includes('/satellite')) return 'Satellite Imagery';
-    if (location.pathname.includes('/detection')) return 'Cyclone Detection';
-    if (location.pathname.includes('/classification')) return 'Morphology Classification';
-    if (location.pathname.includes('/trajectory') || location.pathname.includes('/prediction') || location.pathname.includes('/track')) return 'Trajectory Forecast';
-    if (location.pathname.includes('/impact') || location.pathname.includes('/alerts')) return 'Impact & Landfall';
-    if (location.pathname.includes('/archives') || location.pathname.includes('/analytics')) return 'Storm Archives';
-    if (location.pathname.includes('/models') || location.pathname.includes('/training') || location.pathname.includes('/performance') || location.pathname.includes('/architecture')) return 'AI Model Intelligence';
-    if (location.pathname.includes('/bulletin')) return 'Official Bulletin';
-    return 'Command Overview';
+    if (location.pathname.includes('/earth')) return 'VAYU Earth';
+    if (location.pathname.includes('/satellite')) return 'Satellite Feed';
+    if (location.pathname.includes('/detection')) return 'Cyclone Models';
+    if (location.pathname.includes('/classification')) return 'Morphology';
+    if (location.pathname.includes('/trajectory') || location.pathname.includes('/prediction') || location.pathname.includes('/track')) return 'Trajectory';
+    if (location.pathname.includes('/impact') || location.pathname.includes('/alerts')) return 'Impact & Alerts';
+    if (location.pathname.includes('/archives') || location.pathname.includes('/analytics')) return 'Historical Archives';
+    if (location.pathname.includes('/models') || location.pathname.includes('/training') || location.pathname.includes('/performance') || location.pathname.includes('/architecture')) return 'AI Intelligence';
+    if (location.pathname.includes('/bulletin')) return 'Official Reports';
+    return 'Overview';
+  };
+  
+  const getBreadcrumbCategory = () => {
+    if (location.pathname.includes('/trajectory') || location.pathname.includes('/classification') || location.pathname.includes('/archives') || location.pathname.includes('/models') || location.pathname.includes('/bulletin')) {
+      return 'Pages';
+    }
+    return 'Dashboards';
   };
 
-  const istDateString = time.toLocaleDateString('en-GB', { timeZone: 'Asia/Kolkata', day: '2-digit', month: 'short' });
-  const istString = time.toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour12: false });
+  // Filter search items
+  const filteredSearchItems = SEARCH_ITEMS.filter(item => {
+    if (!searchQuery.trim()) return true;
+    const q = searchQuery.toLowerCase();
+    return item.title.toLowerCase().includes(q) || item.desc.toLowerCase().includes(q) || item.category.toLowerCase().includes(q);
+  });
+
+  const handleSearchSelect = (item) => {
+    setIsSearchOpen(false);
+    setSearchQuery('');
+    if (item.isAction && item.action === 'toggleTheme') {
+      toggleTheme();
+    } else if (item.path) {
+      navigate(toPortalPath(item.path));
+    }
+  };
+
+  const handleMarkAllNotificationsRead = () => {
+    setNotifications(prev => prev.map(n => ({ ...n, unread: false })));
+  };
+
+  const handleNotificationClick = (item) => {
+    setNotifications(prev => prev.map(n => n.id === item.id ? { ...n, unread: false } : n));
+    setIsNotificationsOpen(false);
+    if (item.path) {
+      navigate(toPortalPath(item.path));
+    }
+  };
+
+  const handleClearHistory = () => {
+    setHistoryItems([]);
+  };
+
+  const unreadCount = notifications.filter(n => n.unread).length;
 
   return (
     <>
-      <header className="h-14 bg-white border-b border-slate-200 flex items-center justify-between px-3 sm:px-6 sticky top-0 z-30 text-slate-800">
+      <header className="h-14 bg-white dark:bg-slate-900 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between px-4 sm:px-6 sticky top-0 z-30 text-slate-800 dark:text-slate-200 transition-colors">
         
-        {/* Left Section: Mobile Brand / Desktop Title */}
+        {/* Left Section: Breadcrumbs */}
         <div className="flex items-center gap-3 min-w-0">
-          {/* Mobile Logo on White Background with Continuous Sheen */}
-          <div 
-            className="lg:hidden relative overflow-hidden rounded-lg p-0.5 flex items-center shrink-0 cursor-pointer"
-            onClick={() => navigate(toPortalPath('/dashboard'))}
-          >
-            <img 
-              src="/vayu.png" 
-              alt="VAYU" 
-              className="h-11 sm:h-12 w-auto object-contain" 
-            />
-            <div 
-              className="animate-vayu-sheen absolute inset-y-0 w-20 bg-gradient-to-r from-transparent via-white/85 to-transparent pointer-events-none" 
-            />
-          </div>
-
-          <div className="flex items-center gap-1.5 sm:gap-2 text-xs min-w-0">
-            <span className="text-slate-500 font-medium hidden sm:inline">MoES Command</span>
-            <ChevronRight className="w-3 h-3 text-slate-400 hidden sm:inline" />
-            <span className="text-slate-900 font-bold truncate">{getPageTitle()}</span>
+          <div className="flex items-center gap-2 text-[13px] min-w-0">
+            <button 
+              onClick={() => setIsMobileMenuOpen(prev => !prev)}
+              className="sm:hidden p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors cursor-pointer"
+              title="Open Navigation"
+            >
+              <Menu className="w-4 h-4" />
+            </button>
+            <div className="hidden sm:flex items-center text-slate-400 dark:text-slate-500">
+              <span>{getBreadcrumbCategory()}</span>
+              <span className="mx-2 text-slate-300 dark:text-slate-600">/</span>
+              <span className="text-slate-900 dark:text-slate-100 font-medium truncate">{getPageTitle()}</span>
+            </div>
+            
+            {/* Mobile Title */}
+            <div className="sm:hidden font-semibold text-slate-900 dark:text-slate-100 text-sm">
+              {getPageTitle()}
+            </div>
           </div>
         </div>
 
-        {/* Right Section: Time, Public Portal Link & Mobile Account */}
+        {/* Right Section: Search & Functional Icons */}
         <div className="flex items-center gap-2 sm:gap-3">
-          {/* Real-time IST Clock */}
-          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-            <Clock className="w-3 h-3 text-slate-400" />
-            <span className="font-mono">{istDateString} • {istString} IST</span>
+          
+          {/* Interactive Search Bar */}
+          <div 
+            onClick={() => setIsSearchOpen(true)}
+            className="hidden md:flex relative items-center cursor-pointer group"
+          >
+            <Search className="w-3.5 h-3.5 text-slate-400 group-hover:text-sky-500 absolute left-2.5 transition-colors" />
+            <input 
+              type="text"
+              readOnly
+              value=""
+              placeholder="Search or jump to..."
+              className="pl-8 pr-12 py-1.5 w-48 lg:w-56 bg-slate-100/70 dark:bg-slate-800/80 border border-slate-200/50 dark:border-slate-700/50 group-hover:border-sky-300 dark:group-hover:border-sky-500 rounded-lg text-[13px] text-slate-800 dark:text-slate-200 transition-all placeholder:text-slate-400 cursor-pointer select-none"
+            />
+            <div className="absolute right-2 flex items-center">
+              <span className="text-[10px] font-mono bg-white dark:bg-slate-700 text-slate-500 dark:text-slate-300 px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-600 shadow-xs font-semibold">
+                ⌘/
+              </span>
+            </div>
           </div>
 
-          {/* Return to Public Portal */}
-          <button
-            onClick={() => {
-              if (isProductionDomain()) {
-                window.location.href = getWebsiteUrl('/');
-              } else {
-                navigate('/');
-              }
-            }}
-            className="hidden md:flex items-center gap-1.5 text-xs font-semibold text-slate-600 hover:text-slate-900 bg-slate-50 hover:bg-slate-100 border border-slate-200 px-3 py-1 rounded-md transition-colors cursor-pointer"
-          >
-            <span>Public Portal</span>
-            <ExternalLink className="w-3 h-3" />
-          </button>
-
-          {/* Alert Bell */}
-          <button
-            onClick={() => navigate(toPortalPath('/dashboard/impact'))}
-            className="p-1.5 rounded-lg border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 transition-colors relative cursor-pointer"
-            title="Active Coastal Alerts"
-          >
-            <Bell className="w-4 h-4" />
-            <span className="w-2 h-2 rounded-full bg-red-500 absolute top-1 right-1" />
-          </button>
-
-          {/* Mobile Account Trigger (visible on lg:hidden) */}
-          <div className="lg:hidden relative" ref={mobileAccountRef}>
-            <button
-              onClick={() => setIsMobileAccountOpen(!isMobileAccountOpen)}
-              className="w-8 h-8 rounded-lg bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-700 cursor-pointer"
-              title="Account"
+          {/* Action Icons */}
+          <div className="flex items-center gap-1 sm:gap-1.5">
+            
+            {/* Mobile Search Button */}
+            <button 
+              onClick={() => setIsSearchOpen(true)}
+              className="md:hidden p-1.5 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors cursor-pointer"
+              title="Search (⌘/)"
             >
-              <User className="w-4 h-4" />
+              <Search className="w-4 h-4" />
             </button>
 
-            {isMobileAccountOpen && (
-              <div className="absolute right-0 top-full mt-2 w-56 bg-white border border-slate-200 rounded-2xl shadow-2xl p-2 z-50 animate-in fade-in duration-150">
-                <div className="px-2 py-2 border-b border-slate-100">
-                  <OfficerAccountDisplay />
-                </div>
-                <div className="px-2 py-1.5 border-b border-slate-100 flex items-center gap-1.5 text-[11px] font-mono text-slate-500 font-semibold">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-                  <span>{istDateString} • {istString} IST</span>
-                </div>
-                <div className="pt-1">
-                  <button
-                    onClick={() => {
-                      setIsMobileAccountOpen(false);
-                      setIsLogoutDialogOpen(true);
-                    }}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 rounded-xl transition-all cursor-pointer"
-                  >
-                    <LogOut className="w-4 h-4" />
-                    <span>Logout</span>
-                  </button>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
+            {/* 1. Theme Toggle (Sun / Moon) */}
+            <button 
+              onClick={toggleTheme}
+              className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors cursor-pointer"
+              title={isDark ? "Switch to Light Theme" : "Switch to Dark Theme"}
+            >
+              {isDark ? (
+                <Sun className="w-4 h-4 text-amber-400 transition-transform rotate-0 hover:rotate-45" />
+              ) : (
+                <Moon className="w-4 h-4 text-slate-600 transition-transform rotate-0 hover:-rotate-12" />
+              )}
+            </button>
 
-      </header>
+            {/* 2. History / Recent Activity Popover */}
+            <div className="relative" ref={historyRef}>
+              <button 
+                onClick={() => {
+                  setIsHistoryOpen(prev => !prev);
+                  setIsNotificationsOpen(false);
+                }}
+                className={`p-1.5 rounded-md transition-colors cursor-pointer ${
+                  isHistoryOpen 
+                    ? 'bg-slate-100 dark:bg-slate-800 text-sky-600 dark:text-sky-400' 
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800'
+                }`}
+                title="Operational History"
+              >
+                <History className="w-4 h-4" />
+              </button>
 
-      {/* Mobile Logout Confirmation Modal */}
-      {isLogoutDialogOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-in fade-in duration-150">
-          <div className="w-full max-w-sm bg-white border border-slate-200 rounded-3xl p-6 shadow-2xl space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-red-50 border border-red-200 flex items-center justify-center text-red-600 shrink-0">
-                <LogOut className="w-5 h-5" />
-              </div>
-              <div>
-                <h3 className="text-base font-bold text-slate-900">Confirm Logout</h3>
-                <p className="text-xs text-slate-500 mt-0.5 leading-relaxed">
-                  Are you sure you want to end your operational session?
-                </p>
-              </div>
+              {/* History Dropdown */}
+              {isHistoryOpen && (
+                <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl shadow-2xl z-50 p-4 animate-in fade-in slide-in-from-top-2 duration-150">
+                  <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-slate-500" />
+                      <span className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">Operational Audit Log</span>
+                    </div>
+                    {historyItems.length > 0 && (
+                      <button 
+                        onClick={handleClearHistory}
+                        className="text-[11px] text-slate-400 hover:text-red-500 transition-colors cursor-pointer"
+                      >
+                        Clear
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="mt-3 space-y-2.5 max-h-72 overflow-y-auto">
+                    {historyItems.length === 0 ? (
+                      <div className="py-8 text-center text-xs text-slate-400">
+                        No recent activity recorded.
+                      </div>
+                    ) : (
+                      historyItems.map(item => (
+                        <div 
+                          key={item.id}
+                          onClick={() => {
+                            setIsHistoryOpen(false);
+                            navigate(toPortalPath(item.path));
+                          }}
+                          className="p-2.5 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-800/60 border border-transparent hover:border-slate-200/50 dark:hover:border-slate-700/50 transition-all cursor-pointer group"
+                        >
+                          <p className="text-[12px] font-medium text-slate-800 dark:text-slate-200 group-hover:text-sky-600 dark:group-hover:text-sky-400 leading-snug">
+                            {item.action}
+                          </p>
+                          <span className="text-[10px] text-slate-400 font-mono mt-1 block">
+                            {item.time}
+                          </span>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
             </div>
 
-            <div className="flex items-center justify-end gap-2.5 pt-2">
-              <button
-                type="button"
-                onClick={() => setIsLogoutDialogOpen(false)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold text-slate-700 hover:bg-slate-100 border border-slate-200 transition-all cursor-pointer"
-              >
-                Cancel
-              </button>
-              <SafeSignOutButton
-                onSignOutComplete={() => {
-                  setIsLogoutDialogOpen(false);
-                  if (isProductionDomain()) {
-                    window.location.href = getWebsiteUrl('/');
-                  } else {
-                    navigate('/');
-                  }
+            {/* 3. Notifications Bell */}
+            <div className="relative" ref={notificationsRef}>
+              <button 
+                onClick={() => {
+                  setIsNotificationsOpen(prev => !prev);
+                  setIsHistoryOpen(false);
                 }}
-                className="px-4 py-2 rounded-xl text-xs font-bold text-white bg-red-600 hover:bg-red-700 shadow-md transition-all cursor-pointer flex items-center gap-1.5"
+                className={`p-1.5 rounded-md transition-colors cursor-pointer relative ${
+                  isNotificationsOpen 
+                    ? 'bg-slate-100 dark:bg-slate-800 text-sky-600 dark:text-sky-400' 
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800'
+                }`}
+                title="System Notifications"
               >
-                <LogOut className="w-3.5 h-3.5" />
-                <span>Logout</span>
-              </SafeSignOutButton>
+                <Bell className="w-4 h-4" />
+                {unreadCount > 0 && (
+                  <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-red-500 rounded-full border-2 border-white dark:border-slate-900 animate-pulse" />
+                )}
+              </button>
+
+              {/* Notifications Dropdown */}
+              {isNotificationsOpen && (
+                <div className="absolute right-0 mt-2 w-80 sm:w-96 bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl shadow-2xl z-50 p-4 animate-in fade-in slide-in-from-top-2 duration-150">
+                  <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">Alerts & Warnings</span>
+                      {unreadCount > 0 && (
+                        <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-red-100 dark:bg-red-950/60 text-red-600 dark:text-red-400 font-bold font-mono">
+                          {unreadCount} new
+                        </span>
+                      )}
+                    </div>
+                    {unreadCount > 0 && (
+                      <button 
+                        onClick={handleMarkAllNotificationsRead}
+                        className="text-[11px] text-sky-600 dark:text-sky-400 hover:underline cursor-pointer flex items-center gap-1 font-medium"
+                      >
+                        <Check className="w-3 h-3" /> Mark all read
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="mt-3 space-y-2 max-h-72 overflow-y-auto">
+                    {notifications.map(n => (
+                      <div 
+                        key={n.id}
+                        onClick={() => handleNotificationClick(n)}
+                        className={`p-3 rounded-xl border transition-all cursor-pointer ${
+                          n.unread 
+                            ? 'bg-sky-50/60 dark:bg-sky-950/30 border-sky-100 dark:border-sky-900/40' 
+                            : 'bg-white dark:bg-slate-900/60 border-slate-100 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/40'
+                        }`}
+                      >
+                        <div className="flex items-start gap-2.5">
+                          <div className="shrink-0 mt-0.5">
+                            {n.type === 'critical' ? (
+                              <ShieldAlert className="w-4 h-4 text-red-500" />
+                            ) : n.type === 'warning' ? (
+                              <AlertTriangle className="w-4 h-4 text-amber-500" />
+                            ) : (
+                              <Info className="w-4 h-4 text-sky-500" />
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-center justify-between gap-2">
+                              <h4 className="text-[12px] font-bold text-slate-900 dark:text-white truncate">
+                                {n.title}
+                              </h4>
+                              <span className="text-[10px] text-slate-400 font-mono shrink-0">
+                                {n.time}
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 leading-snug">
+                              {n.desc}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  <div className="pt-3 border-t border-slate-100 dark:border-slate-800 mt-2 text-center">
+                    <button
+                      onClick={() => {
+                        setIsNotificationsOpen(false);
+                        navigate(toPortalPath('/dashboard/impact'));
+                      }}
+                      className="text-[11px] font-semibold text-sky-600 dark:text-sky-400 hover:underline cursor-pointer"
+                    >
+                      View All Coastal Warnings →
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* 4. Right Sidebar / Insights Quick Toggle */}
+            <button 
+              onClick={() => navigate(toPortalPath('/dashboard/earth'))}
+              className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors cursor-pointer hidden sm:flex"
+              title="Launch VAYU Earth Explorer"
+            >
+              <Sidebar className="w-4 h-4" />
+            </button>
+            
+          </div>
+          
+        </div>
+      </header>
+
+      {/* Global Interactive Command Palette / Search Modal */}
+      {isSearchOpen && (
+        <div 
+          className="fixed inset-0 z-50 flex items-start justify-center p-4 pt-16 sm:pt-24 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150"
+          onClick={() => setIsSearchOpen(false)}
+        >
+          <div 
+            className="w-full max-w-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700/80 rounded-2xl shadow-2xl overflow-hidden animate-in zoom-in-95 duration-150"
+            onClick={e => e.stopPropagation()}
+          >
+            {/* Search Input Bar */}
+            <div className="flex items-center px-4 py-3 border-b border-slate-100 dark:border-slate-800 gap-3">
+              <Search className="w-5 h-5 text-slate-400" />
+              <input 
+                ref={searchInputRef}
+                type="text"
+                value={searchQuery}
+                onChange={e => setSearchQuery(e.target.value)}
+                placeholder="Search commands, pages, or cyclones..."
+                className="flex-1 bg-transparent text-sm text-slate-900 dark:text-white placeholder:text-slate-400 focus:outline-none"
+              />
+              {searchQuery && (
+                <button 
+                  onClick={() => setSearchQuery('')}
+                  className="p-1 text-slate-400 hover:text-slate-600 cursor-pointer"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              )}
+              <kbd className="hidden sm:inline-block px-1.5 py-0.5 text-[10px] font-mono text-slate-400 bg-slate-100 dark:bg-slate-800 rounded border border-slate-200 dark:border-slate-700">
+                ESC
+              </kbd>
+            </div>
+
+            {/* Suggestions list */}
+            <div className="max-h-80 overflow-y-auto p-2 space-y-1">
+              {filteredSearchItems.length === 0 ? (
+                <div className="py-10 text-center text-xs text-slate-400">
+                  No matching pages or cyclones found for "{searchQuery}".
+                </div>
+              ) : (
+                filteredSearchItems.map((item, idx) => (
+                  <div
+                    key={item.id}
+                    onClick={() => handleSearchSelect(item)}
+                    className={`flex items-center justify-between p-3 rounded-xl cursor-pointer transition-colors ${
+                      idx === searchSelectedIndex
+                        ? 'bg-sky-50 dark:bg-sky-950/40 text-slate-900 dark:text-white'
+                        : 'hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-300'
+                    }`}
+                  >
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="text-xl shrink-0">{item.icon}</span>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs font-bold truncate">{item.title}</span>
+                          <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-500 font-mono">
+                            {item.category}
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-400 truncate mt-0.5">
+                          {item.desc}
+                        </p>
+                      </div>
+                    </div>
+                    <ArrowRight className="w-3.5 h-3.5 text-slate-300 group-hover:text-sky-500 shrink-0 ml-2" />
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* Modal Footer */}
+            <div className="px-4 py-2 bg-slate-50 dark:bg-slate-800/50 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
+              <span>Quick navigation for VAYU Operations Portal</span>
+              <span>Press <kbd className="font-mono bg-white dark:bg-slate-700 px-1 py-0.5 rounded border border-slate-200 dark:border-slate-600">Enter</kbd> to select</span>
             </div>
           </div>
         </div>

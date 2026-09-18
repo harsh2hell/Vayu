@@ -187,18 +187,18 @@ const ClerkUserDisplay = () => {
         <img 
           src={avatarUrl} 
           alt={name} 
-          className="w-9 h-9 rounded-full object-cover border border-slate-200 shrink-0" 
+          className="w-9 h-9 rounded-full object-cover border border-slate-200 dark:border-slate-700 shrink-0" 
         />
       ) : (
-        <div className="w-9 h-9 rounded-full bg-slate-700 text-white font-semibold text-xs flex items-center justify-center shrink-0 shadow-2xs">
+        <div className="w-9 h-9 rounded-full bg-slate-700 dark:bg-slate-800 text-white font-semibold text-xs flex items-center justify-center shrink-0 shadow-2xs border border-transparent dark:border-slate-600/50">
           {initials}
         </div>
       )}
       <div className="flex flex-col min-w-0 flex-1 text-left">
-        <span className="text-xs font-bold text-slate-900 truncate leading-tight" title={name}>
+        <span className="text-xs font-bold text-slate-900 dark:text-white truncate leading-tight" title={name}>
           {name}
         </span>
-        <span className="text-[11px] text-slate-500 truncate leading-tight mt-0.5" title={email}>
+        <span className="text-[11px] text-slate-500 dark:text-slate-400 truncate leading-tight mt-0.5" title={email}>
           {email || 'Operational Session'}
         </span>
       </div>
@@ -221,18 +221,18 @@ export const OfficerAccountDisplay = () => {
           <img 
             src={cachedAvatar} 
             alt={name} 
-            className="w-9 h-9 rounded-full object-cover border border-slate-200 shrink-0" 
+            className="w-9 h-9 rounded-full object-cover border border-slate-200 dark:border-slate-700 shrink-0" 
           />
         ) : (
-          <div className="w-9 h-9 rounded-full bg-slate-700 text-white font-semibold text-xs flex items-center justify-center shrink-0 shadow-2xs">
+          <div className="w-9 h-9 rounded-full bg-slate-700 dark:bg-slate-800 text-white font-semibold text-xs flex items-center justify-center shrink-0 shadow-2xs border border-transparent dark:border-slate-600/50">
             {initials}
           </div>
         )}
         <div className="flex flex-col min-w-0 flex-1 text-left">
-          <span className="text-xs font-bold text-slate-900 truncate leading-tight" title={name}>
+          <span className="text-xs font-bold text-slate-900 dark:text-white truncate leading-tight" title={name}>
             {name}
           </span>
-          <span className="text-[11px] text-slate-500 truncate leading-tight mt-0.5" title={email}>
+          <span className="text-[11px] text-slate-500 dark:text-slate-400 truncate leading-tight mt-0.5" title={email}>
             {email}
           </span>
         </div>

@@ -111,7 +111,7 @@ const Detection = () => {
             <button 
               onClick={handleRunDetection}
               disabled={isDetecting || !activeImageSrc}
-              className="btn-primary text-xs sm:text-sm py-2 px-4 gap-2 shadow-xs"
+              className="btn-primary text-xs sm:text-sm py-2 px-4 gap-2 shadow-sm"
             >
               <Play className={`w-3.5 h-3.5 fill-current ${isDetecting ? 'animate-spin' : ''}`} />
               <span>
@@ -127,7 +127,7 @@ const Detection = () => {
       />
 
       {/* Frame Selection / Shared Session Bar */}
-      <div className="bg-white border border-slate-200 rounded-xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 shadow-2xs">
+      <div className="bg-white border border-slate-100 rounded-2xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 shadow-2xs">
         <div className="flex flex-wrap items-center gap-2 text-xs">
           <span className="font-bold text-slate-700 uppercase tracking-wider text-[11px]">
             Current Analysis Input:
@@ -168,7 +168,7 @@ const Detection = () => {
 
       {/* Error Banner */}
       {errorMsg && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex items-start gap-3">
+        <div className="p-4 bg-red-50 border border-red-200 rounded-2xl flex items-start gap-3">
           <AlertTriangle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
           <div className="text-xs">
             <h4 className="font-bold text-red-900">ANALYSIS FAILED</h4>
@@ -210,7 +210,7 @@ const Detection = () => {
                   <span className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold border backdrop-blur-md shadow-sm ${
                     isCustomUpload 
                       ? 'bg-amber-950/85 text-amber-300 border-amber-500/50' 
-                      : 'bg-slate-900/85 text-sky-300 border-white/20'
+                      : 'bg-slate-800/85 text-sky-300 border-white/20'
                   }`}>
                     {isCustomUpload ? `USER-UPLOADED IMAGE • ${currentInput?.name}` : `BENCHMARK FRAME: ${currentInput?.name}`}
                   </span>
@@ -252,7 +252,7 @@ const Detection = () => {
 
                 {/* Negative Detection Badge (Rendered when model evaluates NO CYCLONE) */}
                 {detectionResult && !isCycloneDetected && (
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-900/90 text-white border border-slate-700/80 px-4 py-2.5 rounded-xl shadow-xl backdrop-blur-md flex items-center gap-3 pointer-events-none text-left">
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-800/90 text-white border border-slate-700/80 px-4 py-2.5 rounded-2xl shadow-xl backdrop-blur-md flex items-center gap-3 pointer-events-none text-left">
                     <ShieldAlert className="w-5 h-5 text-amber-400 shrink-0" />
                     <div>
                       <div className="text-xs font-mono font-bold uppercase tracking-wider text-red-400">
@@ -294,7 +294,7 @@ const Detection = () => {
             )}
           </div>
 
-          <div className="p-4 bg-slate-50 border-t border-slate-200 text-xs text-slate-600 flex items-center justify-between">
+          <div className="p-4 bg-slate-50 border-t border-slate-100 text-xs text-slate-600 flex items-center justify-between">
             <span>
               <strong>Input Basin:</strong> {activeBasin} • <strong>Source:</strong> {currentInput?.source || 'N/A'}
             </span>
@@ -336,12 +336,12 @@ const Detection = () => {
             {detectionResult ? (
               <div className="space-y-4">
                 {/* 1. Detection Verdict Header Card */}
-                <div className={`border rounded-xl p-4 space-y-2.5 ${
-                  isCycloneDetected ? 'bg-emerald-50 border-emerald-200' : 'bg-slate-50 border-slate-200'
+                <div className={`border rounded-2xl p-4 space-y-2.5 ${
+                  isCycloneDetected ? 'bg-emerald-50 border-emerald-200' : 'bg-slate-50 border-slate-100'
                 }`}>
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-slate-700">Cyclone Detected:</span>
-                    <span className={`text-xs font-mono font-extrabold px-2.5 py-0.5 rounded ${
+                    <span className={`text-xs font-mono font-bold px-2.5 py-0.5 rounded ${
                       isCycloneDetected ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-700'
                     }`}>
                       {isCycloneDetected ? 'YES' : 'NO'}
@@ -477,7 +477,7 @@ const Detection = () => {
                 </div>
 
                 {isCustomUpload && (
-                  <div className="p-3 bg-amber-50/80 border border-amber-200 rounded-xl text-[11px] text-amber-900 leading-snug">
+                  <div className="p-3 bg-amber-50/80 border border-amber-200 rounded-2xl text-[11px] text-amber-900 leading-snug">
                     <span className="font-bold">Input Domain Notice:</span> General image input &mdash; model performance may vary outside the centered satellite training distribution. Regional weather maps with UI controls, graphics, and annotations fall outside the training domain.
                   </div>
                 )}
@@ -498,7 +498,7 @@ const Detection = () => {
                   </button>
                 }
               >
-                <div className="p-3 bg-white rounded-lg border border-slate-200 text-[11px] text-slate-600 text-left font-mono space-y-1">
+                <div className="p-3 bg-white rounded-lg border border-slate-100 text-[11px] text-slate-600 text-left font-mono space-y-1">
                   <div className="text-slate-400 font-bold uppercase text-[10px] mb-1">Inference State Checklist:</div>
                   <div>&bull; Cyclone Detected: <span className="text-amber-700 font-semibold">NOT EVALUATED</span></div>
                   <div>&bull; Objectness Score: <span className="text-amber-700 font-semibold">NOT EVALUATED</span></div>
@@ -522,7 +522,7 @@ const Detection = () => {
           </div>
 
           {/* Model Specification Card */}
-          <div className="card p-4 bg-slate-50 border-slate-200 space-y-2 text-xs text-slate-600">
+          <div className="card p-4 bg-slate-50 border-slate-100 space-y-2 text-xs text-slate-600">
             <h4 className="font-bold text-slate-800 uppercase tracking-wider text-[11px]">
               Scientific Verification Protocol
             </h4>

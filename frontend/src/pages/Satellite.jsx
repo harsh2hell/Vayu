@@ -236,7 +236,7 @@ const Satellite = () => {
       />
 
       {/* 2. Target Preset Selector or Custom Upload Indicator */}
-      <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 shadow-xs space-y-3">
+      <div className="bg-white border border-slate-100/90 rounded-2xl p-4 sm:p-5 shadow-sm space-y-3">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <span className="text-xs font-mono font-bold text-slate-800 uppercase tracking-wider block">
@@ -254,10 +254,10 @@ const Satellite = () => {
               <button
                 key={p.id}
                 onClick={() => handleSelectPreset(p)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border flex items-center gap-1.5 cursor-pointer ${
+                className={`px-3 py-1.5 rounded-2xl text-xs font-semibold transition-all border flex items-center gap-1.5 cursor-pointer ${
                   !customFile && selectedPreset.id === p.id
                     ? 'bg-[#003087] text-white border-[#003087] shadow-2xs'
-                    : 'bg-white text-slate-700 border-slate-200 hover:bg-slate-50'
+                    : 'bg-white text-slate-700 border-slate-100 hover:bg-slate-50'
                 }`}
               >
                 <span>🛰️</span>
@@ -266,7 +266,7 @@ const Satellite = () => {
             ))}
 
             {customFile && (
-              <span className="px-3 py-1.5 rounded-xl text-xs font-semibold bg-emerald-50 text-emerald-900 border border-emerald-300 flex items-center gap-1.5">
+              <span className="px-3 py-1.5 rounded-2xl text-xs font-semibold bg-emerald-50 text-emerald-900 border border-emerald-300 flex items-center gap-1.5">
                 <span>📁</span>
                 <span className="truncate max-w-[160px]">{customFile.name}</span>
               </span>
@@ -289,7 +289,7 @@ const Satellite = () => {
 
       {/* 3. Sequential Progress Banner */}
       {isAnalyzing && (
-        <div className="p-4 rounded-xl bg-sky-50 border border-sky-200 text-xs font-mono text-sky-900 flex items-center gap-3 animate-pulse">
+        <div className="p-4 rounded-2xl bg-sky-50 border border-sky-200 text-xs font-mono text-sky-900 flex items-center gap-3 animate-pulse">
           <RefreshCw className="w-4 h-4 text-sky-600 animate-spin shrink-0" />
           <span className="font-bold">{analysisProgressStep}</span>
         </div>
@@ -297,7 +297,7 @@ const Satellite = () => {
 
       {/* 4. Analysis Error Display */}
       {analysisError && (
-        <div className="p-4 rounded-xl bg-red-50 border border-red-200 text-xs text-red-800 flex items-start gap-3">
+        <div className="p-4 rounded-2xl bg-red-50 border border-red-200 text-xs text-red-800 flex items-start gap-3">
           <AlertTriangle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
           <div className="space-y-1">
             <p className="font-bold">ANALYSIS FAILED</p>
@@ -311,7 +311,7 @@ const Satellite = () => {
         
         {/* Left Column: Satellite Image Canvas & Dual Overlay (7 Cols) */}
         <div className="lg:col-span-7 space-y-4">
-          <div className="bg-white border border-slate-200/90 rounded-2xl p-4 sm:p-5 space-y-3 shadow-xs">
+          <div className="bg-white border border-slate-100/90 rounded-2xl p-4 sm:p-5 space-y-3 shadow-sm">
             
             <div className="flex flex-col sm:flex-row sm:items-center justify-between border-b border-slate-100 pb-3 gap-2">
               <div>
@@ -324,12 +324,12 @@ const Satellite = () => {
               </div>
 
               {/* View Switcher: AI Overlay vs Original */}
-              <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs font-mono">
+              <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-2xl border border-slate-100 text-xs font-mono">
                 <button
                   onClick={() => setVisualMode('overlay')}
                   className={`px-3 py-1 rounded-lg transition-all ${
                     visualMode === 'overlay'
-                      ? 'bg-white text-[#003087] font-bold shadow-xs'
+                      ? 'bg-white text-[#003087] font-bold shadow-sm'
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
@@ -339,7 +339,7 @@ const Satellite = () => {
                   onClick={() => setVisualMode('original')}
                   className={`px-3 py-1 rounded-lg transition-all ${
                     visualMode === 'original'
-                      ? 'bg-white text-slate-900 font-bold shadow-xs'
+                      ? 'bg-white text-slate-900 font-bold shadow-sm'
                       : 'text-slate-600 hover:text-slate-900'
                   }`}
                 >
@@ -349,7 +349,7 @@ const Satellite = () => {
             </div>
 
             {/* Satellite Frame Canvas */}
-            <div className="relative rounded-xl overflow-hidden border border-slate-200 bg-slate-950 min-h-[460px] max-h-[580px] flex items-center justify-center shadow-inner">
+            <div className="relative rounded-2xl overflow-hidden border border-slate-100 bg-slate-950 min-h-[460px] max-h-[580px] flex items-center justify-center shadow-inner">
               <div className="relative inline-block max-w-full max-h-full">
                 <img
                   src={activeImageSource}
@@ -383,7 +383,7 @@ const Satellite = () => {
                         <div className="w-6 h-6 rounded-full border-2 border-white bg-red-600 shadow-lg flex items-center justify-center text-white text-[10px] font-bold">
                           🎯
                         </div>
-                        <div className="absolute top-4 -left-16 bg-slate-900/90 text-white px-2 py-0.5 rounded text-[9px] font-mono whitespace-nowrap shadow border border-amber-300/40">
+                        <div className="absolute top-4 -left-16 bg-slate-800/90 text-white px-2 py-0.5 rounded text-[9px] font-mono whitespace-nowrap shadow border border-amber-300/40">
                           {detectionResult.is_georeferenced && detectionResult.coordinates?.formatted 
                             ? `Center: ${detectionResult.coordinates.formatted}` 
                             : `Center: (${Number(detectionResult.center?.center_x_norm ?? 0).toFixed(2)}, ${Number(detectionResult.center?.center_y_norm ?? 0).toFixed(2)})`}
@@ -419,7 +419,7 @@ const Satellite = () => {
 
                 {/* Subtle Negative Detection Badge (When in overlay mode but cyclone was not detected) */}
                 {visualMode === 'overlay' && detectionResult && !isCycloneDetected && (
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-900/90 text-white border border-slate-700/80 px-4 py-2.5 rounded-xl shadow-xl backdrop-blur-md flex items-center gap-2.5 pointer-events-none text-left">
+                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-800/90 text-white border border-slate-700/80 px-4 py-2.5 rounded-2xl shadow-xl backdrop-blur-md flex items-center gap-2.5 pointer-events-none text-left">
                     <ShieldAlert className="w-5 h-5 text-amber-400 shrink-0" />
                     <div>
                       <div className="text-xs font-mono font-bold uppercase tracking-wider text-red-400">
@@ -438,7 +438,7 @@ const Satellite = () => {
                 <span className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold border backdrop-blur-md shadow-sm ${
                   customFile 
                     ? 'bg-amber-950/85 text-amber-300 border-amber-500/50' 
-                    : 'bg-slate-900/85 text-sky-300 border-white/20'
+                    : 'bg-slate-800/85 text-sky-300 border-white/20'
                 }`}>
                   {customFile ? 'USER-UPLOADED IMAGE • IN-SESSION ANALYSIS' : `BENCHMARK FRAME: ${selectedPreset.name}`}
                 </span>
@@ -456,7 +456,7 @@ const Satellite = () => {
 
               {/* Status Stamp */}
               {detectionResult ? (
-                <div className="absolute bottom-2.5 left-2.5 right-2.5 z-10 bg-slate-900/85 backdrop-blur-md p-2 rounded-xl text-[10px] font-mono text-slate-300 border border-white/10 flex items-center justify-between">
+                <div className="absolute bottom-2.5 left-2.5 right-2.5 z-10 bg-slate-800/85 backdrop-blur-md p-2 rounded-2xl text-[10px] font-mono text-slate-300 border border-white/10 flex items-center justify-between">
                   <span className={detectionResult.cyclone_detected ? "text-emerald-400 font-bold" : "text-slate-400"}>
                     {detectionResult.cyclone_detected ? "Cyclone Detected: YES" : "NO CYCLONE DETECTED"}
                   </span>
@@ -467,7 +467,7 @@ const Satellite = () => {
                   )}
                 </div>
               ) : (
-                <div className="absolute bottom-2.5 left-2.5 right-2.5 z-10 bg-slate-900/75 backdrop-blur-md px-3 py-1.5 rounded-xl text-[10px] font-mono text-slate-400 border border-white/10 flex items-center justify-between">
+                <div className="absolute bottom-2.5 left-2.5 right-2.5 z-10 bg-slate-800/75 backdrop-blur-md px-3 py-1.5 rounded-2xl text-[10px] font-mono text-slate-400 border border-white/10 flex items-center justify-between">
                   <span>Input Raster Loaded ({currentInput?.metadata?.dimensions || '1024 × 768 px'})</span>
                   <span className="text-amber-400 font-semibold">NO INFERENCE EXECUTED</span>
                 </div>
@@ -475,7 +475,7 @@ const Satellite = () => {
             </div>
 
             {/* Image Technical Metadata Strip */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono bg-slate-50 p-2.5 rounded-2xl border border-slate-100">
               <div>
                 <span className="text-[10px] text-slate-400 block uppercase">Filename</span>
                 <span className="font-bold text-slate-800 truncate block" title={currentInput?.name}>
@@ -502,7 +502,7 @@ const Satellite = () => {
           </div>
 
           {/* Scientific Trajectory Protocol Notice */}
-          <div className="p-4 rounded-xl bg-blue-50/70 border border-blue-200 text-xs text-blue-950 space-y-1.5">
+          <div className="p-4 rounded-2xl bg-blue-50/70 border border-blue-200 text-xs text-blue-950 space-y-1.5">
             <div className="flex items-center gap-2 font-bold text-blue-900 text-xs">
               <Info className="w-4 h-4 text-[#003087]" />
               <span>Scientific Sequence Protocol</span>
@@ -516,11 +516,11 @@ const Satellite = () => {
         {/* Right Column: AI IMAGE ASSESSMENT CARD (5 Cols) */}
         <div className="lg:col-span-5 space-y-4">
           
-          <div className="bg-white border border-slate-200/90 rounded-2xl p-5 space-y-4 shadow-xs">
+          <div className="bg-white border border-slate-100/90 rounded-2xl p-5 space-y-4 shadow-sm">
             <div className="flex items-center justify-between border-b border-slate-100 pb-3">
               <div className="flex items-center gap-2">
                 <Target className="w-5 h-5 text-[#003087]" />
-                <h3 className="font-extrabold text-sm text-slate-900 tracking-tight">
+                <h3 className="font-bold text-sm text-slate-900 tracking-tight">
                   AI IMAGE ASSESSMENT
                 </h3>
               </div>
@@ -537,10 +537,10 @@ const Satellite = () => {
               <div className="space-y-3.5 text-xs">
                 
                 {/* 1. DETECTION (MobileNetV3-Small) */}
-                <div className={`p-3 rounded-xl border space-y-1.5 ${
+                <div className={`p-3 rounded-2xl border space-y-1.5 ${
                   detectionResult.cyclone_detected 
                     ? 'bg-emerald-50 border-emerald-200 text-emerald-950' 
-                    : 'bg-slate-50 border-slate-200 text-slate-800'
+                    : 'bg-slate-50 border-slate-100 text-slate-800'
                 }`}>
                   <span className="text-[10px] uppercase font-bold font-mono tracking-wider block text-slate-500">
                     Detection (MobileNetV3-Small)
@@ -591,7 +591,7 @@ const Satellite = () => {
 
                 {/* If no cyclone detected */}
                 {!isCycloneDetected && (
-                  <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-600 text-xs space-y-1">
+                  <div className="p-3.5 bg-slate-50 border border-slate-100 rounded-2xl text-slate-600 text-xs space-y-1">
                     <p className="font-bold text-slate-800">NO CYCLONE DETECTED</p>
                     <p className="text-[11px] text-slate-500">
                       The MobileNetV3 detector classified this frame as ambient / non-cyclonic marine atmosphere. Downstream tropical cyclone center localization, bounding box, and morphology are suppressed.
@@ -601,7 +601,7 @@ const Satellite = () => {
 
                 {/* 2. MORPHOLOGY (ResNet18) - Only if cyclone detected */}
                 {isCycloneDetected && classificationResult && (
-                  <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                  <div className="p-3 bg-slate-50 border border-slate-100 rounded-2xl space-y-2">
                     <span className="text-[10px] uppercase font-bold font-mono tracking-wider block text-slate-500">
                       Morphology (ResNet18)
                     </span>
@@ -618,7 +618,7 @@ const Satellite = () => {
 
                     {/* Class Distribution without Dvorak T-numbers */}
                     {classificationResult.class_probability_distribution && (
-                      <div className="pt-1.5 border-t border-slate-200/80 space-y-1.5">
+                      <div className="pt-1.5 border-t border-slate-100/80 space-y-1.5">
                         <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider block">
                           Class Distribution
                         </span>
@@ -643,7 +643,7 @@ const Satellite = () => {
 
                 {/* 3. EXPLAINABILITY (Grad-CAM) - Only if cyclone detected */}
                 {detectionResult.cyclone_detected && (
-                  <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5 text-xs">
+                  <div className="p-3 bg-slate-50 border border-slate-100 rounded-2xl space-y-1.5 text-xs">
                     <span className="text-[10px] uppercase font-bold font-mono tracking-wider block text-slate-500">
                       Explainability (Grad-CAM)
                     </span>
@@ -671,7 +671,7 @@ const Satellite = () => {
                 )}
 
                 {/* 4. INTENSITY ASSESSMENT - Scientific Status Disclosure */}
-                <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1.5">
+                <div className="p-3 bg-slate-50 border border-slate-100 rounded-2xl space-y-1.5">
                   <span className="text-[10px] uppercase font-bold font-mono tracking-wider block text-slate-500">
                     Intensity Assessment
                   </span>
@@ -687,7 +687,7 @@ const Satellite = () => {
                 </div>
 
                 {/* 5. INFERENCE */}
-                <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-1 text-xs">
+                <div className="p-3 bg-slate-50 border border-slate-100 rounded-2xl space-y-1 text-xs">
                   <span className="text-[10px] uppercase font-bold font-mono tracking-wider block text-slate-500">
                     Inference Latency
                   </span>
