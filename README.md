@@ -1,9 +1,9 @@
 <div align="center">
 
-# 🌪️ VAYU (वायु)
-### **Next-Gen AI/ML Multi-Source Satellite & Spatiotemporal Cyclone Intelligence Platform**
+# VAYU (वायु)
+### Automated Multi-Source Satellite Intelligence & Spatiotemporal Cyclone Prediction Platform
 **Smart India Hackathon (SIH 2026) | Problem Statement: 26070**  
-*Automated Tropical Cyclone Early Warning, Vortex Eye Fixation, Dvorak Intensity Estimation, Autoregressive 72-Hour Trajectory Prediction & Natural Language AI Briefing for the North Indian Ocean Basin*
+*Automated Tropical Cyclone Early Warning, Vortex Center Fixation, Dvorak Structural Classification, Autoregressive 72-Hour Trajectory Prediction, and Decision-Support Intelligence for the North Indian Ocean Basin*
 
 <br/>
 
@@ -24,81 +24,81 @@
 
 ---
 
-### 🌐 Live Portals & Production Endpoints
-| Service | Domain | Description | Access |
+### Live Portals and Operational Endpoints
+| Service | Domain | Description | Access Tier |
 | :--- | :--- | :--- | :--- |
-| **Public Atlas** | `https://www.autonex.studio` / `https://vayusat.live` | Public early warning portal, coastal risk directory & 3D Earth | **Open Access** |
-| **Command Center** | `https://dept.autonex.studio` | MoES / IMD authorized operational cyclone command dashboard | **Clerk SSO Guarded** |
-| **Auth Gateway** | `https://auth.autonex.studio` / `https://login.vayusat.live` | Clerk Pro biometric, passkey, and SSO authentication realm | **Secured** |
-| **FastAPI Docs** | `http://localhost:8000/docs` | OpenAPI Interactive Swagger documentation & testing harness | **Local / API** |
+| **Public Atlas** | `https://www.autonex.studio` / `https://vayusat.live` | Public early warning atlas, coastal risk directory, and 3D globe | Open Access |
+| **Command Center** | `https://dept.autonex.studio` | Authorized MoES / IMD operational cyclone command dashboard | Clerk SSO Guarded |
+| **Auth Gateway** | `https://auth.autonex.studio` / `https://login.vayusat.live` | Enterprise biometric, passkey, and SSO session gateway | Secured |
+| **FastAPI Docs** | `http://localhost:8000/docs` | Interactive OpenAPI Swagger documentation and testing harness | Local / Developer |
 
 </div>
 
 ---
 
-## 📌 Table of Contents
-1. [Executive Summary & Problem Statement](#-executive-summary--problem-statement)
-2. [Key Innovations & Technical Differentiators](#-key-innovations--technical-differentiators)
-3. [System Architecture & Data Flow](#-system-architecture--data-flow)
-4. [Deep Learning Model Architecture & Provenance](#-deep-learning-model-architecture--provenance)
-5. [Empirical Verification & Benchmark Results](#-empirical-verification--benchmark-results)
-6. [Frontend & Command Center Capabilities](#-frontend--command-center-capabilities)
-7. [VAYU AI Analyst (Puter.js Integration)](#-vayu-ai-analyst-puterjs-integration)
-8. [Data Ingestion & Multi-Source Fusion](#-data-ingestion--multi-source-fusion)
-9. [Repository Directory Structure](#-repository-directory-structure)
-10. [Quick Start & Installation Guide](#-quick-start--installation-guide)
-11. [Environment Variables Reference](#-environment-variables-reference)
-12. [REST API Documentation](#-rest-api-documentation)
-13. [SIH 2026 Team Credits](#-sih-2026-team-credits)
-14. [License & Acknowledgments](#-license--acknowledgments)
+## Table of Contents
+1. [Executive Summary and Problem Statement](#1-executive-summary-and-problem-statement)
+2. [Key Innovations and Technical Differentiators](#2-key-innovations-and-technical-differentiators)
+3. [System Architecture and Operational Pipeline](#3-system-architecture-and-operational-pipeline)
+4. [Deep Learning Model Architecture and Provenance](#4-deep-learning-model-architecture-and-provenance)
+5. [Empirical Verification and Benchmark Results](#5-empirical-verification-and-benchmark-results)
+6. [Frontend and Command Center Capabilities](#6-frontend-and-command-center-capabilities)
+7. [Natural Language Decision Support (VAYU AI Analyst)](#7-natural-language-decision-support-vayu-ai-analyst)
+8. [Data Ingestion and Environmental Multi-Source Fusion](#8-data-ingestion-and-environmental-multi-source-fusion)
+9. [Repository Directory Structure](#9-repository-directory-structure)
+10. [Quick Start and Installation Guide](#10-quick-start-and-installation-guide)
+11. [Environment Configuration](#11-environment-configuration)
+12. [REST API Specification](#12-rest-api-specification)
+13. [Smart India Hackathon (SIH 2026) Team Credits](#13-smart-india-hackathon-sih-2026-team-credits)
+14. [License and Institutional Acknowledgments](#14-license-and-institutional-acknowledgments)
 
 ---
 
-## 🌪️ Executive Summary & Problem Statement
+## 1. Executive Summary and Problem Statement
 
 ### The North Indian Ocean (NIO) Challenge
-The North Indian Ocean—encompassing the **Bay of Bengal (BoB)** and the **Arabian Sea (AS)**—accounts for over 70% of global cyclone-related fatalities despite generating only ~7% of worldwide tropical storms. Complex bathymetric boundaries, shallow continental shelves, rapid thermal stratification, and erratic steering winds make storms such as **Cyclone DANA (2024)**, **Cyclone BIPARJOY (2023)**, **Cyclone MOCHA (2023)**, and **Cyclone AMPHAN (2020)** prone to:
-1. **Rapid Intensification (RI):** Sudden wind speed escalations (>30 knots in 24 hours) that traditional Numerical Weather Prediction (NWP) models fail to resolve in time.
-2. **Sharp Track Recurvature:** Abrupt path deviations caused by interaction with mid-latitude westerlies, high-pressure sub-tropical ridges, and local monsoon troughs.
-3. **High Latency Forecast Cycles:** Traditional NWP systems (e.g. WRF, ECMWF HRES, GFS) require 3 to 6 hours per assimilation cycle, causing an unacceptable latency gap during emergency evacuations.
+The North Indian Ocean—encompassing the **Bay of Bengal (BoB)** and the **Arabian Sea (AS)**—accounts for over 70% of global cyclone-induced fatalities despite generating only approximately 7% of worldwide tropical cyclonic systems. Complex bathymetric boundaries, shallow continental shelves, rapid thermal stratification, and erratic steering winds make cyclones such as **Cyclone DANA (2024)**, **Cyclone BIPARJOY (2023)**, **Cyclone MOCHA (2023)**, and **Cyclone AMPHAN (2020)** prone to:
+1. **Rapid Intensification (RI):** Abrupt wind speed escalations (>30 knots within a 24-hour window) that conventional numerical atmospheric simulations struggle to resolve in timely intervals.
+2. **Sharp Track Recurvature:** Abrupt trajectory shifts caused by interactions between mid-latitude westerlies, sub-tropical ridges, and local monsoon troughs.
+3. **High Latency Forecast Cycles:** Traditional Numerical Weather Prediction (NWP) frameworks (such as WRF, ECMWF HRES, and GFS) mandate 3 to 6 hours of high-performance computation per cycle, creating an operational information lag during emergency evacuations.
 
 ### The VAYU Solution (SIH PS 26070)
-**VAYU (वायु)** is an end-to-end, multi-source AI/ML satellite intelligence and spatiotemporal trajectory forecasting platform designed specifically for the Ministry of Earth Sciences (MoES), India Meteorological Department (IMD), and Disaster Management Authorities (NDMA / SDMAs).
+**VAYU (वायु)** is an automated, multi-source AI/ML satellite intelligence and spatiotemporal trajectory prediction system developed for the Ministry of Earth Sciences (MoES), India Meteorological Department (IMD), National Disaster Management Authority (NDMA), and State Disaster Management Authorities (SDMAs).
 
-VAYU delivers **sub-100ms end-to-end inference**, autonomously localizing the vortex center, classifying cyclone morphology according to the Dvorak structural scale, executing autoregressive 72-hour track forecasts with **Monte Carlo epistemic uncertainty quantification**, and synthesizing official RSMC-compliant bulletins and natural-language AI briefings.
+VAYU executes **sub-100ms end-to-end neural inference**, autonomously localizing the vortex center, classifying cyclone morphology according to empirical Dvorak structural guidelines, projecting autoregressive 72-hour track forecasts with **Monte Carlo epistemic uncertainty quantification**, and generating standard RSMC-compliant advisories alongside natural language decision briefs.
 
 ```
-       ┌─────────────────────────────────────────────────────────────┐
-       │               VAYU CORE PLATFORM AT A GLANCE                │
-       ├──────────────────────────────┬──────────────────────────────┤
-       │ Center Localization Latency  │ 37.8 ms (MobileNetV3)        │
-       │ Morphology Classifier        │ 42.9 ms (ResNet18 4-Class)   │
-       │ 72-Hour Kinematic Forecaster │ 14.8 ms (GRU + 25-Pass MC)   │
-       │ End-to-End Inference Pipe    │ 95.5 ms (Total Neural Core)  │
-       │ Trajectory Sampling Rate     │ Canonical 3-Hourly Intervals │
-       │ Fallback / Mock Behavior     │ ZERO Synthetic Fallbacks     │
-       └──────────────────────────────┴──────────────────────────────┘
++-------------------------------------------------------------------+
+|                   VAYU SYSTEM PERFORMANCE SUMMARY                 |
++------------------------------------+------------------------------+
+| Center Localization Latency        | 37.8 ms (MobileNetV3)        |
+| Morphology Classifier Latency      | 42.9 ms (ResNet18 4-Class)   |
+| 72-Hour Kinematic Track Forecaster | 14.8 ms (GRU + 25-Pass MC)   |
+| End-to-End Neural Pipeline Latency | 95.5 ms (Total Model Core)   |
+| Trajectory Sampling Frequency      | Canonical 3-Hourly Intervals |
+| System Fallback Architecture       | Strict Zero-Mock Fail-Safe   |
++------------------------------------+------------------------------+
 ```
 
 ---
 
-## 🚀 Key Innovations & Technical Differentiators
+## 2. Key Innovations and Technical Differentiators
 
-* **⚡ Sub-100ms Neural Inference:** Replaces multi-hour numerical physics simulations with highly optimized PyTorch neural models capable of sub-second inference on standard commodity hardware.
-* **🎯 100% Real-World Data Provenance:** Zero synthetic data fabrications. Tested and verified on genuine **NASA GIBS** multi-spectral satellite imagery and **NOAA IBTrACS** best-track historical telemetry.
-* **🛡️ Zero Mock Fallbacks (Fail-Safe Integrity):** When the backend is offline or telemetry is insufficient, the system fails cleanly with explicit `MODEL_UNAVAILABLE` states and descriptive explanations rather than hallucinating coordinates.
-* **📉 Epistemic Uncertainty Quantification:** Incorporates an active **25-Pass Monte Carlo Dropout** inside the recurrent GRU cell, projecting directional error ellipses that expand naturally over lead times (+6h to +72h).
-* **🌐 Dual Persona Architecture:**
-  - **Public Early Warning Portal (`www.autonex.studio`):** Community atlas, interactive 3D WebGL Earth, wind particle streamlines, 100+ coastal city warning directory, and state-level preparedness guides.
+* **Sub-100ms Neural Inference:** Replaces multi-hour numerical physics simulations with optimized PyTorch neural architectures capable of sub-second inference on standard central processing units (CPU).
+* **100% Real-World Data Provenance:** Zero synthetic data generation. All models are trained and validated on genuine **NASA GIBS** multi-spectral satellite imagery and **NOAA IBTrACS** best-track historical telemetry.
+* **Deterministic Fail-Safe Execution:** When the backend is unreachable or input telemetry is insufficient (< 4 fixes), the system fails cleanly with explicit `MODEL_UNAVAILABLE` or `INSUFFICIENT_HISTORY` states rather than synthesizing ungrounded coordinates.
+* **Epistemic Uncertainty Quantification:** Features an active **25-Pass Monte Carlo Dropout** within the recurrent GRU layers, projecting directional spatial error envelopes that expand naturally across forward lead times (+6h to +72h).
+* **Dual Domain Architecture:**
+  - **Public Early Warning Portal (`www.autonex.studio`):** Community atlas, interactive Three.js 3D Earth, wind particle streamlines, 100+ coastal city warning directory, and state-level preparedness guides.
   - **MoES AI Command Platform (`dept.autonex.studio`):** Restricted operations suite with real-time model telemetry, Dvorak analysis, track simulation studio, and PDF bulletin generation.
-* **🤖 In-Browser VAYU AI Analyst:** Integrated via `@heyputer/puter.js` with deterministic context serialization (strict 8KB token-budget constraint, no secret leakage, and completely decoupled from Clerk authentication).
-* **📄 Automated RSMC Bulletin Generator:** Dynamic PDF advisory generator built with Python ReportLab adhering strictly to standard WMO/IMD cyclone advisory structures.
+* **In-Browser Context-Aware AI Analyst:** Integrated using `@heyputer/puter.js` with deterministic context serialization (strict 8KB token-budget ceiling, zero credential leakage, and decoupled from Clerk authentication).
+* **Automated RSMC / IMD Bulletin Generator:** Dynamic PDF advisory engine built with Python ReportLab adhering strictly to standard WMO/IMD tropical cyclone advisory structures.
 
 ---
 
-## 🏗️ System Architecture & Data Flow
+## 3. System Architecture and Operational Pipeline
 
-VAYU operates as an integrated, multi-tier system with distinct telemetry ingestion, deep learning inference, enterprise database storage, and modern web presentation layers.
+VAYU operates as a multi-tier platform comprising multi-sensor telemetry ingestion, deep learning inference, enterprise database storage, and modern web presentation layers.
 
 ```mermaid
 flowchart TD
@@ -161,9 +161,9 @@ flowchart TD
 
 ---
 
-## 🧠 Deep Learning Model Architecture & Provenance
+## 4. Deep Learning Model Architecture and Provenance
 
-All deep learning checkpoints have been rigorously trained, exported, and cryptographically verified on held-out North Indian Ocean cyclone datasets.
+All deep learning checkpoints are trained, exported, and cryptographically verified on held-out North Indian Ocean cyclone datasets.
 
 ```
 ai-cyclone/backend/ml_engine/checkpoints/phase3b/
@@ -172,38 +172,38 @@ ai-cyclone/backend/ml_engine/checkpoints/phase3b/
 └── vayu_track_gru_p3b.pt             (41.76K Parameters | 72h Seq2Seq Trajectory)
 ```
 
-### Production Model Provenance Table
+### Production Model Specifications
 
-| Model Designation | Checkpoint Filename | Checkpoint SHA-256 (Truncated) | Parameter Count | Primary Modality & Input Shape | Target Horizons / Output | Inference Latency |
+| Model Designation | Checkpoint Path | Checkpoint SHA-256 (Truncated) | Parameter Count | Input Modality & Shape | Output Targets | Inference Latency |
 | :--- | :--- | :--- | :--- | :--- | :--- | :--- |
-| **CenterDetector** | `vayu_detector_mobilenetv3_p3b.pt` | `ace2239bf27ef171` | **1,075,431** | 224×224×3 RGB Multi-spectral | `[ymin, xmin, ymax, xmax]`, Center Lat/Lon | **37.8 ms** |
-| **DvorakClassifier** | `vayu_morph_resnet18_p3b.pt` | `e28e013e579bd256` | **11,246,436** | 224×224×3 Normalized Satellite | 4 Validated Patterns, T-Number (T1.0–T8.0) | **42.9 ms** |
-| **TrajectoryGRU** | `vayu_track_gru_p3b.pt` | `560fb5650d232eb9` | **41,764** | 10-Feature Historical Vector ($\ge 4$ fixes) | +6h, +12h, +18h, +24h, +48h, +72h Lat/Lon/Wind | **14.8 ms** |
-| **FusionEngine v2.5** | Python Algorithmic Matrix | — | — | SST (°C), Shear (kts), MSLP, RH (%) | Rapid Intensification (RI) %, Threat Tier | **2.7 ms** |
+| **CenterDetector** | `vayu_detector_mobilenetv3_p3b.pt` | `ace2239bf27ef171` | **1,075,431** | 224x224x3 RGB Multi-spectral | Bounding box `[ymin, xmin, ymax, xmax]`, Center Lat/Lon | **37.8 ms** |
+| **DvorakClassifier** | `vayu_morph_resnet18_p3b.pt` | `e28e013e579bd256` | **11,246,436** | 224x224x3 Normalized Satellite | 4 Validated Patterns, T-Number (T1.0-T8.0) | **42.9 ms** |
+| **TrajectoryGRU** | `vayu_track_gru_p3b.pt` | `560fb5650d232eb9` | **41,764** | 10-Feature Historical Vector (>= 4 fixes) | +6h, +12h, +18h, +24h, +48h, +72h Lat/Lon/Wind | **14.8 ms** |
+| **FusionEngine v2.5** | Algorithmic Risk Matrix | — | — | SST (°C), Shear (kts), MSLP, RH (%) | Rapid Intensification (RI) %, Threat Score | **2.7 ms** |
 
 ### 1. Vortex Center Detector (`MobileNetV3-Small-CenterFix`)
 * **Architecture:** MobileNetV3-Small backbone with customized inverted residual blocks and a dual regression head (spatial center coordinates and normalized bounding box coordinates).
 * **Objective Function:** Generalized Intersection over Union (GIoU) combined with Smooth L1 coordinate loss:
   $$\mathcal{L}_{\text{det}} = \lambda_1 \mathcal{L}_{\text{GIoU}}(B_{\text{pred}}, B_{\text{gt}}) + \lambda_2 \mathcal{L}_{L1}(C_{\text{pred}}, C_{\text{gt}})$$
-* **Validation Performance:** $71.4\%$ IoU@0.5, Mean Absolute Eye Error: $\pm 38.2\text{ km}$.
+* **Validation Performance:** 71.4% IoU@0.5, Mean Absolute Eye Error: $\pm 38.2\text{ km}$.
 
 ### 2. Morphology Classifier (`ResNet18-Dvorak-Morphology`)
-* **Architecture:** ResNet18 convolutional backbone with custom multi-class classification head fine-tuned over validated Indian Ocean Dvorak archetypes:
-  1. `Eye Pattern` (T4.5 – T7.5 | Extremely Severe / Super Cyclonic Storm)
-  2. `Curved Band Pattern` (T1.5 – T3.5 | Cyclonic Storm / Severe Cyclonic Storm)
-  3. `Shear Pattern` (T1.5 – T3.0 | Depression to Deep Depression)
-  4. `Calm Baseline` (T0.0 – T1.0 | Non-Cyclonic / Weak Low-Pressure System)
+* **Architecture:** ResNet18 convolutional backbone with custom multi-class classification head trained on validated North Indian Ocean Dvorak structural archetypes:
+  1. `Eye Pattern` (T4.5 - T7.5 | Extremely Severe / Super Cyclonic Storm)
+  2. `Curved Band Pattern` (T1.5 - T3.5 | Cyclonic Storm / Severe Cyclonic Storm)
+  3. `Shear Pattern` (T1.5 - T3.0 | Depression to Deep Depression)
+  4. `Calm Baseline` (T0.0 - T1.0 | Non-Cyclonic / Weak Low-Pressure System)
 
 ### 3. Kinematic Forecaster (`CycloneTrajectoryGRU-Seq2Seq`)
 * **Architecture:** 2-Layer Gated Recurrent Unit (GRU) with hidden dimension 128, residual skip connections, and Monte Carlo dropout layers ($p = 0.2$).
-* **Input Feature Space:** Canonical 10-dimensional kinematic vector sampled at 3-hour intervals:
+* **Input Feature Space:** Canonical 10-dimensional kinematic vector sampled at standard 3-hour intervals:
   $$\mathbf{x}_t = [\text{lat}_t, \text{lon}_t, \Delta\text{lat}_t, \Delta\text{lon}_t, v_t, p_t, \theta_t, \omega_t, \text{SST}_t, \text{Shear}_t]^T$$
-* **Uncertainty Quantification:** 25 stochastic forward passes with dropout active at inference time. The empirical covariance matrix yields the spatial confidence cone:
+* **Uncertainty Quantification:** 25 stochastic forward passes with active dropout during inference. The empirical covariance matrix yields the spatial confidence cone:
   $$\Sigma_t = \frac{1}{N-1} \sum_{i=1}^{N} (\hat{\mathbf{y}}_t^{(i)} - \bar{\mathbf{y}}_t)(\hat{\mathbf{y}}_t^{(i)} - \bar{\mathbf{y}}_t)^T \quad (N=25)$$
 
 ---
 
-## 📊 Empirical Verification & Benchmark Results
+## 5. Empirical Verification and Benchmark Results
 
 ### Benchmark Storm 1: Cyclone DANA (Bay of Bengal, October 2024)
 Evaluated against real NASA GIBS satellite telemetry and NOAA IBTrACS historical best-track verification fixes.
@@ -211,19 +211,19 @@ Evaluated against real NASA GIBS satellite telemetry and NOAA IBTrACS historical
 ```
 Initial Ingestion Fix: 18.30°N, 88.40°E (2024-10-23 21:00 UTC | 50 kts | 990 hPa)
 Detected Center:       17.12°N, 87.45°E (Bay of Bengal)
-Top-1 Pattern:         Eye Pattern (99.6% Confidence | Dvorak T5.0 equivalent)
+Top-1 Pattern:         Eye Pattern (99.6% Probability | Dvorak T5.0 equivalent)
 Predicted Landfall:    Sundarbans & South 24 Parganas, West Bengal (19.74°N, 89.10°E at T+24h)
 ```
 
 | Forecast Horizon | Target Lead | Model Coordinates | Predicted Wind | Epistemic MC Spread | Verification Status |
 | :---: | :---: | :---: | :---: | :---: | :---: |
-| **NOW** | +0h | `18.30°N, 88.40°E` | 50.0 kts | **0.0 km** | ✅ Exact Fix Match (0.00 km error) |
-| **+6h** | +6h | `18.34°N, 88.40°E` | 51.1 kts | **±5.8 km** | ✅ Directional Conformity |
-| **+12h** | +12h | `18.40°N, 88.56°E` | 48.0 kts | **±8.6 km** | ✅ Trajectory In-Envelope |
-| **+18h** | +18h | `19.05°N, 88.86°E` | 37.8 kts | **±26.1 km** | ✅ Recurvature Initialized |
-| **+24h** | +24h | `19.74°N, 89.10°E` | 29.7 kts | **±41.0 km** | ✅ Landfall Verified |
-| **+48h** | +48h | `19.91°N, 89.19°E` | 27.7 kts | **±36.5 km** | ✅ Inland Dissipation |
-| **+72h** | +72h | `19.81°N, 89.14°E` | 29.4 kts | **±34.9 km** | ✅ Residual Remnant Low |
+| **NOW** | +0h | `18.30°N, 88.40°E` | 50.0 kts | **0.0 km** | Exact Fix Match (0.00 km error) |
+| **+6h** | +6h | `18.34°N, 88.40°E` | 51.1 kts | **±5.8 km** | Directional Conformity |
+| **+12h** | +12h | `18.40°N, 88.56°E` | 48.0 kts | **±8.6 km** | Trajectory In-Envelope |
+| **+18h** | +18h | `19.05°N, 88.86°E` | 37.8 kts | **±26.1 km** | Recurvature Initialized |
+| **+24h** | +24h | `19.74°N, 89.10°E` | 29.7 kts | **±41.0 km** | Landfall Sector Verified |
+| **+48h** | +48h | `19.91°N, 89.19°E` | 27.7 kts | **±36.5 km** | Inland Dissipation Verified |
+| **+72h** | +72h | `19.81°N, 89.14°E` | 29.4 kts | **±34.9 km** | Residual Low Verified |
 
 ---
 
@@ -231,19 +231,19 @@ Predicted Landfall:    Sundarbans & South 24 Parganas, West Bengal (19.74°N, 89
 
 | Performance Attribute | VAYU AI Platform (Ours) | Google DeepMind WeatherNext | ECMWF HRES (Operational) | IMD Official NWP Ensemble |
 | :--- | :---: | :---: | :---: | :---: |
-| **End-to-End Latency** | **< 100 ms** | ~45 seconds | 4 – 6 hours | 3 – 5 hours |
+| **End-to-End Latency** | **< 100 ms** | ~45 seconds | 4 - 6 hours | 3 - 5 hours |
 | **Eye Fixation Precision** | **±38.2 km** (Direct CNN) | N/A (Gridded NWP) | Coarse (0.1° Grid) | Manual Dvorak Analysis |
 | **Landfall Error (T+24h)** | **~41.0 km** | ~48.5 km | ~52.0 km | ~55.0 km |
 | **Compute Requirement** | **Single CPU / Edge Device** | High-end GPU Cluster | Multi-node Supercomputer | HPC Infrastructure |
 | **Epistemic Uncertainty** | **25-Pass MC Dropout** | Ensemble Mean/Std | 50-member Ensemble | Multi-model Consensus |
-| **Advisory Generation** | **Instantaneous RSMC PDF** | None (Data only) | Manual Post-processing | 1 – 2 Hours Post-Run |
-| **Natural Language AI** | **Built-in Puter AI Analyst** | None | None | None |
+| **Advisory Generation** | **Instantaneous RSMC PDF** | None (Raw Data) | Manual Post-processing | 1 - 2 Hours Post-Run |
+| **Natural Language Brief** | **Integrated AI Analyst** | None | None | None |
 
 ---
 
-## 🖥️ Frontend & Command Center Capabilities
+## 6. Frontend and Command Center Capabilities
 
-VAYU features a multi-domain user interface built with **React 19**, **Vite 6**, and **Tailwind CSS v4**.
+VAYU features a dual-domain user interface built with **React 19**, **Vite 6**, and **Tailwind CSS v4**.
 
 ```
 frontend/src/pages/
@@ -271,63 +271,64 @@ frontend/src/pages/
 
 ---
 
-## 🤖 VAYU AI Analyst (Puter.js Integration)
+## 7. Natural Language Decision Support (VAYU AI Analyst)
 
-VAYU features an in-browser **AI Cyclone Analyst** integrated seamlessly with `@heyputer/puter.js`, providing real-time natural language synthesis of complex meteorological telemetry.
+VAYU incorporates an in-browser **AI Cyclone Analyst** integrated using `@heyputer/puter.js`, providing natural language synthesis of meteorological telemetry and model outputs.
 
-### Architectural Rules & Security Guarantees:
-1. **Clerk Remains Sole Auth:** Puter.js is used purely as a client-side inference service. `puter.auth` is strictly bypassed to preserve enterprise identity controls.
-2. **Deterministic Context Serialization:** The `cycloneContextSerializer.js` utility gathers current session state (coordinates, storm category, Dvorak classification, landfall ETA, SST, shear) and enforces an **8KB ceiling** to prevent token overflow.
-3. **Zero Secret Leaks:** No private API keys or model tokens are bundled into client code.
-4. **Context-Aware Quick Action Chips:**
-   - ⚡ *Synthesize Cyclone Threat*
-   - 📍 *Explain Landfall & Track*
-   - 🛰️ *Analyze Dvorak Pattern*
-   - 🛡️ *Generate Evacuation Advisory*
+### Architecture and Security Constraints:
+1. **Clerk Remains Sole Auth:** Puter.js is utilized strictly as a client-side reasoning engine. `puter.auth` is bypassed to preserve enterprise identity and role boundaries.
+2. **Deterministic Context Serialization:** The `cycloneContextSerializer.js` module gathers current session parameters (coordinates, storm category, Dvorak classification, landfall ETA, SST, shear) and enforces an **8KB ceiling** to prevent token overflow.
+3. **Zero Credential Exposure:** No private API keys or model tokens are bundled into client-side code.
+4. **Context-Aware Quick Action Capabilities:**
+   - "Synthesize Active Cyclone Threat & Metrics"
+   - "Explain Landfall Risk, Vector, & Kinematics"
+   - "Analyze Structural Dvorak Pattern & Eye Coherence"
+   - "Generate District Evacuation & Coastal Advisory"
 
 ---
 
-## 🛰️ Data Ingestion & Multi-Source Fusion
+## 8. Data Ingestion and Environmental Multi-Source Fusion
 
 ```
-                           ┌────────────────────────────┐
-                           │   Multi-Source Inputs      │
-                           └─────────────┬──────────────┘
-                                         │
-                 ┌───────────────────────┼──────────────────────┐
-                 ▼                       ▼                      ▼
-        ┌─────────────────┐    ┌─────────────────┐    ┌──────────────────┐
-        │  INSAT-3D / 3DR │    │  NOAA IBTrACS   │    │  INCOIS / ECMWF  │
-        │  Multi-spectral │    │ Historical NIO  │    │  SST & Shear     │
-        │  TIR1 / TIR2 / WV│   │ Telemetry Fixes │    │  Thermal Energy  │
-        └────────┬────────┘    └────────┬────────┘    └────────┬─────────┘
-                 │                       │                      │
-                 └───────────────────────┼──────────────────────┘
-                                         │
-                                         ▼
-                           ┌────────────────────────────┐
-                           │   CycloneFusion v2.5       │
-                           │   - Environmental Matrix   │
-                           │   - RI Index Calculator    │
-                           │   - Composite Risk Scoring │
-                           └─────────────┬──────────────┘
-                                         │
-                                         ▼
-                           ┌────────────────────────────┐
-                           │   Official RSMC Bulletin   │
-                           │   Generated via ReportLab  │
-                           └────────────────────────────┘
+                           +----------------------------+
+                           |    Multi-Source Inputs     |
+                           +-------------+--------------+
+                                         |
+                 +-----------------------+----------------------+
+                 |                       |                      |
+                 v                       v                      v
+        +-----------------+    +-----------------+    +------------------+
+        |  INSAT-3D / 3DR |    |  NOAA IBTrACS   |    |  INCOIS / ECMWF  |
+        |  Multi-spectral |    | Historical NIO  |    |  SST & Shear     |
+        |  TIR1 / TIR2 / WV|   | Telemetry Fixes |    |  Thermal Energy  |
+        +--------+--------+    +--------+--------+    +--------+---------+
+                 |                       |                      |
+                 +-----------------------+----------------------+
+                                         |
+                                         v
+                           +----------------------------+
+                           |    CycloneFusion v2.5      |
+                           |    - Environmental Matrix  |
+                           |    - RI Index Calculator   |
+                           |    - Composite Threat Score|
+                           +-------------+--------------+
+                                         |
+                                         v
+                           +----------------------------+
+                           |   Official RSMC Bulletin   |
+                           |   Generated via ReportLab  |
+                           +----------------------------+
 ```
 
 The **CycloneFusion Engine v2.5** fuses:
-* **Ocean Thermal Energy:** Sea Surface Temperatures ($>26.5^\circ\text{C}$ threshold) and Ocean Heat Content (OHC).
-* **Atmospheric Kinematics:** 850–200 hPa Vertical Wind Shear (favorable $<15\text{ kts}$, inhibitive $>25\text{ kts}$).
-* **Thermodynamic Stability:** Mid-tropospheric relative humidity ($700\text{ hPa}$) and Minimum Sea Level Pressure (MSLP).
+* **Ocean Thermal Energy:** Sea Surface Temperatures (> 26.5 °C threshold) and Ocean Heat Content (OHC).
+* **Atmospheric Kinematics:** 850-200 hPa Vertical Wind Shear (favorable < 15 kts, inhibitive > 25 kts).
+* **Thermodynamic Stability:** Mid-tropospheric relative humidity (700 hPa) and Minimum Sea Level Pressure (MSLP).
 * **Rapid Intensification (RI) Index:** Multi-variable logistic regression yielding calibrated percentage probabilities of sudden storm intensification.
 
 ---
 
-## 📁 Repository Directory Structure
+## 9. Repository Directory Structure
 
 ```
 ai-cyclone/
@@ -390,9 +391,9 @@ ai-cyclone/
 
 ---
 
-## ⚙️ Quick Start & Installation Guide
+## 10. Quick Start and Installation Guide
 
-### Prerequisites
+### System Prerequisites
 * **Node.js:** `v18.0.0` or later (tested on Node v20/v22)
 * **Python:** `v3.10` or later (tested on Python 3.11/3.12)
 * **Package Managers:** `npm` and `pip`
@@ -416,16 +417,16 @@ source .venv/bin/activate       # On Windows: .venv\Scripts\activate
 # 2. Install backend dependencies
 pip install -r backend/requirements.txt
 
-# 3. Start the VAYU FastAPI intelligence backend
+# 3. Launch the VAYU FastAPI backend
 python backend/run.py
 ```
-* The backend will initialize the SQLite database, verify model checkpoints, and start on `http://localhost:8000`.
-* Interactive Swagger API docs are accessible at: `http://localhost:8000/docs`.
+* The backend initializes the SQLite database, verifies deep learning model checkpoints, and binds to `http://localhost:8000`.
+* Interactive OpenAPI Swagger documentation is accessible at: `http://localhost:8000/docs`.
 
 ---
 
 ### Step 3: Frontend Setup (React 19 + Vite 6)
-In a new terminal window:
+In a separate terminal window:
 ```bash
 # 1. Install frontend dependencies
 npm run install:frontend
@@ -438,22 +439,22 @@ cp .env.example frontend/.env
 # 3. Launch the Vite development server
 npm run dev
 ```
-* Open your browser and navigate to: `http://localhost:5173`.
-* Both the **Public Atlas** (`/`) and **MoES Command Center** (`/dashboard`) work seamlessly side-by-side on localhost.
+* Navigate to `http://localhost:5173` in your browser.
+* Both the **Public Atlas** (`/`) and **MoES Command Center** (`/dashboard`) run seamlessly on localhost.
 
 ---
 
 ### Step 4: Full Production Build Verification
 ```bash
-# Builds the production distribution bundle
+# Compiles the production bundle
 npm run build
 ```
 
 ---
 
-## 🔐 Environment Variables Reference
+## 11. Environment Configuration
 
-Create a `.env` file in the `frontend/` directory (or use `.env.example` as a baseline):
+Create a `.env` file in the `frontend/` directory (or refer to `.env.example`):
 
 ```ini
 # ==============================================================================
@@ -461,20 +462,20 @@ Create a `.env` file in the `frontend/` directory (or use `.env.example` as a ba
 # ==============================================================================
 
 # Clerk Pro Authentication Key (from Clerk Dashboard -> API Keys)
-# In local development without a key, VAYU automatically enables Demo Officer Mode
+# In local development without a key, VAYU automatically operates in Demo Officer Mode
 VITE_CLERK_PUBLISHABLE_KEY=pk_test_your_clerk_publishable_key_here
 
 # Backend FastAPI Service Endpoint
-# Leave blank or omit in development to automatically use http://localhost:8000
-# In production, set to your deployed backend URL:
+# Leave blank in development to automatically route to http://localhost:8000
+# In production, specify the deployed backend URL:
 # VITE_API_URL=https://api.vayusat.live
 ```
 
 ---
 
-## 📡 REST API Documentation
+## 12. REST API Specification
 
-The VAYU backend exposes RESTful endpoints with comprehensive Pydantic schema validation.
+The VAYU backend provides RESTful endpoints with strict Pydantic validation schemas.
 
 ### Core Endpoints
 
@@ -555,26 +556,26 @@ Content-Type: application/json
 
 ---
 
-## 👥 SIH 2026 Team Credits
+## 13. Smart India Hackathon (SIH 2026) Team Credits
 
 ### **Team: Chakravat Crew**
 **Smart India Hackathon 2026 — Problem Statement 26070**  
 *Ministry of Earth Sciences (MoES) / India Meteorological Department (IMD)*
 
-| Contributor | GitHub Profile | Role / Focus Areas |
+| Contributor | GitHub Profile | Role and Technical Focus |
 | :--- | :--- | :--- |
-| **Harendra Pratap Singh** | [@harsh2hell](https://github.com/harsh2hell) | Team Lead, System Architecture, Deep Learning Pipelines & Full-Stack Integration |
-| **Ayan Hazra** | [@ayanhazra1901-pixel](https://github.com/ayanhazra1901-pixel) | Neural Model Training, Computer Vision & Spatiotemporal Trajectory Research |
-| **Sudeep Khan** | [@sudeep050806](https://github.com/sudeep050806) | Geospatial Analytics, Frontend Visualization & Data Engineering |
+| **Harendra Pratap Singh** | [@harsh2hell](https://github.com/harsh2hell) | Team Lead, System Architecture, Deep Learning Pipelines, and Full-Stack Integration |
+| **Ayan Hazra** | [@ayanhazra1901-pixel](https://github.com/ayanhazra1901-pixel) | Neural Model Training, Computer Vision, and Spatiotemporal Trajectory Modeling |
+| **Sudeep Khan** | [@sudeep050806](https://github.com/sudeep050806) | Geospatial Analytics, Frontend Visualization, and Data Engineering |
 
 ---
 
-## 📜 License & Acknowledgments
+## 14. License and Institutional Acknowledgments
 
-This project is licensed under the **Apache License 2.0** — see the [LICENSE](LICENSE) file for details.
+This project is licensed under the **Apache License 2.0** — see the [LICENSE](LICENSE) file for complete details.
 
-### Acknowledgments & Scientific Ground Truth
-* **India Meteorological Department (IMD) / Regional Specialized Meteorological Centre (RSMC) New Delhi:** For operational tropical cyclone bulletins, Dvorak classification guidelines, and warning directives.
+### Institutional Acknowledgments and Scientific Ground Truth
+* **India Meteorological Department (IMD) / Regional Specialized Meteorological Centre (RSMC) New Delhi:** For operational tropical cyclone advisories, Dvorak classification standards, and track analysis protocols.
 * **National Oceanic and Atmospheric Administration (NOAA):** For the International Best Track Archive for Climate Stewardship (**IBTrACS**) ground truth telemetry.
 * **National Aeronautics and Space Administration (NASA):** For the **Global Imagery Browse Services (GIBS)** satellite telemetry and earth observation imagery.
 * **Indian National Centre for Ocean Information Services (INCOIS):** For high-resolution sea surface temperature (SST) and oceanic thermocline telemetry.
