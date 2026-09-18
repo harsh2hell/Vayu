@@ -423,33 +423,6 @@ const PublicNavbar = ({
             </button>
           </div>
 
-<<<<<<< HEAD
-
-=======
-          {/* Theme Switcher */}
-          {setIsDarkMode && (
-            <button
-              onClick={() => setIsDarkMode(!isDarkMode)}
-              aria-label="Toggle light/dark theme"
-              className="header-theme-btn relative p-1.5 sm:p-2 rounded-2xl border border-slate-100 dark:border-slate-700 bg-slate-100/80 dark:bg-slate-800/80 shadow-sm hover:bg-white dark:hover:bg-slate-700 text-slate-700 dark:text-amber-400 transition-all duration-300 overflow-hidden group cursor-pointer shrink-0"
-              title={isDarkMode ? (isHindi ? "लाइट थीम पर स्विच करें" : "Switch to Light Theme") : (isHindi ? "डार्क थीम पर स्विच करें" : "Switch to Dark Theme")}
-            >
-              <div className="relative w-4 h-4 flex items-center justify-center">
-                <Sun
-                  className={`w-4 h-4 text-amber-500 absolute transition-all duration-500 transform ${
-                    isDarkMode ? 'rotate-90 scale-0 opacity-0' : 'rotate-0 scale-100 opacity-100 group-hover:rotate-45'
-                  }`}
-                />
-                <Moon
-                  className={`w-4 h-4 text-sky-400 dark:text-amber-300 absolute transition-all duration-500 transform ${
-                    isDarkMode ? 'rotate-0 scale-100 opacity-100 group-hover:-rotate-12' : '-rotate-90 scale-0 opacity-0'
-                  }`}
-                />
-              </div>
-            </button>
-          )}
->>>>>>> f1dd9d8b9f695faeb7830c3fbb6419ecee937b83
-
           {/* Mobile Menu Hamburger Toggle */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
