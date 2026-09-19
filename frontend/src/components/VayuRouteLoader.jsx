@@ -42,7 +42,7 @@ export default function VayuRouteLoader({ message = 'Initializing meteorological
       <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,rgba(14,165,233,0.12)_0%,rgba(248,250,252,0)_70%)]" />
 
       {/* Cyclone Vortex Center Stage */}
-      <div className="relative flex items-center justify-center mb-6">
+      <div className="relative flex items-center justify-center">
         {/* Doppler Radar Scan Pulse Wave 1 */}
         <div className="absolute w-44 h-44 rounded-full border border-sky-400/25 animate-ping opacity-30 pointer-events-none" />
 
@@ -58,7 +58,7 @@ export default function VayuRouteLoader({ message = 'Initializing meteorological
         {/* Soft Cyclone Eye Glow Backdrop */}
         <div className="absolute w-24 h-24 rounded-full bg-gradient-to-tr from-sky-400/25 via-blue-500/15 to-transparent blur-lg pointer-events-none" />
 
-        {/* Cyclone Emblem (Rotating Counter-Clockwise like North Indian Ocean Cyclones) */}
+        {/* Cyclone Emblem */}
         <div 
           className="relative w-20 h-20 sm:w-24 sm:h-24 flex items-center justify-center z-10"
           style={{ animation: 'vayu-cyclone-spin 2.4s linear infinite' }}
@@ -72,31 +72,6 @@ export default function VayuRouteLoader({ message = 'Initializing meteorological
 
         {/* Eye of the Cyclone (Subtle Pulsing Core) */}
         <div className="absolute z-20 w-3.5 h-3.5 rounded-full bg-white border-2 border-sky-500 shadow-[0_0_12px_rgba(14,165,233,0.85)] animate-pulse pointer-events-none" />
-      </div>
-
-      {/* Branding & Status Info */}
-      <div className="text-center z-10 space-y-2 max-w-sm">
-        <div className="flex items-center justify-center gap-2">
-          <span className="text-2xl font-black tracking-wider text-slate-900 font-sans">
-            VAYU
-          </span>
-          <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-sky-100 text-sky-800 border border-sky-200 uppercase tracking-wider">
-            Meteorological Intelligence
-          </span>
-        </div>
-
-        <p className="text-xs sm:text-[13px] font-medium text-slate-500 flex items-center justify-center gap-2">
-          <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse shrink-0" />
-          <span>{message}</span>
-        </p>
-
-        {/* Radar Telemetry Progress Sweep Bar */}
-        <div className="w-48 sm:w-56 h-1 bg-slate-200/80 rounded-full overflow-hidden mx-auto mt-3 relative">
-          <div 
-            className="h-full bg-gradient-to-r from-sky-500 via-blue-600 to-sky-400 w-1/3 rounded-full"
-            style={{ animation: 'vayu-progress-sweep 1.6s ease-in-out infinite' }}
-          />
-        </div>
       </div>
     </div>
   );
