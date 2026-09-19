@@ -1554,15 +1554,15 @@ const Welcome = () => {
       />
 
       {/* MOVING NATIONAL ADVISORY TICKER (RIGHT TO LEFT) */}
-      <div className="bg-amber-500/10 dark:bg-amber-950/30 border-b border-amber-200/80 dark:border-amber-900/50 py-2.5 text-xs text-amber-950 dark:text-amber-200 transition-colors duration-500 overflow-hidden">
+      <div className="bg-slate-50/90 dark:bg-slate-900/60 border-b border-slate-200/80 dark:border-slate-800/80 py-2 text-xs text-slate-700 dark:text-slate-300 transition-colors overflow-hidden font-sans">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-3">
           {/* Pinned Authority Tag */}
-          <div className="flex items-center gap-2 shrink-0 bg-amber-500/20 dark:bg-amber-500/25 px-3 py-1 rounded-full z-10 select-none border border-amber-300/50 dark:border-amber-700/50">
+          <div className="flex items-center gap-2 shrink-0 bg-slate-900 text-white dark:bg-white dark:text-slate-950 px-2.5 py-0.5 rounded-lg z-10 select-none border border-slate-900 dark:border-white shadow-xs">
             <span className="relative flex h-2 w-2">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-500 opacity-75"></span>
-              <span className="relative inline-flex rounded-full h-2 w-2 bg-amber-600 dark:bg-amber-400"></span>
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
             </span>
-            <span className="font-bold text-amber-950 dark:text-amber-200 tracking-wider text-[11px] uppercase whitespace-nowrap">
+            <span className="font-bold tracking-wider text-[10px] uppercase whitespace-nowrap">
               {isHindi ? 'राष्ट्रीय चेतावनी' : 'NATIONAL ADVISORY'}
             </span>
           </div>
@@ -1574,11 +1574,11 @@ const Welcome = () => {
                 <span>{isHindi
                   ? 'बंगाल की खाड़ी (13.5°N, 88.5°E) में चक्रवाती परिसंचरण इन्वेस्ट 92B सक्रिय। 48 घंटों में चक्रवात बनने की संभावना: 68%।'
                   : 'Incipient cyclonic circulation Invest 92B in Bay of Bengal (13.5°N, 88.5°E). 48h cyclogenesis potential: 68%.'}</span>
-                <span className="text-amber-500/60 dark:text-amber-400/60">•</span>
+                <span className="text-slate-400 dark:text-slate-600">•</span>
                 <span>{isHindi
                   ? 'आपदा प्रबंधन बल (NDRF/SDRF) तटीय क्षेत्रों में अलर्ट पर।'
                   : 'Disaster response authorities on vigil across coastal corridors.'}</span>
-                <span className="text-amber-500/60 dark:text-amber-400/60">•</span>
+                <span className="text-slate-400 dark:text-slate-600">•</span>
                 <span>{isHindi
                   ? 'मछुआरों को गहरे समुद्र में न जाने की आधिकारिक सलाह।'
                   : 'Fishermen advised not to venture into deep sea.'}</span>
@@ -1589,11 +1589,11 @@ const Welcome = () => {
                 <span>{isHindi
                   ? 'बंगाल की खाड़ी (13.5°N, 88.5°E) में चक्रवाती परिसंचरण इन्वेस्ट 92B सक्रिय। 48 घंटों में चक्रवात बनने की संभावना: 68%।'
                   : 'Incipient cyclonic circulation Invest 92B in Bay of Bengal (13.5°N, 88.5°E). 48h cyclogenesis potential: 68%.'}</span>
-                <span className="text-amber-500/60 dark:text-amber-400/60">•</span>
+                <span className="text-slate-400 dark:text-slate-600">•</span>
                 <span>{isHindi
                   ? 'आपदा प्रबंधन बल (NDRF/SDRF) तटीय क्षेत्रों में अलर्ट पर।'
                   : 'Disaster response authorities on vigil across coastal corridors.'}</span>
-                <span className="text-amber-500/60 dark:text-amber-400/60">•</span>
+                <span className="text-slate-400 dark:text-slate-600">•</span>
                 <span>{isHindi
                   ? 'मछुआरों को गहरे समुद्र में न जाने की आधिकारिक सलाह।'
                   : 'Fishermen advised not to venture into deep sea.'}</span>
