@@ -230,12 +230,12 @@ export default function CycloneAtmosphericLiveView() {
   return (
     <div
       ref={containerRef}
-      className="absolute inset-0 overflow-hidden bg-slate-950 select-none rounded-r-2xl"
+      className="absolute inset-0 overflow-hidden bg-slate-950 select-none rounded-r-2xl touch-none overscroll-none pointer-events-none"
     >
       {hasWebGL ? (
         <canvas
           ref={canvasRef}
-          className="w-full h-full object-cover block pointer-events-none"
+          className="w-full h-full object-cover block pointer-events-none touch-none"
         />
       ) : (
         <img

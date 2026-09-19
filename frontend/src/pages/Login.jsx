@@ -87,7 +87,7 @@ const Login = ({ initialMode }) => {
   }
 
   return (
-    <div className="min-h-screen bg-white flex items-center justify-center p-4 sm:p-6 lg:p-10 font-sans relative">
+    <div className="min-h-screen w-full bg-white flex items-center justify-center p-4 sm:p-6 lg:p-10 font-sans relative overflow-x-hidden touch-pan-y">
       {/* 2px National Tricolor Stripe */}
       <div className="fixed top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#FF9933] via-slate-300 to-[#138808] z-50" />
 

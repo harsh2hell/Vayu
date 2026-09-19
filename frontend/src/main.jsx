@@ -8,6 +8,10 @@ import App from './App.jsx';
 import ErrorBoundary from './components/ErrorBoundary.jsx';
 import { getDashboardUrl, getAuthUrl } from './utils/domain';
 import { clerkLightTheme } from './utils/clerkTheme';
+import { initZoomLock } from './utils/zoomLock';
+
+// Initialize global viewport zoom prevention
+initZoomLock();
 
 const PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY;
 

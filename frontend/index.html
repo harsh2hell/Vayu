@@ -8,8 +8,49 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="icon" type="image/png" href="/vayu-icon.png" />
     <link rel="apple-touch-icon" href="/vayu-icon.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, shrink-to-fit=no" />
     <title>VAYU — India Cyclone & Weather Intelligence</title>
+    <script>
+      // Strict Viewport & Zoom Lock (Prevents wheel/pinch/gesture/keyboard zoom)
+      (function() {
+        function onWheel(e) {
+          if (e.ctrlKey || e.metaKey) {
+            e.preventDefault();
+          }
+        }
+        window.addEventListener('wheel', onWheel, { passive: false });
+        document.addEventListener('wheel', onWheel, { passive: false });
+
+        function onKeyDown(e) {
+          if (e.ctrlKey || e.metaKey) {
+            if (
+              e.key === '+' || e.key === '-' || e.key === '=' || e.key === '_' ||
+              e.code === 'NumpadAdd' || e.code === 'NumpadSubtract' ||
+              e.code === 'Equal' || e.code === 'Minus'
+            ) {
+              e.preventDefault();
+            }
+          }
+        }
+        window.addEventListener('keydown', onKeyDown, { passive: false });
+
+        function onGesture(e) {
+          if (e.target && e.target.closest && e.target.closest('.leaflet-container')) return;
+          e.preventDefault();
+        }
+        document.addEventListener('gesturestart', onGesture, { passive: false });
+        document.addEventListener('gesturechange', onGesture, { passive: false });
+        document.addEventListener('gestureend', onGesture, { passive: false });
+
+        function onTouchMove(e) {
+          if (e.touches && e.touches.length > 1) {
+            if (e.target && e.target.closest && e.target.closest('.leaflet-container')) return;
+            e.preventDefault();
+          }
+        }
+        document.addEventListener('touchmove', onTouchMove, { passive: false });
+      })();
+    </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet" />
