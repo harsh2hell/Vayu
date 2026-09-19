@@ -4,6 +4,7 @@ import { Sparkles } from 'lucide-react';
 import Sidebar from './Sidebar';
 import Topbar from './Topbar';
 import { AnalysisSessionProvider } from '../context/AnalysisSessionContext';
+import LanguageWelcomeAnimation from './LanguageWelcomeAnimation';
 const VayuAiAnalystDrawer = React.lazy(() => import('./VayuAiAnalystDrawer'));
 import ErrorBoundary from './ErrorBoundary';
 import VayuRouteLoader from './VayuRouteLoader';
@@ -12,9 +13,19 @@ const DashboardLayout = () => {
   const location = useLocation();
   const isMapFirst = location.pathname.includes('/earth');
   const [isAiAnalystOpen, setIsAiAnalystOpen] = useState(false);
+  const [showWelcomeAnim, setShowWelcomeAnim] = useState(true);
 
   return (
     <AnalysisSessionProvider>
+      {showWelcomeAnim && (
+        <LanguageWelcomeAnimation
+          isOpen={showWelcomeAnim}
+          mode="first-visit"
+          targetLanguage={typeof window !== 'undefined' && localStorage.getItem('vayu_is_hindi') === 'true' ? 'hi' : 'en'}
+          onLanguageSwitch={() => {}}
+          onComplete={() => setShowWelcomeAnim(false)}
+        />
+      )}
       <div className="min-h-screen bg-[#F8FAFC] dark:bg-black text-slate-900 dark:text-slate-100 font-sans antialiased selection:bg-sky-500 selection:text-white relative transition-colors duration-200">
         
         {/* Left Column: Sidebar */}
