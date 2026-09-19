@@ -50,9 +50,7 @@ const ProductionLoginRedirect = () => {
   }, [location]);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center text-xs font-mono">
-      <span>Redirecting to secure login gateway...</span>
-    </div>
+    <VayuRouteLoader message="Redirecting to secure login gateway..." />
   );
 };
 
@@ -65,9 +63,7 @@ const ProductionPortalRedirect = () => {
   }, [location]);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center text-xs font-mono">
-      <span>Redirecting to VAYU Operations Portal (portal.vayusat.live)...</span>
-    </div>
+    <VayuRouteLoader message="Redirecting to VAYU Operations Portal (portal.vayusat.live)..." />
   );
 };
 
@@ -80,13 +76,19 @@ const ProductionStatusRedirect = () => {
   }, [location]);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-black text-slate-800 dark:text-slate-200 flex items-center justify-center text-xs font-mono">
-      <span>Redirecting to VAYU Live Status (status.vayusat.live)...</span>
-    </div>
+    <VayuRouteLoader message="Redirecting to VAYU Live Status (status.vayusat.live)..." />
   );
 };
 
 function App() {
+  useEffect(() => {
+    document.documentElement.classList.remove('dark');
+    document.documentElement.style.colorScheme = 'light';
+    try {
+      localStorage.removeItem('theme');
+    } catch {}
+  }, []);
+
   const isAuth = isAuthSubdomain();
   const isPortal = isPortalSubdomain();
   const isStatus = isStatusSubdomain();

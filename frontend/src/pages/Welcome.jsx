@@ -1194,19 +1194,7 @@ const Welcome = () => {
     setAnimState(prev => ({ ...prev, isOpen: false }));
   }, []);
 
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    return document.documentElement.classList.contains('dark') || localStorage.getItem('theme') === 'dark';
-  });
-
-  useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-    }
-  }, [isDarkMode]);
+  const [isDarkMode, setIsDarkMode] = useState(false);
 
   const [fontSizeOffset, setFontSizeOffset] = useState(() => {
     try {
@@ -1546,8 +1534,6 @@ const Welcome = () => {
       <PublicNavbar
         isHindi={isHindi}
         setIsHindi={handleLanguageToggle}
-        isDarkMode={isDarkMode}
-        setIsDarkMode={setIsDarkMode}
         fontSizeOffset={fontSizeOffset}
         setFontSizeOffset={setFontSizeOffset}
         isScrolled={isScrolled}

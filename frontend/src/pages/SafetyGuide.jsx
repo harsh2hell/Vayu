@@ -34,20 +34,13 @@ const SafetyGuide = () => {
     localStorage.setItem('vayu_is_hindi', String(val));
   };
 
-  // Dark mode state
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    return document.documentElement.classList.contains('dark') || localStorage.getItem('theme') === 'dark';
-  });
-
+  // Enforce light mode
+  const [isDarkMode, setIsDarkMode] = useState(false);
   useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-    }
-  }, [isDarkMode]);
+    document.documentElement.classList.remove('dark');
+    document.documentElement.style.colorScheme = 'light';
+    try { localStorage.removeItem('theme'); } catch {}
+  }, []);
 
   // Font size scaling
   const [fontSizeOffset, setFontSizeOffset] = useState(0);
@@ -71,8 +64,6 @@ const SafetyGuide = () => {
       <PublicNavbar
         isHindi={isHindi}
         setIsHindi={handleSetHindi}
-        isDarkMode={isDarkMode}
-        setIsDarkMode={setIsDarkMode}
         fontSizeOffset={fontSizeOffset}
         setFontSizeOffset={setFontSizeOffset}
         isScrolled={isScrolled}

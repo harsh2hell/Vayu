@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
   Bell, Clock, Search,
-  Sun, Moon, History, Sidebar, Menu, X, Check, ShieldAlert,
+  History, Sidebar, Menu, X, Check, ShieldAlert,
   AlertTriangle, Info, ArrowRight
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
@@ -17,7 +17,6 @@ const SEARCH_ITEMS = [
   { id: 'archives', title: 'Historical Archives', category: 'Pages', path: '/dashboard/archives', icon: '📚', desc: 'Historical North Indian Ocean cyclonic storm database' },
   { id: 'models', title: 'AI Intelligence', category: 'Pages', path: '/dashboard/models', icon: '🧠', desc: 'Model architecture, loss convergence curves & benchmark evaluations' },
   { id: 'bulletin', title: 'Official Reports', category: 'Pages', path: '/dashboard/bulletin', icon: '📄', desc: 'MoES / IMD standard formatted operational cyclone bulletins' },
-  { id: 'action-theme', title: 'Toggle Dark Theme', category: 'Quick Action', isAction: true, action: 'toggleTheme', icon: '🌓', desc: 'Switch interface between light and dark modes' },
   { id: 'action-dana', title: 'View Cyclone DANA Analysis', category: 'Active Cyclones', path: '/dashboard/trajectory', icon: '🌪️', desc: 'Severe Cyclonic storm active in Bay of Bengal' },
 ];
 
@@ -40,11 +39,6 @@ const Topbar = ({ onOpenAiAnalyst }) => {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Theme state
-  const [isDark, setIsDark] = useState(() => {
-    return document.documentElement.classList.contains('dark') || localStorage.getItem('theme') === 'dark';
-  });
-
   // Modals & Panels state
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -60,22 +54,14 @@ const Topbar = ({ onOpenAiAnalyst }) => {
   const notificationsRef = useRef(null);
   const historyRef = useRef(null);
 
-  // Sync theme
+  // Enforce light theme
   useEffect(() => {
-    if (isDark) {
-      document.documentElement.classList.add('dark');
-      document.documentElement.style.colorScheme = 'dark';
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      document.documentElement.style.colorScheme = 'light';
-      localStorage.setItem('theme', 'light');
-    }
-  }, [isDark]);
-
-  const toggleTheme = () => {
-    setIsDark(prev => !prev);
-  };
+    document.documentElement.classList.remove('dark');
+    document.documentElement.style.colorScheme = 'light';
+    try {
+      localStorage.removeItem('theme');
+    } catch {}
+  }, []);
 
   // Keyboard shortcut for Cmd+/ or Ctrl+/ or Escape
   useEffect(() => {
@@ -144,9 +130,7 @@ const Topbar = ({ onOpenAiAnalyst }) => {
   const handleSearchSelect = (item) => {
     setIsSearchOpen(false);
     setSearchQuery('');
-    if (item.isAction && item.action === 'toggleTheme') {
-      toggleTheme();
-    } else if (item.path) {
+    if (item.path) {
       navigate(toPortalPath(item.path));
     }
   };
@@ -229,19 +213,6 @@ const Topbar = ({ onOpenAiAnalyst }) => {
               title="Search (⌘/)"
             >
               <Search className="w-4 h-4" />
-            </button>
-
-            {/* 1. Theme Toggle (Sun / Moon) */}
-            <button 
-              onClick={toggleTheme}
-              className="p-1.5 text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-md transition-colors cursor-pointer"
-              title={isDark ? "Switch to Light Theme" : "Switch to Dark Theme"}
-            >
-              {isDark ? (
-                <Sun className="w-4 h-4 text-amber-400 transition-transform rotate-0 hover:rotate-45" />
-              ) : (
-                <Moon className="w-4 h-4 text-slate-600 transition-transform rotate-0 hover:-rotate-12" />
-              )}
             </button>
 
             {/* 2. History / Recent Activity Popover */}

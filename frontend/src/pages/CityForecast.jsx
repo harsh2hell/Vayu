@@ -421,9 +421,7 @@ const CityForecast = () => {
     return localStorage.getItem('vayu_is_hindi') === 'true';
   });
 
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    return document.documentElement.classList.contains('dark');
-  });
+  const [isDarkMode] = useState(false);
 
   const liveClock = useLiveClock(1000);
 
@@ -439,6 +437,12 @@ const CityForecast = () => {
   const [isScrolled, setIsScrolled] = useState(false);
 
   useEffect(() => {
+    document.documentElement.classList.remove('dark');
+    document.documentElement.style.colorScheme = 'light';
+    try { localStorage.removeItem('theme'); } catch {}
+  }, []);
+
+  useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 20);
     };
@@ -452,15 +456,7 @@ const CityForecast = () => {
     localStorage.setItem('vayu_is_hindi', String(nextVal));
   };
 
-  const handleSetDarkMode = (val) => {
-    const nextVal = typeof val === 'function' ? val(isDarkMode) : val;
-    setIsDarkMode(nextVal);
-    if (nextVal) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  };
+  const handleSetDarkMode = () => {};
 
   const locationState = useLocation();
 
@@ -820,8 +816,6 @@ const CityForecast = () => {
       <PublicNavbar
         isHindi={isHindi}
         setIsHindi={handleSetHindi}
-        isDarkMode={isDarkMode}
-        setIsDarkMode={handleSetDarkMode}
         fontSizeOffset={fontSizeOffset}
         setFontSizeOffset={setFontSizeOffset}
         isScrolled={isScrolled}

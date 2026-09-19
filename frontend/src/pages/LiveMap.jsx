@@ -94,17 +94,13 @@ const LiveMap = () => {
     localStorage.setItem('preferredLanguage', val ? 'hi' : 'en');
   };
 
-  // Dark mode detection
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    return document.documentElement.classList.contains('dark');
-  });
+  // Light mode enforced
+  const [isDarkMode] = useState(false);
 
   useEffect(() => {
-    const observer = new MutationObserver(() => {
-      setIsDarkMode(document.documentElement.classList.contains('dark'));
-    });
-    observer.observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
-    return () => observer.disconnect();
+    document.documentElement.classList.remove('dark');
+    document.documentElement.style.colorScheme = 'light';
+    try { localStorage.removeItem('theme'); } catch {}
   }, []);
 
   // MANDATORY USER REQUIREMENT:

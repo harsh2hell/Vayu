@@ -37,10 +37,8 @@ const AICycloneIntelligence = () => {
   const tabParam = useMemo(() => new URLSearchParams(location.search).get('tab'), [location.search]);
   const liveClock = useLiveClock(1000);
 
-  // Global Theme & Preferences
-  const [isDarkMode, setIsDarkMode] = useState(() => {
-    return document.documentElement.classList.contains('dark');
-  });
+  // Global Theme & Preferences (Light mode enforced)
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const [isHindi, setIsHindi] = useState(false);
   const [fontSizeOffset, setFontSizeOffset] = useState(() => {
     try {
@@ -51,14 +49,12 @@ const AICycloneIntelligence = () => {
     }
   });
 
-  // Sync Dark Mode class with root document
+  // Enforce Light Mode
   useEffect(() => {
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-    }
-  }, [isDarkMode]);
+    document.documentElement.classList.remove('dark');
+    document.documentElement.style.colorScheme = 'light';
+    try { localStorage.removeItem('theme'); } catch {}
+  }, []);
 
   // Active Module Tab State
   // 'identification' | 'classification' | 'multisource' | 'prediction' | 'benchmarks'
@@ -145,8 +141,6 @@ const AICycloneIntelligence = () => {
       <PublicNavbar
         isHindi={isHindi}
         setIsHindi={setIsHindi}
-        isDarkMode={isDarkMode}
-        setIsDarkMode={setIsDarkMode}
         fontSizeOffset={fontSizeOffset}
         setFontSizeOffset={setFontSizeOffset}
         isScrolled={false}

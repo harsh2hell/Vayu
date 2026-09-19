@@ -3,7 +3,7 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import {
   CheckCircle2, AlertTriangle, ChevronDown, ChevronUp,
   RefreshCw, ChevronLeft, ChevronRight, Calendar, ArrowRight,
-  Sun, Moon, Activity, Server, Cpu, Radio, ShieldCheck
+  Activity, Server, Cpu, Radio, ShieldCheck
 } from 'lucide-react';
 import { checkBackendHealth } from '../services/api';
 import { getPortalUrl } from '../utils/domain';
@@ -210,22 +210,14 @@ export default function StatusPage() {
                             location.pathname.startsWith('/portal') || 
                             (location.pathname === '/status' && !window.location.hostname.includes('status.'));
 
-  // Dark mode
-  const [isDark, setIsDark] = useState(() => {
-    return document.documentElement.classList.contains('dark') || localStorage.getItem('theme') === 'dark';
-  });
-
-  const toggleTheme = () => {
-    const nextDark = !isDark;
-    setIsDark(nextDark);
-    if (nextDark) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
-    }
-  };
+  // Enforce light mode
+  useEffect(() => {
+    document.documentElement.classList.remove('dark');
+    document.documentElement.style.colorScheme = 'light';
+    try {
+      localStorage.removeItem('theme');
+    } catch {}
+  }, []);
 
   // State: checkPhase: 1 = Probing, 2 = 100% Green
   const [checkPhase, setCheckPhase] = useState(2);
@@ -302,14 +294,6 @@ export default function StatusPage() {
           </div>
 
           <div className="flex items-center gap-2.5">
-            <button
-              onClick={toggleTheme}
-              className="p-2 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
-              title="Toggle theme"
-            >
-              {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
-            </button>
-
             <button
               onClick={runVerification}
               disabled={isVerifying}

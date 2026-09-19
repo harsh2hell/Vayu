@@ -115,7 +115,7 @@ export default function AtmosphericPatterns() {
   const navigate = useNavigate();
   const liveClock = useLiveClock(1000);
 
-  const [isDarkMode, setIsDarkMode] = useState(() => document.documentElement.classList.contains('dark'));
+  const [isDarkMode, setIsDarkMode] = useState(false);
   const [fontSizeOffset, setFontSizeOffset] = useState(() => {
     try { return parseInt(localStorage.getItem('vayu_font_offset') ?? '0', 10); } catch { return 0; }
   });
@@ -123,9 +123,10 @@ export default function AtmosphericPatterns() {
   const [activeTab, setActiveTab] = useState('synoptic');
 
   useEffect(() => {
-    if (isDarkMode) document.documentElement.classList.add('dark');
-    else document.documentElement.classList.remove('dark');
-  }, [isDarkMode]);
+    document.documentElement.classList.remove('dark');
+    document.documentElement.style.colorScheme = 'light';
+    try { localStorage.removeItem('theme'); } catch {}
+  }, []);
 
   useEffect(() => {
     const t = setTimeout(() => setIsLoading(false), 800);
@@ -137,8 +138,6 @@ export default function AtmosphericPatterns() {
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-black text-slate-900 dark:text-white flex flex-col">
       <PublicNavbar
-        isDarkMode={isDarkMode}
-        setIsDarkMode={setIsDarkMode}
         fontSizeOffset={fontSizeOffset}
         setFontSizeOffset={(v) => { setFontSizeOffset(v); applyGlobalFontScale(v); }}
         isHindi={false}

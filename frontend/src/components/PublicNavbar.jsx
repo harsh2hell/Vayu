@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { PhoneCall, Menu, X, ChevronRight, Sun, Moon } from 'lucide-react';
+import { PhoneCall, Menu, X, ChevronRight } from 'lucide-react';
 import { useLiveClock } from '../utils/liveDateTime';
 import { getStatusUrl, isProductionDomain } from '../utils/domain';
 
@@ -32,8 +32,8 @@ export const applyGlobalFontScale = (offset) => {
 const PublicNavbar = ({
   isHindi,
   setIsHindi,
-  isDarkMode,
-  setIsDarkMode,
+  isDarkMode: _isDarkMode,
+  setIsDarkMode: _setIsDarkMode,
   fontSizeOffset,
   _setFontSizeOffset
 }) => {
@@ -116,9 +116,9 @@ const PublicNavbar = ({
           title={isHindi ? "राष्ट्रीय चक्रवात पोर्टल होमपेज पर जाएं" : "Go to National Cyclone Portal Home"}
         >
           <img
-            src={isDarkMode ? "/vayu-white.png?v=2" : "/vayu.png"}
+            src="/vayu.png"
             alt="VAYU"
-            className="h-8 sm:h-9 w-auto object-contain transition-opacity duration-150 group-hover:opacity-80"
+            className="h-10 sm:h-12 w-auto object-contain transition-transform duration-150 group-hover:scale-105"
           />
         </div>
 
@@ -150,7 +150,7 @@ const PublicNavbar = ({
           })}
         </nav>
 
-        {/* Right: Operational Portal CTA & Theme Switcher */}
+        {/* Right: Operational Portal CTA & Language Switcher */}
         <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
           
           {/* Operations Console Button */}
@@ -171,20 +171,6 @@ const PublicNavbar = ({
               title="Toggle Language / भाषा बदलें"
             >
               {isHindi ? 'EN' : 'हिन्दी'}
-            </button>
-          )}
-
-          {/* Theme Switcher */}
-          {setIsDarkMode && (
-            <button
-              onClick={() => setIsDarkMode(!isDarkMode)}
-              aria-label="Toggle light/dark theme"
-              className="p-2 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-colors cursor-pointer shrink-0"
-              title={isDarkMode ? (isHindi ? "लाइट थीम पर स्विच करें" : "Switch to Light Theme") : (isHindi ? "डार्क थीम पर स्विच करें" : "Switch to Dark Theme")}
-            >
-              <div className="relative w-4 h-4 flex items-center justify-center">
-                {isDarkMode ? <Sun className="w-4 h-4 text-amber-400" /> : <Moon className="w-4 h-4 text-slate-700 dark:text-slate-300" />}
-              </div>
             </button>
           )}
 
