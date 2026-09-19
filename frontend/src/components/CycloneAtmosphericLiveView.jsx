@@ -5,14 +5,14 @@ import React, { useRef, useEffect, useState } from 'react';
  * -------------------------------------------------------------
  * 1. Proper Earth Visibility:
  *    Calibrated horizontal focal framing so the Earth horizon, Indian subcontinent,
- *    and coastlines are properly visible on the left and top.
- * 2. Continuous, Seamless Cloud Swirl (NO Cuts / NO Pauses / NO Restarts):
- *    Continuous mathematical angular rotation around the cyclone eye.
- *    No period reset, no jump, no cross-fade loop — just perpetual, slow, silky-smooth motion.
- * 3. 100% Clean Borders & Static Earth:
- *    Rotation is strictly bounded to the cyclone vortex (r <= 0.32).
- *    All background land, ocean, and 4 sides are 100% static original photo.
- *    Zero streaking or edge artifacts.
+ *    and coastlines are properly visible.
+ * 2. Global Differential Rotation — Lorentzian (Rankine-style) falloff:
+ *    omega(r) = omega_core / (1 + (r/r0)^2)
+ *    The core spins at full speed; the edges drift very slowly but NEVER stop.
+ *    There is no hard mask boundary, so no side-cut artifact whatsoever.
+ * 3. Zero Edge Artifacts:
+ *    A soft edge blend (5% UV margin) re-merges the warped sample with the
+ *    original photo at the very borders, eliminating clamping streaks.
  */
 
 const VERTEX_SHADER_SOURCE = `
@@ -28,77 +28,77 @@ const FRAGMENT_SHADER_SOURCE = `
   precision highp float;
 
   uniform sampler2D u_texture;
-  uniform float u_time;
-  uniform vec2 u_resolution;
+  uniform float     u_time;
+  uniform vec2      u_resolution;
 
   varying vec2 v_uv;
 
   void main() {
-    // 1. Calibrated Framing for Proper Earth Visibility:
-    // Original photo aspect ratio: 1200 / 896 = 1.339286
-    float imgAspect = 1200.0 / 896.0;
+    // ── 1. Aspect-correct UV mapping ────────────────────────────────────────
+    // Original photo: 1200 × 896 px  →  aspect = 1.339286
+    float imgAspect   = 1200.0 / 896.0;
     float screenAspect = u_resolution.x / max(u_resolution.y, 1.0);
 
     vec2 imgUV;
     if (screenAspect > imgAspect) {
+      // Screen wider than image — pillarbox vertical
       imgUV = vec2(v_uv.x, (v_uv.y - 0.5) * (imgAspect / screenAspect) + 0.5);
     } else {
-      // Container is taller than image (vertical login card pane):
-      // Horizontal focal point shifted to 0.43 to show the Indian landmass & Earth curvature properly!
+      // Screen taller than image — horizontal crop, focal offset 0.43 to
+      // show the Indian subcontinent & Earth curvature
       float scale = screenAspect / imgAspect;
       imgUV = vec2((v_uv.x - 0.5) * scale + 0.43, v_uv.y);
     }
 
-    // Original base photo sample
-    vec4 baseColor = texture2D(u_texture, clamp(imgUV, 0.0, 1.0));
-
-    // 2. Cyclone Eye Coordinates in the photograph
+    // ── 2. Cyclone eye & aspect-corrected radius ─────────────────────────────
     vec2 eye = vec2(0.501, 0.500);
-    vec2 d = imgUV - eye;
-    d.y /= imgAspect; // Circular metric
-    float r = length(d);
+    vec2 d   = imgUV - eye;
 
-    // 3. Storm Vortex Zone Mask:
-    // Strictly bounded inside r <= 0.32 (well away from all 4 borders).
-    // Beyond r = 0.32, rotMask is EXACTLY 0.0 (Earth landmass, ocean & all borders stay 100% static!)
-    float rotMask = smoothstep(0.32, 0.18, r);
+    // Circular metric: correct x for image aspect so radii are true circles
+    vec2 dC = vec2(d.x, d.y / imgAspect);
+    float r  = length(dC);
 
-    // Only rotate bright cloud structures
-    float lum = dot(baseColor.rgb, vec3(0.299, 0.587, 0.114));
-    float cloudMask = smoothstep(0.20, 0.52, lum) * rotMask;
+    // ── 3. Differential rotation — Lorentzian profile ────────────────────────
+    //    omega(r) = omega_core / (1 + (r / r0)^2)
+    //    r = 0:   full core speed (omega_core)
+    //    r = r0:  half speed
+    //    r >> r0: approaches zero — but asymptotically, never a hard stop
+    float omega_core = 0.022;   // rad/s at eye (~286 s per full revolution)
+    float r0         = 0.20;    // half-velocity radius (UV units)
+    float rr0        = r / r0;
+    float omega_r    = omega_core / (1.0 + rr0 * rr0);
 
-    // Fast path: If outside storm or on dark ocean/land, output original photo directly
-    if (cloudMask <= 0.0005) {
-      gl_FragColor = baseColor;
-      return;
-    }
+    // Clockwise positive: angle increases with time
+    float angle = u_time * omega_r;
+    float cosA  = cos(angle);
+    float sinA  = sin(angle);
 
-    // 4. Continuous, Perpetual Rotation (Zero Cuts / Zero Pauses / Zero Restarts):
-    // Angular velocity: One majestic, graceful full revolution every ~160 seconds
-    float omega = 0.038; // rad/sec
-    float rotAngle = -u_time * omega;
+    // Rotate displacement vector in the circular metric space
+    vec2 dCrot = vec2(
+      cosA * dC.x - sinA * dC.y,
+      sinA * dC.x + cosA * dC.y
+    );
 
-    // Angle of current pixel relative to eye
-    float currentAngle = atan(d.y, d.x);
+    // Re-map back to raw image UV space (undo aspect correction)
+    vec2 sampleUV = eye + vec2(dCrot.x, dCrot.y * imgAspect);
 
-    // Continuous rotation angle smoothly modulated by storm radius
-    float sampleAngle = currentAngle + rotAngle * rotMask;
+    // ── 4. Sample both versions ───────────────────────────────────────────────
+    vec4 baseColor = texture2D(u_texture, clamp(imgUV,    0.001, 0.999));
+    vec4 rotColor  = texture2D(u_texture, clamp(sampleUV, 0.001, 0.999));
 
-    // Rotated sample position
-    vec2 dRot = r * vec2(cos(sampleAngle), sin(sampleAngle));
-    dRot.y *= imgAspect; // Re-apply aspect ratio
-    vec2 sampleUV = eye + dRot;
+    // ── 5. Edge softening — prevent clamping streaks at borders ──────────────
+    // edgeMask = 0 right at UV edge, 1 beyond 5% inward
+    float marginX   = min(imgUV.x, 1.0 - imgUV.x);
+    float marginY   = min(imgUV.y, 1.0 - imgUV.y);
+    float edgeMask  = smoothstep(0.0, 0.05, min(marginX, marginY));
 
-    // Sample rotated cloud texture
-    vec4 rotColor = texture2D(u_texture, clamp(sampleUV, 0.0, 1.0));
-
-    // 5. Seamlessly blend rotating clouds with static background
-    gl_FragColor = mix(baseColor, rotColor, cloudMask);
+    // Final output: blend rotated with original, guarded by edge mask
+    gl_FragColor = mix(baseColor, rotColor, edgeMask);
   }
 `;
 
 export default function CycloneAtmosphericLiveView() {
-  const canvasRef = useRef(null);
+  const canvasRef    = useRef(null);
   const containerRef = useRef(null);
   const [hasWebGL, setHasWebGL] = useState(true);
 
@@ -106,19 +106,19 @@ export default function CycloneAtmosphericLiveView() {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
-    let gl = canvas.getContext('webgl', { 
-      alpha: false, 
+    const gl = canvas.getContext('webgl', {
+      alpha: false,
       antialias: true,
-      powerPreference: 'high-performance' 
+      powerPreference: 'high-performance',
     });
 
     if (!gl) {
-      console.warn('[VAYU] WebGL not available, displaying original satellite image');
+      console.warn('[VAYU] WebGL not available — showing static image');
       setHasWebGL(false);
       return;
     }
 
-    function createShader(gl, type, source) {
+    function createShader(type, source) {
       const shader = gl.createShader(type);
       gl.shaderSource(shader, source);
       gl.compileShader(shader);
@@ -130,48 +130,38 @@ export default function CycloneAtmosphericLiveView() {
       return shader;
     }
 
-    const vertShader = createShader(gl, gl.VERTEX_SHADER, VERTEX_SHADER_SOURCE);
-    const fragShader = createShader(gl, gl.FRAGMENT_SHADER, FRAGMENT_SHADER_SOURCE);
-    if (!vertShader || !fragShader) {
-      setHasWebGL(false);
-      return;
-    }
+    const vertShader = createShader(gl.VERTEX_SHADER,   VERTEX_SHADER_SOURCE);
+    const fragShader = createShader(gl.FRAGMENT_SHADER, FRAGMENT_SHADER_SOURCE);
+    if (!vertShader || !fragShader) { setHasWebGL(false); return; }
 
     const program = gl.createProgram();
     gl.attachShader(program, vertShader);
     gl.attachShader(program, fragShader);
     gl.linkProgram(program);
-
     if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
       console.error('[VAYU] Program link error:', gl.getProgramInfoLog(program));
       setHasWebGL(false);
       return;
     }
 
+    // Full-screen quad
     const positionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
     gl.bufferData(
       gl.ARRAY_BUFFER,
-      new Float32Array([
-        -1, -1,
-         1, -1,
-        -1,  1,
-        -1,  1,
-         1, -1,
-         1,  1,
-      ]),
+      new Float32Array([-1, -1,  1, -1, -1,  1,  -1,  1,  1, -1,  1,  1]),
       gl.STATIC_DRAW
     );
 
-    const aPositionLoc = gl.getAttribLocation(program, 'a_position');
-    const uTimeLoc = gl.getUniformLocation(program, 'u_time');
-    const uResolutionLoc = gl.getUniformLocation(program, 'u_resolution');
-    const uTextureLoc = gl.getUniformLocation(program, 'u_texture');
+    const aPositionLoc  = gl.getAttribLocation(program,  'a_position');
+    const uTimeLoc      = gl.getUniformLocation(program, 'u_time');
+    const uResolutionLoc= gl.getUniformLocation(program, 'u_resolution');
+    const uTextureLoc   = gl.getUniformLocation(program, 'u_texture');
 
     // Load original cyclone satellite image
     const texture = gl.createTexture();
-    const image = new Image();
-    image.src = '/cyclone_satellite_vis.jpg';
+    const image   = new Image();
+    image.src     = '/cyclone_satellite_vis.jpg';
 
     let isTextureLoaded = false;
     image.onload = () => {
@@ -186,18 +176,15 @@ export default function CycloneAtmosphericLiveView() {
     };
 
     let animationFrameId;
-    let startTime = performance.now();
+    const startTime = performance.now();
 
     function resize() {
       if (!canvas) return;
-      const displayWidth = canvas.clientWidth;
-      const displayHeight = canvas.clientHeight;
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      const width = Math.floor(displayWidth * dpr);
-      const height = Math.floor(displayHeight * dpr);
-
+      const dpr    = Math.min(window.devicePixelRatio || 1, 2);
+      const width  = Math.floor(canvas.clientWidth  * dpr);
+      const height = Math.floor(canvas.clientHeight * dpr);
       if (canvas.width !== width || canvas.height !== height) {
-        canvas.width = width;
+        canvas.width  = width;
         canvas.height = height;
         gl.viewport(0, 0, width, height);
       }
@@ -207,7 +194,7 @@ export default function CycloneAtmosphericLiveView() {
       resize();
 
       if (isTextureLoaded) {
-        const elapsedTime = (now - startTime) / 1000.0;
+        const elapsed = (now - startTime) / 1000.0;
 
         gl.useProgram(program);
 
@@ -215,7 +202,7 @@ export default function CycloneAtmosphericLiveView() {
         gl.enableVertexAttribArray(aPositionLoc);
         gl.vertexAttribPointer(aPositionLoc, 2, gl.FLOAT, false, 0, 0);
 
-        gl.uniform1f(uTimeLoc, elapsedTime);
+        gl.uniform1f(uTimeLoc,       elapsed);
         gl.uniform2f(uResolutionLoc, canvas.width, canvas.height);
 
         gl.activeTexture(gl.TEXTURE0);
@@ -232,18 +219,16 @@ export default function CycloneAtmosphericLiveView() {
 
     return () => {
       cancelAnimationFrame(animationFrameId);
-      if (gl) {
-        gl.deleteProgram(program);
-        gl.deleteShader(vertShader);
-        gl.deleteShader(fragShader);
-        gl.deleteBuffer(positionBuffer);
-        gl.deleteTexture(texture);
-      }
+      gl.deleteProgram(program);
+      gl.deleteShader(vertShader);
+      gl.deleteShader(fragShader);
+      gl.deleteBuffer(positionBuffer);
+      gl.deleteTexture(texture);
     };
   }, []);
 
   return (
-    <div 
+    <div
       ref={containerRef}
       className="absolute inset-0 overflow-hidden bg-slate-950 select-none rounded-r-2xl"
     >
