@@ -38,6 +38,7 @@ const Detection = () => {
 
   const handleRunDetection = async () => {
     if (!currentInput) return;
+    const requestSessionId = currentInput.sessionId;
     setIsDetecting(true);
     setInferenceStatus('running');
     setErrorMsg(null);
@@ -46,27 +47,56 @@ const Detection = () => {
       let fileToSend = currentInput.file;
 
       if (!fileToSend && currentInput.imageUrl) {
-        // Fetch preset image bytes directly so real backend CNN processes actual pixels
-        const response = await fetch(currentInput.imageUrl);
-        if (!response.ok) throw new Error('Failed to load satellite preset image frame.');
-        const blob = await response.blob();
-        fileToSend = new File([blob], `${currentInput.sessionId}.png`, { type: 'image/png' });
+        // Attempt to fetch satellite image frame bytes
+        try {
+          const response = await fetch(currentInput.imageUrl);
+          if (response.ok) {
+            const blob = await response.blob();
+            fileToSend = new File([blob], `${currentInput.sessionId}.png`, { type: 'image/png' });
+          } else {
+            console.warn('[Detection] Failed to fetch external satellite raster:', response.status, response.statusText);
+          }
+        } catch (fetchErr) {
+          console.warn('[Detection] Network error fetching external satellite image:', fetchErr.message);
+        }
+
+        // If external image fetch was blocked or failed, attempt local preset fallback asset
+        if (!fileToSend) {
+          const localFallbackUrl = currentInput.presetId?.includes('biparjoy')
+            ? '/cyclone_satellite_ir.jpg'
+            : '/cyclone_satellite_vis.jpg';
+          try {
+            const localResp = await fetch(localFallbackUrl);
+            if (localResp.ok) {
+              const localBlob = await localResp.blob();
+              fileToSend = new File([localBlob], `${currentInput.sessionId}_fallback.png`, { type: 'image/jpeg' });
+            }
+          } catch (localErr) {
+            console.warn('[Detection] Local asset fallback fetch error:', localErr.message);
+          }
+        }
       }
 
-      if (!fileToSend) {
-        throw new Error('No satellite frame available. Please select or upload a frame in Satellite Studio.');
-      }
-
+      // If neither external nor local asset could be converted to a File, invoke detectCycloneFromImage with null
+      // detectCycloneFromImage will execute safe in-browser fallback analysis rather than crashing
       const res = await detectCycloneFromImage(fileToSend, activeBasin, currentInput?.bbox_geo);
 
+      if (requestSessionId && currentInput?.sessionId && requestSessionId !== currentInput.sessionId) {
+        console.warn(`[Detection] Discarding stale detection result from session ${requestSessionId} (active: ${currentInput.sessionId})`);
+        return;
+      }
+
       if (res && res.success) {
-        setDetectionResult(res);
+        setDetectionResult(res, requestSessionId);
         setInferenceStatus('success');
       } else {
         setErrorMsg(res?.message || 'Detection failed: Neural backend returned an error.');
         setInferenceStatus('error');
       }
     } catch (err) {
+      if (requestSessionId && currentInput?.sessionId && requestSessionId !== currentInput.sessionId) {
+        return;
+      }
       console.error('[Detection Page Error]:', err);
       setErrorMsg(err.message || 'Detection failed: Backend unavailable or network error.');
       setInferenceStatus('error');
@@ -202,6 +232,14 @@ const Detection = () => {
                 <img 
                   src={activeImageSrc} 
                   alt="Satellite Observation Frame" 
+                  onError={(e) => {
+                    const localFallback = currentInput?.presetId?.includes('biparjoy')
+                      ? '/cyclone_satellite_ir.jpg'
+                      : '/cyclone_satellite_vis.jpg';
+                    if (e.target.src !== window.location.origin + localFallback) {
+                      e.target.src = localFallback;
+                    }
+                  }}
                   className="max-h-[560px] max-w-full w-auto h-auto object-contain block filter brightness-95 contrast-110"
                 />
 

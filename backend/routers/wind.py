@@ -37,7 +37,7 @@ from fastapi import APIRouter, HTTPException, Query
 router = APIRouter(prefix="/api/v1/wind", tags=["Global Wind Field"])
 
 # ─── Windy.com API Configuration ──────────────────────────────────────────────
-WINDY_API_KEY: str = os.environ.get("WINDY_API_KEY", "h8RC1gtsg6HRNS4Ig1VW0J25sYgQd0re")
+WINDY_API_KEY: str = os.environ.get("WINDY_API_KEY", "")
 
 # ─── Grid configuration ────────────────────────────────────────────────────────
 # 12° global grid (16 lat × 31 lon = 496 points) — strictly adheres to Open-Meteo's

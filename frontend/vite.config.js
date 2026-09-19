@@ -21,10 +21,13 @@ function duplicateCssFallback() {
         const assetsDir = path.resolve(__dirname, 'dist/assets');
         if (fs.existsSync(assetsDir)) {
           const files = fs.readdirSync(assetsDir);
-          const cssFile = files.find(f => f.endsWith('.css') && f !== 'style.css');
-          if (cssFile) {
-            fs.copyFileSync(path.join(assetsDir, cssFile), path.join(assetsDir, 'style.css'));
-            console.log(`[Vite] Copied ${cssFile} -> dist/assets/style.css as permanent fallback stylesheet.`);
+          const cssFiles = files.filter(f => f.endsWith('.css') && f !== 'style.css');
+          // Prefer main index-*.css or pick largest stylesheet
+          const primaryCss = cssFiles.find(f => f.startsWith('index-')) || 
+            cssFiles.sort((a, b) => fs.statSync(path.join(assetsDir, b)).size - fs.statSync(path.join(assetsDir, a)).size)[0];
+          if (primaryCss) {
+            fs.copyFileSync(path.join(assetsDir, primaryCss), path.join(assetsDir, 'style.css'));
+            console.log(`[Vite] Copied ${primaryCss} -> dist/assets/style.css as permanent fallback stylesheet.`);
           }
         }
       } catch (err) {
@@ -42,6 +45,31 @@ export default defineConfig({
       '/api': {
         target: 'http://localhost:8000',
         changeOrigin: true,
+      },
+    },
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('node_modules')) {
+            if (id.includes('leaflet')) {
+              return 'vendor-leaflet';
+            }
+            if (id.includes('recharts') || id.includes('d3-') || id.includes('victory-vendor')) {
+              return 'vendor-recharts';
+            }
+            if (id.includes('@heyputer/puter.js')) {
+              return 'vendor-puter';
+            }
+            if (id.includes('@clerk')) {
+              return 'vendor-clerk';
+            }
+            if (id.includes('lucide-react')) {
+              return 'vendor-lucide';
+            }
+          }
+        },
       },
     },
   },

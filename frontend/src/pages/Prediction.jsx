@@ -58,8 +58,10 @@ const createWaypointIcon = (isNow, isLandfall) => L.divIcon({
 
 const Prediction = () => {
   const navigate = useNavigate();
-  const { currentInput } = useAnalysisSession();
-  const [selectedStormId, setSelectedStormId] = useState('DANA');
+  const { currentInput, setTrajectoryResult, setLandfallPrediction, setStormPreset } = useAnalysisSession();
+  const [selectedStormId, setSelectedStormId] = useState(
+    currentInput?.presetId === 'biparjoy-2023' ? 'BIPARJOY' : 'DANA'
+  );
   const [forecastData, setForecastData] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState(null);
@@ -69,8 +71,25 @@ const Prediction = () => {
 
   const activeStorm = VERIFIED_STORMS.find(s => s.id === selectedStormId) || VERIFIED_STORMS[0];
 
+  // Sync selectedStormId if session preset changes externally
+  useEffect(() => {
+    if (currentInput?.presetId === 'biparjoy-2023' && selectedStormId !== 'BIPARJOY') {
+      setSelectedStormId('BIPARJOY');
+    } else if (currentInput?.presetId === 'dana-2024' && selectedStormId !== 'DANA') {
+      setSelectedStormId('DANA');
+    }
+  }, [currentInput?.presetId]);
+
+  const handleSelectStorm = (stormId) => {
+    setSelectedStormId(stormId);
+    if (setStormPreset) {
+      setStormPreset(stormId === 'DANA' ? 'dana-2024' : 'biparjoy-2023');
+    }
+  };
+
   useEffect(() => {
     let isMounted = true;
+    const requestSessionId = currentInput?.sessionId;
 
     const fetchForecast = async () => {
       setIsLoading(true);
@@ -86,13 +105,26 @@ const Prediction = () => {
 
         if (!isMounted) return;
 
+        // Session guard: Discard response if user switched session during async call
+        if (requestSessionId && currentInput?.sessionId && requestSessionId !== currentInput.sessionId) {
+          console.warn(`[Prediction] Discarding stale trajectory prediction from session ${requestSessionId} (active: ${currentInput.sessionId})`);
+          return;
+        }
+
         if (res && res.success) {
           setForecastData(res);
+          setTrajectoryResult(res, requestSessionId);
+          if (res.landfall_prediction) {
+            setLandfallPrediction(res.landfall_prediction, requestSessionId);
+          }
         } else {
           setErrorMsg(res?.message || 'Trajectory prediction service returned an error.');
         }
       } catch (err) {
         if (!isMounted) return;
+        if (requestSessionId && currentInput?.sessionId && requestSessionId !== currentInput.sessionId) {
+          return;
+        }
         console.error('[Trajectory Page Error]:', err);
         setErrorMsg('Failed to connect to AI Trajectory prediction backend.');
       } finally {
@@ -105,7 +137,7 @@ const Prediction = () => {
     return () => {
       isMounted = false;
     };
-  }, [selectedStormId]);
+  }, [selectedStormId, currentInput?.sessionId]);
 
   const trajectoryList = forecastData?.trajectory_forecast || [];
   const conePolygon = forecastData?.cone_polygon || [];
@@ -145,7 +177,7 @@ const Prediction = () => {
               {VERIFIED_STORMS.map((storm) => (
                 <button
                   key={storm.id}
-                  onClick={() => setSelectedStormId(storm.id)}
+                  onClick={() => handleSelectStorm(storm.id)}
                   disabled={isLoading}
                   className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                     selectedStormId === storm.id

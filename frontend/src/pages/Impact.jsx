@@ -9,6 +9,7 @@ import { MapContainer, TileLayer, Marker, Popup, Circle } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 import { predictCycloneTrack } from '../services/api';
+import { useAnalysisSession } from '../context/AnalysisSessionContext';
 import DataTypeBadge from '../components/DataTypeBadge';
 import LastUpdatedBadge from '../components/LastUpdatedBadge';
 import PageHeader from '../components/PageHeader';
@@ -52,15 +53,35 @@ const createHazardIcon = (threat = 'ORANGE') => L.divIcon({
 
 const Impact = () => {
   const navigate = useNavigate();
-  const [selectedStormId, setSelectedStormId] = useState('DANA');
+  const { currentInput, setLandfallPrediction, setTrajectoryResult, setStormPreset } = useAnalysisSession();
+  const [selectedStormId, setSelectedStormId] = useState(
+    currentInput?.presetId === 'biparjoy-2023' ? 'BIPARJOY' : 'DANA'
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [impactData, setImpactData] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
 
   const activeStorm = BENCHMARK_STORMS.find(s => s.id === selectedStormId) || BENCHMARK_STORMS[0];
 
+  // Sync selectedStormId if session preset changes externally
+  useEffect(() => {
+    if (currentInput?.presetId === 'biparjoy-2023' && selectedStormId !== 'BIPARJOY') {
+      setSelectedStormId('BIPARJOY');
+    } else if (currentInput?.presetId === 'dana-2024' && selectedStormId !== 'DANA') {
+      setSelectedStormId('DANA');
+    }
+  }, [currentInput?.presetId]);
+
+  const handleSelectStorm = (stormId) => {
+    setSelectedStormId(stormId);
+    if (setStormPreset) {
+      setStormPreset(stormId === 'DANA' ? 'dana-2024' : 'biparjoy-2023');
+    }
+  };
+
   useEffect(() => {
     let isMounted = true;
+    const requestSessionId = currentInput?.sessionId;
 
     const loadImpactAssessment = async () => {
       setIsLoading(true);
@@ -76,13 +97,25 @@ const Impact = () => {
 
         if (!isMounted) return;
 
+        if (requestSessionId && currentInput?.sessionId && requestSessionId !== currentInput.sessionId) {
+          console.warn(`[Impact] Discarding stale impact assessment from session ${requestSessionId} (active: ${currentInput.sessionId})`);
+          return;
+        }
+
         if (res && res.success) {
           setImpactData(res);
+          if (res.landfall_prediction) {
+            setLandfallPrediction(res.landfall_prediction, requestSessionId);
+          }
+          setTrajectoryResult(res, requestSessionId);
         } else {
           setErrorMsg(res?.message || 'Impact and landfall calculation unavailable.');
         }
       } catch (err) {
         if (!isMounted) return;
+        if (requestSessionId && currentInput?.sessionId && requestSessionId !== currentInput.sessionId) {
+          return;
+        }
         console.error('[Impact Page Error]:', err);
         setErrorMsg('Failed to retrieve forecast impact from VAYU backend.');
       } finally {
@@ -95,7 +128,7 @@ const Impact = () => {
     return () => {
       isMounted = false;
     };
-  }, [selectedStormId]);
+  }, [selectedStormId, currentInput?.sessionId]);
 
   const landfall = impactData?.landfall_prediction;
   const criticalDistricts = (
@@ -134,7 +167,7 @@ const Impact = () => {
                 return (
                   <button
                     key={storm.id}
-                    onClick={() => setSelectedStormId(storm.id)}
+                    onClick={() => handleSelectStorm(storm.id)}
                     disabled={isLoading}
                     className={`storm-pill-3d-btn ${isActive ? 'is-active' : ''}`}
                   >

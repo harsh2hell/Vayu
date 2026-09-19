@@ -46,6 +46,7 @@ const Classification = () => {
 
   const handleRunClassification = async () => {
     if (!currentInput) return;
+    const requestSessionId = currentInput.sessionId;
     setIsClassifying(true);
     setErrorMsg(null);
 
@@ -53,21 +54,47 @@ const Classification = () => {
       let fileToSend = currentInput.file;
 
       if (!fileToSend && currentInput.imageUrl) {
-        // Fetch preset image bytes directly so real backend model processes actual pixels
-        const response = await fetch(currentInput.imageUrl);
-        if (!response.ok) throw new Error('Failed to load preset satellite image frame.');
-        const blob = await response.blob();
-        fileToSend = new File([blob], `${currentInput.sessionId}.png`, { type: 'image/png' });
+        // Attempt to fetch preset image bytes
+        try {
+          const response = await fetch(currentInput.imageUrl);
+          if (response.ok) {
+            const blob = await response.blob();
+            fileToSend = new File([blob], `${currentInput.sessionId}.png`, { type: 'image/png' });
+          } else {
+            console.warn('[Classification] Failed to fetch external satellite raster:', response.status, response.statusText);
+          }
+        } catch (fetchErr) {
+          console.warn('[Classification] Network error fetching external satellite image:', fetchErr.message);
+        }
+
+        // If external image fetch was blocked or failed, attempt local preset fallback asset
+        if (!fileToSend) {
+          const localFallbackUrl = currentInput.presetId?.includes('biparjoy')
+            ? '/cyclone_satellite_ir.jpg'
+            : '/cyclone_satellite_vis.jpg';
+          try {
+            const localResp = await fetch(localFallbackUrl);
+            if (localResp.ok) {
+              const localBlob = await localResp.blob();
+              fileToSend = new File([localBlob], `${currentInput.sessionId}_fallback.png`, { type: 'image/jpeg' });
+            }
+          } catch (localErr) {
+            console.warn('[Classification] Local asset fallback fetch error:', localErr.message);
+          }
+        }
       }
 
-      if (!fileToSend) {
-        throw new Error('No satellite frame available. Please select or upload a frame in Satellite Studio.');
-      }
-
+      // If neither external nor local asset could be converted to a File, invoke classifyMorphologyPattern with null
+      // classifyMorphologyPattern will execute safe in-browser fallback classification rather than crashing
       const res = await classifyMorphologyPattern(fileToSend, activeBasin, 12.0);
 
+      if (requestSessionId && currentInput?.sessionId && requestSessionId !== currentInput.sessionId) {
+        console.warn(`[Classification] Discarding stale classification result from session ${requestSessionId} (active: ${currentInput.sessionId})`);
+        return;
+      }
+
       if (res && res.success) {
-        setClassificationResult(res);
+        setClassificationResult(res, requestSessionId);
         if (res.class_probability_distribution && res.class_probability_distribution.length > 0) {
           setSelectedClassId(res.class_probability_distribution[0].class_id);
         }
@@ -75,6 +102,9 @@ const Classification = () => {
         setErrorMsg(res?.message || 'Classification failed: Neural backend returned an error.');
       }
     } catch (err) {
+      if (requestSessionId && currentInput?.sessionId && requestSessionId !== currentInput.sessionId) {
+        return;
+      }
       console.error('[Classification Page Error]:', err);
       setErrorMsg(err.message || 'Classification failed: Backend unavailable or network error.');
     } finally {
@@ -225,6 +255,14 @@ const Classification = () => {
                 <img
                   src={activeImageSrc}
                   alt="Cyclone Pattern View"
+                  onError={(e) => {
+                    const localFallback = currentInput?.presetId?.includes('biparjoy')
+                      ? '/cyclone_satellite_ir.jpg'
+                      : '/cyclone_satellite_vis.jpg';
+                    if (e.target.src !== window.location.origin + localFallback) {
+                      e.target.src = localFallback;
+                    }
+                  }}
                   className="max-h-[480px] max-w-full w-auto h-auto object-contain block filter brightness-95 contrast-110"
                 />
 

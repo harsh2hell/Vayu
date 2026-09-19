@@ -1,8 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { 
-  Bell, Clock, ChevronRight, ExternalLink, User, LogOut, Search,
+  Bell, Clock, Search,
   Sun, Moon, History, Sidebar, Menu, X, Check, ShieldAlert,
-  AlertTriangle, Info, ArrowRight, Sparkles, Compass
+  AlertTriangle, Info, ArrowRight
 } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { toPortalPath } from '../utils/domain';
@@ -404,18 +404,7 @@ const Topbar = ({ onOpenAiAnalyst }) => {
               )}
             </div>
 
-            {/* 4. VAYU AI Analyst Header Action Button */}
-            {onOpenAiAnalyst && (
-              <button
-                type="button"
-                onClick={onOpenAiAnalyst}
-                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-sky-50 dark:bg-sky-950/60 hover:bg-sky-100 dark:hover:bg-sky-900/60 text-sky-700 dark:text-sky-300 border border-sky-200/80 dark:border-sky-800/80 transition-colors cursor-pointer shadow-2xs"
-                title="Open VAYU AI Operational Analyst"
-              >
-                <Sparkles className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-                <span className="hidden md:inline">AI Analyst</span>
-              </button>
-            )}
+
 
             {/* 5. Right Sidebar / Insights Quick Toggle */}
             <button 

@@ -45,6 +45,24 @@ export const isPortalSubdomain = () => {
   return false;
 };
 
+export const isStatusSubdomain = () => {
+  const host = getHostname();
+  if (
+    host.startsWith('status.') ||
+    host.includes('status-')
+  ) {
+    return true;
+  }
+  // Allow simulation/testing in dev via ?status=true or ?subdomain=status
+  if (typeof window !== 'undefined' && window.location.search) {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('status') === 'true' || params.get('subdomain') === 'status') {
+      return true;
+    }
+  }
+  return false;
+};
+
 // URL generators for seamless cross-subdomain transitions
 export const getWebsiteUrl = (path = '/') => {
   const cleanPath = path.startsWith('/') ? path : `/${path}`;
@@ -74,6 +92,14 @@ export const getAuthUrl = (redirectTarget) => {
     return `https://login.vayusat.live?redirect_url=${encodeURIComponent(target)}`;
   }
   return `/login?redirect_url=${encodeURIComponent(target)}`;
+};
+
+export const getStatusUrl = (subPath = '') => {
+  const cleanPath = subPath ? (subPath.startsWith('/') ? subPath : `/${subPath}`) : '';
+  if (isProductionDomain()) {
+    return `https://status.vayusat.live${cleanPath || '/'}`;
+  }
+  return `/status${cleanPath}`;
 };
 
 /**

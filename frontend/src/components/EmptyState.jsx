@@ -3,7 +3,7 @@ import { AlertCircle } from 'lucide-react';
 
 /**
  * Standard VAYU Unified Empty State Component
- * Replaces disparate, jarring warning boxes with a clean, professional placeholder.
+ * Clean, professional, monochromatic placeholder.
  */
 const EmptyState = ({
   icon: Icon = AlertCircle,
@@ -13,14 +13,14 @@ const EmptyState = ({
   children = null
 }) => {
   return (
-    <div className="p-8 sm:p-12 text-center flex flex-col items-center justify-center rounded-2xl bg-slate-50/50 border border-slate-100">
-      <div className="w-12 h-12 rounded-2xl bg-white border border-slate-100 text-slate-400 flex items-center justify-center mb-3 shadow-sm">
-        <Icon className="w-6 h-6 stroke-[1.75]" />
+    <div className="p-8 sm:p-10 text-center flex flex-col items-center justify-center rounded-2xl bg-slate-50/70 dark:bg-slate-900/40 border border-slate-200/80 dark:border-slate-800">
+      <div className="w-11 h-11 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-400 dark:text-slate-500 flex items-center justify-center mb-3 shadow-xs">
+        <Icon className="w-5 h-5 stroke-[1.75]" />
       </div>
-      <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider font-mono">
+      <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider font-mono">
         {title}
       </h4>
-      <p className="text-xs text-slate-500 max-w-md mt-1 leading-relaxed">
+      <p className="text-xs text-slate-500 dark:text-slate-400 max-w-md mt-1 leading-relaxed">
         {description}
       </p>
       {children && (

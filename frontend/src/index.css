@@ -1396,4 +1396,48 @@ header .header-theme-btn {
   }
 }
 
+/* Gemini / Claude / GPT Style Top-to-Down Visibility Fade Animations */
+@keyframes streamRevealFade {
+  0% {
+    opacity: 0;
+    transform: translateY(5px);
+    filter: blur(1.5px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+.animate-stream-reveal {
+  animation: streamRevealFade 0.28s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes promptCardStagger {
+  0% {
+    opacity: 0;
+    transform: translateY(12px) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-stagger-in {
+  animation: promptCardStagger 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes shimmerText {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+.animate-shimmer {
+  background-size: 200% 100%;
+  animation: shimmerText 2.5s ease-in-out infinite;
+}
+
+
 

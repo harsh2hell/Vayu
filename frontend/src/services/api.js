@@ -1065,6 +1065,8 @@ export async function fetchLivePointWindTelemetry(lat, lon) {
   return null;
 }
 
+export const fetchLivePointWind = fetchLivePointWindTelemetry;
+
 /**
  * Fetches real-time atmospheric telemetry at the center of an active/historical cyclone system.
  */

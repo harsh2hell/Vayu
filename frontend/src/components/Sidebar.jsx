@@ -4,7 +4,8 @@ import {
   LogOut, Shield, ChevronRight, ChevronDown,
   PieChart, Globe, Satellite, Crosshair, Layers,
   Compass, MapPin, Database, Cpu, FileText,
-  User, Briefcase, BookOpen, MessageSquare, ShieldCheck
+  User, Briefcase, BookOpen, MessageSquare, ShieldCheck,
+  Activity
 } from 'lucide-react';
 import { OfficerAccountDisplay, SafeSignOutButton } from './auth/ClerkAuth';
 import { getWebsiteUrl, isProductionDomain, toPortalPath } from '../utils/domain';
@@ -136,7 +137,8 @@ const Sidebar = () => {
     { path: toPortalPath('/dashboard/classification'), label: 'Morphology', icon: Layers },
     { path: toPortalPath('/dashboard/archives'), label: 'Historical', icon: Database },
     { path: toPortalPath('/dashboard/models'), label: 'AI Intelligence', icon: Cpu },
-    { path: toPortalPath('/dashboard/bulletin'), label: 'Official Reports', icon: FileText }
+    { path: toPortalPath('/dashboard/bulletin'), label: 'Official Reports', icon: FileText },
+    { path: toPortalPath('/dashboard/status'), label: 'System Status', icon: Activity }
   ];
 
   return (

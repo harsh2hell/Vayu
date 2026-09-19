@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { PhoneCall, Menu, X, ChevronRight, Clock, Sun, Moon } from 'lucide-react';
 import { useLiveClock } from '../utils/liveDateTime';
+import { getStatusUrl, isProductionDomain } from '../utils/domain';
 
 export const FONT_SCALE_MAP = {
   '-3': 75,
@@ -114,8 +115,125 @@ const PublicNavbar = ({
       path: '/safety-updates',
       label: isHindi ? 'बुलेटिन व सुरक्षा' : 'Bulletins & Safety',
       match: ['/safety-updates', '/bulletins', '/safety-guide', '/safety', '/updates']
+    },
+    {
+      path: '/status',
+      label: isHindi ? 'सिस्टम स्थिति' : 'System Status',
+      match: ['/status']
     }
   ];
+
+  const [isPastHeroLocal, setIsPastHeroLocal] = useState(false);
+  const isPastHeroRef = useRef(false);
+  const isPastHero = isPastHeroLocal;
+
+  useEffect(() => {
+    let rafId = null;
+
+    const checkScroll = () => {
+      const currentY = window.scrollY;
+      const heroH1 = document.querySelector('#three-globe-hero h1') || document.querySelector('h1');
+
+      let shouldCollapse = false;
+      let shouldExpand = false;
+
+      if (heroH1) {
+        const bottom = heroH1.getBoundingClientRect().bottom;
+        shouldCollapse = bottom <= 75;
+        shouldExpand = bottom >= 135;
+      } else {
+        shouldCollapse = currentY > 220;
+        shouldExpand = currentY < 160;
+      }
+
+      if (!isPastHeroRef.current && shouldCollapse) {
+        isPastHeroRef.current = true;
+        setIsPastHeroLocal(true);
+      } else if (isPastHeroRef.current && shouldExpand) {
+        isPastHeroRef.current = false;
+        setIsPastHeroLocal(false);
+      }
+    };
+
+    const onScroll = () => {
+      if (rafId !== null) return;
+      rafId = window.requestAnimationFrame(() => {
+        checkScroll();
+        rafId = null;
+      });
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll, { passive: true });
+
+    const t1 = setTimeout(checkScroll, 60);
+    const t2 = setTimeout(checkScroll, 350);
+
+    return () => {
+      if (rafId !== null) window.cancelAnimationFrame(rafId);
+      clearTimeout(t1);
+      clearTimeout(t2);
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
+    };
+  }, [location.pathname]);
+
+  const navTrackRef = useRef(null);
+  const itemRefs = useRef([]);
+  const [hoveredIdx, setHoveredIdx] = useState(null);
+  const [pillRect, setPillRect] = useState({ left: 0, top: 0, width: 0, height: 0, ready: false });
+  const [glassMouse, setGlassMouse] = useState({ x: 0, y: 0, isHovered: false });
+
+  const activeIdx = NAV_LINKS.findIndex(l => l.match.includes(location.pathname));
+  const validActiveIdx = activeIdx >= 0 ? activeIdx : 0;
+  const targetIdx = hoveredIdx !== null ? hoveredIdx : validActiveIdx;
+
+  const updatePill = useCallback(() => {
+    const track = navTrackRef.current;
+    const targetEl = itemRefs.current[targetIdx];
+    if (!track || !targetEl) return;
+    const trackRect = track.getBoundingClientRect();
+    const targetRect = targetEl.getBoundingClientRect();
+    setPillRect({
+      left: targetRect.left - trackRect.left,
+      top: targetRect.top - trackRect.top,
+      width: targetRect.width,
+      height: targetRect.height,
+      ready: true
+    });
+  }, [targetIdx]);
+
+  useEffect(() => {
+    updatePill();
+    window.addEventListener('resize', updatePill);
+    window.addEventListener('fontScaleChange', updatePill);
+    const t = setTimeout(updatePill, 40);
+    return () => {
+      window.removeEventListener('resize', updatePill);
+      window.removeEventListener('fontScaleChange', updatePill);
+      clearTimeout(t);
+    };
+  }, [updatePill, location.pathname, isHindi]);
+
+  const handleNavWheel = (e) => {
+    if (!navTrackRef.current) return;
+    if (e.deltaY !== 0) {
+      navTrackRef.current.scrollLeft += e.deltaY;
+    }
+  };
+
+  const handleNavMouseMove = (e) => {
+    if (!navTrackRef.current) return;
+    const trackRect = navTrackRef.current.getBoundingClientRect();
+    const relX = e.clientX - trackRect.left - pillRect.left;
+    const relY = e.clientY - trackRect.top - pillRect.top;
+    setGlassMouse({ x: relX, y: relY, isHovered: true });
+  };
+
+  const handleNavMouseLeave = () => {
+    setHoveredIdx(null);
+    setGlassMouse(prev => ({ ...prev, isHovered: false }));
+  };
 
   return (
     <header className={`sticky top-0 z-[1000] w-full transition-all duration-300 header-glass-bar ${isScrolled ? 'is-scrolled' : ''
@@ -218,6 +336,8 @@ const PublicNavbar = ({
                   setHoveredIdx(null);
                   if (link.path === '/' && location.pathname === '/') {
                     window.scrollTo({ top: 0, behavior: 'smooth' });
+                  } else if (link.path === '/status' && isProductionDomain()) {
+                    window.location.href = getStatusUrl('/status');
                   } else {
                     navigate(link.path);
                   }
@@ -316,6 +436,8 @@ const PublicNavbar = ({
                 setIsMobileMenuOpen(false);
                 if (link.path === '/' && location.pathname === '/') {
                   window.scrollTo({ top: 0, behavior: 'smooth' });
+                } else if (link.path === '/status' && isProductionDomain()) {
+                  window.location.href = getStatusUrl('/status');
                 } else {
                   navigate(link.path);
                 }

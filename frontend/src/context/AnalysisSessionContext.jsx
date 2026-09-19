@@ -46,6 +46,9 @@ export const AnalysisSessionProvider = ({ children }) => {
         sizeKb: null,
         type: 'NASA GIBS Tile Snapshot'
       },
+      date: defaultPreset.date,
+      observation_date: defaultPreset.date,
+      session_created_at: new Date().toISOString(),
       timestamp: new Date().toISOString()
     };
   });
@@ -54,7 +57,11 @@ export const AnalysisSessionProvider = ({ children }) => {
   const [sessionResults, setSessionResults] = useState({
     sessionId: `session_preset_${DEFAULT_PRESETS[0].id}_init`,
     detectionResult: null,
-    classificationResult: null
+    classificationResult: null,
+    trajectoryResult: null,
+    landfallPrediction: null,
+    environmentalResult: null,
+    windTelemetry: null
   });
 
   // Switch input to a user-uploaded image (generates a new unique sessionId and clears dependent results)
@@ -80,6 +87,9 @@ export const AnalysisSessionProvider = ({ children }) => {
         sizeKb: metadata.sizeKb || (file.size / 1024).toFixed(1),
         type: file.type || 'image/png'
       },
+      date: null,
+      observation_date: metadata.observation_date || null,
+      session_created_at: new Date().toISOString(),
       timestamp: new Date().toISOString()
     });
 
@@ -87,12 +97,25 @@ export const AnalysisSessionProvider = ({ children }) => {
     setSessionResults({
       sessionId: newSessionId,
       detectionResult: null,
-      classificationResult: null
+      classificationResult: null,
+      trajectoryResult: null,
+      landfallPrediction: null,
+      environmentalResult: null,
+      windTelemetry: null
     });
   }, []);
 
-  // Switch input to a verified benchmark preset
-  const setInputFromPreset = useCallback((preset) => {
+  // Switch input to a verified benchmark preset (accepts preset object OR string ID like 'dana-2024' or 'DANA')
+  const setInputFromPreset = useCallback((presetOrId) => {
+    let preset = presetOrId;
+    if (typeof presetOrId === 'string') {
+      const normalized = presetOrId.toLowerCase();
+      preset = DEFAULT_PRESETS.find(p => p.id === normalized || p.id.includes(normalized) || normalized.includes(p.id)) || DEFAULT_PRESETS[0];
+    }
+    if (!preset || !preset.id) {
+      preset = DEFAULT_PRESETS[0];
+    }
+
     const newSessionId = `session_preset_${preset.id}_${Date.now()}`;
     
     setCurrentInput({
@@ -113,6 +136,9 @@ export const AnalysisSessionProvider = ({ children }) => {
         sizeKb: null,
         type: 'NASA GIBS Tile Snapshot'
       },
+      date: preset.date,
+      observation_date: preset.date,
+      session_created_at: new Date().toISOString(),
       timestamp: new Date().toISOString()
     });
 
@@ -120,15 +146,29 @@ export const AnalysisSessionProvider = ({ children }) => {
     setSessionResults({
       sessionId: newSessionId,
       detectionResult: null,
-      classificationResult: null
+      classificationResult: null,
+      trajectoryResult: null,
+      landfallPrediction: null,
+      environmentalResult: null,
+      windTelemetry: null
     });
   }, []);
 
-  // Store MobileNetV3 Detection Result for the current session
-  const setDetectionResult = useCallback((result) => {
+  // Canonical alias for preset switching
+  const setStormPreset = setInputFromPreset;
+  const setActiveStormPreset = setInputFromPreset;
+
+  // Store MobileNetV3 Detection Result for the current session (with async session guard)
+  const setDetectionResult = useCallback((result, expectedSessionId = null) => {
     if (!result) return;
+    const originSessionId = expectedSessionId || result.sessionId;
+    if (originSessionId && originSessionId !== currentInput.sessionId) {
+      console.warn(`[Session Guard] Discarding stale detection result from session ${originSessionId} (active: ${currentInput.sessionId})`);
+      return;
+    }
     setSessionResults(prev => ({
       ...prev,
+      sessionId: currentInput.sessionId,
       detectionResult: {
         ...result,
         sessionId: currentInput.sessionId
@@ -136,11 +176,17 @@ export const AnalysisSessionProvider = ({ children }) => {
     }));
   }, [currentInput.sessionId]);
 
-  // Store ResNet18 Morphology Classification Result for the current session
-  const setClassificationResult = useCallback((result) => {
+  // Store ResNet18 Morphology Classification Result for the current session (with async session guard)
+  const setClassificationResult = useCallback((result, expectedSessionId = null) => {
     if (!result) return;
+    const originSessionId = expectedSessionId || result.sessionId;
+    if (originSessionId && originSessionId !== currentInput.sessionId) {
+      console.warn(`[Session Guard] Discarding stale classification result from session ${originSessionId} (active: ${currentInput.sessionId})`);
+      return;
+    }
     setSessionResults(prev => ({
       ...prev,
+      sessionId: currentInput.sessionId,
       classificationResult: {
         ...result,
         sessionId: currentInput.sessionId
@@ -148,12 +194,117 @@ export const AnalysisSessionProvider = ({ children }) => {
     }));
   }, [currentInput.sessionId]);
 
-  // Store both Detection + Classification results (e.g., from Satellite "Run AI Analysis")
-  const setFullPipelineResults = useCallback(({ detectionResult, classificationResult }) => {
-    setSessionResults({
+  // Store Trajectory-GRU Forecast Result for the current session (with async session guard)
+  const setTrajectoryResult = useCallback((result, expectedSessionId = null) => {
+    if (!result) return;
+    const originSessionId = expectedSessionId || result.sessionId;
+    if (originSessionId && originSessionId !== currentInput.sessionId) {
+      console.warn(`[Session Guard] Discarding stale trajectory result from session ${originSessionId} (active: ${currentInput.sessionId})`);
+      return;
+    }
+    setSessionResults(prev => ({
+      ...prev,
       sessionId: currentInput.sessionId,
-      detectionResult: detectionResult ? { ...detectionResult, sessionId: currentInput.sessionId } : null,
-      classificationResult: classificationResult ? { ...classificationResult, sessionId: currentInput.sessionId } : null
+      trajectoryResult: {
+        ...result,
+        sessionId: currentInput.sessionId
+      }
+    }));
+  }, [currentInput.sessionId]);
+
+  // Store Landfall Prediction Result for the current session (with async session guard)
+  const setLandfallPrediction = useCallback((result, expectedSessionId = null) => {
+    if (!result) return;
+    const originSessionId = expectedSessionId || result.sessionId;
+    if (originSessionId && originSessionId !== currentInput.sessionId) {
+      console.warn(`[Session Guard] Discarding stale landfall prediction from session ${originSessionId} (active: ${currentInput.sessionId})`);
+      return;
+    }
+    setSessionResults(prev => ({
+      ...prev,
+      sessionId: currentInput.sessionId,
+      landfallPrediction: {
+        ...result,
+        sessionId: currentInput.sessionId
+      }
+    }));
+  }, [currentInput.sessionId]);
+
+  // Store Environmental & Multi-Source Fusion Result for the current session (with async session guard)
+  const setEnvironmentalResult = useCallback((result, expectedSessionId = null) => {
+    if (!result) return;
+    const originSessionId = expectedSessionId || result.sessionId;
+    if (originSessionId && originSessionId !== currentInput.sessionId) {
+      console.warn(`[Session Guard] Discarding stale environmental result from session ${originSessionId} (active: ${currentInput.sessionId})`);
+      return;
+    }
+    setSessionResults(prev => ({
+      ...prev,
+      sessionId: currentInput.sessionId,
+      environmentalResult: {
+        ...result,
+        sessionId: currentInput.sessionId
+      }
+    }));
+  }, [currentInput.sessionId]);
+
+  // Store Real-Time Point Wind Telemetry for the current session (with async session guard)
+  const setWindTelemetry = useCallback((result, expectedSessionId = null) => {
+    if (!result) return;
+    const originSessionId = expectedSessionId || result.sessionId;
+    if (originSessionId && originSessionId !== currentInput.sessionId) {
+      console.warn(`[Session Guard] Discarding stale wind telemetry from session ${originSessionId} (active: ${currentInput.sessionId})`);
+      return;
+    }
+    setSessionResults(prev => ({
+      ...prev,
+      sessionId: currentInput.sessionId,
+      windTelemetry: {
+        ...result,
+        sessionId: currentInput.sessionId
+      }
+    }));
+  }, [currentInput.sessionId]);
+
+  // Store multi-module pipeline results safely without breaking existing callers
+  const setFullPipelineResults = useCallback((payload = {}, expectedSessionId = null) => {
+    const originSessionId = expectedSessionId || payload.sessionId;
+    if (originSessionId && originSessionId !== currentInput.sessionId) {
+      console.warn(`[Session Guard] Discarding stale full pipeline results from session ${originSessionId} (active: ${currentInput.sessionId})`);
+      return;
+    }
+    const { 
+      detectionResult, 
+      classificationResult, 
+      trajectoryResult, 
+      landfallPrediction, 
+      environmentalResult, 
+      windTelemetry 
+    } = payload;
+
+    setSessionResults(prev => {
+      const isSameSession = prev.sessionId === currentInput.sessionId;
+      return {
+        sessionId: currentInput.sessionId,
+        detectionResult: detectionResult !== undefined
+          ? (detectionResult ? { ...detectionResult, sessionId: currentInput.sessionId } : null)
+          : (isSameSession ? prev.detectionResult : null),
+        classificationResult: classificationResult !== undefined
+          ? (classificationResult ? { ...classificationResult, sessionId: currentInput.sessionId } : null)
+          : (isSameSession ? prev.classificationResult : null),
+        trajectoryResult: trajectoryResult !== undefined
+          ? (trajectoryResult ? { ...trajectoryResult, sessionId: currentInput.sessionId } : null)
+          : (isSameSession ? prev.trajectoryResult : null),
+        landfallPrediction: landfallPrediction !== undefined
+          ? (landfallPrediction ? { ...landfallPrediction, sessionId: currentInput.sessionId } : null)
+          : (isSameSession ? prev.landfallPrediction : null),
+        environmentalResult: environmentalResult !== undefined
+          ? (environmentalResult ? { ...environmentalResult, sessionId: currentInput.sessionId } : null)
+          : (isSameSession ? prev.environmentalResult : null),
+        windTelemetry: windTelemetry !== undefined
+          ? (windTelemetry ? { ...windTelemetry, sessionId: currentInput.sessionId } : null)
+          : (isSameSession ? prev.windTelemetry : null)
+      };
     });
   }, [currentInput.sessionId]);
 
@@ -172,23 +323,71 @@ export const AnalysisSessionProvider = ({ children }) => {
     return null;
   }, [sessionResults, currentInput.sessionId]);
 
+  const activeTrajectoryResult = useMemo(() => {
+    if (sessionResults.sessionId === currentInput.sessionId) {
+      return sessionResults.trajectoryResult;
+    }
+    return null;
+  }, [sessionResults, currentInput.sessionId]);
+
+  const activeLandfallPrediction = useMemo(() => {
+    if (sessionResults.sessionId === currentInput.sessionId) {
+      return sessionResults.landfallPrediction;
+    }
+    return null;
+  }, [sessionResults, currentInput.sessionId]);
+
+  const activeEnvironmentalResult = useMemo(() => {
+    if (sessionResults.sessionId === currentInput.sessionId) {
+      return sessionResults.environmentalResult;
+    }
+    return null;
+  }, [sessionResults, currentInput.sessionId]);
+
+  const activeWindTelemetry = useMemo(() => {
+    if (sessionResults.sessionId === currentInput.sessionId) {
+      return sessionResults.windTelemetry;
+    }
+    return null;
+  }, [sessionResults, currentInput.sessionId]);
+
   const value = useMemo(() => ({
     currentInput,
     detectionResult: activeDetectionResult,
     classificationResult: activeClassificationResult,
+    trajectoryResult: activeTrajectoryResult,
+    landfallPrediction: activeLandfallPrediction,
+    environmentalResult: activeEnvironmentalResult,
+    windTelemetry: activeWindTelemetry,
     setInputFromUpload,
     setInputFromPreset,
+    setStormPreset,
+    setActiveStormPreset,
     setDetectionResult,
     setClassificationResult,
+    setTrajectoryResult,
+    setLandfallPrediction,
+    setEnvironmentalResult,
+    setWindTelemetry,
     setFullPipelineResults
   }), [
     currentInput,
     activeDetectionResult,
     activeClassificationResult,
+    activeTrajectoryResult,
+    activeLandfallPrediction,
+    activeEnvironmentalResult,
+    activeWindTelemetry,
     setInputFromUpload,
     setInputFromPreset,
+    setStormPreset,
+    setActiveStormPreset,
     setDetectionResult,
     setClassificationResult,
+    setTrajectoryResult,
+    setLandfallPrediction,
+    setEnvironmentalResult,
+    setWindTelemetry,
     setFullPipelineResults
   ]);
 

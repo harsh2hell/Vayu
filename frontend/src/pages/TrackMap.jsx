@@ -14,6 +14,7 @@ import L from 'leaflet';
 import icon from 'leaflet/dist/images/marker-icon.png';
 import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 import { predictCycloneTrack, fetchNasaGibsLayers, getFormattedLastUpdated } from '../services/api';
+import { useAnalysisSession } from '../context/AnalysisSessionContext';
 import DataTypeBadge from '../components/DataTypeBadge';
 import LastUpdatedBadge from '../components/LastUpdatedBadge';
 
@@ -121,6 +122,7 @@ const MapController = ({ center, zoom }) => {
 };
 
 const TrackMap = () => {
+  const { currentInput, setTrajectoryResult, setLandfallPrediction } = useAnalysisSession();
   const [selectedBasin, setSelectedBasin] = useState('Bay of Bengal');
   const [activeStep, setActiveStep] = useState(3);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -143,27 +145,57 @@ const TrackMap = () => {
 
   // Fetch or recompute prediction whenever basin, SST, or shear changes
   useEffect(() => {
+    let isMounted = true;
+    const requestSessionId = currentInput?.sessionId;
+
     const runPrediction = async () => {
       setIsLoadingForecast(true);
       const init = currentSystem.initialFix;
       const stormId = selectedBasin === 'Bay of Bengal' ? 'DANA' : 'BIPARJOY';
-      const res = await predictCycloneTrack({
-        lat: init.lat,
-        lon: init.lon,
-        wind: init.wind,
-        mslp: init.mslp,
-        sst: sstInput,
-        shear: shearInput,
-        basin: selectedBasin,
-        storm_id: stormId
-      });
-      setForecastData(res);
-      setIsLoadingForecast(false);
-      setLastUpdated(getFormattedLastUpdated());
+
+      try {
+        const res = await predictCycloneTrack({
+          lat: init.lat,
+          lon: init.lon,
+          wind: init.wind,
+          mslp: init.mslp,
+          sst: sstInput,
+          shear: shearInput,
+          basin: selectedBasin,
+          storm_id: stormId
+        });
+
+        if (!isMounted) return;
+
+        if (requestSessionId && currentInput?.sessionId && requestSessionId !== currentInput.sessionId) {
+          console.warn(`[TrackMap] Discarding stale trajectory result from session ${requestSessionId} (active: ${currentInput.sessionId})`);
+          return;
+        }
+
+        setForecastData(res);
+        if (res && res.success) {
+          setTrajectoryResult(res, requestSessionId);
+          if (res.landfall_prediction) {
+            setLandfallPrediction(res.landfall_prediction, requestSessionId);
+          }
+        }
+      } catch (err) {
+        if (!isMounted) return;
+        console.error('[TrackMap Error]:', err);
+      } finally {
+        if (isMounted) {
+          setIsLoadingForecast(false);
+          setLastUpdated(getFormattedLastUpdated());
+        }
+      }
     };
 
     runPrediction();
-  }, [selectedBasin, sstInput, shearInput]);
+
+    return () => {
+      isMounted = false;
+    };
+  }, [selectedBasin, sstInput, shearInput, currentInput?.sessionId]);
 
   const timeSteps = (forecastData && forecastData.success) ? (forecastData.trajectory_forecast || []) : [];
   const currentPoint = timeSteps[activeStep] || timeSteps[0] || {

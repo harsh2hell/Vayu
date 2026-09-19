@@ -133,7 +133,7 @@ function serializeClassification(classification) {
  * @param {Object|null} trajectory - Trajectory prediction result from API or state
  * @returns {Object|null} Clean trajectory block with explicit source attribution
  */
-function serializeTrajectory(trajectory) {
+function serializeTrajectory(trajectory, landfallOverride = null) {
   if (!trajectory || typeof trajectory !== 'object') return null;
 
   const rawSteps = Array.isArray(trajectory.trajectory_forecast)
@@ -157,7 +157,27 @@ function serializeTrajectory(trajectory) {
   }
 
   // Landfall prediction
-  const lf = trajectory.landfall_prediction || trajectory.landfall || null;
+  const lf = trajectory.landfall_prediction || trajectory.landfall || landfallOverride || null;
+
+  // Coastal strike probabilities if produced by VAYU pipeline
+  const rawDistricts = trajectory.coastal_strike_probabilities
+    || (lf && lf.coastal_strike_probabilities)
+    || trajectory.impact_assessment?.critical_districts
+    || (landfallOverride && landfallOverride.coastal_strike_probabilities)
+    || null;
+
+  let coastalStrikeProbabilities = null;
+  if (Array.isArray(rawDistricts) && rawDistricts.length > 0) {
+    coastalStrikeProbabilities = rawDistricts.slice(0, 6).map(d => ({
+      district: d.district || d.name || 'Coastal District',
+      state: d.state || null,
+      strike_probability_pct: safeFloat(d.strike_prob_pct ?? d.probability_pct ?? d.strike_probability_pct, 1),
+      surge_height_m: d.surge_height_m ?? d.surge_potential_m ?? null,
+      rainfall_24h_mm: safeFloat(d.rainfall_24h_mm ?? d.estimated_rainfall_mm ?? d.rainfall_mm, 1),
+      threat_level: d.threat_level || d.warning_level || null
+    })).filter(d => d.strike_probability_pct !== null);
+  }
+
   let landfallData = null;
   if (lf && typeof lf === 'object') {
     landfallData = {
@@ -169,13 +189,35 @@ function serializeTrajectory(trajectory) {
       landfall_coordinates: (lf.lat !== undefined && lf.lon !== undefined) ? {
         latitude: safeFloat(lf.lat),
         longitude: safeFloat(lf.lon)
-      } : null
+      } : null,
+      coastal_strike_probabilities: coastalStrikeProbabilities
+    };
+  } else if (coastalStrikeProbabilities && coastalStrikeProbabilities.length > 0) {
+    landfallData = {
+      is_landfall_projected: true,
+      target_coast: null,
+      estimated_time: null,
+      expected_wind_at_landfall_kmh: null,
+      projected_storm_surge_m: null,
+      landfall_coordinates: null,
+      coastal_strike_probabilities: coastalStrikeProbabilities
     };
   }
+
+  const mcSamples = safeInt(trajectory.mc_dropout_samples ?? trajectory._model_meta?.mc_dropout_samples);
+  const maxUncertaintyKm = (sanitizedSteps && sanitizedSteps.length > 0)
+    ? Math.max(...sanitizedSteps.map(s => s.uncertainty_radius_km || 0).filter(Boolean))
+    : null;
 
   return {
     source: 'VAYU 2-Layer GRU Spatiotemporal Trajectory Forecaster',
     forecast_status: trajectory.forecast_status || 'OPERATIONAL',
+    mc_dropout_samples: mcSamples,
+    uncertainty_envelope_km: maxUncertaintyKm !== null ? {
+      initial_radius_km: sanitizedSteps[0]?.uncertainty_radius_km ?? null,
+      horizon_24h_radius_km: sanitizedSteps.find(s => s.hour === 24)?.uncertainty_radius_km ?? null,
+      horizon_72h_radius_km: sanitizedSteps[sanitizedSteps.length - 1]?.uncertainty_radius_km ?? null
+    } : null,
     trajectory_milestones: sanitizedSteps,
     landfall_projection: landfallData
   };
@@ -190,11 +232,13 @@ function serializeTrajectory(trajectory) {
 function serializeEnvironment(envData) {
   if (!envData || typeof envData !== 'object') return null;
 
-  const sst = safeFloat(envData.sst_celsius ?? envData.sea_surface_temp_c ?? envData.sst, 1);
-  const shear = safeFloat(envData.vertical_shear_knots ?? envData.shear_knots ?? envData.shear, 1);
-  const rh = safeFloat(envData.mid_level_rh_pct ?? envData.mid_level_relative_humidity_pct ?? envData.humidity, 1);
-  const mpi = safeFloat(envData.max_potential_intensity_kmh, 1);
-  const ri = envData.rapid_intensification_analysis || envData.rapid_intensification || null;
+  const thermo = envData.environmental_thermodynamics || envData;
+
+  const sst = safeFloat(thermo.sea_surface_temperature_c ?? thermo.sst_celsius ?? thermo.sea_surface_temp_c ?? thermo.sst, 1);
+  const shear = safeFloat(thermo.vertical_wind_shear_knots ?? thermo.vertical_shear_knots ?? thermo.shear_knots ?? thermo.shear, 1);
+  const rh = safeFloat(thermo.mid_level_relative_humidity_pct ?? thermo.mid_level_rh_pct ?? thermo.humidity, 1);
+  const mpi = safeFloat(thermo.maximum_potential_intensity_kmh ?? thermo.max_potential_intensity_kmh, 1);
+  const ri = envData.rapid_intensification_analysis || thermo.rapid_intensification_analysis || envData.rapid_intensification || thermo.rapid_intensification || null;
 
   if (sst === null && shear === null && rh === null && ri === null) {
     return null;
@@ -245,7 +289,63 @@ export function buildCyclonePromptContext(session) {
     || 'Active Tropical System';
 
   const basin = session.basin || currentInput.basin || 'North Indian Ocean (Bay of Bengal / Arabian Sea)';
-  const timestamp = session.timestamp || currentInput.timestamp || new Date().toISOString();
+
+  // Application / browser session initialization timestamp (strictly preserved for session tracking)
+  const sessionCreatedAt = session.session_created_at
+    || currentInput.session_created_at
+    || session.timestamp
+    || currentInput.timestamp
+    || new Date().toISOString();
+
+  // Authoritative genuine observation timestamp if available from live stream or satellite telemetry
+  const authoritativeObservationTime = session.windTelemetry?.timestamp
+    || session.observation_time
+    || session.telemetry_timestamp
+    || session.satellite_timestamp
+    || session.detectionResult?.observation_time
+    || session.classificationResult?.observation_time
+    || currentInput.metadata?.observation_time
+    || currentInput.metadata?.telemetry_timestamp
+    || null;
+
+  // Authoritative historical observation date (e.g. '2024-10-24' for Cyclone DANA)
+  const presetDates = {
+    'dana-2024': '2024-10-24',
+    'cyclone_dana_2024': '2024-10-24',
+    'dana': '2024-10-24',
+    'biparjoy-2023': '2023-06-12',
+    'biparjoy': '2023-06-12'
+  };
+  const presetKey = currentInput.presetId || session.presetId || session.id;
+  let observationDate = session.observation_date
+    || session.date
+    || currentInput.observation_date
+    || currentInput.date
+    || (presetKey ? presetDates[presetKey] : null)
+    || null;
+
+  if (!observationDate && typeof stormName === 'string') {
+    const lowerName = stormName.toLowerCase();
+    if (lowerName.includes('dana')) {
+      observationDate = '2024-10-24';
+    } else if (lowerName.includes('biparjoy')) {
+      observationDate = '2023-06-12';
+    }
+  }
+
+  let isHistoricalPreset = currentInput.sourceType === 'benchmark'
+    || Boolean(currentInput.presetId)
+    || Boolean(session.presetId)
+    || Boolean(observationDate && !authoritativeObservationTime);
+
+  if (!isHistoricalPreset && observationDate) {
+    const parsed = new Date(observationDate).getTime();
+    if (!Number.isNaN(parsed) && parsed < Date.now() - 24 * 60 * 60 * 1000) {
+      isHistoricalPreset = true;
+    }
+  }
+
+  const dataSourceType = isHistoricalPreset ? 'historical_preset' : (currentInput.sourceType || 'live_telemetry');
 
   // 2. Resolve Detection (MobileNetV3)
   const rawDetection = session.detectionResult || session.detection || (session.center ? session : null);
@@ -255,17 +355,21 @@ export function buildCyclonePromptContext(session) {
   const rawClassification = session.classificationResult || session.classification || (session.primary_class ? session : null);
   const classification = serializeClassification(rawClassification);
 
-  // 4. Resolve Trajectory Forecast (GRU)
-  const rawTrajectory = session.trajectoryResult || session.trajectory || (session.trajectory_forecast ? session : null);
-  const trajectory = serializeTrajectory(rawTrajectory);
+  // 4. Resolve Trajectory Forecast (GRU) & Landfall
+  const rawTrajectory = session.trajectoryResult
+    || session.trajectory
+    || (session.trajectory_forecast ? session : null)
+    || (session.landfallPrediction ? { landfall_prediction: session.landfallPrediction } : null);
+  const trajectory = serializeTrajectory(rawTrajectory, session.landfallPrediction);
 
   // 5. Resolve Environmental & Fusion Data
-  const rawEnv = session.environmental_thermodynamics
+  const rawEnv = session.environmentalResult
+    || session.environmental_thermodynamics
     || session.environmental_conditions
     || session.environment
     || session.fusionResult
     || session.fusion
-    || session;
+    || (session.windTelemetry?.sst_celsius !== undefined || session.windTelemetry?.vertical_shear_knots !== undefined ? session.windTelemetry : null);
   const environmentalConditions = serializeEnvironment(rawEnv);
 
   // 6. Build Baseline Coordinate & Intensity Fix from Best Available Source
@@ -277,6 +381,9 @@ export function buildCyclonePromptContext(session) {
   if (detection?.center_coordinates) {
     consolidatedLat = detection.center_coordinates.latitude;
     consolidatedLon = detection.center_coordinates.longitude;
+  } else if (session.windTelemetry?.lat !== undefined && session.windTelemetry?.lon !== undefined) {
+    consolidatedLat = safeFloat(session.windTelemetry.lat);
+    consolidatedLon = safeFloat(session.windTelemetry.lon);
   } else if (currentInput.ground_truth_center) {
     consolidatedLat = safeFloat(currentInput.ground_truth_center.lat);
     consolidatedLon = safeFloat(currentInput.ground_truth_center.lon);
@@ -285,13 +392,17 @@ export function buildCyclonePromptContext(session) {
     consolidatedLon = safeFloat(session.lon);
   }
 
-  if (classification?.estimated_intensity?.max_sustained_wind_kmh) {
+  if (session.windTelemetry?.wind_speed_kmh !== undefined && session.windTelemetry?.wind_speed_kmh !== null) {
+    consolidatedWind = safeFloat(session.windTelemetry.wind_speed_kmh, 1);
+  } else if (classification?.estimated_intensity?.max_sustained_wind_kmh) {
     consolidatedWind = classification.estimated_intensity.max_sustained_wind_kmh;
   } else if (session.wind_speed_kmh !== undefined || session.current_wind !== undefined) {
     consolidatedWind = safeFloat(session.wind_speed_kmh ?? session.current_wind, 1);
   }
 
-  if (classification?.estimated_intensity?.central_pressure_hpa) {
+  if (session.windTelemetry?.mslp_hpa !== undefined && session.windTelemetry?.mslp_hpa !== null) {
+    consolidatedPressure = safeFloat(session.windTelemetry.mslp_hpa, 1);
+  } else if (classification?.estimated_intensity?.central_pressure_hpa) {
     consolidatedPressure = classification.estimated_intensity.central_pressure_hpa;
   } else if (session.central_mslp_hpa !== undefined || session.current_mslp !== undefined) {
     consolidatedPressure = safeFloat(session.central_mslp_hpa ?? session.current_mslp, 1);
@@ -303,7 +414,11 @@ export function buildCyclonePromptContext(session) {
     storm_identification: {
       name: stormName,
       basin: basin,
-      observation_time: timestamp
+      observation_date: observationDate,
+      observation_time: authoritativeObservationTime,
+      session_created_at: sessionCreatedAt,
+      data_source_type: dataSourceType,
+      is_historical: Boolean(isHistoricalPreset)
     },
     current_observation: {
       estimated_center: (consolidatedLat !== null && consolidatedLon !== null) ? {
@@ -373,4 +488,157 @@ export function buildCycloneContextSummary(session) {
   }
 
   return lines.join('\n');
+}
+
+/**
+ * Constructs a focused, module-aware cyclone prompt context for specific AI quick actions.
+ * Eliminates extraneous, unrelated context sections while preserving rigorous grounding.
+ *
+ * @param {'summarize'|'dvorak'|'trajectory'|'landfall'|'confidence'|string} actionId
+ * @param {Object} sessionOrContext - Active AnalysisSessionContext state or serialized context
+ * @returns {Object} Module-focused serialized context
+ */
+export function buildAiActionContext(actionId, sessionOrContext) {
+  const base = sessionOrContext?.platform ? sessionOrContext : buildCyclonePromptContext(sessionOrContext);
+
+  switch (actionId) {
+    case 'dvorak':
+      return {
+        ...base,
+        action_focus: 'dvorak_morphology',
+        // Dvorak morphology analysis needs storm identification, synoptic observation, center fix, and ResNet18 classification
+        detection: base.detection ? {
+          source: base.detection.source,
+          cyclone_detected: base.detection.cyclone_detected,
+          center_coordinates: base.detection.center_coordinates,
+          eye_status: base.detection.eye_status
+        } : null,
+        classification: base.classification,
+        trajectory: null,
+        environmental_conditions: null
+      };
+
+    case 'trajectory':
+      return {
+        ...base,
+        action_focus: 'spatiotemporal_trajectory',
+        detection: null,
+        classification: null, // omits ResNet18 class distribution
+        trajectory: base.trajectory,
+        // Only include steering/thermodynamic factors relevant to track prediction
+        environmental_conditions: base.environmental_conditions ? {
+          source: base.environmental_conditions.source,
+          vertical_wind_shear_knots: base.environmental_conditions.vertical_wind_shear_knots,
+          sea_surface_temperature_c: base.environmental_conditions.sea_surface_temperature_c,
+          mid_level_relative_humidity_pct: null,
+          maximum_potential_intensity_kmh: null,
+          rapid_intensification: base.environmental_conditions.rapid_intensification
+        } : null
+      };
+
+    case 'landfall':
+      return {
+        ...base,
+        action_focus: 'coastal_landfall_risk',
+        detection: null,
+        classification: null,
+        trajectory: base.trajectory ? {
+          source: base.trajectory.source,
+          forecast_status: base.trajectory.forecast_status,
+          trajectory_milestones: base.trajectory.trajectory_milestones?.filter(m => m.is_landfall || m.hour === 24 || m.hour === 48) || null,
+          landfall_projection: base.trajectory.landfall_projection
+        } : null,
+        environmental_conditions: null
+      };
+
+    case 'confidence':
+      return {
+        ...base,
+        action_focus: 'model_confidence_and_uncertainty',
+        detection: base.detection ? {
+          source: base.detection.source,
+          cyclone_detected: base.detection.cyclone_detected,
+          detection_confidence: base.detection.detection_confidence,
+          eye_status: base.detection.eye_status
+        } : null,
+        classification: base.classification ? {
+          source: base.classification.source,
+          primary_pattern: base.classification.primary_pattern,
+          dvorak_t_number: base.classification.dvorak_t_number,
+          confidence_percentage: base.classification.confidence_percentage
+        } : null,
+        trajectory: base.trajectory ? {
+          source: base.trajectory.source,
+          forecast_status: base.trajectory.forecast_status,
+          mc_dropout_samples: base.trajectory.mc_dropout_samples,
+          uncertainty_envelope_km: base.trajectory.uncertainty_envelope_km,
+          trajectory_milestones: base.trajectory.trajectory_milestones?.map(m => ({
+            hour: m.hour,
+            step_label: m.step_label,
+            uncertainty_radius_km: m.uncertainty_radius_km
+          })) || null
+        } : null,
+        environmental_conditions: base.environmental_conditions?.rapid_intensification ? {
+          source: base.environmental_conditions.source,
+          rapid_intensification: base.environmental_conditions.rapid_intensification
+        } : null
+      };
+
+    case 'bulletin':
+      return {
+        ...base,
+        action_focus: 'bulletin_draft',
+        detection: base.detection ? {
+          source: base.detection.source,
+          cyclone_detected: base.detection.cyclone_detected,
+          detection_confidence: base.detection.detection_confidence,
+          center_coordinates: base.detection.center_coordinates,
+          eye_status: base.detection.eye_status
+        } : null,
+        classification: base.classification ? {
+          source: base.classification.source,
+          primary_pattern: base.classification.primary_pattern,
+          dvorak_t_number: base.classification.dvorak_t_number,
+          confidence_percentage: base.classification.confidence_percentage,
+          pattern_probabilities: base.classification.pattern_probabilities,
+          estimated_intensity: base.classification.estimated_intensity
+        } : null,
+        trajectory: base.trajectory ? {
+          source: base.trajectory.source,
+          forecast_status: base.trajectory.forecast_status,
+          mc_dropout_samples: base.trajectory.mc_dropout_samples,
+          uncertainty_envelope_km: base.trajectory.uncertainty_envelope_km,
+          trajectory_milestones: base.trajectory.trajectory_milestones?.filter(m => 
+            m.hour === 0 || m.hour === 6 || m.hour === 12 || m.hour === 24 || m.hour === 48 || m.hour === 72 || m.is_landfall
+          ) || null,
+          landfall_projection: base.trajectory.landfall_projection
+        } : null,
+        environmental_conditions: base.environmental_conditions ? {
+          source: base.environmental_conditions.source,
+          sea_surface_temperature_c: base.environmental_conditions.sea_surface_temperature_c,
+          vertical_wind_shear_knots: base.environmental_conditions.vertical_wind_shear_knots,
+          mid_level_relative_humidity_pct: base.environmental_conditions.mid_level_relative_humidity_pct,
+          maximum_potential_intensity_kmh: base.environmental_conditions.maximum_potential_intensity_kmh,
+          rapid_intensification: base.environmental_conditions.rapid_intensification
+        } : null
+      };
+
+    case 'summarize':
+    default:
+      // Comprehensive briefing retains all available modules
+      return {
+        ...base,
+        action_focus: 'comprehensive_summary'
+      };
+  }
+}
+
+/**
+ * Dedicated helper to construct a focused bulletin context.
+ *
+ * @param {Object} sessionOrContext
+ * @returns {Object} Focused bulletin context
+ */
+export function buildBulletinPromptContext(sessionOrContext) {
+  return buildAiActionContext('bulletin', sessionOrContext);
 }

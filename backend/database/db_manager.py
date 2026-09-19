@@ -2,9 +2,72 @@ import sqlite3
 import json
 import os
 import time
-from typing import List, Dict, Any, Optional
+from pathlib import Path
+from typing import List, Dict, Any, Optional, Union
 
-DB_PATH = os.path.join(os.path.dirname(__file__), "cyclone_intel.db")
+# Canonical backend and database directories anchored to this file's physical location
+DB_DIR = Path(__file__).resolve().parent
+BACKEND_DIR = DB_DIR.parent
+
+DEFAULT_DB_FILENAME = "cyclone_intel.db"
+FALLBACK_DB_FILENAME = "cyclone_data.db"
+
+
+def resolve_database_path(override: Optional[Union[str, Path]] = None) -> Path:
+    """
+    Deterministically resolves the canonical SQLite database path for VAYU.
+    Guarantees path independence regardless of process working directory (os.getcwd()).
+
+    Resolution precedence:
+    1. Explicit function argument `override`
+    2. Environment variable `DATABASE_URL` (e.g. sqlite:////path/to/db or sqlite:///./rel)
+    3. Environment variable `CYCLONE_DB_PATH` or `VAYU_DB_PATH`
+    4. Existing `cyclone_intel.db` in `backend/database/`
+    5. Existing `cyclone_data.db` in `backend/database/` or `backend/data/`
+    6. Canonical default: `backend/database/cyclone_intel.db`
+    """
+    raw_path = override
+    if raw_path is None:
+        raw_path = os.environ.get("CYCLONE_DB_PATH") or os.environ.get("VAYU_DB_PATH") or os.environ.get("DATABASE_URL")
+
+    if raw_path:
+        path_str = str(raw_path).strip()
+        # Strip sqlite URI prefixes if supplied via DATABASE_URL
+        if path_str.startswith("sqlite:///"):
+            path_str = path_str[len("sqlite:///"): ]
+        elif path_str.startswith("sqlite://"):
+            path_str = path_str[len("sqlite://"): ]
+
+        p = Path(path_str)
+        if p.is_absolute():
+            return p.resolve()
+
+        # If relative, anchor to DB_DIR rather than process cwd
+        candidate = (DB_DIR / p).resolve()
+        if candidate.exists():
+            return candidate
+        candidate_backend = (BACKEND_DIR / p).resolve()
+        if candidate_backend.exists():
+            return candidate_backend
+        return candidate
+
+    # Default canonical lookup: prefer existing database file to preserve seeded data
+    primary = DB_DIR / DEFAULT_DB_FILENAME
+    if primary.exists():
+        return primary.resolve()
+
+    secondary = DB_DIR / FALLBACK_DB_FILENAME
+    if secondary.exists():
+        return secondary.resolve()
+
+    backend_data_cand = BACKEND_DIR / "data" / FALLBACK_DB_FILENAME
+    if backend_data_cand.exists():
+        return backend_data_cand.resolve()
+
+    return primary.resolve()
+
+
+DB_PATH = str(resolve_database_path())
 
 class DatabaseManager:
     """
@@ -12,8 +75,11 @@ class DatabaseManager:
     Handles thread-safe transactions, schema migrations, and high-performance querying
     for satellite feeds, ocean buoys, deep learning inference logs, and CAP alerts.
     """
-    def __init__(self, db_path: str = DB_PATH):
-        self.db_path = db_path
+    def __init__(self, db_path: Optional[Union[str, Path]] = None):
+        self.db_path_obj = resolve_database_path(db_path)
+        self.db_path = str(self.db_path_obj)
+        # Ensure database parent directory exists
+        self.db_path_obj.parent.mkdir(parents=True, exist_ok=True)
         self._init_db()
 
     def _get_connection(self) -> sqlite3.Connection:

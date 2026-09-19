@@ -262,3 +262,38 @@ class TestKnownVectors:
 
         travel_diff = min(abs(travel - exp_travel), 360 - abs(travel - exp_travel))
         assert travel_diff < TOL, f"[{label}] travel_dir: expected {exp_travel}, got {travel}"
+
+
+# ─── Security & Configuration Tests ──────────────────────────────────────────
+
+class TestWindyApiKeyConfiguration:
+    """Test 9: Verify WINDY_API_KEY is read from environment without hardcoded secrets"""
+
+    def test_no_hardcoded_credential_in_source(self):
+        """Verify the wind router file has no hardcoded default secret literal"""
+        import inspect
+        import backend.routers.wind as wind_mod
+        source = inspect.getsource(wind_mod)
+        assert "h8RC1gtsg6HRNS4Ig1VW0J25sYgQd0re" not in source, (
+            "Exposed credential literal found in backend/routers/wind.py!"
+        )
+
+    def test_windy_api_key_absent_behavior(self, monkeypatch):
+        """Verify wind telemetry operates cleanly when WINDY_API_KEY is empty/absent"""
+        import backend.routers.wind as wind_mod
+        monkeypatch.setattr(wind_mod, "WINDY_API_KEY", "")
+        # Should not crash, and correctly report windy_api_key_configured: False
+        telemetry = wind_mod.fetch_live_cyclone_wind_telemetry(18.0, 88.0)
+        assert isinstance(telemetry, dict)
+        assert "wind_speed_kmh" in telemetry
+        if telemetry.get("success"):
+            assert telemetry.get("windy_api_key_configured") is False
+
+    def test_windy_api_key_present_behavior(self, monkeypatch):
+        """Verify wind telemetry flags configured key when WINDY_API_KEY is provided"""
+        import backend.routers.wind as wind_mod
+        monkeypatch.setattr(wind_mod, "WINDY_API_KEY", "dummy_test_key_xyz123")
+        telemetry = wind_mod.fetch_live_cyclone_wind_telemetry(18.0, 88.0)
+        assert isinstance(telemetry, dict)
+        assert "wind_speed_kmh" in telemetry
+

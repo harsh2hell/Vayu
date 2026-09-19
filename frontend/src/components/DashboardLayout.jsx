@@ -4,7 +4,7 @@ import { Sparkles } from 'lucide-react';
 import Sidebar from './Sidebar';
 import Topbar from './Topbar';
 import { AnalysisSessionProvider } from '../context/AnalysisSessionContext';
-import VayuAiAnalystDrawer from './VayuAiAnalystDrawer';
+const VayuAiAnalystDrawer = React.lazy(() => import('./VayuAiAnalystDrawer'));
 import ErrorBoundary from './ErrorBoundary';
 
 const DashboardLayout = () => {
@@ -44,18 +44,22 @@ const DashboardLayout = () => {
         <button
           type="button"
           onClick={() => setIsAiAnalystOpen(prev => !prev)}
-          className="fixed bottom-5 right-5 z-40 flex items-center gap-2 px-3.5 py-2.5 rounded-full bg-gradient-to-r from-sky-600 to-cyan-600 hover:from-sky-500 hover:to-cyan-500 text-white font-semibold text-xs shadow-lg shadow-sky-600/30 hover:shadow-sky-600/40 hover:scale-105 active:scale-95 transition-all cursor-pointer border border-white/20"
+          className="fixed bottom-5 right-5 z-40 flex items-center gap-2 px-4 py-2.5 rounded-full bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:text-slate-950 dark:hover:bg-slate-100 font-medium text-xs shadow-lg shadow-slate-900/15 dark:shadow-black/50 hover:scale-105 active:scale-95 transition-all cursor-pointer border border-slate-700/40 dark:border-slate-200/50"
           title="Open VAYU AI Operational Analyst"
         >
-          <Sparkles className="w-4 h-4 text-amber-300 animate-pulse" />
+          <Sparkles className="w-3.5 h-3.5 text-slate-300 dark:text-slate-700" />
           <span className="hidden sm:inline">VAYU AI Analyst</span>
         </button>
 
         {/* Operational AI Analyst Drawer */}
-        <VayuAiAnalystDrawer 
-          isOpen={isAiAnalystOpen} 
-          onClose={() => setIsAiAnalystOpen(false)} 
-        />
+        {isAiAnalystOpen && (
+          <React.Suspense fallback={null}>
+            <VayuAiAnalystDrawer 
+              isOpen={isAiAnalystOpen} 
+              onClose={() => setIsAiAnalystOpen(false)} 
+            />
+          </React.Suspense>
+        )}
 
       </div>
     </AnalysisSessionProvider>
