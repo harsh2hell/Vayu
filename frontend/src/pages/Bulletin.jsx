@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { 
   Download, CheckCircle, AlertTriangle, 
   RefreshCw, ArrowRight, ChevronLeft,
-  Sparkles, FileText, Edit3, Eye, Copy, Check
+  Sparkles, FileText, Edit3, Eye, Copy, Check, Printer
 } from 'lucide-react';
 import { downloadOfficialBulletinPdf } from '../services/api';
 import { useAnalysisSession } from '../context/AnalysisSessionContext';
@@ -193,6 +193,31 @@ const Bulletin = () => {
     a.click();
     a.remove();
     URL.revokeObjectURL(url);
+  };
+
+  const handlePrintDraft = () => {
+    if (!aiDraftText) return;
+    const printWindow = window.open('', '_blank');
+    if (printWindow) {
+      printWindow.document.write(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>VAYU AI Bulletin Draft - ${activeStorm.fullName}</title>
+          <style>
+            body { font-family: monospace, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; font-size: 12px; line-height: 1.6; padding: 24px; white-space: pre-wrap; color: #0f172a; }
+            @media print { body { padding: 0; } }
+          </style>
+        </head>
+        <body>${aiDraftText.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</body>
+        </html>
+      `);
+      printWindow.document.close();
+      printWindow.focus();
+      printWindow.print();
+    } else {
+      window.print();
+    }
   };
 
   return (
@@ -507,6 +532,15 @@ const Bulletin = () => {
                 >
                   <Download className="w-3.5 h-3.5" />
                   <span>Export TXT</span>
+                </button>
+
+                <button
+                  onClick={handlePrintDraft}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 border border-slate-200/80 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg font-medium transition-colors cursor-pointer shadow-xs"
+                  title="Print bulletin draft"
+                >
+                  <Printer className="w-3.5 h-3.5" />
+                  <span>Print</span>
                 </button>
 
                 <button

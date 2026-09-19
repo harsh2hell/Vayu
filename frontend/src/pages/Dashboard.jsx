@@ -352,7 +352,7 @@ const Dashboard = () => {
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-1.5">
               <span className={`w-2 h-2 rounded-full ${isGatewayOnline ? 'bg-emerald-500' : 'bg-slate-400'}`} />
-              <strong className="text-slate-700 dark:text-slate-300">Inference Gateway:</strong> {isGatewayOnline ? 'FastAPI Microservice (Online)' : 'Client In-Browser Execution'}
+              <strong className="text-slate-700 dark:text-slate-300">Inference Gateway:</strong> {isGatewayOnline ? 'FastAPI Gateway (Online)' : 'Client In-Browser Execution'}
             </span>
             <span className="text-slate-300 dark:text-slate-700 hidden sm:inline">•</span>
             <span className="hidden md:inline">MobileNetV3 + ResNet18 + 2-Layer GRU</span>
@@ -369,9 +369,14 @@ const Dashboard = () => {
           <div className="lg:col-span-8 bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
               <div>
-                <h3 className="text-sm font-semibold text-slate-900 dark:text-white tracking-tight">
-                  Climatological Basin Baseline
-                </h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-sm font-semibold text-slate-900 dark:text-white tracking-tight">
+                    Climatological Basin Baseline
+                  </h3>
+                  <span className="text-[10px] px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-mono font-medium border border-slate-200/60 dark:border-slate-700">
+                    Seasonal Reference
+                  </span>
+                </div>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                   Historical monthly trends for North Indian Ocean basins (Reference benchmark)
                 </p>
