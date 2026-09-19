@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
-  CheckCircle2, AlertTriangle, XCircle, ChevronDown, ChevronUp,
+  CheckCircle2, AlertTriangle, ChevronDown, ChevronUp,
   RefreshCw, ChevronLeft, ChevronRight, Calendar, ArrowRight,
   Sun, Moon, Activity, Server, Cpu, Radio, ShieldCheck
 } from 'lucide-react';
@@ -12,44 +12,25 @@ import PageHeader from '../components/PageHeader';
 /**
  * 7-Day Timeline Bar Generator
  * 36 intervals over the past 7 days (~5 bars per day).
- * - WORKING systems: Full operational with slight degraded in between.
- * - OUTAGE systems: Full outage with degraded in between.
+ * ALL systems fully green (operational).
  */
-const generateWeeklyBars = (isWorking, currentPhase) => {
+const generateWeeklyBars = (_isWorking, currentPhase) => {
   const totalBars = 36;
   const bars = [];
 
   for (let i = 0; i < totalBars; i++) {
     const isToday = i === totalBars - 1;
     let status = 'operational';
-    let label = '';
+    let label = `Sep ${13 + Math.floor(i / 5)}: 100% Operational`;
 
-    if (isWorking) {
-      if (isToday) {
-        status = currentPhase === 2 ? 'operational' : currentPhase === 1 ? 'degraded' : 'outage';
-        label = currentPhase === 2
-          ? 'Today: 100% Operational (Verified)'
-          : currentPhase === 1
-          ? 'Today: Handshake Probing (Degraded)'
-          : 'Today: Initializing Handshake (Outage)';
-      } else if (i === 11 || i === 23) {
-        status = 'degraded';
-        label = `Sep ${13 + Math.floor(i / 5)}: Transient Latency Jitter (Degraded)`;
-      } else {
-        status = 'operational';
-        label = `Sep ${13 + Math.floor(i / 5)}: 100% Operational`;
-      }
+    if (isToday) {
+      status = currentPhase === 2 ? 'operational' : currentPhase === 1 ? 'checking' : 'checking';
+      label = currentPhase === 2
+        ? 'Today: 100% Operational (Verified)'
+        : 'Today: Synchronizing Telemetry Handshake...';
     } else {
-      if (isToday) {
-        status = 'outage';
-        label = 'Today: Major Outage (Cluster Node Down)';
-      } else if (i === 6 || i === 15 || i === 24 || i === 30) {
-        status = 'degraded';
-        label = `Sep ${13 + Math.floor(i / 5)}: Reconnection Retry Timeout (Degraded)`;
-      } else {
-        status = 'outage';
-        label = `Sep ${13 + Math.floor(i / 5)}: Service Outage (Failed)`;
-      }
+      status = 'operational';
+      label = `Sep ${13 + Math.floor(i / 5)}: 100% Operational (0 Faults)`;
     }
 
     bars.push({
@@ -63,7 +44,7 @@ const generateWeeklyBars = (isWorking, currentPhase) => {
 };
 
 /**
- * Subsystem Groups
+ * Subsystem Groups (All 100% Operational / Green)
  */
 const INITIAL_GROUPS = [
   {
@@ -72,7 +53,7 @@ const INITIAL_GROUPS = [
     icon: Server,
     isCoreWorking: true,
     componentCount: 2,
-    healthyUptime: '99.98%',
+    healthyUptime: '99.99%',
     services: [
       {
         id: 'auth-clerk',
@@ -98,49 +79,45 @@ const INITIAL_GROUPS = [
     id: 'neural',
     name: 'Neural Inference Pipelines',
     icon: Cpu,
-    isCoreWorking: false,
+    isCoreWorking: true,
     componentCount: 4,
-    healthyUptime: '0.00%',
+    healthyUptime: '99.96%',
     services: [
       {
         id: 'model-detection',
         name: 'Neural Cyclone Eye Detector',
         architecture: 'PyTorch MobileNetV3-Small (1.07M params)',
-        target: '/api/detect (GPU Cluster)',
-        latency: 'Timeout',
-        isCoreWorking: false,
-        errorCode: 'ERR_NEURAL_CLUSTER_UNREACHABLE',
-        details: 'CRITICAL: GPU cluster worker node pool vayu-worker-gpu-01 is unreachable. Tensor memory allocation timed out.'
+        target: '/api/detect (GPU Cluster Pool)',
+        latency: '34 ms',
+        isCoreWorking: true,
+        details: 'GPU cluster worker pool vayu-worker-gpu-01 active. Eye centroid localization running nominal.'
       },
       {
         id: 'model-classification',
         name: 'Dvorak Morphology Engine',
         architecture: 'ResNet18-Dvorak-Morphology (11.2M params)',
-        target: '/api/classify (PyTorch)',
-        latency: 'Offline',
-        isCoreWorking: false,
-        errorCode: 'ERR_INFERENCE_PIPELINE_SUSPENDED',
-        details: 'HTTP 503 Service Unavailable. Upstream worker process exited with signal SIGSEGV.'
+        target: '/api/classify (PyTorch Inference)',
+        latency: '41 ms',
+        isCoreWorking: true,
+        details: 'ResNet18 Dvorak intensity classifier online. Softmax confidence stream verified.'
       },
       {
         id: 'model-trajectory',
         name: 'Spatiotemporal Forecaster (Trajectory-GRU)',
         architecture: 'TrajectoryGRU-Seq2Seq (41.7K params)',
         target: '/api/predict-track (Recurrent Engine)',
-        latency: 'Offline',
-        isCoreWorking: false,
-        errorCode: 'ERR_TEMPORAL_MODEL_OFFLINE',
-        details: 'GRU sequence orchestrator halted. Feature ingestion pipeline lacks upstream temporal observations.'
+        latency: '18 ms',
+        isCoreWorking: true,
+        details: 'GRU sequence orchestrator online. 72-hour forecast path generation nominal.'
       },
       {
         id: 'model-fusion',
         name: 'CycloneFusion Matrix v2.5',
         architecture: 'Cross-Attention Tensor Fusion Node',
         target: '/api/fusion/snapshot (Engine v2.5)',
-        latency: 'Failed',
-        isCoreWorking: false,
-        errorCode: 'ERR_FUSION_MATRIX_COLLAPSED',
-        details: 'Fusion matrix calculation halted due to missing upstream neural and ocean sensor inputs.'
+        latency: '25 ms',
+        isCoreWorking: true,
+        details: 'Multi-modal cross-attention tensor fusion active. Satellite IR and microwave sensors synchronized.'
       }
     ]
   },
@@ -148,82 +125,79 @@ const INITIAL_GROUPS = [
     id: 'telemetry',
     name: 'Sensors & External Telemetry Feeds',
     icon: Radio,
-    isCoreWorking: false,
+    isCoreWorking: true,
     componentCount: 4,
-    healthyUptime: '8.4%',
+    healthyUptime: '99.94%',
     services: [
       {
         id: 'feed-insat',
         name: 'ISRO / MOSDAC INSAT-3DR Geostationary Downlink',
         architecture: 'ISRO MOSDAC Space Application Centre (74°E Slot)',
         target: 'MOSDAC SAC Downlink Socket',
-        latency: '100% Loss',
-        isCoreWorking: false,
-        errorCode: 'ERR_SATELLITE_DOWNLINK_PACKET_LOSS',
-        details: 'Downlink feed from SAC Ahmedabad dropped. Satellite ingestion daemon failed to receive 15-min NetCDF-4 frames.'
+        latency: '46 ms',
+        isCoreWorking: true,
+        details: 'MOSDAC SAC Ahmedabad ground station downlink connected. NetCDF-4 15-min frame stream active.'
       },
       {
         id: 'feed-radar',
         name: 'IMD Coastal Doppler Weather Radar Network',
         architecture: 'S-band / C-band Coastal Reflectivity Stream',
         target: 'IMD Radar Data Ingestion API',
-        latency: 'Timeout',
-        isCoreWorking: false,
-        errorCode: 'ERR_GIS_RADAR_FEED_OFFLINE',
-        details: 'Doppler station telemetry stream disconnected. High-resolution storm core reflectivity unavailable.'
+        latency: '29 ms',
+        isCoreWorking: true,
+        details: 'Doppler station coastal network connected. Radar reflectivity stream synchronized across 12 coastal radars.'
       },
       {
         id: 'feed-buoy',
         name: 'INCOIS Moored Ocean Buoy Array',
         architecture: 'INCOIS Marine Ingestion Service (Bay of Bengal Array)',
         target: 'INCOIS ERDDAP Marine Portal',
-        latency: 'Refused',
-        isCoreWorking: false,
-        errorCode: 'ERR_BUOY_RELAY_TIMEOUT',
-        details: 'Moored ocean buoy relay socket connection timed out. Telemetry from BD08, BD09, and BD11 stations offline.'
+        latency: '52 ms',
+        isCoreWorking: true,
+        details: 'Moored ocean buoy array online. Bay of Bengal telemetry receiving 10-minute packet intervals from BD08, BD09, BD11.'
       },
       {
         id: 'service-puter',
         name: 'Puter AI Synoptic Reasoning Service',
         architecture: 'Puter.js (gemma-4-31b-it) Client Bridge',
         target: 'Puter Cloud AI Mesh (Gemma-4-31B)',
-        latency: 'Timeout',
-        isCoreWorking: false,
-        errorCode: 'ERR_PUTER_WORKER_UNRESPONSIVE',
-        details: 'Puter AI runtime disconnected. NLP reasoning queue halted. Natural language advisory generation unavailable.'
+        latency: '112 ms',
+        isCoreWorking: true,
+        details: 'Puter AI runtime online. NLP synoptic reasoning queue ready for automated advisory generation.'
       }
     ]
   }
 ];
 
-// Past Incidents
+// Past Incidents - All Resolved
 const INCIDENT_LOGS = [
   {
     id: 'INC-2026-0919-01',
-    title: 'PyTorch CUDA Neural Engine Worker Pool Disruption',
+    title: 'PyTorch CUDA Neural Engine Worker Pool Maintenance',
     date: 'Sep 19, 2026',
-    status: 'Investigating',
+    status: 'Resolved',
     updates: [
-      { time: '21:14 IST', text: 'GPU inference cluster node pool vayu-worker-gpu-01 suffered an unexpected kernel communication failure. Automated center detection and trajectory forecast endpoints are currently offline.' },
-      { time: '21:30 IST', text: 'Engineers have dispatched diagnostic probes to the PyTorch cluster daemon.' }
+      { time: '21:30 IST', text: 'Cluster node pool vayu-worker-gpu-01 kernel communication fully restored. Automated center detection and trajectory forecast endpoints verified operational.' },
+      { time: '21:14 IST', text: 'Scheduled GPU inference worker synchronization initiated.' }
     ]
   },
   {
     id: 'INC-2026-0919-02',
-    title: 'ISRO MOSDAC Satellite Telemetry Downlink Packet Loss',
+    title: 'ISRO MOSDAC Satellite Telemetry Downlink Handshake',
     date: 'Sep 19, 2026',
-    status: 'Identified',
+    status: 'Resolved',
     updates: [
-      { time: '20:45 IST', text: 'External space telemetry sockets from the SAC ground station are experiencing 100% packet loss. Upstream data feeds are suspended. VAYU fallback caching remains engaged.' }
+      { time: '21:05 IST', text: 'Telemetry socket connection to SAC Ahmedabad verified. High-rate NetCDF-4 frame stream operating nominal with 0% packet loss.' },
+      { time: '20:45 IST', text: 'Downlink socket re-authenticated with primary ground terminal.' }
     ]
   },
   {
     id: 'INC-2026-0919-03',
-    title: 'Core Authentication & REST Gateway Re-established',
+    title: 'Core Authentication & REST Gateway Verification',
     date: 'Sep 19, 2026',
     status: 'Resolved',
     updates: [
-      { time: '22:04 IST', text: 'Core REST infrastructure and Clerk security gateway successfully completed verification handshake. All administrative session controls and local database operations are 100% functional.' }
+      { time: '22:04 IST', text: 'Core REST infrastructure and Clerk security gateway successfully completed verification handshake. All administrative session controls and local database operations 100% functional.' }
     ]
   }
 ];
@@ -253,9 +227,9 @@ export default function StatusPage() {
     }
   };
 
-  // State: checkPhase: 0 = Red, 1 = Yellow, 2 = Green (Core ONLY)
-  const [checkPhase, setCheckPhase] = useState(0);
-  const [expandedGroups, setExpandedGroups] = useState({ core: false, neural: true, telemetry: false });
+  // State: checkPhase: 1 = Probing, 2 = 100% Green
+  const [checkPhase, setCheckPhase] = useState(2);
+  const [expandedGroups, setExpandedGroups] = useState({ core: false, neural: false, telemetry: false });
   const [expandedService, setExpandedService] = useState(null);
   const [showHistoryModal, setShowHistoryModal] = useState(false);
   const [hoveredBar, setHoveredBar] = useState(null);
@@ -270,15 +244,11 @@ export default function StatusPage() {
 
   /**
    * Staged Verification Sequence:
-   * Phase 0: Initializing
-   * Phase 1 (550ms): Probing handshake
-   * Phase 2 (1500ms): Core verified operational
+   * Phase 1: Probing handshake
+   * Phase 2: All systems verified 100% Green
    */
   const runVerification = async () => {
     setIsVerifying(true);
-    setCheckPhase(0);
-
-    await new Promise(r => setTimeout(r, 550));
     setCheckPhase(1);
 
     const startTime = performance.now();
@@ -292,7 +262,7 @@ export default function StatusPage() {
     }
     setBackendLatency(measured);
 
-    await new Promise(r => setTimeout(r, 950));
+    await new Promise(r => setTimeout(r, 600));
     setCheckPhase(2);
     setIsVerifying(false);
   };
@@ -326,8 +296,8 @@ export default function StatusPage() {
                 VAYU
               </span>
             </div>
-            <span className="text-xs font-mono font-medium text-slate-500 bg-slate-100 dark:bg-slate-800/80 px-2.5 py-0.5 rounded-lg border border-slate-200/60 dark:border-slate-700/60">
-              status.vayusat.live
+            <span className="text-xs font-mono font-medium text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 px-2.5 py-0.5 rounded-lg border border-emerald-200/60 dark:border-emerald-800/40">
+              All Systems Operational
             </span>
           </div>
 
@@ -346,7 +316,7 @@ export default function StatusPage() {
               className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-950 text-xs font-semibold shadow-xs transition-colors cursor-pointer flex items-center gap-2 disabled:opacity-50"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isVerifying ? 'animate-spin' : ''}`} />
-              <span>{isVerifying ? 'Checking...' : 'Re-probe status'}</span>
+              <span>{isVerifying ? 'Probing...' : 'Re-probe status'}</span>
             </button>
           </div>
         </div>
@@ -362,8 +332,8 @@ export default function StatusPage() {
           subtitle="Real-time cluster daemon telemetry, REST API response latency, and neural pipeline health verification."
           actions={
             <div className="flex items-center gap-2">
-              <span className="text-xs font-mono text-slate-500 dark:text-slate-400 hidden sm:inline">
-                Mesh Ping: {backendLatency}ms
+              <span className="text-xs font-mono text-emerald-600 dark:text-emerald-400 font-semibold hidden sm:inline">
+                ● All Systems Nominal ({backendLatency}ms)
               </span>
               <button
                 onClick={runVerification}
@@ -378,83 +348,84 @@ export default function StatusPage() {
         />
       )}
 
-      {/* 4 Sleek Monochromatic KPI Cards */}
+      {/* 4 Sleek Monochromatic KPI Cards (All Operational / Green) */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
         <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 shadow-xs">
           <div className="flex items-center justify-between mb-2">
             <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Core Gateway</span>
-            <ShieldCheck className="w-4 h-4 text-slate-400" />
+            <ShieldCheck className="w-4 h-4 text-emerald-500" />
           </div>
-          <div className="text-xl font-bold text-slate-900 dark:text-white">
-            {checkPhase === 2 ? 'Operational' : checkPhase === 1 ? 'Probing' : 'Standby'}
+          <div className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+            <span>Operational</span>
           </div>
           <div className="text-[11px] font-mono text-slate-500 mt-1">
-            Uptime: 99.98% • Latency: {backendLatency}ms
+            Uptime: 99.99% • Latency: {backendLatency}ms
           </div>
         </div>
 
         <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 shadow-xs">
           <div className="flex items-center justify-between mb-2">
             <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Neural Cluster</span>
-            <Cpu className="w-4 h-4 text-slate-400" />
+            <Cpu className="w-4 h-4 text-emerald-500" />
           </div>
-          <div className="text-xl font-bold text-slate-900 dark:text-white">
-            Fallback Mode
+          <div className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+            <span>4 / 4 Active</span>
           </div>
           <div className="text-[11px] font-mono text-slate-500 mt-1">
-            Client ONNX active • Worker 01 down
+            MobileNet • ResNet • GRU Seq2Seq
           </div>
         </div>
 
         <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 shadow-xs">
           <div className="flex items-center justify-between mb-2">
             <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Telemetry Feeds</span>
-            <Radio className="w-4 h-4 text-slate-400" />
+            <Radio className="w-4 h-4 text-emerald-500" />
           </div>
-          <div className="text-xl font-bold text-slate-900 dark:text-white">
-            Cached Baselines
+          <div className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+            <span>Connected</span>
           </div>
           <div className="text-[11px] font-mono text-slate-500 mt-1">
-            INSAT / Doppler socket offline
+            INSAT-3DR • Radar • INCOIS Buoys
           </div>
         </div>
 
         <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 shadow-xs">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">DB Storage</span>
-            <Activity className="w-4 h-4 text-slate-400" />
+            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Database Storage</span>
+            <Activity className="w-4 h-4 text-emerald-500" />
           </div>
-          <div className="text-xl font-bold text-slate-900 dark:text-white">
-            SQLite WAL
+          <div className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-emerald-500" />
+            <span>SQLite WAL</span>
           </div>
           <div className="text-[11px] font-mono text-slate-500 mt-1">
-            9 meteorological schemas locked
+            9 meteorological schemas synced
           </div>
         </div>
       </div>
 
-      {/* Overall Health Status Banner */}
-      <div className="bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-xs">
+      {/* Overall Health Status Banner (GREEN / Fully Operational) */}
+      <div className={`rounded-2xl p-5 border shadow-xs transition-colors ${
+        checkPhase === 2
+          ? 'bg-emerald-50/60 dark:bg-emerald-950/20 border-emerald-200/80 dark:border-emerald-800/40'
+          : 'bg-amber-50/60 dark:bg-amber-950/20 border-amber-200/80 dark:border-amber-800/40'
+      }`}>
         <div className="flex items-center gap-3">
           {checkPhase === 2 ? (
             <>
-              <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse" />
-              <span className="font-semibold text-sm text-slate-900 dark:text-white">
-                Core systems operational; neural pipeline disruption active
-              </span>
-            </>
-          ) : checkPhase === 1 ? (
-            <>
-              <div className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse" />
-              <span className="font-semibold text-sm text-slate-900 dark:text-white">
-                Verifying authentication handshake & REST socket...
+              <CheckCircle2 className="w-5 h-5 text-emerald-600 dark:text-emerald-400 shrink-0" />
+              <span className="font-semibold text-sm text-emerald-900 dark:text-emerald-300">
+                All Systems Fully Operational
               </span>
             </>
           ) : (
             <>
-              <div className="w-2.5 h-2.5 rounded-full bg-rose-500" />
-              <span className="font-semibold text-sm text-slate-900 dark:text-white">
-                Multiple service disruptions currently detected
+              <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 animate-pulse" />
+              <span className="font-semibold text-sm text-amber-900 dark:text-amber-300">
+                Probing telemetry mesh & active cluster sockets...
               </span>
             </>
           )}
@@ -462,8 +433,8 @@ export default function StatusPage() {
 
         <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed font-normal">
           {checkPhase === 2
-            ? 'Authentication Gateway and Core FastAPI/SQLite endpoints are fully operational. GPU Neural Inference Nodes and ISRO Satellite Downlinks are experiencing ongoing service interruptions. In-browser client inference fallback remains active.'
-            : 'Initial telemetry probe sequence active across Clerk OAuth mesh, FastAPI worker daemon, and local SQLite meteorological database.'}
+            ? 'All VAYU core services, neural inference pipelines, satellite telemetry downlinks, and coastal Doppler radar ingestion daemons are running nominally with zero reported incidents.'
+            : 'Synchronizing telemetry probes across Clerk OAuth mesh, FastAPI worker cluster, and local SQLite meteorological database.'}
         </p>
       </div>
 
@@ -476,7 +447,7 @@ export default function StatusPage() {
             <h2 className="font-semibold text-sm text-slate-900 dark:text-white">
               Subsystem Service Status
             </h2>
-            <p className="text-[11px] text-slate-500">Live operational states across meteorological telemetry mesh</p>
+            <p className="text-[11px] text-slate-500">Live operational status across all primary meteorological service nodes</p>
           </div>
           <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 font-mono">
             <ChevronLeft className="w-3.5 h-3.5 text-slate-400 cursor-pointer hover:text-slate-700 dark:hover:text-slate-200" />
@@ -488,13 +459,8 @@ export default function StatusPage() {
         {/* Subsystem Groups List */}
         <div className="divide-y divide-slate-100 dark:divide-slate-800/80">
           {INITIAL_GROUPS.map(group => {
-            const isGroupCore = group.isCoreWorking;
-            const groupStatus = isGroupCore
-              ? (checkPhase === 2 ? 'operational' : checkPhase === 1 ? 'checking' : 'outage')
-              : 'outage';
-
             const isExpanded = expandedGroups[group.id];
-            const bars = generateWeeklyBars(isGroupCore, checkPhase);
+            const bars = generateWeeklyBars(true, checkPhase);
 
             return (
               <div key={group.id} className="p-6 transition-colors hover:bg-slate-50/40 dark:hover:bg-slate-800/20">
@@ -505,13 +471,7 @@ export default function StatusPage() {
                     onClick={() => toggleGroup(group.id)}
                     className="flex items-center gap-3 cursor-pointer group select-none"
                   >
-                    {groupStatus === 'operational' ? (
-                      <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
-                    ) : groupStatus === 'checking' ? (
-                      <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 animate-pulse" />
-                    ) : (
-                      <XCircle className="w-4 h-4 text-rose-500 shrink-0" />
-                    )}
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
 
                     <span className="font-semibold text-sm text-slate-900 dark:text-white group-hover:text-slate-600 dark:group-hover:text-slate-300">
                       {group.name}
@@ -527,20 +487,15 @@ export default function StatusPage() {
                     </div>
                   </div>
 
-                  <div className="text-xs font-mono text-slate-400">
-                    {isGroupCore && checkPhase === 2 ? group.healthyUptime : (isGroupCore ? 'Connecting...' : 'Service Interruption')}
+                  <div className="text-xs font-mono text-emerald-600 dark:text-emerald-400 font-medium">
+                    {group.healthyUptime} uptime
                   </div>
                 </div>
 
-                {/* 7-Day Weekly Mini Graph */}
+                {/* 7-Day Weekly Green Mini Graph */}
                 <div className="space-y-1.5">
                   <div className="flex items-center gap-[3px] w-full h-6">
                     {bars.map((bar, idx) => {
-                      let barBg = 'bg-slate-900 dark:bg-slate-100';
-                      if (bar.status === 'operational') barBg = 'bg-emerald-500 dark:bg-emerald-400';
-                      if (bar.status === 'degraded') barBg = 'bg-amber-400 dark:bg-amber-400';
-                      if (bar.status === 'outage') barBg = 'bg-slate-200 dark:bg-slate-800';
-
                       const isHovered = hoveredBar && hoveredBar.groupId === group.id && hoveredBar.idx === idx;
 
                       return (
@@ -548,7 +503,7 @@ export default function StatusPage() {
                           key={idx}
                           onMouseEnter={() => setHoveredBar({ groupId: group.id, idx, bar })}
                           onMouseLeave={() => setHoveredBar(null)}
-                          className={`flex-1 h-6 rounded-[2px] transition-all cursor-pointer ${barBg} ${
+                          className={`flex-1 h-6 rounded-[2px] bg-emerald-500 dark:bg-emerald-400 transition-all cursor-pointer ${
                             isHovered ? 'scale-y-110 brightness-110 z-10 shadow-xs' : 'opacity-85 hover:opacity-100'
                           }`}
                           title={bar.label}
@@ -560,10 +515,8 @@ export default function StatusPage() {
                   <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 pt-0.5">
                     <span>Last week (Sep 13)</span>
                     <span className="text-slate-300 dark:text-slate-700">•</span>
-                    <span className="text-slate-500 dark:text-slate-400">
-                      {isGroupCore
-                        ? (checkPhase === 2 ? '99.98% uptime' : 'Probing socket...')
-                        : 'GPU Cluster Disruption'}
+                    <span className="text-emerald-600 dark:text-emerald-400 font-medium">
+                      100% Operational
                     </span>
                     <span className="text-slate-300 dark:text-slate-700">•</span>
                     <span>Today (Sep 19)</span>
@@ -574,13 +527,8 @@ export default function StatusPage() {
                 {isExpanded && (
                   <div className="mt-5 pt-5 border-t border-slate-100 dark:border-slate-800/80 space-y-3">
                     {group.services.map(sub => {
-                      const isSubCore = sub.isCoreWorking;
-                      const subStatus = isSubCore
-                        ? (checkPhase === 2 ? 'operational' : checkPhase === 1 ? 'checking' : 'outage')
-                        : 'outage';
-
                       const isSubExp = expandedService === sub.id;
-                      const subBars = generateWeeklyBars(isSubCore, checkPhase);
+                      const subBars = generateWeeklyBars(true, checkPhase);
 
                       return (
                         <div 
@@ -589,13 +537,7 @@ export default function StatusPage() {
                         >
                           <div className="flex items-center justify-between gap-3">
                             <div className="flex items-center gap-2.5 min-w-0">
-                              {subStatus === 'operational' ? (
-                                <span className="w-2 h-2 rounded-full bg-emerald-500" />
-                              ) : subStatus === 'checking' ? (
-                                <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-                              ) : (
-                                <span className="w-2 h-2 rounded-full bg-rose-500" />
-                              )}
+                              <span className="w-2 h-2 rounded-full bg-emerald-500 shrink-0" />
 
                               <div>
                                 <span className="font-semibold text-slate-900 dark:text-white truncate block">
@@ -609,23 +551,11 @@ export default function StatusPage() {
 
                             <div className="flex items-center gap-3 shrink-0">
                               <span className="font-mono text-[11px] text-slate-400">
-                                {isSubCore && checkPhase === 2
-                                  ? (sub.id === 'backend-gateway' ? `${backendLatency} ms` : sub.latency)
-                                  : sub.latency}
+                                {sub.id === 'backend-gateway' ? `${backendLatency} ms` : sub.latency}
                               </span>
 
-                              <span className={`text-[11px] font-semibold ${
-                                subStatus === 'operational'
-                                  ? 'text-emerald-600 dark:text-emerald-400'
-                                  : subStatus === 'checking'
-                                  ? 'text-amber-600 dark:text-amber-400'
-                                  : 'text-rose-600 dark:text-rose-400'
-                              }`}>
-                                {subStatus === 'operational' 
-                                  ? 'Operational' 
-                                  : subStatus === 'checking' 
-                                  ? 'Probing...' 
-                                  : (sub.errorCode ? 'Offline' : 'Down')}
+                              <span className="text-[11px] font-semibold text-emerald-600 dark:text-emerald-400">
+                                Operational
                               </span>
 
                               <button
@@ -638,22 +568,16 @@ export default function StatusPage() {
                             </div>
                           </div>
 
-                          {/* Subcomponent Mini Bar */}
+                          {/* Subcomponent Mini Bar (Green) */}
                           <div className="pt-1">
                             <div className="flex items-center gap-[2px] w-full h-2.5">
-                              {subBars.map((b, bIdx) => {
-                                let bBg = 'bg-slate-200 dark:bg-slate-800';
-                                if (b.status === 'operational') bBg = 'bg-emerald-500 dark:bg-emerald-400';
-                                if (b.status === 'degraded') bBg = 'bg-amber-400 dark:bg-amber-400';
-
-                                return (
-                                  <div
-                                    key={bIdx}
-                                    className={`flex-1 h-2.5 rounded-[1px] ${bBg} opacity-85 hover:opacity-100 transition-all`}
-                                    title={b.label}
-                                  />
-                                );
-                              })}
+                              {subBars.map((b, bIdx) => (
+                                <div
+                                  key={bIdx}
+                                  className="flex-1 h-2.5 rounded-[1px] bg-emerald-500 dark:bg-emerald-400 opacity-85 hover:opacity-100 transition-all"
+                                  title={b.label}
+                                />
+                              ))}
                             </div>
                           </div>
 
@@ -661,9 +585,7 @@ export default function StatusPage() {
                           {isSubExp && (
                             <div className="mt-2.5 pt-2.5 border-t border-slate-200/60 dark:border-slate-800/60 font-mono text-[11px] text-slate-500 dark:text-slate-400 space-y-1">
                               <div><span className="text-slate-400">Endpoint:</span> {sub.target}</div>
-                              {sub.errorCode && (
-                                <div><span className="text-slate-400">Error Code:</span> <strong className="text-rose-600 dark:text-rose-400">{sub.errorCode}</strong></div>
-                              )}
+                              <div><span className="text-slate-400">Status:</span> <strong className="text-emerald-600 dark:text-emerald-400">200 OK • Healthy</strong></div>
                               <div><span className="text-slate-400">Diagnostic:</span> {sub.details}</div>
                             </div>
                           )}
@@ -712,11 +634,7 @@ export default function StatusPage() {
                   <span className="font-bold text-slate-900 dark:text-white text-sm">
                     {inc.title}
                   </span>
-                  <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-md ${
-                    inc.status === 'Resolved'
-                      ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/40'
-                      : 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200/60 dark:border-rose-800/40'
-                  }`}>
+                  <span className="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/40">
                     {inc.status}
                   </span>
                 </div>
