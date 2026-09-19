@@ -10,22 +10,15 @@ import { getDashboardUrl, getWebsiteUrl } from '../utils/domain';
 import { CLERK_PUBLISHABLE_KEY, AuthConfigurationNotice } from '../components/auth/ClerkAuth';
 import { clerkLightTheme } from '../utils/clerkTheme';
 import VayuRouteLoader from '../components/VayuRouteLoader';
+import CycloneAtmosphericLiveView from '../components/CycloneAtmosphericLiveView';
 
 /* ═══════════════════════════════════════════════════════════════════════════
-   ATMOSPHERIC BACKGROUND — Clean Satellite Image
-   Displays the project theme cyclone satellite image without points, markers, or text
+   ATMOSPHERIC BACKGROUND — Live Animated Cyclone Satellite Visual
+   Features planetary Earth rotation and counter-clockwise swirling cloud vortex
    ═══════════════════════════════════════════════════════════════════════════ */
 
 const AtmosphericBackground = () => {
-  return (
-    <div className="absolute inset-0 overflow-hidden bg-slate-950">
-      <img
-        src="/cyclone_satellite_vis.jpg"
-        alt="VAYU Cyclone Satellite Intelligence"
-        className="w-full h-full object-cover object-center select-none pointer-events-none"
-      />
-    </div>
-  );
+  return <CycloneAtmosphericLiveView />;
 };
 
 /* ═══════════════════════════════════════════════════════════════════════════

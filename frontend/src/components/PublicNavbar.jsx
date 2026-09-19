@@ -101,7 +101,7 @@ const PublicNavbar = ({
       {/* Subtle National Tricolor Accent Line */}
       <div className="h-[1.5px] bg-gradient-to-r from-[#FF9933] via-slate-300 dark:via-slate-700 to-[#138808] opacity-80" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 sm:h-16 flex items-center justify-between gap-3">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-3">
         
         {/* Left: VAYU Brand Logo */}
         <div 
@@ -112,13 +112,13 @@ const PublicNavbar = ({
               navigate('/');
             }
           }}
-          className="flex items-center gap-2.5 cursor-pointer select-none shrink-0 group"
+          className="flex items-center gap-2.5 cursor-pointer select-none shrink-0 group py-1"
           title={isHindi ? "राष्ट्रीय चक्रवात पोर्टल होमपेज पर जाएं" : "Go to National Cyclone Portal Home"}
         >
           <img
             src="/vayu.png"
             alt="VAYU"
-            className="h-10 sm:h-12 w-auto object-contain transition-transform duration-150 group-hover:scale-105"
+            className="h-12 sm:h-15 md:h-16 w-auto object-contain transition-transform duration-150 group-hover:scale-105 filter drop-shadow-xs"
           />
         </div>
 
