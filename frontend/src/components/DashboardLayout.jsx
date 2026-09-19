@@ -28,9 +28,13 @@ const DashboardLayout = () => {
             style={isMapFirst ? { height: 'calc(100vh - 3.5rem)', minHeight: 'calc(100vh - 3.5rem)', width: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative', background: '#020617' } : undefined}
             className={isMapFirst ? "flex-1 flex flex-col overflow-hidden relative bg-slate-950 min-h-0" : "flex-1 p-4 sm:p-6 lg:p-8 bg-slate-50/50 dark:bg-black/90 pb-12 min-w-0 transition-colors duration-200"}
           >
+<<<<<<< HEAD
             <React.Suspense fallback={
               <VayuRouteLoader message="Loading Geospatial Intelligence..." />
             }>
+=======
+            <React.Suspense fallback={<VayuRouteLoader message="Loading VAYU Operations..." />}>
+>>>>>>> d2bda6f92485f3a0e192f4013f0420e0ec7ea10c
               <ErrorBoundary key={location.pathname}>
                 <Outlet />
               </ErrorBoundary>

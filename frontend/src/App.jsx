@@ -49,9 +49,13 @@ const ProductionLoginRedirect = () => {
     window.location.href = getAuthUrl(location.pathname + location.search);
   }, [location]);
 
+<<<<<<< HEAD
   return (
     <VayuRouteLoader message="Redirecting to secure login gateway..." />
   );
+=======
+  return <VayuRouteLoader message="Redirecting to secure login gateway..." />;
+>>>>>>> d2bda6f92485f3a0e192f4013f0420e0ec7ea10c
 };
 
 // Redirect helper when accessing /dashboard on production apex domain (vayusat.live)
@@ -62,9 +66,13 @@ const ProductionPortalRedirect = () => {
     window.location.href = getPortalUrl(subPath + location.search);
   }, [location]);
 
+<<<<<<< HEAD
   return (
     <VayuRouteLoader message="Redirecting to VAYU Operations Portal (portal.vayusat.live)..." />
   );
+=======
+  return <VayuRouteLoader message="Opening VAYU Operations Portal..." />;
+>>>>>>> d2bda6f92485f3a0e192f4013f0420e0ec7ea10c
 };
 
 // Redirect helper when accessing /status on production apex domain (vayusat.live)
@@ -75,9 +83,13 @@ const ProductionStatusRedirect = () => {
     window.location.href = getStatusUrl(subPath + location.search);
   }, [location]);
 
+<<<<<<< HEAD
   return (
     <VayuRouteLoader message="Redirecting to VAYU Live Status (status.vayusat.live)..." />
   );
+=======
+  return <VayuRouteLoader message="Opening VAYU Live Status..." />;
+>>>>>>> d2bda6f92485f3a0e192f4013f0420e0ec7ea10c
 };
 
 function App() {

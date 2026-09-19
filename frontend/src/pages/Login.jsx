@@ -9,6 +9,7 @@ import { Shield, ArrowLeft } from 'lucide-react';
 import { getDashboardUrl, getWebsiteUrl } from '../utils/domain';
 import { CLERK_PUBLISHABLE_KEY, AuthConfigurationNotice } from '../components/auth/ClerkAuth';
 import { clerkLightTheme } from '../utils/clerkTheme';
+import VayuRouteLoader from '../components/VayuRouteLoader';
 
 /* ═══════════════════════════════════════════════════════════════════════════
    ATMOSPHERIC BACKGROUND — Clean Satellite Image
@@ -41,12 +42,7 @@ const ClerkAuthSection = ({ redirectTarget, isSignUp = false }) => {
   }, [isLoaded, isSignedIn, redirectTarget]);
 
   if (!isLoaded) {
-    return (
-      <div className="flex flex-col items-center justify-center p-12 space-y-3">
-        <div className="w-8 h-8 border-2 border-sky-600 border-t-transparent rounded-full animate-spin" />
-        <p className="text-xs font-mono text-slate-500">Checking authentication...</p>
-      </div>
-    );
+    return <VayuRouteLoader message="Checking authentication..." />;
   }
 
   if (isSignedIn) {
