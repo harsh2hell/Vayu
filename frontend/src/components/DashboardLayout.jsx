@@ -6,6 +6,7 @@ import Topbar from './Topbar';
 import { AnalysisSessionProvider } from '../context/AnalysisSessionContext';
 const VayuAiAnalystDrawer = React.lazy(() => import('./VayuAiAnalystDrawer'));
 import ErrorBoundary from './ErrorBoundary';
+import VayuRouteLoader from './VayuRouteLoader';
 
 const DashboardLayout = () => {
   const location = useLocation();
@@ -27,12 +28,7 @@ const DashboardLayout = () => {
             style={isMapFirst ? { height: 'calc(100vh - 3.5rem)', minHeight: 'calc(100vh - 3.5rem)', width: '100%', display: 'flex', flexDirection: 'column', overflow: 'hidden', position: 'relative', background: '#020617' } : undefined}
             className={isMapFirst ? "flex-1 flex flex-col overflow-hidden relative bg-slate-950 min-h-0" : "flex-1 p-4 sm:p-6 lg:p-8 bg-slate-50/50 dark:bg-black/90 pb-12 min-w-0 transition-colors duration-200"}
           >
-            <React.Suspense fallback={
-              <div className="flex-1 flex flex-col items-center justify-center p-8 bg-slate-950 text-slate-400 font-mono text-xs" style={{ minHeight: 'calc(100vh - 3.5rem)' }}>
-                <div className="w-8 h-8 border-2 border-sky-500 border-t-transparent rounded-full animate-spin mb-3" />
-                <span>Loading Geospatial Intelligence...</span>
-              </div>
-            }>
+            <React.Suspense fallback={<VayuRouteLoader message="Loading VAYU Operations..." />}>
               <ErrorBoundary key={location.pathname}>
                 <Outlet />
               </ErrorBoundary>

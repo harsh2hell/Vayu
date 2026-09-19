@@ -7,6 +7,7 @@ import {
 } from '@clerk/clerk-react';
 import { AlertTriangle, User } from 'lucide-react';
 import { getAuthUrl, isProductionDomain } from '../../utils/domain';
+import VayuRouteLoader from '../VayuRouteLoader';
 
 export const CLERK_PUBLISHABLE_KEY = import.meta.env.VITE_CLERK_PUBLISHABLE_KEY || '';
 
@@ -85,12 +86,7 @@ const ClerkProtectedRoute = ({ children }) => {
 
   // 1. Wait until Clerk has fully loaded the session
   if (!isLoaded) {
-    return (
-      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center space-y-3">
-        <div className="w-8 h-8 border-2 border-sky-600 border-t-transparent rounded-full animate-spin" />
-        <p className="text-xs font-mono text-slate-500">Verifying session...</p>
-      </div>
-    );
+    return <VayuRouteLoader message="Verifying session..." />;
   }
 
   // 2. If unauthenticated in development, use React Router Navigate
@@ -98,12 +94,7 @@ const ClerkProtectedRoute = ({ children }) => {
     if (!isProductionDomain()) {
       return <Navigate to={`/login?redirect_url=${encodeURIComponent(location.pathname + location.search)}`} replace />;
     }
-    return (
-      <div className="min-h-screen bg-slate-50 flex flex-col items-center justify-center space-y-3">
-        <div className="w-8 h-8 border-2 border-sky-600 border-t-transparent rounded-full animate-spin" />
-        <p className="text-xs font-mono text-slate-500">Redirecting to secure login gateway...</p>
-      </div>
-    );
+    return <VayuRouteLoader message="Redirecting to secure login gateway..." />;
   }
 
   // 3. User is authenticated! Render the dashboard
