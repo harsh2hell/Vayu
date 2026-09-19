@@ -15,12 +15,26 @@ class ErrorBoundary extends React.Component {
     this.setState({ errorInfo });
   }
 
-  handleClearCacheAndReload = () => {
+  handleClearCacheAndReload = async () => {
     try {
       localStorage.clear();
       sessionStorage.clear();
-    } catch (e) {}
-    window.location.reload();
+      if ('caches' in window) {
+        const cacheKeys = await window.caches.keys();
+        await Promise.all(cacheKeys.map((key) => window.caches.delete(key)));
+      }
+      if ('serviceWorker' in navigator) {
+        const registrations = await navigator.serviceWorker.getRegistrations();
+        for (const reg of registrations) {
+          await reg.unregister();
+        }
+      }
+    } catch (e) {
+      console.warn('Cache clearing error:', e);
+    }
+    const cleanUrl = new URL(window.location.href);
+    cleanUrl.searchParams.set('_vayu_reload', Date.now().toString());
+    window.location.href = cleanUrl.toString();
   };
 
   render() {
