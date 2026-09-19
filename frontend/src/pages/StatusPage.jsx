@@ -3,16 +3,17 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import {
   CheckCircle2, AlertTriangle, XCircle, ChevronDown, ChevronUp,
   RefreshCw, ChevronLeft, ChevronRight, Calendar, ArrowRight,
-  Sun, Moon
+  Sun, Moon, Activity, Server, Cpu, Radio, ShieldCheck
 } from 'lucide-react';
 import { checkBackendHealth } from '../services/api';
 import { getPortalUrl } from '../utils/domain';
+import PageHeader from '../components/PageHeader';
 
 /**
  * 7-Day Timeline Bar Generator
  * 36 intervals over the past 7 days (~5 bars per day).
- * - WORKING systems: Full GREEN with slight YELLOW in between.
- * - OUTAGE systems: Full RED with YELLOW in between.
+ * - WORKING systems: Full operational with slight degraded in between.
+ * - OUTAGE systems: Full outage with degraded in between.
  */
 const generateWeeklyBars = (isWorking, currentPhase) => {
   const totalBars = 36;
@@ -20,11 +21,10 @@ const generateWeeklyBars = (isWorking, currentPhase) => {
 
   for (let i = 0; i < totalBars; i++) {
     const isToday = i === totalBars - 1;
-    let status = 'operational'; // 'operational' (green), 'degraded' (yellow), 'outage' (red)
+    let status = 'operational';
     let label = '';
 
     if (isWorking) {
-      // Working systems: FULL GREEN with slight yellow in between
       if (isToday) {
         status = currentPhase === 2 ? 'operational' : currentPhase === 1 ? 'degraded' : 'outage';
         label = currentPhase === 2
@@ -33,7 +33,6 @@ const generateWeeklyBars = (isWorking, currentPhase) => {
           ? 'Today: Handshake Probing (Degraded)'
           : 'Today: Initializing Handshake (Outage)';
       } else if (i === 11 || i === 23) {
-        // Slight yellow in between
         status = 'degraded';
         label = `Sep ${13 + Math.floor(i / 5)}: Transient Latency Jitter (Degraded)`;
       } else {
@@ -41,12 +40,10 @@ const generateWeeklyBars = (isWorking, currentPhase) => {
         label = `Sep ${13 + Math.floor(i / 5)}: 100% Operational`;
       }
     } else {
-      // Outage systems: FULL RED with yellow in between
       if (isToday) {
         status = 'outage';
         label = 'Today: Major Outage (Cluster Node Down)';
       } else if (i === 6 || i === 15 || i === 24 || i === 30) {
-        // Yellow in between (degraded packet loss / failed reconnect attempt)
         status = 'degraded';
         label = `Sep ${13 + Math.floor(i / 5)}: Reconnection Retry Timeout (Degraded)`;
       } else {
@@ -66,12 +63,13 @@ const generateWeeklyBars = (isWorking, currentPhase) => {
 };
 
 /**
- * Subsystem Groups matching status.openai.com
+ * Subsystem Groups
  */
 const INITIAL_GROUPS = [
   {
     id: 'core',
     name: 'Core Infrastructure',
+    icon: Server,
     isCoreWorking: true,
     componentCount: 2,
     healthyUptime: '99.98%',
@@ -99,6 +97,7 @@ const INITIAL_GROUPS = [
   {
     id: 'neural',
     name: 'Neural Inference Pipelines',
+    icon: Cpu,
     isCoreWorking: false,
     componentCount: 4,
     healthyUptime: '0.00%',
@@ -148,6 +147,7 @@ const INITIAL_GROUPS = [
   {
     id: 'telemetry',
     name: 'Sensors & External Telemetry Feeds',
+    icon: Radio,
     isCoreWorking: false,
     componentCount: 4,
     healthyUptime: '8.4%',
@@ -196,7 +196,7 @@ const INITIAL_GROUPS = [
   }
 ];
 
-// Past Incidents (status.openai.com style)
+// Past Incidents
 const INCIDENT_LOGS = [
   {
     id: 'INC-2026-0919-01',
@@ -232,7 +232,9 @@ export default function StatusPage() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const isInsideDashboard = location.pathname.startsWith('/dashboard') || location.pathname.startsWith('/portal');
+  const isInsideDashboard = location.pathname.startsWith('/dashboard') || 
+                            location.pathname.startsWith('/portal') || 
+                            (location.pathname === '/status' && !window.location.hostname.includes('status.'));
 
   // Dark mode
   const [isDark, setIsDark] = useState(() => {
@@ -259,7 +261,7 @@ export default function StatusPage() {
   const [hoveredBar, setHoveredBar] = useState(null);
   const [isVerifying, setIsVerifying] = useState(false);
   const [backendLatency, setBackendLatency] = useState(14);
-  const [currentTime, setCurrentTime] = useState(new Date());
+  const [_currentTime, setCurrentTime] = useState(new Date());
 
   useEffect(() => {
     const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -268,404 +270,477 @@ export default function StatusPage() {
 
   /**
    * Staged Verification Sequence:
-   * Phase 0 (0ms): Core Red
-   * Phase 1 (550ms): Core turns Yellow
-   * Phase 2 (1500ms): Core turns Green
-   * Neural Models & Telemetry Feeds: Permanently Red (Major Outage)
+   * Phase 0: Initializing
+   * Phase 1 (550ms): Probing handshake
+   * Phase 2 (1500ms): Core verified operational
    */
   const runVerification = async () => {
     setIsVerifying(true);
     setCheckPhase(0);
 
-    // Phase 1: 550ms
     await new Promise(r => setTimeout(r, 550));
     setCheckPhase(1);
 
-    // Live ping in background
     const startTime = performance.now();
     let measured = 14;
     try {
       await checkBackendHealth();
       const elapsed = Math.round(performance.now() - startTime);
       if (elapsed > 0) measured = Math.min(elapsed, 45);
-    } catch (e) {
+    } catch {
       measured = 14;
     }
     setBackendLatency(measured);
 
-    // Phase 2: 950ms -> Green for Core
     await new Promise(r => setTimeout(r, 950));
     setCheckPhase(2);
     setIsVerifying(false);
   };
 
   useEffect(() => {
-    runVerification();
+    const timer = setTimeout(() => {
+      runVerification();
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   const toggleGroup = (groupId) => {
     setExpandedGroups(prev => ({ ...prev, [groupId]: !prev[groupId] }));
   };
 
-  return (
-    <div 
-      style={{ fontFamily: "'Plus Jakarta Sans', sans-serif" }}
-      className={`min-h-screen antialiased text-neutral-900 dark:text-neutral-100 ${
-        isInsideDashboard ? '' : 'bg-[#FAFAFA] dark:bg-[#09090b]'
-      }`}
-    >
+  const content = (
+    <div className="space-y-6">
       
-      {/* ─── OpenAI-STYLE HEADER BAR ─── */}
-      <div className="max-w-[760px] mx-auto px-4 sm:px-6 pt-10 pb-6">
-        
-        <div className="flex items-center justify-between mb-8">
-          {/* Brand Header (OpenAI style) */}
+      {/* Standalone Brand Header (only if accessed directly on status.vayusat.live) */}
+      {!isInsideDashboard && (
+        <div className="flex items-center justify-between pb-6 border-b border-slate-200/80 dark:border-slate-800">
           <div className="flex items-center gap-3">
             <div 
               onClick={() => navigate('/')} 
-              className="flex items-center gap-2 cursor-pointer select-none"
+              className="flex items-center gap-2.5 cursor-pointer select-none"
             >
-              <img src="/vayu-icon.png" alt="VAYU" className="w-7 h-7 object-contain dark:invert" />
-              <span className="text-2xl font-bold tracking-tight text-neutral-900 dark:text-white">
+              <div className="w-8 h-8 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-950 flex items-center justify-center font-black text-sm shadow-xs">
+                V
+              </div>
+              <span className="text-xl font-bold tracking-tight text-slate-900 dark:text-white">
                 VAYU
               </span>
             </div>
-            <span className="text-xs font-mono font-medium text-neutral-500 bg-neutral-200/60 dark:bg-neutral-800/80 px-2 py-0.5 rounded-md">
+            <span className="text-xs font-mono font-medium text-slate-500 bg-slate-100 dark:bg-slate-800/80 px-2.5 py-0.5 rounded-lg border border-slate-200/60 dark:border-slate-700/60">
               status.vayusat.live
             </span>
           </div>
 
-          {/* Right: Theme Toggle & Dashboard Portal Link */}
           <div className="flex items-center gap-2.5">
             <button
               onClick={toggleTheme}
-              className="p-2 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white transition-colors cursor-pointer"
+              className="p-2 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors cursor-pointer"
               title="Toggle theme"
             >
               {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
             </button>
 
-            {/* Re-ping Status Button */}
             <button
               onClick={runVerification}
               disabled={isVerifying}
-              className="px-4 py-2 rounded-lg bg-neutral-900 hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-100 text-white dark:text-neutral-950 text-xs font-semibold shadow-xs transition-colors cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
+              className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-950 text-xs font-semibold shadow-xs transition-colors cursor-pointer flex items-center gap-2 disabled:opacity-50"
             >
-              <RefreshCw className={`w-3 h-3 ${isVerifying ? 'animate-spin' : ''}`} />
-              <span>{isVerifying ? 'Checking...' : 'Re-ping status'}</span>
+              <RefreshCw className={`w-3.5 h-3.5 ${isVerifying ? 'animate-spin' : ''}`} />
+              <span>{isVerifying ? 'Checking...' : 'Re-probe status'}</span>
             </button>
           </div>
         </div>
+      )}
 
-        {/* ─── STATUS BANNER (Exact OpenAI banner layout) ─── */}
-        <div className={`rounded-xl p-5 border transition-colors mb-8 ${
-          checkPhase === 2
-            ? 'bg-[#EBF7F2] dark:bg-[#0c1f17] border-[#B9EAD8] dark:border-[#154633]'
-            : checkPhase === 1
-            ? 'bg-[#FFFBEB] dark:bg-[#201b09] border-[#FDE68A] dark:border-[#4d3e12]'
-            : 'bg-[#FEF2F2] dark:bg-[#230d0d] border-[#FECACA] dark:border-[#521c1c]'
-        }`}>
-          <div className="flex items-center gap-2.5">
-            {checkPhase === 2 ? (
-              <>
-                <CheckCircle2 className="w-5 h-5 text-[#10A37F] shrink-0" />
-                <span className="font-semibold text-[15px] text-[#0D6E53] dark:text-[#38D5A3]">
-                  Core systems operational; neural pipeline disruption active
-                </span>
-              </>
-            ) : checkPhase === 1 ? (
-              <>
-                <AlertTriangle className="w-5 h-5 text-amber-500 shrink-0 animate-pulse" />
-                <span className="font-semibold text-[15px] text-amber-800 dark:text-amber-300">
-                  Verifying authentication handshake & REST socket...
-                </span>
-              </>
-            ) : (
-              <>
-                <XCircle className="w-5 h-5 text-rose-500 shrink-0" />
-                <span className="font-semibold text-[15px] text-rose-800 dark:text-rose-300">
-                  Multiple major outages currently affecting systems
-                </span>
-              </>
-            )}
-          </div>
-
-          <p className="text-xs text-neutral-600 dark:text-neutral-400 mt-2 leading-relaxed font-normal">
-            {checkPhase === 2
-              ? 'Authentication Gateway and Core FastAPI/SQLite endpoints are fully operational. GPU Neural Inference Nodes and ISRO Satellite Downlinks are experiencing ongoing service interruptions.'
-              : 'Initial telemetry probe sequence active across Clerk OAuth mesh, FastAPI worker daemon, and local SQLite meteorological database.'}
-          </p>
-        </div>
-
-        {/* ─── "SYSTEM STATUS" CARD (OpenAI Graph Layout) ─── */}
-        <div className="bg-white dark:bg-[#0d0e12] border border-neutral-200/80 dark:border-neutral-800/80 rounded-xl shadow-xs overflow-hidden mb-8">
-          
-          {/* Card Title Row: Last Week Range */}
-          <div className="px-6 py-4 border-b border-neutral-100 dark:border-neutral-800/80 flex items-center justify-between">
-            <h2 className="font-semibold text-[15px] text-neutral-900 dark:text-white">
-              System status
-            </h2>
-            <div className="flex items-center gap-2 text-xs text-neutral-500 dark:text-neutral-400 font-mono font-medium">
-              <ChevronLeft className="w-3.5 h-3.5 text-neutral-400 cursor-pointer hover:text-neutral-700 dark:hover:text-neutral-200" />
-              <span>Last 7 days: Sep 13 - Sep 19, 2026</span>
-              <ChevronRight className="w-3.5 h-3.5 text-neutral-300 dark:text-neutral-600 cursor-not-allowed" />
-            </div>
-          </div>
-
-          {/* Subsystem Groups List */}
-          <div className="divide-y divide-neutral-100 dark:divide-neutral-800/80">
-            {INITIAL_GROUPS.map(group => {
-              const isGroupCore = group.isCoreWorking;
-              // Group status: Core reflects checkPhase (0=outage, 1=degraded, 2=operational). Rest permanently outage.
-              const groupStatus = isGroupCore
-                ? (checkPhase === 2 ? 'operational' : checkPhase === 1 ? 'checking' : 'outage')
-                : 'outage';
-
-              const isExpanded = expandedGroups[group.id];
-              const bars = generateWeeklyBars(isGroupCore, checkPhase);
-
-              return (
-                <div key={group.id} className="p-6 transition-colors hover:bg-neutral-50/40 dark:hover:bg-neutral-900/40">
-                  
-                  {/* Top line: Status Icon + Group Name + Component Count + Uptime % */}
-                  <div className="flex items-center justify-between mb-3">
-                    <div 
-                      onClick={() => toggleGroup(group.id)}
-                      className="flex items-center gap-2.5 cursor-pointer group select-none"
-                    >
-                      {groupStatus === 'operational' ? (
-                        <CheckCircle2 className="w-4 h-4 text-[#10A37F] shrink-0" />
-                      ) : groupStatus === 'checking' ? (
-                        <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 animate-pulse" />
-                      ) : (
-                        <XCircle className="w-4 h-4 text-rose-500 shrink-0" />
-                      )}
-
-                      <span className="font-semibold text-sm text-neutral-900 dark:text-white group-hover:text-neutral-700 dark:group-hover:text-neutral-300">
-                        {group.name}
-                      </span>
-
-                      <div className="flex items-center gap-1 text-xs text-neutral-400 group-hover:text-neutral-600 dark:group-hover:text-neutral-300 font-normal">
-                        <span>{group.componentCount} components</span>
-                        {isExpanded ? (
-                          <ChevronUp className="w-3.5 h-3.5" />
-                        ) : (
-                          <ChevronDown className="w-3.5 h-3.5" />
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="text-xs font-mono text-neutral-400">
-                      {isGroupCore && checkPhase === 2 ? group.healthyUptime : (isGroupCore ? 'Connecting...' : 'Major outage')}
-                    </div>
-                  </div>
-
-                  {/* ─── 7-DAY WEEKLY GRAPH ─── */}
-                  <div className="space-y-1.5">
-                    <div className="flex items-center gap-[3px] w-full h-8">
-                      {bars.map((bar, idx) => {
-                        let barBg = 'bg-[#10A37F]'; // Full green
-                        if (bar.status === 'degraded') barBg = 'bg-[#EAB308]'; // Yellow in between
-                        if (bar.status === 'outage') barBg = 'bg-[#EF4444]'; // Full red
-
-                        const isHovered = hoveredBar && hoveredBar.groupId === group.id && hoveredBar.idx === idx;
-
-                        return (
-                          <div
-                            key={idx}
-                            onMouseEnter={() => setHoveredBar({ groupId: group.id, idx, bar })}
-                            onMouseLeave={() => setHoveredBar(null)}
-                            className={`flex-1 h-8 rounded-[2px] transition-all cursor-pointer ${barBg} ${
-                              isHovered ? 'scale-y-110 brightness-110 z-10 shadow-xs' : 'opacity-95 hover:opacity-100'
-                            }`}
-                            title={bar.label}
-                          />
-                        );
-                      })}
-                    </div>
-
-                    {/* Graph Footer: Last week / Incident note / Today */}
-                    <div className="flex items-center justify-between text-[10px] font-mono text-neutral-400 pt-0.5">
-                      <span>Last week (Sep 13)</span>
-                      <span className="text-neutral-300 dark:text-neutral-700">•</span>
-                      <span className="text-neutral-500 dark:text-neutral-400">
-                        {isGroupCore
-                          ? (checkPhase === 2 ? '99.98% uptime' : 'Probing socket...')
-                          : 'Major Outage'}
-                      </span>
-                      <span className="text-neutral-300 dark:text-neutral-700">•</span>
-                      <span>Today (Sep 19)</span>
-                    </div>
-                  </div>
-
-                  {/* ─── EXPANDED COMPONENTS (OpenAI Style Subcomponents with Graphs) ─── */}
-                  {isExpanded && (
-                    <div className="mt-5 pt-5 border-t border-neutral-100 dark:border-neutral-800/80 space-y-4">
-                      {group.services.map(sub => {
-                        const isSubCore = sub.isCoreWorking;
-                        const subStatus = isSubCore
-                          ? (checkPhase === 2 ? 'operational' : checkPhase === 1 ? 'checking' : 'outage')
-                          : 'outage';
-
-                        const isSubExp = expandedService === sub.id;
-                        const subBars = generateWeeklyBars(isSubCore, checkPhase);
-
-                        return (
-                          <div 
-                            key={sub.id} 
-                            className="p-3.5 rounded-xl bg-neutral-50/70 dark:bg-neutral-900/60 border border-neutral-200/60 dark:border-neutral-800/60 text-xs transition-colors space-y-2.5"
-                          >
-                            <div className="flex items-center justify-between gap-3">
-                              <div className="flex items-center gap-2.5 min-w-0">
-                                {subStatus === 'operational' ? (
-                                  <span className="w-2 h-2 rounded-full bg-[#10A37F]" />
-                                ) : subStatus === 'checking' ? (
-                                  <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
-                                ) : (
-                                  <span className="w-2 h-2 rounded-full bg-rose-500" />
-                                )}
-
-                                <div>
-                                  <span className="font-semibold text-neutral-900 dark:text-white truncate block">
-                                    {sub.name}
-                                  </span>
-                                  <span className="text-[10px] font-mono text-neutral-400 truncate block">
-                                    {sub.architecture}
-                                  </span>
-                                </div>
-                              </div>
-
-                              <div className="flex items-center gap-3 shrink-0">
-                                <span className="font-mono text-[11px] text-neutral-400">
-                                  {isSubCore && checkPhase === 2
-                                    ? (sub.id === 'backend-gateway' ? `${backendLatency} ms` : sub.latency)
-                                    : sub.latency}
-                                </span>
-
-                                <span className={`text-[11px] font-semibold ${
-                                  subStatus === 'operational'
-                                    ? 'text-[#10A37F]'
-                                    : subStatus === 'checking'
-                                    ? 'text-amber-600 dark:text-amber-400'
-                                    : 'text-rose-600 dark:text-rose-400'
-                                }`}>
-                                  {subStatus === 'operational' 
-                                    ? 'Operational' 
-                                    : subStatus === 'checking' 
-                                    ? 'Checking...' 
-                                    : (sub.errorCode ? 'Major Outage' : 'Down')}
-                                </span>
-
-                                <button
-                                  onClick={() => setExpandedService(isSubExp ? null : sub.id)}
-                                  className="text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200 p-0.5 cursor-pointer"
-                                  title="Details"
-                                >
-                                  {isSubExp ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                                </button>
-                              </div>
-                            </div>
-
-                            {/* Individual Subcomponent 7-day Graph */}
-                            <div className="pt-1">
-                              <div className="flex items-center gap-[2px] w-full h-4">
-                                {subBars.map((b, bIdx) => {
-                                  let bBg = 'bg-[#10A37F]';
-                                  if (b.status === 'degraded') bBg = 'bg-[#EAB308]';
-                                  if (b.status === 'outage') bBg = 'bg-[#EF4444]';
-
-                                  return (
-                                    <div
-                                      key={bIdx}
-                                      className={`flex-1 h-3.5 rounded-[1px] ${bBg} opacity-85 hover:opacity-100 transition-all`}
-                                      title={b.label}
-                                    />
-                                  );
-                                })}
-                              </div>
-                            </div>
-
-                            {/* Subsystem Technical Diagnostic Drawer */}
-                            {isSubExp && (
-                              <div className="mt-2.5 pt-2.5 border-t border-neutral-200/60 dark:border-neutral-800/60 font-mono text-[11px] text-neutral-500 dark:text-neutral-400 space-y-1">
-                                <div><span className="text-neutral-400">Endpoint:</span> {sub.target}</div>
-                                {sub.errorCode && (
-                                  <div><span className="text-neutral-400">Error Code:</span> <strong className="text-rose-600 dark:text-rose-400">{sub.errorCode}</strong></div>
-                                )}
-                                <div><span className="text-neutral-400">Trace:</span> {sub.details}</div>
-                              </div>
-                            )}
-                          </div>
-                        );
-                      })}
-                    </div>
-                  )}
-
-                </div>
-              );
-            })}
-          </div>
-
-        </div>
-
-        {/* ─── "VIEW HISTORY" BUTTON (Exact OpenAI Button Style) ─── */}
-        <div className="flex justify-center mb-8">
-          <button
-            onClick={() => setShowHistoryModal(!showHistoryModal)}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-neutral-200 dark:border-neutral-800 bg-white dark:bg-[#0d0e12] hover:bg-neutral-50 dark:hover:bg-neutral-900 text-xs font-semibold text-neutral-700 dark:text-neutral-300 shadow-2xs transition-colors cursor-pointer"
-          >
-            <Calendar className="w-3.5 h-3.5 text-neutral-400" />
-            <span>{showHistoryModal ? 'Hide history' : 'View history'}</span>
-          </button>
-        </div>
-
-        {/* ─── PAST INCIDENTS SECTION (Toggled via "View history") ─── */}
-        {showHistoryModal && (
-          <div className="bg-white dark:bg-[#0d0e12] border border-neutral-200/80 dark:border-neutral-800/80 rounded-xl p-6 shadow-xs space-y-6 mb-8 animate-in fade-in duration-150">
-            <div className="flex items-center justify-between pb-3 border-b border-neutral-100 dark:border-neutral-800">
-              <h3 className="font-semibold text-sm text-neutral-900 dark:text-white">
-                Past Incidents & Telemetry Log
-              </h3>
-              <span className="text-xs font-mono text-neutral-400">
-                September 2026
+      {/* Inside Dashboard Standard Unified Header */}
+      {isInsideDashboard && (
+        <PageHeader
+          categoryBadge="DIAGNOSTICS • SYSTEM STATUS"
+          categoryColor="slate"
+          modelBadge="Telemetry Mesh v2.1"
+          title="System Telemetry & Service Status"
+          subtitle="Real-time cluster daemon telemetry, REST API response latency, and neural pipeline health verification."
+          actions={
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-mono text-slate-500 dark:text-slate-400 hidden sm:inline">
+                Mesh Ping: {backendLatency}ms
               </span>
+              <button
+                onClick={runVerification}
+                disabled={isVerifying}
+                className="px-3.5 py-1.5 rounded-xl bg-slate-900 text-white dark:bg-white dark:text-slate-950 text-xs font-semibold hover:bg-slate-800 dark:hover:bg-slate-100 transition-all flex items-center gap-2 shadow-xs disabled:opacity-50 cursor-pointer"
+              >
+                <RefreshCw className={`w-3.5 h-3.5 ${isVerifying ? 'animate-spin' : ''}`} />
+                <span>{isVerifying ? 'Probing...' : 'Re-probe All'}</span>
+              </button>
             </div>
+          }
+        />
+      )}
 
-            <div className="space-y-6">
-              {INCIDENT_LOGS.map(inc => (
-                <div key={inc.id} className="space-y-2 text-xs">
-                  <div className="flex items-center justify-between">
-                    <span className="font-bold text-neutral-900 dark:text-white text-sm">
-                      {inc.title}
+      {/* 4 Sleek Monochromatic KPI Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3.5">
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 shadow-xs">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Core Gateway</span>
+            <ShieldCheck className="w-4 h-4 text-slate-400" />
+          </div>
+          <div className="text-xl font-bold text-slate-900 dark:text-white">
+            {checkPhase === 2 ? 'Operational' : checkPhase === 1 ? 'Probing' : 'Standby'}
+          </div>
+          <div className="text-[11px] font-mono text-slate-500 mt-1">
+            Uptime: 99.98% • Latency: {backendLatency}ms
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 shadow-xs">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Neural Cluster</span>
+            <Cpu className="w-4 h-4 text-slate-400" />
+          </div>
+          <div className="text-xl font-bold text-slate-900 dark:text-white">
+            Fallback Mode
+          </div>
+          <div className="text-[11px] font-mono text-slate-500 mt-1">
+            Client ONNX active • Worker 01 down
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 shadow-xs">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">Telemetry Feeds</span>
+            <Radio className="w-4 h-4 text-slate-400" />
+          </div>
+          <div className="text-xl font-bold text-slate-900 dark:text-white">
+            Cached Baselines
+          </div>
+          <div className="text-[11px] font-mono text-slate-500 mt-1">
+            INSAT / Doppler socket offline
+          </div>
+        </div>
+
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 shadow-xs">
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">DB Storage</span>
+            <Activity className="w-4 h-4 text-slate-400" />
+          </div>
+          <div className="text-xl font-bold text-slate-900 dark:text-white">
+            SQLite WAL
+          </div>
+          <div className="text-[11px] font-mono text-slate-500 mt-1">
+            9 meteorological schemas locked
+          </div>
+        </div>
+      </div>
+
+      {/* Overall Health Status Banner */}
+      <div className="bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-xs">
+        <div className="flex items-center gap-3">
+          {checkPhase === 2 ? (
+            <>
+              <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 dark:bg-emerald-400 animate-pulse" />
+              <span className="font-semibold text-sm text-slate-900 dark:text-white">
+                Core systems operational; neural pipeline disruption active
+              </span>
+            </>
+          ) : checkPhase === 1 ? (
+            <>
+              <div className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse" />
+              <span className="font-semibold text-sm text-slate-900 dark:text-white">
+                Verifying authentication handshake & REST socket...
+              </span>
+            </>
+          ) : (
+            <>
+              <div className="w-2.5 h-2.5 rounded-full bg-rose-500" />
+              <span className="font-semibold text-sm text-slate-900 dark:text-white">
+                Multiple service disruptions currently detected
+              </span>
+            </>
+          )}
+        </div>
+
+        <p className="text-xs text-slate-600 dark:text-slate-400 mt-2 leading-relaxed font-normal">
+          {checkPhase === 2
+            ? 'Authentication Gateway and Core FastAPI/SQLite endpoints are fully operational. GPU Neural Inference Nodes and ISRO Satellite Downlinks are experiencing ongoing service interruptions. In-browser client inference fallback remains active.'
+            : 'Initial telemetry probe sequence active across Clerk OAuth mesh, FastAPI worker daemon, and local SQLite meteorological database.'}
+        </p>
+      </div>
+
+      {/* Subsystem Health Grid */}
+      <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl shadow-xs overflow-hidden">
+        
+        {/* Table Header Row */}
+        <div className="px-6 py-4 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+          <div>
+            <h2 className="font-semibold text-sm text-slate-900 dark:text-white">
+              Subsystem Service Status
+            </h2>
+            <p className="text-[11px] text-slate-500">Live operational states across meteorological telemetry mesh</p>
+          </div>
+          <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400 font-mono">
+            <ChevronLeft className="w-3.5 h-3.5 text-slate-400 cursor-pointer hover:text-slate-700 dark:hover:text-slate-200" />
+            <span>Last 7 days: Sep 13 - Sep 19, 2026</span>
+            <ChevronRight className="w-3.5 h-3.5 text-slate-300 dark:text-slate-600 cursor-not-allowed" />
+          </div>
+        </div>
+
+        {/* Subsystem Groups List */}
+        <div className="divide-y divide-slate-100 dark:divide-slate-800/80">
+          {INITIAL_GROUPS.map(group => {
+            const isGroupCore = group.isCoreWorking;
+            const groupStatus = isGroupCore
+              ? (checkPhase === 2 ? 'operational' : checkPhase === 1 ? 'checking' : 'outage')
+              : 'outage';
+
+            const isExpanded = expandedGroups[group.id];
+            const bars = generateWeeklyBars(isGroupCore, checkPhase);
+
+            return (
+              <div key={group.id} className="p-6 transition-colors hover:bg-slate-50/40 dark:hover:bg-slate-800/20">
+                
+                {/* Header line */}
+                <div className="flex items-center justify-between mb-3">
+                  <div 
+                    onClick={() => toggleGroup(group.id)}
+                    className="flex items-center gap-3 cursor-pointer group select-none"
+                  >
+                    {groupStatus === 'operational' ? (
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                    ) : groupStatus === 'checking' ? (
+                      <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0 animate-pulse" />
+                    ) : (
+                      <XCircle className="w-4 h-4 text-rose-500 shrink-0" />
+                    )}
+
+                    <span className="font-semibold text-sm text-slate-900 dark:text-white group-hover:text-slate-600 dark:group-hover:text-slate-300">
+                      {group.name}
                     </span>
-                    <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-full ${
-                      inc.status === 'Resolved'
-                        ? 'bg-emerald-50 dark:bg-emerald-950/60 text-[#10A37F] border border-emerald-200/60 dark:border-emerald-800/40'
-                        : 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200/60 dark:border-rose-800/40'
-                    }`}>
-                      {inc.status}
-                    </span>
+
+                    <div className="flex items-center gap-1 text-xs text-slate-400 group-hover:text-slate-600 dark:group-hover:text-slate-300">
+                      <span>{group.componentCount} components</span>
+                      {isExpanded ? (
+                        <ChevronUp className="w-3.5 h-3.5" />
+                      ) : (
+                        <ChevronDown className="w-3.5 h-3.5" />
+                      )}
+                    </div>
                   </div>
 
-                  <div className="space-y-2 border-l-2 border-neutral-200 dark:border-neutral-800 pl-3 ml-1 mt-2">
-                    {inc.updates.map((upd, idx) => (
-                      <div key={idx} className="space-y-0.5">
-                        <div className="text-[10px] font-mono text-neutral-400">{inc.date} - {upd.time}</div>
-                        <p className="text-neutral-600 dark:text-neutral-300 leading-relaxed text-[11px]">{upd.text}</p>
-                      </div>
-                    ))}
+                  <div className="text-xs font-mono text-slate-400">
+                    {isGroupCore && checkPhase === 2 ? group.healthyUptime : (isGroupCore ? 'Connecting...' : 'Service Interruption')}
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
-        )}
 
-        {/* ─── FOOTER (OpenAI style "Powered by incident.io") ─── */}
-        <footer className="pt-6 pb-12 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-neutral-400 font-mono border-t border-neutral-200/60 dark:border-neutral-800/60">
+                {/* 7-Day Weekly Mini Graph */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center gap-[3px] w-full h-6">
+                    {bars.map((bar, idx) => {
+                      let barBg = 'bg-slate-900 dark:bg-slate-100';
+                      if (bar.status === 'operational') barBg = 'bg-emerald-500 dark:bg-emerald-400';
+                      if (bar.status === 'degraded') barBg = 'bg-amber-400 dark:bg-amber-400';
+                      if (bar.status === 'outage') barBg = 'bg-slate-200 dark:bg-slate-800';
+
+                      const isHovered = hoveredBar && hoveredBar.groupId === group.id && hoveredBar.idx === idx;
+
+                      return (
+                        <div
+                          key={idx}
+                          onMouseEnter={() => setHoveredBar({ groupId: group.id, idx, bar })}
+                          onMouseLeave={() => setHoveredBar(null)}
+                          className={`flex-1 h-6 rounded-[2px] transition-all cursor-pointer ${barBg} ${
+                            isHovered ? 'scale-y-110 brightness-110 z-10 shadow-xs' : 'opacity-85 hover:opacity-100'
+                          }`}
+                          title={bar.label}
+                        />
+                      );
+                    })}
+                  </div>
+
+                  <div className="flex items-center justify-between text-[10px] font-mono text-slate-400 pt-0.5">
+                    <span>Last week (Sep 13)</span>
+                    <span className="text-slate-300 dark:text-slate-700">•</span>
+                    <span className="text-slate-500 dark:text-slate-400">
+                      {isGroupCore
+                        ? (checkPhase === 2 ? '99.98% uptime' : 'Probing socket...')
+                        : 'GPU Cluster Disruption'}
+                    </span>
+                    <span className="text-slate-300 dark:text-slate-700">•</span>
+                    <span>Today (Sep 19)</span>
+                  </div>
+                </div>
+
+                {/* Expanded Subservices */}
+                {isExpanded && (
+                  <div className="mt-5 pt-5 border-t border-slate-100 dark:border-slate-800/80 space-y-3">
+                    {group.services.map(sub => {
+                      const isSubCore = sub.isCoreWorking;
+                      const subStatus = isSubCore
+                        ? (checkPhase === 2 ? 'operational' : checkPhase === 1 ? 'checking' : 'outage')
+                        : 'outage';
+
+                      const isSubExp = expandedService === sub.id;
+                      const subBars = generateWeeklyBars(isSubCore, checkPhase);
+
+                      return (
+                        <div 
+                          key={sub.id} 
+                          className="p-3.5 rounded-xl bg-slate-50/70 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800/60 text-xs transition-colors space-y-2.5"
+                        >
+                          <div className="flex items-center justify-between gap-3">
+                            <div className="flex items-center gap-2.5 min-w-0">
+                              {subStatus === 'operational' ? (
+                                <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                              ) : subStatus === 'checking' ? (
+                                <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse" />
+                              ) : (
+                                <span className="w-2 h-2 rounded-full bg-rose-500" />
+                              )}
+
+                              <div>
+                                <span className="font-semibold text-slate-900 dark:text-white truncate block">
+                                  {sub.name}
+                                </span>
+                                <span className="text-[10px] font-mono text-slate-400 truncate block">
+                                  {sub.architecture}
+                                </span>
+                              </div>
+                            </div>
+
+                            <div className="flex items-center gap-3 shrink-0">
+                              <span className="font-mono text-[11px] text-slate-400">
+                                {isSubCore && checkPhase === 2
+                                  ? (sub.id === 'backend-gateway' ? `${backendLatency} ms` : sub.latency)
+                                  : sub.latency}
+                              </span>
+
+                              <span className={`text-[11px] font-semibold ${
+                                subStatus === 'operational'
+                                  ? 'text-emerald-600 dark:text-emerald-400'
+                                  : subStatus === 'checking'
+                                  ? 'text-amber-600 dark:text-amber-400'
+                                  : 'text-rose-600 dark:text-rose-400'
+                              }`}>
+                                {subStatus === 'operational' 
+                                  ? 'Operational' 
+                                  : subStatus === 'checking' 
+                                  ? 'Probing...' 
+                                  : (sub.errorCode ? 'Offline' : 'Down')}
+                              </span>
+
+                              <button
+                                onClick={() => setExpandedService(isSubExp ? null : sub.id)}
+                                className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-0.5 cursor-pointer"
+                                title="Details"
+                              >
+                                {isSubExp ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
+                              </button>
+                            </div>
+                          </div>
+
+                          {/* Subcomponent Mini Bar */}
+                          <div className="pt-1">
+                            <div className="flex items-center gap-[2px] w-full h-2.5">
+                              {subBars.map((b, bIdx) => {
+                                let bBg = 'bg-slate-200 dark:bg-slate-800';
+                                if (b.status === 'operational') bBg = 'bg-emerald-500 dark:bg-emerald-400';
+                                if (b.status === 'degraded') bBg = 'bg-amber-400 dark:bg-amber-400';
+
+                                return (
+                                  <div
+                                    key={bIdx}
+                                    className={`flex-1 h-2.5 rounded-[1px] ${bBg} opacity-85 hover:opacity-100 transition-all`}
+                                    title={b.label}
+                                  />
+                                );
+                              })}
+                            </div>
+                          </div>
+
+                          {/* Diagnostic Drawer */}
+                          {isSubExp && (
+                            <div className="mt-2.5 pt-2.5 border-t border-slate-200/60 dark:border-slate-800/60 font-mono text-[11px] text-slate-500 dark:text-slate-400 space-y-1">
+                              <div><span className="text-slate-400">Endpoint:</span> {sub.target}</div>
+                              {sub.errorCode && (
+                                <div><span className="text-slate-400">Error Code:</span> <strong className="text-rose-600 dark:text-rose-400">{sub.errorCode}</strong></div>
+                              )}
+                              <div><span className="text-slate-400">Diagnostic:</span> {sub.details}</div>
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
+
+              </div>
+            );
+          })}
+        </div>
+
+      </div>
+
+      {/* Past Incidents Toggle & View */}
+      <div className="flex justify-center">
+        <button
+          onClick={() => setShowHistoryModal(!showHistoryModal)}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800/60 text-xs font-semibold text-slate-700 dark:text-slate-300 shadow-xs transition-colors cursor-pointer"
+        >
+          <Calendar className="w-3.5 h-3.5 text-slate-400" />
+          <span>{showHistoryModal ? 'Hide Incident History' : 'View Incident History'}</span>
+        </button>
+      </div>
+
+      {showHistoryModal && (
+        <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-6 shadow-xs space-y-6 animate-in fade-in duration-150">
+          <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+            <div>
+              <h3 className="font-semibold text-sm text-slate-900 dark:text-white">
+                Incident Telemetry Log
+              </h3>
+              <p className="text-[11px] text-slate-500">Documented node interruptions and resolution audit trail</p>
+            </div>
+            <span className="text-xs font-mono text-slate-400">
+              September 2026
+            </span>
+          </div>
+
+          <div className="space-y-6">
+            {INCIDENT_LOGS.map(inc => (
+              <div key={inc.id} className="space-y-2 text-xs">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-slate-900 dark:text-white text-sm">
+                    {inc.title}
+                  </span>
+                  <span className={`text-[11px] font-semibold px-2 py-0.5 rounded-md ${
+                    inc.status === 'Resolved'
+                      ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800/40'
+                      : 'bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 border border-rose-200/60 dark:border-rose-800/40'
+                  }`}>
+                    {inc.status}
+                  </span>
+                </div>
+
+                <div className="space-y-2 border-l-2 border-slate-200 dark:border-slate-800 pl-3 ml-1 mt-2">
+                  {inc.updates.map((upd, idx) => (
+                    <div key={idx} className="space-y-0.5">
+                      <div className="text-[10px] font-mono text-slate-400">{inc.date} - {upd.time}</div>
+                      <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-[11px]">{upd.text}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Standalone Footer */}
+      {!isInsideDashboard && (
+        <footer className="pt-6 pb-12 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-slate-400 font-mono border-t border-slate-200/60 dark:border-slate-800/60">
           <div className="flex items-center gap-1.5">
             <span>Powered by</span>
-            <strong className="text-neutral-700 dark:text-neutral-300">VAYU Telemetry Mesh</strong>
+            <strong className="text-slate-700 dark:text-slate-300 font-semibold">VAYU Telemetry Mesh</strong>
           </div>
 
           <div className="flex items-center gap-4">
@@ -673,16 +748,31 @@ export default function StatusPage() {
               onClick={() => {
                 window.location.href = getPortalUrl();
               }}
-              className="hover:text-neutral-700 dark:hover:text-neutral-200 transition-colors cursor-pointer flex items-center gap-1"
+              className="hover:text-slate-700 dark:hover:text-slate-200 transition-colors cursor-pointer flex items-center gap-1"
             >
               <span>Command Operations Portal</span>
               <ArrowRight className="w-3 h-3" />
             </button>
           </div>
         </footer>
+      )}
 
+    </div>
+  );
+
+  if (isInsideDashboard) {
+    return (
+      <div className="max-w-5xl mx-auto pb-12 font-sans">
+        {content}
       </div>
+    );
+  }
 
+  return (
+    <div className="min-h-screen antialiased text-slate-900 dark:text-slate-100 bg-slate-50 dark:bg-slate-950 font-sans">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 pt-10 pb-6">
+        {content}
+      </div>
     </div>
   );
 }

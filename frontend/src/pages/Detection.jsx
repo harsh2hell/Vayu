@@ -1,17 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { 
-  Target, Cpu, Upload, Play, CheckCircle2, 
-  AlertTriangle, ChevronRight, RefreshCw, Layers, 
-  Eye, Image as ImageIcon, ShieldCheck, HelpCircle, Activity,
-  ArrowLeftRight
+  Target, Upload, Play, 
+  AlertTriangle, ChevronRight, RefreshCw, 
+  Image as ImageIcon, ShieldCheck, Crosshair
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { detectCycloneFromImage } from '../services/api';
 import { useAnalysisSession } from '../context/AnalysisSessionContext';
 import PageHeader from '../components/PageHeader';
-import EmptyState from '../components/EmptyState';
-import StatusBadge from '../components/StatusBadge';
-import DataTypeBadge from '../components/DataTypeBadge';
 
 const Detection = () => {
   const navigate = useNavigate();
@@ -19,48 +15,37 @@ const Detection = () => {
   
   // Real inference state
   const [isDetecting, setIsDetecting] = useState(false);
-  const [inferenceStatus, setInferenceStatus] = useState(detectionResult ? 'success' : 'ready');
   const [errorMsg, setErrorMsg] = useState(null);
 
-  // Keep inferenceStatus in sync with detectionResult
-  useEffect(() => {
-    if (detectionResult) {
-      setInferenceStatus('success');
-    } else {
-      setInferenceStatus('ready');
-    }
-  }, [detectionResult]);
+  const inferenceStatus = isDetecting ? 'running' : (detectionResult ? 'success' : 'ready');
 
   const activeImageSrc = currentInput?.imageUrl;
   const activeBasin = currentInput?.basin || 'Bay of Bengal';
   const isCustomUpload = currentInput?.inputType === 'upload';
   const fileMeta = currentInput?.metadata;
 
-  const handleRunDetection = async () => {
+  const handleRunDetection = useCallback(async () => {
     if (!currentInput) return;
     const requestSessionId = currentInput.sessionId;
     setIsDetecting(true);
-    setInferenceStatus('running');
     setErrorMsg(null);
 
     try {
       let fileToSend = currentInput.file;
 
       if (!fileToSend && currentInput.imageUrl) {
-        // Attempt to fetch satellite image frame bytes
         try {
           const response = await fetch(currentInput.imageUrl);
           if (response.ok) {
             const blob = await response.blob();
             fileToSend = new File([blob], `${currentInput.sessionId}.png`, { type: 'image/png' });
           } else {
-            console.warn('[Detection] Failed to fetch external satellite raster:', response.status, response.statusText);
+            console.warn('[Detection] Failed to fetch external satellite raster:', response.status);
           }
         } catch (fetchErr) {
-          console.warn('[Detection] Network error fetching external satellite image:', fetchErr.message);
+          console.warn('[Detection] Network error fetching satellite image:', fetchErr.message);
         }
 
-        // If external image fetch was blocked or failed, attempt local preset fallback asset
         if (!fileToSend) {
           const localFallbackUrl = currentInput.presetId?.includes('biparjoy')
             ? '/cyclone_satellite_ir.jpg'
@@ -77,21 +62,17 @@ const Detection = () => {
         }
       }
 
-      // If neither external nor local asset could be converted to a File, invoke detectCycloneFromImage with null
-      // detectCycloneFromImage will execute safe in-browser fallback analysis rather than crashing
       const res = await detectCycloneFromImage(fileToSend, activeBasin, currentInput?.bbox_geo);
 
       if (requestSessionId && currentInput?.sessionId && requestSessionId !== currentInput.sessionId) {
-        console.warn(`[Detection] Discarding stale detection result from session ${requestSessionId} (active: ${currentInput.sessionId})`);
+        console.warn(`[Detection] Discarding stale detection result from session ${requestSessionId}`);
         return;
       }
 
       if (res && res.success) {
         setDetectionResult(res, requestSessionId);
-        setInferenceStatus('success');
       } else {
         setErrorMsg(res?.message || 'Detection failed: Neural backend returned an error.');
-        setInferenceStatus('error');
       }
     } catch (err) {
       if (requestSessionId && currentInput?.sessionId && requestSessionId !== currentInput.sessionId) {
@@ -99,476 +80,429 @@ const Detection = () => {
       }
       console.error('[Detection Page Error]:', err);
       setErrorMsg(err.message || 'Detection failed: Backend unavailable or network error.');
-      setInferenceStatus('error');
     } finally {
       setIsDetecting(false);
     }
-  };
+  }, [currentInput, activeBasin, setDetectionResult]);
 
-  // Strict scientific gating: Bounding box and center fix are ONLY valid when cyclone is detected
+  // Global Keyboard shortcut: Cmd+Enter or Ctrl+Enter to trigger detection
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'Enter') {
+        e.preventDefault();
+        if (!isDetecting && activeImageSrc) {
+          handleRunDetection();
+        }
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [isDetecting, activeImageSrc, handleRunDetection]);
+
   const isCycloneDetected = Boolean(detectionResult && (detectionResult.cyclone_detected || detectionResult.detected));
 
-  // Convert normalized bbox [ymin, xmin, ymax, xmax] or {ymin, xmin, ymax, xmax} to CSS percentages
+  // Convert normalized bbox to CSS percentages
   const bboxStyle = isCycloneDetected && detectionResult?.bounding_box ? {
     top: `${Math.max(0, (Array.isArray(detectionResult.bounding_box) ? detectionResult.bounding_box[0] : (detectionResult.bounding_box.ymin ?? 0.2)) * 100)}%`,
     left: `${Math.max(0, (Array.isArray(detectionResult.bounding_box) ? detectionResult.bounding_box[1] : (detectionResult.bounding_box.xmin ?? 0.2)) * 100)}%`,
-    height: `${Math.max(5, ((Array.isArray(detectionResult.bounding_box) ? (detectionResult.bounding_box[2] - detectionResult.bounding_box[0]) : (detectionResult.bounding_box.ymax - detectionResult.bounding_box.ymin)) || 0.4) * 100)}%`,
-    width: `${Math.max(5, ((Array.isArray(detectionResult.bounding_box) ? (detectionResult.bounding_box[3] - detectionResult.bounding_box[1]) : (detectionResult.bounding_box.xmax - detectionResult.bounding_box.xmin)) || 0.4) * 100)}%`,
+    height: `${Math.max(8, ((Array.isArray(detectionResult.bounding_box) ? (detectionResult.bounding_box[2] - detectionResult.bounding_box[0]) : (detectionResult.bounding_box.ymax - detectionResult.bounding_box.ymin)) || 0.4) * 100)}%`,
+    width: `${Math.max(8, ((Array.isArray(detectionResult.bounding_box) ? (detectionResult.bounding_box[3] - detectionResult.bounding_box[1]) : (detectionResult.bounding_box.xmax - detectionResult.bounding_box.xmin)) || 0.4) * 100)}%`,
   } : null;
 
   return (
-    <div className="space-y-6 max-w-[1400px] mx-auto pb-10">
+    <div className="space-y-6 max-w-6xl mx-auto pb-16 font-sans">
       
-      {/* Standard Unified Header */}
+      {/* 1. Header Banner */}
       <PageHeader
-        categoryBadge="AI VISION • DETECTION LAB"
-        categoryColor="blue"
+        categoryBadge="AI COMPUTER VISION • DETECTION LAB"
+        categoryColor="navy"
         modelBadge="MobileNetV3-Small (1.08M Params)"
-        title="AI Deep Learning Detection Lab"
-        subtitle="Convolutional neural network for automated tropical cyclogenesis identification & center localization."
+        title="Cyclone Detection & Center Localization"
+        subtitle="Dual-head convolutional neural network for automated tropical cyclogenesis verification and eye-center coordinate regression."
         actions={
-          <>
-            <span className="text-[11px] text-amber-800 bg-amber-50 font-mono px-2 py-0.5 rounded border border-amber-200 hidden sm:inline-block">
-              Page-Local Analysis • Shared Session
-            </span>
+          <div className="flex items-center gap-2">
             <button
               onClick={() => navigate('/dashboard/satellite')}
-              className="btn-secondary text-xs sm:text-sm py-2 px-3 gap-1.5"
+              className="px-3.5 py-2 rounded-xl text-xs font-medium bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 transition-colors flex items-center gap-1.5 cursor-pointer shadow-2xs"
             >
-              <ArrowLeftRight className="w-3.5 h-3.5" />
+              <Upload className="w-3.5 h-3.5 text-slate-400" />
               <span>Change Input</span>
             </button>
             <button 
               onClick={handleRunDetection}
               disabled={isDetecting || !activeImageSrc}
-              className="btn-primary text-xs sm:text-sm py-2 px-4 gap-2 shadow-sm"
+              className="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:text-slate-950 dark:hover:bg-slate-100 border border-slate-900 dark:border-white shadow-sm transition-all flex items-center gap-2 cursor-pointer disabled:opacity-50"
             >
-              <Play className={`w-3.5 h-3.5 fill-current ${isDetecting ? 'animate-spin' : ''}`} />
-              <span>
-                {isDetecting 
-                  ? 'Running MobileNetV3...' 
-                  : detectionResult 
-                    ? 'Re-run Detection' 
-                    : 'Run Detection Inference'}
-              </span>
+              {isDetecting ? (
+                <>
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                  <span>Running MobileNetV3...</span>
+                </>
+              ) : (
+                <>
+                  <Play className="w-3.5 h-3.5 fill-current" />
+                  <span>{detectionResult ? 'Re-run Detection' : 'Run Detection Inference'}</span>
+                  <span className="font-mono text-[10px] opacity-70 hidden sm:inline">⌘↵</span>
+                </>
+              )}
             </button>
-          </>
+          </div>
         }
       />
 
-      {/* Frame Selection / Shared Session Bar */}
-      <div className="bg-white border border-slate-100 rounded-2xl p-4 flex flex-col md:flex-row items-start md:items-center justify-between gap-3 shadow-2xs">
-        <div className="flex flex-wrap items-center gap-2 text-xs">
-          <span className="font-bold text-slate-700 uppercase tracking-wider text-[11px]">
-            Current Analysis Input:
+      {/* 2. Current Session Frame Toolbar */}
+      <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-xs">
+        <div className="flex flex-wrap items-center gap-2.5 text-xs">
+          <span className="font-mono text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
+            Active Session Frame:
           </span>
           {currentInput ? (
-            <span className={`px-3 py-1.5 rounded-lg font-semibold text-xs flex items-center gap-1.5 border ${
-              isCustomUpload 
-                ? 'bg-amber-50 text-amber-900 border-amber-300' 
-                : 'bg-blue-50 text-[#003087] border-blue-200'
-            }`}>
-              <ImageIcon className="w-3.5 h-3.5" />
+            <span className="px-3 py-1.5 rounded-xl font-medium text-xs flex items-center gap-1.5 border bg-slate-50 dark:bg-slate-800/80 text-slate-800 dark:text-slate-200 border-slate-200 dark:border-slate-700 shadow-2xs">
+              <ImageIcon className="w-3.5 h-3.5 text-slate-400" />
               <span>{currentInput.name}</span>
-              <span className="text-[10px] font-normal opacity-80">({currentInput.source})</span>
+              <span className="text-[10px] text-slate-400 font-mono">({currentInput.source})</span>
             </span>
           ) : (
-            <span className="bg-slate-100 text-slate-500 px-3 py-1.5 rounded-lg text-xs">
-              No active session
+            <span className="bg-slate-100 dark:bg-slate-800 text-slate-500 px-3 py-1.5 rounded-xl text-xs font-mono">
+              No active session frame
             </span>
           )}
           
           <button
             onClick={() => navigate('/dashboard/satellite')}
-            className="text-xs text-[#003087] hover:underline font-semibold flex items-center gap-1 ml-1"
+            className="text-xs text-slate-900 dark:text-white hover:underline font-semibold flex items-center gap-1 ml-1 cursor-pointer"
           >
-            <span>Change Input in Satellite Studio</span>
+            <span>Change in Studio</span>
             <ChevronRight className="w-3 h-3" />
           </button>
         </div>
 
         {fileMeta && (
-          <div className="text-[11px] font-mono text-slate-500 flex items-center gap-3">
+          <div className="text-[11px] font-mono text-slate-400 flex items-center gap-3">
             <span>Dimensions: {fileMeta.dimensions}</span>
             {fileMeta.sizeKb && <span>Size: {fileMeta.sizeKb} KB</span>}
-            <span>Format: {fileMeta.type}</span>
+            <span>Native Raster</span>
           </div>
         )}
       </div>
 
-      {/* Error Banner */}
+      {/* 3. Error Banner */}
       {errorMsg && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-2xl flex items-start gap-3">
-          <AlertTriangle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
-          <div className="text-xs">
-            <h4 className="font-bold text-red-900">ANALYSIS FAILED</h4>
-            <p className="text-red-700 mt-0.5">{errorMsg}</p>
+        <div className="p-4 bg-slate-50 dark:bg-slate-900 border border-amber-300 dark:border-amber-900/60 rounded-2xl flex items-start gap-3 shadow-xs">
+          <AlertTriangle className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0 mt-0.5" />
+          <div className="text-xs space-y-0.5">
+            <h4 className="font-semibold text-slate-900 dark:text-white">Analysis Status</h4>
+            <p className="text-slate-600 dark:text-slate-300">{errorMsg}</p>
           </div>
         </div>
       )}
 
-      {/* Main Inspection Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      {/* 4. Main 2-Column Inspection Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
         
         {/* Left: Image Canvas with Dynamic Bounding Box (7 Cols) */}
-        <div className="lg:col-span-7 card overflow-hidden flex flex-col">
-          <div className="card-header bg-white flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <ImageIcon className="w-4 h-4 text-[#003087]" />
-              <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                Satellite Imagery & Neural Localization Overlay
-              </h3>
+        <div className="lg:col-span-7 space-y-4">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-4 sm:p-5 space-y-3.5 shadow-xs">
+            
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+              <div className="flex items-center gap-2">
+                <Target className="w-4 h-4 text-slate-900 dark:text-white" />
+                <h3 className="text-sm font-semibold text-slate-900 dark:text-white tracking-tight">
+                  Neural Localization Overlay
+                </h3>
+              </div>
+              {detectionResult ? (
+                <span className={`px-2 py-0.5 rounded-md text-[10px] font-mono font-medium border ${
+                  isCycloneDetected 
+                    ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800' 
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700'
+                }`}>
+                  {isCycloneDetected ? 'Target Confirmed' : 'No Cyclone Detected'}
+                </span>
+              ) : (
+                <span className="text-[10px] font-mono text-slate-400">READY</span>
+              )}
             </div>
-            {detectionResult && (
-              <span className={`badge text-[10px] ${isCycloneDetected ? 'badge-green' : 'badge-red'}`}>
-                {isCycloneDetected ? 'Target Confirmed' : 'No Cyclone Detected'}
-              </span>
-            )}
-          </div>
 
-          <div className="relative bg-slate-950 flex items-center justify-center min-h-[460px] max-h-[560px] overflow-hidden">
-            {activeImageSrc ? (
-              <div className="relative inline-block max-w-full max-h-full">
-                <img 
-                  src={activeImageSrc} 
-                  alt="Satellite Observation Frame" 
-                  onError={(e) => {
-                    const localFallback = currentInput?.presetId?.includes('biparjoy')
-                      ? '/cyclone_satellite_ir.jpg'
-                      : '/cyclone_satellite_vis.jpg';
-                    if (e.target.src !== window.location.origin + localFallback) {
-                      e.target.src = localFallback;
-                    }
-                  }}
-                  className="max-h-[560px] max-w-full w-auto h-auto object-contain block filter brightness-95 contrast-110"
-                />
+            <div className="relative bg-slate-950 rounded-2xl flex items-center justify-center min-h-[440px] max-h-[560px] overflow-hidden border border-slate-200 dark:border-slate-800 shadow-inner select-none">
+              {activeImageSrc ? (
+                <div className="relative inline-block max-w-full max-h-full">
+                  <img 
+                    src={activeImageSrc} 
+                    alt="Satellite Observation Frame" 
+                    onError={(e) => {
+                      const localFallback = currentInput?.presetId?.includes('biparjoy')
+                        ? '/cyclone_satellite_ir.jpg'
+                        : '/cyclone_satellite_vis.jpg';
+                      if (e.target.src !== window.location.origin + localFallback) {
+                        e.target.src = localFallback;
+                      }
+                    }}
+                    className="max-h-[540px] max-w-full w-auto h-auto object-contain block filter brightness-95 contrast-105"
+                  />
 
-                {/* Source and Lifecycle Watermarks */}
-                <div className="absolute top-2.5 left-2.5 z-10 flex flex-col gap-1 pointer-events-none">
-                  <span className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold border backdrop-blur-md shadow-sm ${
-                    isCustomUpload 
-                      ? 'bg-amber-950/85 text-amber-300 border-amber-500/50' 
-                      : 'bg-slate-800/85 text-sky-300 border-white/20'
-                  }`}>
-                    {isCustomUpload ? `USER-UPLOADED IMAGE • ${currentInput?.name}` : `BENCHMARK FRAME: ${currentInput?.name}`}
-                  </span>
-                  {isCustomUpload && (
-                    <span className="px-2 py-0.5 rounded text-[9px] font-mono font-medium bg-amber-950/90 text-amber-200 border border-amber-500/40 backdrop-blur-md">
-                      Trained on centered synoptic satellite crops • Regional weather maps with UI/graphics may fail detection
+                  {/* Watermarks */}
+                  <div className="absolute top-3 left-3 z-10 flex flex-col gap-1 pointer-events-none">
+                    <span className="px-2.5 py-1 rounded-lg text-[10px] font-mono font-medium border bg-slate-950/85 text-slate-200 border-slate-800 backdrop-blur-md shadow-xs">
+                      {isCustomUpload ? `USER-UPLOADED • ${currentInput?.name}` : `BENCHMARK • ${currentInput?.name}`}
                     </span>
+                    {!detectionResult && (
+                      <span className="px-2 py-0.5 rounded text-[9px] font-mono bg-slate-950/90 text-slate-400 border border-slate-800">
+                        INPUT PREVIEW • NO INFERENCE
+                      </span>
+                    )}
+                  </div>
+
+                  {/* Dynamic Bounding Box Overlay */}
+                  {isCycloneDetected && bboxStyle && (
+                    <div 
+                      className="absolute border border-white/90 bg-white/5 rounded transition-all duration-300 pointer-events-none shadow-[0_0_15px_rgba(255,255,255,0.2)]"
+                      style={bboxStyle}
+                    >
+                      <div className="absolute -top-6 left-0 bg-slate-950 text-white font-mono text-[9px] font-semibold px-2 py-0.5 rounded shadow whitespace-nowrap border border-slate-700/80 flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 rounded-full bg-white" />
+                        <span>STORM ENVELOPE • {((detectionResult.objectness ?? 1) * 100).toFixed(1)}%</span>
+                      </div>
+                    </div>
                   )}
-                  {!detectionResult && (
-                    <span className="px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold bg-red-950/90 text-red-300 border border-red-500/50 backdrop-blur-md shadow-sm">
-                      INPUT IMAGE PREVIEW ONLY — NO INFERENCE EXECUTED
-                    </span>
+
+                  {/* Center Fix Pin Marker */}
+                  {isCycloneDetected && detectionResult?.center && (
+                    <div 
+                      className="absolute -translate-x-1/2 -translate-y-1/2 pointer-events-none transition-all duration-300 z-10"
+                      style={{
+                        top: `${((detectionResult.center.center_y_norm ?? 0.5) * 100).toFixed(1)}%`,
+                        left: `${((detectionResult.center.center_x_norm ?? 0.5) * 100).toFixed(1)}%`
+                      }}
+                    >
+                      <div className="w-9 h-9 rounded-full border border-white/70 bg-white/10 animate-ping absolute -top-4.5 -left-4.5" />
+                      <div className="w-5 h-5 rounded-full border-2 border-white bg-slate-950 shadow-lg flex items-center justify-center text-white">
+                        <Crosshair className="w-3 h-3 text-white" />
+                      </div>
+                      <div className="absolute top-4 -left-16 bg-slate-950/90 text-white px-2.5 py-0.5 rounded text-[9px] font-mono whitespace-nowrap shadow border border-slate-700">
+                        {detectionResult.is_georeferenced && detectionResult.coordinates?.formatted 
+                          ? `Center: ${detectionResult.coordinates.formatted}` 
+                          : `Fix: (${Number(detectionResult.center?.center_x_norm ?? 0).toFixed(2)}, ${Number(detectionResult.center?.center_y_norm ?? 0).toFixed(2)})`}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Negative Detection Badge */}
+                  {detectionResult && !isCycloneDetected && (
+                    <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-950/90 text-white border border-slate-800 px-4 py-2.5 rounded-xl shadow-xl backdrop-blur-md flex items-center gap-2.5 pointer-events-none text-left">
+                      <ShieldCheck className="w-4 h-4 text-slate-400 shrink-0" />
+                      <div>
+                        <div className="text-xs font-mono font-semibold uppercase tracking-wider text-slate-200">
+                          NO CYCLONE DETECTED
+                        </div>
+                        <div className="text-[10px] text-slate-400 font-mono">
+                          Objectness: {((detectionResult.objectness ?? 0) * 100).toFixed(1)}% • Localization suppressed
+                        </div>
+                      </div>
+                    </div>
                   )}
                 </div>
-
-                {/* Real Dynamic Bounding Box Overlay (Visible ONLY when cyclone is detected) */}
-                {isCycloneDetected && bboxStyle && (
-                  <div 
-                    className="absolute border-2 border-red-500 bg-red-500/15 rounded transition-all duration-500 pointer-events-none"
-                    style={bboxStyle}
+              ) : (
+                <div className="p-12 text-center text-slate-400 space-y-3">
+                  <ImageIcon className="w-10 h-10 mx-auto text-slate-600 opacity-60" />
+                  <h3 className="text-sm font-semibold text-white tracking-tight">NO ACTIVE FRAME LOADED</h3>
+                  <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                    Select an official benchmark frame or upload a satellite observation image in Satellite Studio.
+                  </p>
+                  <button 
+                    onClick={() => navigate('/dashboard/satellite')}
+                    className="px-4 py-2 rounded-xl text-xs font-semibold bg-white text-slate-950 hover:bg-slate-100 transition-all inline-flex items-center gap-2 cursor-pointer mt-2"
                   >
-                    <div className="absolute -top-6 left-0 bg-red-600 text-white font-mono text-[10px] font-bold px-2 py-0.5 rounded shadow whitespace-nowrap flex items-center gap-1">
-                      <span>CYCLONE CENTER FIX</span>
-                      <span>({((detectionResult.objectness ?? 1) * 100).toFixed(1)}%)</span>
-                    </div>
-                  </div>
-                )}
+                    <span>Open Satellite Studio</span>
+                  </button>
+                </div>
+              )}
 
-                {/* Center Fix Pin Marker (Visible ONLY when cyclone is detected) */}
-                {isCycloneDetected && detectionResult?.center && (
-                  <div 
-                    className="absolute w-4 h-4 rounded-full border-2 border-amber-300 bg-red-600 shadow-lg pointer-events-none transform -translate-x-1/2 -translate-y-1/2 animate-pulse"
-                    style={{
-                      top: `${((detectionResult.center.center_y_norm ?? 0.5) * 100).toFixed(1)}%`,
-                      left: `${((detectionResult.center.center_x_norm ?? 0.5) * 100).toFixed(1)}%`
-                    }}
-                  />
-                )}
-
-                {/* Negative Detection Badge (Rendered when model evaluates NO CYCLONE) */}
-                {detectionResult && !isCycloneDetected && (
-                  <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 bg-slate-800/90 text-white border border-slate-700/80 px-4 py-2.5 rounded-2xl shadow-xl backdrop-blur-md flex items-center gap-3 pointer-events-none text-left">
-                    <ShieldAlert className="w-5 h-5 text-amber-400 shrink-0" />
-                    <div>
-                      <div className="text-xs font-mono font-bold uppercase tracking-wider text-red-400">
-                        NO CYCLONE DETECTED
-                      </div>
-                      <div className="text-[10px] text-slate-300">
-                        Objectness: {((detectionResult.objectness ?? 0) * 100).toFixed(1)}% &bull; Center localization suppressed
-                      </div>
-                    </div>
-                  </div>
+              {/* Bottom Canvas Telemetry Strip */}
+              <div className="absolute bottom-3 left-3 right-3 bg-slate-950/85 backdrop-blur-md px-3.5 py-2 rounded-xl text-[10px] font-mono text-slate-300 border border-slate-800 flex items-center justify-between">
+                <span>MobileNetV3-Small Regressor (1.08M Params)</span>
+                {detectionResult?.inference_time_ms && (
+                  <span className="text-emerald-400 font-medium">{detectionResult.inference_time_ms} ms</span>
                 )}
               </div>
-            ) : (
-              <div className="p-12 text-center text-slate-400 space-y-3">
-                <ImageIcon className="w-12 h-12 mx-auto text-slate-600 opacity-60" />
-                <h3 className="text-sm font-bold text-white uppercase tracking-wider">NO ACTIVE ANALYSIS SESSION</h3>
-                <p className="text-xs text-slate-400 max-w-sm mx-auto">
-                  Please select an official benchmark frame or upload a satellite observation image in Satellite Studio.
-                </p>
-                <button 
-                  onClick={() => navigate('/dashboard/satellite')}
-                  className="btn-primary text-xs py-2 px-4 inline-flex items-center gap-2 cursor-pointer mt-2"
-                >
-                  <ImageIcon className="w-4 h-4" />
-                  <span>Open Satellite Imagery Studio</span>
-                </button>
-              </div>
-            )}
-
-            {/* Backbone Spec Stamp */}
-            <div className="absolute bottom-3 left-3 bg-black/85 text-cyan-300 text-[10px] font-mono px-2.5 py-1 rounded border border-white/10">
-              Model: MobileNetV3-Small Dual-Head Regressor (1,075,431 Params)
             </div>
 
-            {detectionResult?.inference_time_ms && (
-              <div className="absolute bottom-3 right-3 bg-black/85 text-emerald-400 text-[10px] font-mono px-2.5 py-1 rounded border border-white/10">
-                Inference Latency: {detectionResult.inference_time_ms} ms
+            {/* Technical Metadata Row */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs font-mono bg-slate-50 dark:bg-slate-800/40 p-3 rounded-xl border border-slate-200/80 dark:border-slate-800">
+              <div>
+                <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Input Basin</span>
+                <span className="font-semibold text-slate-800 dark:text-slate-200 block mt-0.5">{activeBasin}</span>
               </div>
-            )}
-          </div>
+              <div>
+                <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Source</span>
+                <span className="font-semibold text-slate-800 dark:text-slate-200 truncate block mt-0.5">{currentInput?.source || 'N/A'}</span>
+              </div>
+              <div>
+                <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Mode</span>
+                <span className="font-semibold text-slate-800 dark:text-slate-200 block mt-0.5">
+                  {isCustomUpload ? 'Local In-Session' : 'Verified Benchmark'}
+                </span>
+              </div>
+              <div>
+                <span className="text-[10px] text-slate-400 uppercase tracking-wider block">Status</span>
+                <span className="font-semibold text-slate-800 dark:text-slate-200 block mt-0.5">
+                  {inferenceStatus === 'success' && detectionResult ? 'Evaluated' : 'Ready'}
+                </span>
+              </div>
+            </div>
 
-          <div className="p-4 bg-slate-50 border-t border-slate-100 text-xs text-slate-600 flex items-center justify-between">
-            <span>
-              <strong>Input Basin:</strong> {activeBasin} • <strong>Source:</strong> {currentInput?.source || 'N/A'}
-            </span>
-            <span className="font-mono text-[11px]">
-              {inferenceStatus === 'success' && detectionResult ? (
-                <span className="text-emerald-700 font-bold">Inference Status: COMPLETE</span>
-              ) : inferenceStatus === 'running' ? (
-                <span className="text-blue-700 font-bold animate-pulse">Inference Status: RUNNING...</span>
-              ) : (
-                <span className="text-slate-500 font-semibold">NO INFERENCE EXECUTED</span>
-              )}
-            </span>
           </div>
         </div>
 
-        {/* Right: Real AI Verdict & Localization Coordinates (5 Cols) */}
-        <div className="lg:col-span-5 space-y-5 flex flex-col">
+        {/* Right: AI Verdict & Localization Coordinates (5 Cols) */}
+        <div className="lg:col-span-5 space-y-4">
           
-          <div className="card p-5 space-y-4 flex-1">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3 flex-wrap gap-2">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 space-y-4 shadow-xs">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
               <div className="flex items-center gap-2">
-                <Target className="w-5 h-5 text-emerald-600" />
-                <h3 className="font-bold text-sm text-slate-900">MobileNetV3 Inference Verdict</h3>
+                <Target className="w-4 h-4 text-slate-900 dark:text-white" />
+                <h3 className="font-semibold text-sm text-slate-900 dark:text-white tracking-tight">
+                  MobileNetV3 Diagnostics
+                </h3>
               </div>
-              <div className="flex items-center gap-1.5">
-                <DataTypeBadge type="ai" size="xs" />
-                {detectionResult ? (
-                  <span className={`badge ${detectionResult.detected ? 'badge-green' : 'badge-red'}`}>
-                    {detectionResult.detected ? 'Positive Fix' : 'Negative'}
-                  </span>
-                ) : inferenceStatus === 'running' ? (
-                  <span className="badge badge-yellow animate-pulse">Running MobileNetV3...</span>
-                ) : (
-                  <span className="badge badge-red font-mono text-[10px]">NO INFERENCE EXECUTED</span>
-                )}
-              </div>
+              <span className={`px-2.5 py-0.5 rounded-md text-[10px] font-mono font-medium border ${
+                detectionResult 
+                  ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800' 
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700'
+              }`}>
+                {detectionResult ? (detectionResult.detected ? 'POSITIVE FIX' : 'NEGATIVE') : 'AWAITING RUN'}
+              </span>
             </div>
 
             {detectionResult ? (
-              <div className="space-y-4">
-                {/* 1. Detection Verdict Header Card */}
-                <div className={`border rounded-2xl p-4 space-y-2.5 ${
-                  isCycloneDetected ? 'bg-emerald-50 border-emerald-200' : 'bg-slate-50 border-slate-100'
-                }`}>
+              <div className="space-y-3.5 text-xs">
+                
+                {/* 1. Detection Verdict Card */}
+                <div className="p-3.5 rounded-xl border space-y-2 bg-slate-50 dark:bg-slate-800/40 border-slate-200/80 dark:border-slate-700/80">
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-bold text-slate-700">Cyclone Detected:</span>
-                    <span className={`text-xs font-mono font-bold px-2.5 py-0.5 rounded ${
-                      isCycloneDetected ? 'bg-emerald-100 text-emerald-800' : 'bg-slate-200 text-slate-700'
-                    }`}>
-                      {isCycloneDetected ? 'YES' : 'NO'}
+                    <span className="text-slate-500 dark:text-slate-400">Cyclone Classification:</span>
+                    <span className="font-semibold font-mono text-slate-900 dark:text-white">
+                      {isCycloneDetected ? 'Confirmed Cyclone' : 'Non-Cyclonic Marine Frame'}
                     </span>
                   </div>
 
-                  <div className="flex justify-between items-center text-xs">
-                    <span className="text-slate-600 font-medium">Objectness:</span>
-                    <span className="font-bold font-mono text-slate-900">
+                  <div className="flex justify-between items-center">
+                    <span className="text-slate-500 dark:text-slate-400">Objectness Confidence:</span>
+                    <span className="font-semibold font-mono text-slate-900 dark:text-white">
                       {((detectionResult.objectness ?? (detectionResult.confidence_percentage / 100)) * 100).toFixed(1)}%
                     </span>
                   </div>
 
-                  <div className="progress-bar bg-slate-200">
+                  <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1 overflow-hidden">
                     <div 
-                      className={`progress-fill ${isCycloneDetected ? 'bg-emerald-600' : 'bg-slate-400'}`} 
+                      className="bg-slate-900 dark:bg-white h-1 rounded-full transition-all duration-500" 
                       style={{ width: `${Math.min(100, Math.max(5, (detectionResult.objectness ?? 0) * 100))}%` }}
                     />
                   </div>
 
                   {!isCycloneDetected && (
-                    <div className="text-[11px] text-slate-500 pt-0.5 leading-snug">
-                      Ambient / non-cyclonic atmosphere. Objectness fell below the detection threshold (50.0%). Downstream center localization and bounding box are suppressed.
-                    </div>
+                    <p className="text-[11px] text-slate-500 pt-0.5 leading-snug">
+                      Ambient marine atmosphere. Objectness fell below the detection threshold (50.0%). Center localization and bounding envelope are suppressed.
+                    </p>
                   )}
                 </div>
 
-                {/* 2. Detailed Gated Localization & Architecture Table */}
-                <div className="space-y-2.5 text-xs">
-                  {/* Center Localization (Image Space Coordinates) */}
-                  <div className="flex justify-between items-center py-1.5 border-b border-slate-100">
-                    <span className="text-slate-500 font-medium">Center Localization:</span>
-                    <span className={`font-mono text-xs ${isCycloneDetected && detectionResult.center ? 'font-bold text-slate-900' : 'font-semibold text-slate-500'}`}>
+                {/* 2. Coordinates Fix */}
+                <div className="space-y-2 text-xs">
+                  <div className="flex justify-between items-center py-1.5 border-b border-slate-100 dark:border-slate-800">
+                    <span className="text-slate-500 dark:text-slate-400">Center Localization:</span>
+                    <span className="font-mono font-medium text-slate-900 dark:text-white">
                       {isCycloneDetected && detectionResult.center
                         ? `X: ${Number(detectionResult.center.center_x_norm ?? 0).toFixed(3)}, Y: ${Number(detectionResult.center.center_y_norm ?? 0).toFixed(3)}`
                         : 'NOT AVAILABLE'}
                     </span>
                   </div>
 
-                  {/* Geographic Fix (Scientifically Gated on Verified Scene Extent) */}
-                  <div className="py-2 border-b border-slate-100 space-y-1">
+                  <div className="py-1.5 border-b border-slate-100 dark:border-slate-800 space-y-1">
                     <div className="flex justify-between items-center">
-                      <span className="text-slate-500 font-medium">Geographic Fix:</span>
-                      {isCycloneDetected && detectionResult.is_georeferenced && detectionResult.center?.lat != null ? (
-                        <span className="font-mono text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
-                          {detectionResult.coordinates?.formatted || `${Number(detectionResult.center.lat).toFixed(2)}°N, ${Number(detectionResult.center.lon).toFixed(2)}°E`}
-                        </span>
-                      ) : (
-                        <span className="font-mono text-[11px] font-semibold text-amber-800 bg-amber-50 px-2 py-0.5 rounded border border-amber-200">
-                          Unavailable
-                        </span>
-                      )}
+                      <span className="text-slate-500 dark:text-slate-400">Geographic Coordinate Fix:</span>
+                      <span className="font-mono text-xs font-semibold text-slate-900 dark:text-white">
+                        {isCycloneDetected && detectionResult.is_georeferenced && detectionResult.center?.lat != null
+                          ? (detectionResult.coordinates?.formatted || `${Number(detectionResult.center.lat).toFixed(2)}°N, ${Number(detectionResult.center.lon).toFixed(2)}°E`)
+                          : 'Relative (Uncalibrated)'}
+                      </span>
                     </div>
-                    {isCycloneDetected && (
-                      <div className="text-[11px] font-mono leading-tight">
-                        {detectionResult.is_georeferenced && detectionResult.center?.lat != null ? (
-                          <div className="text-slate-600 flex flex-col gap-0.5">
-                            <span>Scene Extent: [{currentInput?.bbox_geo?.join(', ') || 'EPSG:4326'}]</span>
-                            {currentInput?.ground_truth_center && (
-                              <span className="text-emerald-800 font-semibold">
-                                Best-Track Ref: {currentInput.ground_truth_center.lat}°N, {currentInput.ground_truth_center.lon}°E
-                                {(() => {
-                                  const R = 6371;
-                                  const lat1 = detectionResult.center.lat, lon1 = detectionResult.center.lon;
-                                  const lat2 = currentInput.ground_truth_center.lat, lon2 = currentInput.ground_truth_center.lon;
-                                  const dLat = (lat2 - lat1) * Math.PI / 180, dLon = (lon2 - lon1) * Math.PI / 180;
-                                  const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
-                                  const cle = Math.round(R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)) * 10) / 10;
-                                  return ` • CLE: ${cle} km`;
-                                })()}
-                              </span>
-                            )}
-                          </div>
-                        ) : (
-                          <span className="text-slate-500">
-                            Unavailable &mdash; uploaded image has no verified geospatial extent. Image-space center estimate available above.
-                          </span>
-                        )}
+                    {isCycloneDetected && currentInput?.ground_truth_center && (
+                      <div className="text-[11px] font-mono text-slate-400">
+                        Reference Ground Truth: {currentInput.ground_truth_center.lat}°N, {currentInput.ground_truth_center.lon}°E (IMD)
                       </div>
                     )}
                   </div>
 
-                  {/* Bounding Box Gated */}
-                  <div className="flex justify-between items-center py-1.5 border-b border-slate-100">
-                    <span className="text-slate-500 font-medium">Bounding Box (Norm):</span>
-                    <span className={`font-mono text-[11px] ${isCycloneDetected ? 'font-semibold text-slate-800' : 'text-slate-500'}`}>
+                  <div className="flex justify-between items-center py-1.5 border-b border-slate-100 dark:border-slate-800">
+                    <span className="text-slate-500 dark:text-slate-400">Bounding Box (Normalized):</span>
+                    <span className="font-mono text-slate-700 dark:text-slate-300 text-[11px]">
                       {isCycloneDetected && detectionResult.bounding_box
                         ? (Array.isArray(detectionResult.bounding_box)
-                            ? `[${detectionResult.bounding_box.map(v => typeof v === 'number' ? v.toFixed(3) : v).join(', ')}]`
-                            : `[${Number(detectionResult.bounding_box.ymin ?? 0).toFixed(3)}, ${Number(detectionResult.bounding_box.xmin ?? 0).toFixed(3)}, ${Number(detectionResult.bounding_box.ymax ?? 0).toFixed(3)}, ${Number(detectionResult.bounding_box.xmax ?? 0).toFixed(3)}]`)
+                            ? `[${detectionResult.bounding_box.map(v => typeof v === 'number' ? v.toFixed(2) : v).join(', ')}]`
+                            : `[${Number(detectionResult.bounding_box.ymin ?? 0).toFixed(2)}, ${Number(detectionResult.bounding_box.xmin ?? 0).toFixed(2)}, ${Number(detectionResult.bounding_box.ymax ?? 0).toFixed(2)}, ${Number(detectionResult.bounding_box.xmax ?? 0).toFixed(2)}]`)
                         : 'NOT AVAILABLE'}
                     </span>
                   </div>
 
-                  {/* Inference Latency */}
-                  <div className="flex justify-between items-center py-1.5 border-b border-slate-100">
-                    <span className="text-slate-500 font-medium">Inference Latency:</span>
-                    <span className="font-bold font-mono text-emerald-700">
+                  <div className="flex justify-between items-center py-1.5 border-b border-slate-100 dark:border-slate-800">
+                    <span className="text-slate-500 dark:text-slate-400">Inference Latency:</span>
+                    <span className="font-mono font-medium text-slate-900 dark:text-white">
                       {detectionResult.inference_time_ms ? `${detectionResult.inference_time_ms} ms` : 'N/A'}
                     </span>
                   </div>
 
-                  {/* Architecture Backbone */}
-                  <div className="flex justify-between items-center py-1.5 border-b border-slate-100">
-                    <span className="text-slate-500 font-medium">Architecture Backbone:</span>
-                    <span className="font-semibold text-slate-800">
-                      MobileNetV3-Small Dual-Head
-                    </span>
-                  </div>
-
-                  {/* Parameter Count */}
-                  <div className="flex justify-between items-center py-1.5 border-b border-slate-100">
-                    <span className="text-slate-500 font-medium">Parameter Count:</span>
-                    <span className="font-mono text-slate-800">
-                      1,075,431 parameters
-                    </span>
-                  </div>
-
-                  {/* Input Domain Metadata */}
-                  <div className="flex justify-between items-center py-1.5 border-b border-slate-100">
-                    <span className="text-slate-500 font-medium">Input Domain:</span>
-                    <span className="font-semibold text-slate-800">
-                      {isCustomUpload ? 'User Uploaded Frame' : 'Curated Synoptic Benchmark'}
-                    </span>
-                  </div>
-
-                  <div className="flex justify-between items-center py-1.5 border-b border-slate-100">
-                    <span className="text-slate-500 font-medium">Analysis Domain:</span>
-                    <span className="font-semibold text-slate-800">
-                      Satellite Imagery (NASA GIBS / MOSDAC)
+                  <div className="flex justify-between items-center py-1.5 border-b border-slate-100 dark:border-slate-800">
+                    <span className="text-slate-500 dark:text-slate-400">Model Architecture:</span>
+                    <span className="font-mono font-medium text-slate-800 dark:text-slate-200">
+                      MobileNetV3-Small (1.08M)
                     </span>
                   </div>
                 </div>
 
-                {isCustomUpload && (
-                  <div className="p-3 bg-amber-50/80 border border-amber-200 rounded-2xl text-[11px] text-amber-900 leading-snug">
-                    <span className="font-bold">Input Domain Notice:</span> General image input &mdash; model performance may vary outside the centered satellite training distribution. Regional weather maps with UI controls, graphics, and annotations fall outside the training domain.
-                  </div>
-                )}
               </div>
             ) : (
-              <EmptyState
-                icon={Target}
-                title={errorMsg ? "INPUT NOT SUITABLE FOR ANALYSIS" : "NO INFERENCE EXECUTED"}
-                description={errorMsg ? errorMsg : "This is an input image preview. No neural inference has been executed on this frame."}
-                action={
-                  <button 
-                    onClick={handleRunDetection}
-                    disabled={isDetecting || !activeImageSrc}
-                    className="btn-primary text-xs py-2 px-4 gap-2"
-                  >
-                    <Play className="w-3.5 h-3.5 fill-current" />
-                    <span>Run Detection Inference</span>
-                  </button>
-                }
-              >
-                <div className="p-3 bg-white rounded-lg border border-slate-100 text-[11px] text-slate-600 text-left font-mono space-y-1">
-                  <div className="text-slate-400 font-bold uppercase text-[10px] mb-1">Inference State Checklist:</div>
-                  <div>&bull; Cyclone Detected: <span className="text-amber-700 font-semibold">NOT EVALUATED</span></div>
-                  <div>&bull; Objectness Score: <span className="text-amber-700 font-semibold">NOT EVALUATED</span></div>
-                  <div>&bull; Predicted Center: <span className="text-amber-700 font-semibold">NOT COMPUTED</span></div>
-                  <div>&bull; Center Localization: <span className="text-amber-700 font-semibold">NOT AVAILABLE</span></div>
-                  <div>&bull; Bounding Box: <span className="text-amber-700 font-semibold">NOT COMPUTED</span></div>
-                  <div>&bull; Latency: <span className="text-amber-700 font-semibold">NOT MEASURED</span></div>
+              <div className="space-y-4 py-3">
+                <div className="p-3.5 rounded-xl border border-slate-200/70 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/30 space-y-2 text-xs text-slate-600 dark:text-slate-300">
+                  <span className="text-[10px] uppercase font-semibold font-mono tracking-wider text-slate-400 block">
+                    Execution Protocol
+                  </span>
+                  <p className="text-[11px] leading-relaxed">
+                    MobileNetV3-Small runs dual-head regression to identify marine convective organization, compute objectness probability, and regress center pixel coordinates.
+                  </p>
                 </div>
-              </EmptyState>
+
+                <button 
+                  onClick={handleRunDetection}
+                  disabled={isDetecting || !activeImageSrc}
+                  className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold bg-slate-900 hover:bg-slate-800 text-white dark:bg-white dark:text-slate-950 dark:hover:bg-slate-100 transition-all flex items-center justify-center gap-2 cursor-pointer shadow-sm"
+                >
+                  <Play className="w-3.5 h-3.5 fill-current" />
+                  <span>Execute MobileNetV3 Detection</span>
+                </button>
+              </div>
             )}
 
-            <div className="pt-2">
+            {/* Downstream Actions */}
+            <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-2">
               <button 
                 onClick={() => navigate('/dashboard/classification')}
-                className="btn-primary w-full text-xs py-2.5 justify-center gap-1.5"
+                className="w-full py-2.5 px-4 rounded-xl text-xs font-semibold bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700 flex items-center justify-center gap-2 cursor-pointer transition-colors"
               >
                 <span>Proceed to Morphology Classification</span>
-                <ChevronRight className="w-3.5 h-3.5" />
+                <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
               </button>
             </div>
           </div>
 
-          {/* Model Specification Card */}
-          <div className="card p-4 bg-slate-50 border-slate-100 space-y-2 text-xs text-slate-600">
-            <h4 className="font-bold text-slate-800 uppercase tracking-wider text-[11px]">
-              Scientific Verification Protocol
-            </h4>
-            <div className="space-y-1 font-mono text-[11px]">
-              <div>• <strong>Model:</strong> MobileNetV3-Small Dual-Head (Objectness + Localization)</div>
-              <div>• <strong>Held-out Benchmark:</strong> 100% objectness accuracy on held-out benchmark set</div>
-              <div>• <strong>Center Localization Error:</strong> 25.6 km validation CLE, 38.2 km test CLE</div>
-              <div>• <strong>Execution Mode:</strong> PyTorch Native CPU/MPS inference via FastAPI</div>
+          {/* Model Spec Note */}
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/30 border border-slate-200/70 dark:border-slate-800 space-y-1 text-xs text-slate-600 dark:text-slate-400">
+            <span className="text-[10px] font-mono font-semibold text-slate-400 uppercase tracking-wider block">
+              Validation Benchmark Metrics
+            </span>
+            <div className="space-y-0.5 font-mono text-[11px]">
+              <div>• <strong>Center Localization Error (CLE):</strong> 25.6 km validation, 38.2 km test</div>
+              <div>• <strong>Execution Runtime:</strong> ~15–25ms native inference via PyTorch</div>
             </div>
           </div>
 

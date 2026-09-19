@@ -6,7 +6,7 @@ import {
 import { 
   BrainCircuit, TrendingUp, ShieldCheck, 
   Activity, AlertTriangle, Compass, ShieldAlert, 
-  Navigation, ArrowRight, Info
+  Navigation, ArrowRight
 } from 'lucide-react';
 import { 
   Marker, Popup, Polyline, Polygon 
@@ -17,11 +17,7 @@ import VayuCycloneMap from '../components/VayuCycloneMap';
 import { useNavigate } from 'react-router-dom';
 import { predictCycloneTrack } from '../services/api';
 import { useAnalysisSession } from '../context/AnalysisSessionContext';
-import DataTypeBadge from '../components/DataTypeBadge';
-import LastUpdatedBadge from '../components/LastUpdatedBadge';
 import PageHeader from '../components/PageHeader';
-import StatusBadge from '../components/StatusBadge';
-import InfoCallout from '../components/InfoCallout';
 
 const VERIFIED_STORMS = [
   {
@@ -166,23 +162,23 @@ const Prediction = () => {
       {/* Standard Unified Header */}
       <PageHeader
         categoryBadge="FORECAST • TRAJECTORY"
-        categoryColor="blue"
+        categoryColor="slate"
         modelBadge="2-Layer GRU Seq2Seq (41,764 Params)"
         title="AI Spatiotemporal Trajectory Studio"
         subtitle="10-feature kinematic schema • Multi-Horizon 72h Spatiotemporal Trajectory Forecasting with 25-pass MC Dropout"
         actions={
           <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-slate-600 hidden sm:inline">Storm:</span>
-            <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-2xl border border-slate-100">
+            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 hidden sm:inline">Storm:</span>
+            <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200/80 dark:border-slate-700">
               {VERIFIED_STORMS.map((storm) => (
                 <button
                   key={storm.id}
                   onClick={() => handleSelectStorm(storm.id)}
                   disabled={isLoading}
-                  className={`px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-all ${
                     selectedStormId === storm.id
-                      ? 'bg-[#003087] text-white shadow-sm'
-                      : 'text-slate-600 hover:text-slate-900'
+                      ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-950 shadow-xs'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                   }`}
                 >
                   {storm.name}
@@ -195,31 +191,31 @@ const Prediction = () => {
 
       {/* Uploaded Image Temporal Sequence Scientific Disclosure */}
       {isCustomUpload ? (
-        <div className="p-4 bg-amber-50 border border-amber-300 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-2xs">
+        <div className="p-4 bg-slate-50 dark:bg-slate-900/60 border border-slate-200/80 dark:border-slate-800 rounded-2xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-2xs">
           <div className="space-y-1">
             <div className="flex items-center gap-2">
-              <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-200 text-amber-900 uppercase">
+              <span className="px-2 py-0.5 rounded text-[10px] font-mono font-medium bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-200 uppercase">
                 Temporal Sequence Required
               </span>
-              <span className="text-xs font-bold text-amber-950">
+              <span className="text-xs font-semibold text-slate-900 dark:text-slate-100">
                 CURRENT ANALYSIS IMAGE: {currentInput?.name}
               </span>
             </div>
-            <p className="text-xs text-amber-800 max-w-3xl leading-relaxed">
+            <p className="text-xs text-slate-600 dark:text-slate-400 max-w-3xl leading-relaxed">
               Trajectory forecasting requires a valid temporal track sequence. A single uploaded satellite frame cannot provide the historical sequence required by the GRU. Showing verified historical benchmark sequence below.
             </p>
           </div>
           <div className="flex items-center gap-2 shrink-0">
-            <span className="text-xs font-semibold text-slate-700">Select Storm:</span>
-            <div className="flex items-center gap-1.5 bg-white p-1 rounded-lg border border-amber-200">
+            <span className="text-xs font-medium text-slate-600 dark:text-slate-400">Select Storm:</span>
+            <div className="flex items-center gap-1 bg-white dark:bg-slate-800 p-1 rounded-lg border border-slate-200 dark:border-slate-700">
               {VERIFIED_STORMS.map((storm) => (
                 <button
                   key={storm.id}
                   onClick={() => setSelectedStormId(storm.id)}
-                  className={`px-2.5 py-1 rounded text-xs font-semibold transition-all ${
+                  className={`px-2.5 py-1 rounded text-xs font-medium transition-all ${
                     selectedStormId === storm.id
-                      ? 'bg-[#003087] text-white'
-                      : 'text-slate-600 hover:text-slate-900'
+                      ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-950'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                   }`}
                 >
                   {storm.id}
@@ -229,21 +225,21 @@ const Prediction = () => {
           </div>
         </div>
       ) : (
-        <InfoCallout
-          title="Trajectory Kinematics Protocol"
-          badge={`Active: ${activeStorm.name}`}
-        >
-          Deep GRU Seq2Seq autoregression requires historical track sequence data (IBTrACS 3-hourly fixes). Single-frame observations provide spatial fix & morphology, while trajectory forecasting executes on verified sequence tracks.
-        </InfoCallout>
+        <div className="p-4 bg-slate-50/80 dark:bg-slate-900/50 border border-slate-200/80 dark:border-slate-800 rounded-2xl text-xs text-slate-600 dark:text-slate-400 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <span className="font-semibold text-slate-800 dark:text-slate-200">Trajectory Kinematics Protocol:</span>
+            <span>Deep GRU Seq2Seq autoregression requires historical track sequence data (IBTrACS 3-hourly fixes). Active: <strong className="text-slate-900 dark:text-white font-mono">{activeStorm.name}</strong></span>
+          </div>
+        </div>
       )}
 
       {/* Error Banner */}
       {errorMsg && (
-        <div className="p-4 bg-red-50 border border-red-200 rounded-2xl flex items-start gap-3">
-          <AlertTriangle className="w-5 h-5 text-red-600 shrink-0 mt-0.5" />
+        <div className="p-4 bg-red-50/70 dark:bg-red-950/30 border border-red-200 dark:border-red-900/50 rounded-2xl flex items-start gap-3">
+          <AlertTriangle className="w-5 h-5 text-red-600 dark:text-red-400 shrink-0 mt-0.5" />
           <div className="text-xs">
-            <h4 className="font-bold text-red-900">FORECAST GENERATION FAILED</h4>
-            <p className="text-red-700 mt-0.5">{errorMsg}</p>
+            <h4 className="font-semibold text-red-900 dark:text-red-300">FORECAST GENERATION FAILED</h4>
+            <p className="text-red-700 dark:text-red-400 mt-0.5">{errorMsg}</p>
           </div>
         </div>
       )}
@@ -252,23 +248,23 @@ const Prediction = () => {
       <div className="grid grid-cols-1 xl:grid-cols-12 gap-6">
         
         {/* Left: GIS Leaflet Spatiotemporal Trajectory Map (7 Cols) */}
-        <div className="xl:col-span-7 card overflow-hidden flex flex-col">
-          <div className="card-header bg-white flex items-center justify-between">
+        <div className="xl:col-span-7 bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl overflow-hidden flex flex-col shadow-2xs">
+          <div className="px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Compass className="w-4 h-4 text-[#003087]" />
-              <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+              <Compass className="w-4 h-4 text-slate-700 dark:text-slate-300" />
+              <h3 className="text-xs font-semibold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
                 Predicted 72-Hour Spatiotemporal Trajectory & MC Uncertainty
               </h3>
             </div>
-            <div className="flex items-center gap-2 text-xs font-mono">
-              <span className="flex items-center gap-1">
-                <span className="w-2.5 h-2.5 rounded-full bg-red-600" /> Fix
+            <div className="flex items-center gap-3 text-xs font-mono text-slate-600 dark:text-slate-400">
+              <span className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-slate-900 dark:bg-white" /> Fix
               </span>
-              <span className="flex items-center gap-1">
-                <span className="w-2.5 h-2.5 rounded-full bg-sky-600" /> GRU Forecast
+              <span className="flex items-center gap-1.5">
+                <span className="w-2.5 h-2.5 rounded-full bg-slate-500" /> GRU Forecast
               </span>
-              <span className="flex items-center gap-1">
-                <span className="w-3 h-2 bg-sky-400/30 border border-sky-500" /> MC Uncertainty
+              <span className="flex items-center gap-1.5">
+                <span className="w-3 h-2 bg-slate-400/30 border border-slate-500" /> MC Uncertainty
               </span>
             </div>
           </div>
@@ -276,8 +272,8 @@ const Prediction = () => {
           <div className="h-[480px] w-full relative bg-slate-950">
             {isLoading ? (
               <div className="h-full w-full flex flex-col items-center justify-center text-white space-y-3">
-                <BrainCircuit className="w-8 h-8 text-sky-400 animate-spin" />
-                <span className="text-xs font-mono">Executing 2-Layer GRU Seq2Seq & 25-Pass MC Dropout...</span>
+                <BrainCircuit className="w-8 h-8 text-slate-300 animate-spin" />
+                <span className="text-xs font-mono text-slate-400">Executing 2-Layer GRU Seq2Seq & 25-Pass MC Dropout...</span>
               </div>
             ) : (
               <VayuCycloneMap
@@ -291,9 +287,9 @@ const Prediction = () => {
                   <Polygon
                     positions={conePolygon}
                     pathOptions={{
-                      color: '#0284c7',
-                      fillColor: '#38bdf8',
-                      fillOpacity: 0.22,
+                      color: '#64748B',
+                      fillColor: '#94A3B8',
+                      fillOpacity: 0.25,
                       weight: 1.5,
                       dashArray: '4, 4'
                     }}
@@ -305,7 +301,7 @@ const Prediction = () => {
                   <Polyline
                     positions={polylineCoords}
                     pathOptions={{
-                      color: '#0284c7',
+                      color: '#0F172A',
                       weight: 3,
                       opacity: 0.95
                     }}
@@ -329,7 +325,7 @@ const Prediction = () => {
                           <p className="text-slate-600 font-mono text-[10px]">
                             {pt.lat.toFixed(2)}°N, {pt.lon.toFixed(2)}°E
                           </p>
-                          <p className="text-sky-700 font-semibold text-[11px]">
+                          <p className="text-slate-900 font-semibold text-[11px]">
                             Wind: {Math.round(pt.wind * 1.852)} km/h ({Math.round(pt.wind)} kt)
                           </p>
                           <p className="text-slate-500 text-[10px]">
@@ -344,12 +340,12 @@ const Prediction = () => {
             )}
 
             {/* Scientific Notice overlay */}
-            <div className="absolute bottom-3 left-3 z-[1000] bg-black/85 text-cyan-300 text-[10px] font-mono px-2.5 py-1 rounded border border-white/10">
+            <div className="absolute bottom-3 left-3 z-[1000] bg-black/85 text-slate-300 text-[10px] font-mono px-2.5 py-1 rounded border border-white/10">
               Uncertainty: 25-pass MC Dropout (p=0.20) • Epistemic uncertainty estimate
             </div>
           </div>
 
-          <div className="p-3 bg-slate-50 border-t border-slate-100 text-xs text-slate-600 flex items-center justify-between">
+          <div className="p-3.5 bg-slate-50/50 dark:bg-slate-900/50 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-600 dark:text-slate-400 flex items-center justify-between">
             <span>
               <strong>Basin:</strong> {activeStorm.basin} • <strong>Storm:</strong> {activeStorm.name}
             </span>
@@ -363,19 +359,19 @@ const Prediction = () => {
         <div className="xl:col-span-5 space-y-5 flex flex-col justify-between">
           
           {/* Kinematic Sequence Telemetry */}
-          <div className="card p-5 space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-2xs space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
               <div className="flex items-center gap-2">
-                <Navigation className="w-5 h-5 text-[#003087]" />
-                <h3 className="font-bold text-sm text-slate-900">Kinematic Sequence Metrics</h3>
+                <Navigation className="w-4 h-4 text-slate-700 dark:text-slate-300" />
+                <h3 className="font-semibold text-sm text-slate-900 dark:text-white">Kinematic Sequence Metrics</h3>
               </div>
-              <span className="badge badge-navy text-[10px]">72h Autoregressive</span>
+              <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700">72h Autoregressive</span>
             </div>
 
             <div className="grid grid-cols-2 gap-3 text-xs">
-              <div className="p-3 bg-slate-50 border border-slate-100 rounded-2xl">
+              <div className="p-3.5 bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800 rounded-xl">
                 <span className="text-slate-400 text-[10px] block uppercase font-mono">Initial Fix (NOW)</span>
-                <span className="font-bold text-slate-900 text-xs mt-0.5 block font-mono">
+                <span className="font-semibold text-slate-900 dark:text-white text-xs mt-0.5 block font-mono">
                   {trajectoryList[0] ? `${trajectoryList[0].lat.toFixed(2)}°N, ${trajectoryList[0].lon.toFixed(2)}°E` : `${activeStorm.initial_lat}°N, ${activeStorm.initial_lon}°E`}
                 </span>
                 <span className="text-[10px] text-slate-500 font-mono mt-0.5 block">
@@ -383,9 +379,9 @@ const Prediction = () => {
                 </span>
               </div>
 
-              <div className="p-3 bg-slate-50 border border-slate-100 rounded-2xl">
+              <div className="p-3.5 bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800 rounded-xl">
                 <span className="text-slate-400 text-[10px] block uppercase font-mono">+72h Predicted Fix</span>
-                <span className="font-bold text-sky-700 text-xs mt-0.5 block font-mono">
+                <span className="font-semibold text-slate-900 dark:text-white text-xs mt-0.5 block font-mono">
                   {trajectoryList.length > 0 ? `${trajectoryList[trajectoryList.length - 1].lat.toFixed(2)}°N, ${trajectoryList[trajectoryList.length - 1].lon.toFixed(2)}°E` : '--'}
                 </span>
                 <span className="text-[10px] text-slate-500 font-mono mt-0.5 block">
@@ -393,69 +389,69 @@ const Prediction = () => {
                 </span>
               </div>
 
-              <div className="p-3 bg-slate-50 border border-slate-100 rounded-2xl">
+              <div className="p-3.5 bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800 rounded-xl">
                 <span className="text-slate-400 text-[10px] block uppercase font-mono">Epistemic Radius (+72h)</span>
-                <span className="font-bold text-slate-900 text-xs mt-0.5 block font-mono">
+                <span className="font-semibold text-slate-900 dark:text-white text-xs mt-0.5 block font-mono">
                   ±{trajectoryList.length > 0 ? Math.round(trajectoryList[trajectoryList.length - 1].uncertainty_radius_km || 0) : 0} km
                 </span>
                 <span className="text-[10px] text-slate-500 font-mono mt-0.5 block">25-Pass MC Dropout</span>
               </div>
 
-              <div className="p-3 bg-slate-50 border border-slate-100 rounded-2xl">
+              <div className="p-3.5 bg-slate-50 dark:bg-slate-800/40 border border-slate-200/60 dark:border-slate-800 rounded-xl">
                 <span className="text-slate-400 text-[10px] block uppercase font-mono">Step Discretization</span>
-                <span className="font-bold text-slate-900 text-xs mt-0.5 block font-mono">3-Hour Intervals</span>
+                <span className="font-semibold text-slate-900 dark:text-white text-xs mt-0.5 block font-mono">3-Hour Intervals</span>
                 <span className="text-[10px] text-slate-500 font-mono mt-0.5 block">24 Timesteps to +72h</span>
               </div>
             </div>
           </div>
 
           {/* Model Specification & Empirical Benchmarks */}
-          <div className="card p-5 space-y-3">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-2">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl p-5 shadow-2xs space-y-3">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
               <div className="flex items-center gap-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-600" />
-                <h3 className="font-bold text-xs text-slate-800 uppercase tracking-wider">
+                <ShieldCheck className="w-4 h-4 text-slate-700 dark:text-slate-300" />
+                <h3 className="font-semibold text-xs text-slate-800 dark:text-slate-200 uppercase tracking-wider">
                   Verified Empirical Benchmark Scope
                 </h3>
               </div>
-              <span className="text-[10px] font-mono text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200 font-bold">
+              <span className="text-[10px] font-mono text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700 font-semibold">
                 P &lt; 0.001
               </span>
             </div>
 
-            <div className="space-y-2 text-xs text-slate-600">
-              <div className="flex justify-between items-center py-1 border-b border-slate-100">
+            <div className="space-y-2 text-xs text-slate-600 dark:text-slate-400">
+              <div className="flex justify-between items-center py-1 border-b border-slate-100 dark:border-slate-800">
                 <span>Model Architecture:</span>
-                <span className="font-bold font-mono text-slate-900">2-Layer GRU Seq2Seq (41,764 params)</span>
+                <span className="font-semibold font-mono text-slate-900 dark:text-white">2-Layer GRU Seq2Seq (41,764 params)</span>
               </div>
-              <div className="flex justify-between items-center py-1 border-b border-slate-100">
+              <div className="flex justify-between items-center py-1 border-b border-slate-100 dark:border-slate-800">
                 <span>Canonical Feature Schema:</span>
-                <span className="font-bold font-mono text-slate-900">10 Kinematic Features</span>
+                <span className="font-semibold font-mono text-slate-900 dark:text-white">10 Kinematic Features</span>
               </div>
-              <div className="flex justify-between items-center py-1 border-b border-slate-100">
+              <div className="flex justify-between items-center py-1 border-b border-slate-100 dark:border-slate-800">
                 <span>Validation CLE (+72h):</span>
-                <span className="font-bold font-mono text-emerald-700">25.6 km (Cyclone DANA)</span>
+                <span className="font-semibold font-mono text-slate-900 dark:text-white">25.6 km (Cyclone DANA)</span>
               </div>
-              <div className="flex justify-between items-center py-1 border-b border-slate-100">
+              <div className="flex justify-between items-center py-1 border-b border-slate-100 dark:border-slate-800">
                 <span>Test CLE (+72h):</span>
-                <span className="font-bold font-mono text-sky-700">38.2 km (Cyclone BIPARJOY)</span>
+                <span className="font-semibold font-mono text-slate-900 dark:text-white">38.2 km (Cyclone BIPARJOY)</span>
               </div>
               <div className="flex justify-between items-center py-1">
                 <span>Skill vs Persistence (+72h):</span>
-                <span className="font-bold font-mono text-purple-700">+86.0 km lower mean error</span>
+                <span className="font-semibold font-mono text-slate-900 dark:text-white">+86.0 km lower mean error</span>
               </div>
             </div>
           </div>
 
           {/* Dedicated Impact Analysis Bridge */}
-          <div className="card p-5 bg-gradient-to-br from-red-50 to-amber-50/60 border border-red-200 space-y-3">
-            <div className="flex items-center gap-2">
-              <ShieldAlert className="w-5 h-5 text-red-600" />
+          <div className="bg-slate-900 dark:bg-slate-800 rounded-2xl p-5 text-white border border-slate-800 dark:border-slate-700 shadow-sm space-y-3">
+            <div className="flex items-center gap-3">
+              <ShieldAlert className="w-5 h-5 text-slate-300" />
               <div>
-                <h4 className="font-bold text-xs text-red-950 uppercase tracking-wider">
+                <h4 className="font-semibold text-xs text-white uppercase tracking-wider">
                   Impact & Landfall Assessment
                 </h4>
-                <p className="text-[11px] text-red-800 mt-0.5">
+                <p className="text-[11px] text-slate-400 mt-0.5">
                   Analyze high-resolution GIS coastal district impact polygons, storm surge projections, and CAP alert matrices for this trajectory.
                 </p>
               </div>
@@ -463,7 +459,7 @@ const Prediction = () => {
 
             <button
               onClick={() => navigate('/dashboard/impact')}
-              className="btn-danger w-full text-xs py-2.5 justify-center gap-2 shadow-sm"
+              className="w-full px-4 py-2.5 rounded-xl text-xs font-medium bg-white text-slate-950 hover:bg-slate-100 transition-colors flex items-center justify-center gap-2 shadow-xs cursor-pointer"
             >
               <span>Proceed to Impact & Landfall Studio</span>
               <ArrowRight className="w-4 h-4" />
@@ -475,11 +471,11 @@ const Prediction = () => {
       </div>
 
       {/* 3. Trajectory Sequence Table (+6h to +72h) */}
-      <div className="card overflow-hidden">
-        <div className="card-header bg-white flex items-center justify-between">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl overflow-hidden shadow-2xs">
+        <div className="px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Activity className="w-4 h-4 text-[#003087]" />
-            <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+            <Activity className="w-4 h-4 text-slate-700 dark:text-slate-300" />
+            <h3 className="text-xs font-semibold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
               Autoregressive 3-Hourly Forecast Trajectory Schedule
             </h3>
           </div>
@@ -488,35 +484,35 @@ const Prediction = () => {
 
         <div className="overflow-x-auto">
           <table className="w-full text-xs text-left">
-            <thead className="bg-slate-50 border-b border-slate-100 text-slate-500 font-mono text-[11px]">
+            <thead className="bg-slate-50/80 dark:bg-slate-800/40 border-b border-slate-100 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-mono text-[11px]">
               <tr>
-                <th className="py-2.5 px-4 font-semibold">Forecast Horizon</th>
-                <th className="py-2.5 px-4 font-semibold">Lead Time</th>
-                <th className="py-2.5 px-4 font-semibold">Latitude</th>
-                <th className="py-2.5 px-4 font-semibold">Longitude</th>
-                <th className="py-2.5 px-4 font-semibold">Max Winds</th>
-                <th className="py-2.5 px-4 font-semibold">Central MSLP</th>
-                <th className="py-2.5 px-4 font-semibold">MC Uncertainty Radius</th>
-                <th className="py-2.5 px-4 font-semibold">Evolutionary Stage</th>
+                <th className="py-3 px-4 font-medium">Forecast Horizon</th>
+                <th className="py-3 px-4 font-medium">Lead Time</th>
+                <th className="py-3 px-4 font-medium">Latitude</th>
+                <th className="py-3 px-4 font-medium">Longitude</th>
+                <th className="py-3 px-4 font-medium">Max Winds</th>
+                <th className="py-3 px-4 font-medium">Central MSLP</th>
+                <th className="py-3 px-4 font-medium">MC Uncertainty Radius</th>
+                <th className="py-3 px-4 font-medium">Evolutionary Stage</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100 font-mono text-[11px]">
+            <tbody className="divide-y divide-slate-100 dark:divide-slate-800 font-mono text-[11px]">
               {trajectoryList.map((pt, idx) => {
                 const isNow = pt.time === 'NOW' || idx === 0;
                 return (
-                  <tr key={idx} className={isNow ? 'bg-blue-50/50 font-bold' : 'hover:bg-slate-50'}>
-                    <td className="py-2 px-4 text-slate-900 font-bold">{pt.time}</td>
-                    <td className="py-2 px-4 text-slate-500">{pt.lead_hours}h</td>
-                    <td className="py-2 px-4 text-slate-800">{pt.lat.toFixed(2)}°N</td>
-                    <td className="py-2 px-4 text-slate-800">{pt.lon.toFixed(2)}°E</td>
-                    <td className="py-2 px-4 text-red-600 font-bold">
+                  <tr key={idx} className={isNow ? 'bg-slate-100/60 dark:bg-slate-800/60 font-semibold' : 'hover:bg-slate-50/80 dark:hover:bg-slate-800/30'}>
+                    <td className="py-2.5 px-4 text-slate-900 dark:text-white font-semibold">{pt.time}</td>
+                    <td className="py-2.5 px-4 text-slate-500">{pt.lead_hours}h</td>
+                    <td className="py-2.5 px-4 text-slate-800 dark:text-slate-200">{pt.lat.toFixed(2)}°N</td>
+                    <td className="py-2.5 px-4 text-slate-800 dark:text-slate-200">{pt.lon.toFixed(2)}°E</td>
+                    <td className="py-2.5 px-4 text-slate-900 dark:text-white font-semibold">
                       {Math.round(pt.wind * 1.852)} km/h ({Math.round(pt.wind)} kt)
                     </td>
-                    <td className="py-2 px-4 text-slate-700">{pt.pressure} hPa</td>
-                    <td className="py-2 px-4 text-sky-700 font-semibold">
+                    <td className="py-2.5 px-4 text-slate-600 dark:text-slate-300">{pt.pressure} hPa</td>
+                    <td className="py-2.5 px-4 text-slate-700 dark:text-slate-300">
                       {pt.uncertainty_radius_km ? `±${Math.round(pt.uncertainty_radius_km)} km` : '0 km (Initial Fix)'}
                     </td>
-                    <td className="py-2 px-4 text-slate-600 font-sans font-medium">{pt.stage || 'Forecast Point'}</td>
+                    <td className="py-2.5 px-4 text-slate-600 dark:text-slate-400 font-sans font-medium">{pt.stage || 'Forecast Point'}</td>
                   </tr>
                 );
               })}
@@ -526,27 +522,27 @@ const Prediction = () => {
       </div>
 
       {/* 4. Real GRU Intensity & Pressure Curves */}
-      <div className="card overflow-hidden">
-        <div className="card-header bg-white flex items-center justify-between">
+      <div className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 rounded-2xl overflow-hidden shadow-2xs">
+        <div className="px-5 py-3.5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <TrendingUp className="w-4 h-4 text-[#003087]" />
-            <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+            <TrendingUp className="w-4 h-4 text-slate-700 dark:text-slate-300" />
+            <h3 className="text-xs font-semibold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
               Kinematic Evolution Curve (GRU Autoregressive Sequence)
             </h3>
           </div>
-          <div className="flex items-center gap-1.5 bg-slate-100 p-1 rounded-lg text-xs">
+          <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl text-xs">
             <button
               onClick={() => setChartMetric('wind')}
-              className={`px-3 py-1 rounded font-medium transition-all ${
-                chartMetric === 'wind' ? 'bg-white text-[#003087] shadow-sm' : 'text-slate-600'
+              className={`px-3 py-1 rounded-lg font-medium transition-all ${
+                chartMetric === 'wind' ? 'bg-white text-slate-900 shadow-xs dark:bg-slate-900 dark:text-white' : 'text-slate-600 dark:text-slate-400'
               }`}
             >
               Wind Speed (km/h)
             </button>
             <button
               onClick={() => setChartMetric('pressure')}
-              className={`px-3 py-1 rounded font-medium transition-all ${
-                chartMetric === 'pressure' ? 'bg-white text-[#003087] shadow-sm' : 'text-slate-600'
+              className={`px-3 py-1 rounded-lg font-medium transition-all ${
+                chartMetric === 'pressure' ? 'bg-white text-slate-900 shadow-xs dark:bg-slate-900 dark:text-white' : 'text-slate-600 dark:text-slate-400'
               }`}
             >
               Central Pressure (hPa)
@@ -562,10 +558,10 @@ const Prediction = () => {
                 <XAxis dataKey="time" tick={{ fontSize: 11, fill: '#64748B' }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 11, fill: '#64748B' }} axisLine={false} tickLine={false} unit=" km/h" />
                 <Tooltip 
-                  contentStyle={{ borderRadius: 8, border: '1px solid #E2E8F0', fontSize: 12 }}
+                  contentStyle={{ borderRadius: 12, border: '1px solid #E2E8F0', fontSize: 12 }}
                   formatter={(val) => [`${val} km/h`, 'Wind Velocity']}
                 />
-                <Area type="monotone" dataKey="wind_kmh" stroke="#DC2626" fill="#FEE2E2" strokeWidth={2} name="Wind Velocity" />
+                <Area type="monotone" dataKey="wind_kmh" stroke="#0F172A" fill="#F1F5F9" strokeWidth={2} name="Wind Velocity" />
               </AreaChart>
             ) : (
               <LineChart data={chartData} margin={{ top: 10, right: 20, left: 0, bottom: 0 }}>
@@ -573,10 +569,10 @@ const Prediction = () => {
                 <XAxis dataKey="time" tick={{ fontSize: 11, fill: '#64748B' }} axisLine={false} tickLine={false} />
                 <YAxis domain={['dataMin - 5', 'dataMax + 5']} tick={{ fontSize: 11, fill: '#64748B' }} axisLine={false} tickLine={false} unit=" hPa" />
                 <Tooltip 
-                  contentStyle={{ borderRadius: 8, border: '1px solid #E2E8F0', fontSize: 12 }}
+                  contentStyle={{ borderRadius: 12, border: '1px solid #E2E8F0', fontSize: 12 }}
                   formatter={(val) => [`${val} hPa`, 'Central MSLP']}
                 />
-                <Line type="monotone" dataKey="pressure_hpa" stroke="#003087" strokeWidth={2} dot={{ r: 4 }} name="Pressure MSLP" />
+                <Line type="monotone" dataKey="pressure_hpa" stroke="#0F172A" strokeWidth={2} dot={{ r: 4, fill: '#0F172A' }} name="Pressure MSLP" />
               </LineChart>
             )}
           </ResponsiveContainer>
