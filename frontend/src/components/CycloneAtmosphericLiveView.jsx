@@ -3,12 +3,16 @@ import React, { useRef, useEffect, useState } from 'react';
 /**
  * CycloneAtmosphericLiveView
  * -------------------------------------------------------------
- * 100% faithful to the original satellite photograph:
- * 1. Preserves original image colors, framing, landmass, ocean, and horizon exactly.
- * 2. Only the cyclone clouds swirl counter-clockwise along the spiral rainband path.
- * 3. Slower, gentle, and majestic rotation speed.
- * 4. Outside the storm (India, ocean, space horizon, and all 4 edges), the image is 100% static original photo.
- * 5. Zero edge streaking or border artifacts.
+ * 1. Proper Earth Visibility:
+ *    Calibrated horizontal focal framing so the Earth horizon, Indian subcontinent,
+ *    and coastlines are properly visible on the left and top.
+ * 2. Continuous, Seamless Cloud Swirl (NO Cuts / NO Pauses / NO Restarts):
+ *    Continuous mathematical angular rotation around the cyclone eye.
+ *    No period reset, no jump, no cross-fade loop — just perpetual, slow, silky-smooth motion.
+ * 3. 100% Clean Borders & Static Earth:
+ *    Rotation is strictly bounded to the cyclone vortex (r <= 0.32).
+ *    All background land, ocean, and 4 sides are 100% static original photo.
+ *    Zero streaking or edge artifacts.
  */
 
 const VERTEX_SHADER_SOURCE = `
@@ -30,7 +34,8 @@ const FRAGMENT_SHADER_SOURCE = `
   varying vec2 v_uv;
 
   void main() {
-    // 1. Exact CSS object-cover UV mapping for 1200x896 original photograph
+    // 1. Calibrated Framing for Proper Earth Visibility:
+    // Original photo aspect ratio: 1200 / 896 = 1.339286
     float imgAspect = 1200.0 / 896.0;
     float screenAspect = u_resolution.x / max(u_resolution.y, 1.0);
 
@@ -38,64 +43,57 @@ const FRAGMENT_SHADER_SOURCE = `
     if (screenAspect > imgAspect) {
       imgUV = vec2(v_uv.x, (v_uv.y - 0.5) * (imgAspect / screenAspect) + 0.5);
     } else {
-      imgUV = vec2((v_uv.x - 0.5) * (screenAspect / imgAspect) + 0.5, v_uv.y);
+      // Container is taller than image (vertical login card pane):
+      // Horizontal focal point shifted to 0.43 to show the Indian landmass & Earth curvature properly!
+      float scale = screenAspect / imgAspect;
+      imgUV = vec2((v_uv.x - 0.5) * scale + 0.43, v_uv.y);
     }
 
-    // Base original photo sample
+    // Original base photo sample
     vec4 baseColor = texture2D(u_texture, clamp(imgUV, 0.0, 1.0));
 
-    // 2. Cyclone Eye in exact photograph coordinates
+    // 2. Cyclone Eye Coordinates in the photograph
     vec2 eye = vec2(0.501, 0.500);
     vec2 d = imgUV - eye;
-    d.y /= imgAspect; // Correct for image aspect ratio
+    d.y /= imgAspect; // Circular metric
     float r = length(d);
 
-    // 3. Cloud Isolation Mask:
-    // Only animate within the cyclone storm radius (fade out before reaching land/space borders)
-    float stormRadiusMask = smoothstep(0.42, 0.10, r);
+    // 3. Storm Vortex Zone Mask:
+    // Strictly bounded inside r <= 0.32 (well away from all 4 borders).
+    // Beyond r = 0.32, rotMask is EXACTLY 0.0 (Earth landmass, ocean & all borders stay 100% static!)
+    float rotMask = smoothstep(0.32, 0.18, r);
 
-    // Brightness mask: Only move the bright cloud structures, leave dark ocean/land static
-    float cloudLuminance = dot(baseColor.rgb, vec3(0.299, 0.587, 0.114));
-    float cloudMask = smoothstep(0.20, 0.55, cloudLuminance) * stormRadiusMask;
+    // Only rotate bright cloud structures
+    float lum = dot(baseColor.rgb, vec3(0.299, 0.587, 0.114));
+    float cloudMask = smoothstep(0.20, 0.52, lum) * rotMask;
 
-    // If outside the cloud storm, render the exact original photo directly
-    if (cloudMask <= 0.001) {
+    // Fast path: If outside storm or on dark ocean/land, output original photo directly
+    if (cloudMask <= 0.0005) {
       gl_FragColor = baseColor;
       return;
     }
 
-    // 4. Counter-Clockwise Spiral Flow Direction:
-    vec2 tangent = vec2(-d.y, d.x) / max(r, 0.001);
-    vec2 inward = -d / max(r, 0.001);
-    // Inward spiral pitch along the rainbands (~16 degrees)
-    vec2 flowDir = normalize(tangent + 0.28 * inward);
-    flowDir.y *= imgAspect;
+    // 4. Continuous, Perpetual Rotation (Zero Cuts / Zero Pauses / Zero Restarts):
+    // Angular velocity: One majestic, graceful full revolution every ~160 seconds
+    float omega = 0.038; // rad/sec
+    float rotAngle = -u_time * omega;
 
-    // Modified Burgers vortex velocity curve:
-    // Eyewall has peak rotational speed, tapering off naturally outward
-    float rCore = 0.085;
-    float vortexProfile = (2.0 * (r / rCore)) / (1.0 + pow(r / rCore, 2.0));
+    // Angle of current pixel relative to eye
+    float currentAngle = atan(d.y, d.x);
 
-    // Slow, graceful rotation speed requested by user
-    float maxFlow = 0.015 * vortexProfile * cloudMask;
+    // Continuous rotation angle smoothly modulated by storm radius
+    float sampleAngle = currentAngle + rotAngle * rotMask;
 
-    // Dual-phase seamless flow advection (5.2-second slow majestic period)
-    float period = 5.2;
-    float phase1 = fract(u_time / period);
-    float phase2 = fract((u_time / period) + 0.5);
+    // Rotated sample position
+    vec2 dRot = r * vec2(cos(sampleAngle), sin(sampleAngle));
+    dRot.y *= imgAspect; // Re-apply aspect ratio
+    vec2 sampleUV = eye + dRot;
 
-    vec2 uv1 = imgUV + flowDir * maxFlow * (phase1 - 0.5);
-    vec2 uv2 = imgUV + flowDir * maxFlow * (phase2 - 0.5);
+    // Sample rotated cloud texture
+    vec4 rotColor = texture2D(u_texture, clamp(sampleUV, 0.0, 1.0));
 
-    // Smooth sinusoidal crossfade
-    float weight = 0.5 - 0.5 * cos(phase1 * 6.2831853);
-
-    vec4 sample1 = texture2D(u_texture, clamp(uv1, 0.0, 1.0));
-    vec4 sample2 = texture2D(u_texture, clamp(uv2, 0.0, 1.0));
-    vec4 movingClouds = mix(sample1, sample2, weight);
-
-    // Blend only moving clouds into original photo
-    gl_FragColor = mix(baseColor, movingClouds, cloudMask);
+    // 5. Seamlessly blend rotating clouds with static background
+    gl_FragColor = mix(baseColor, rotColor, cloudMask);
   }
 `;
 
