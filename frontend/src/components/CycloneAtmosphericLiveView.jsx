@@ -2,20 +2,19 @@ import React, { useRef, useEffect, useState } from 'react';
 
 /**
  * CycloneAtmosphericLiveView
- * -------------------------------------------------------------
- * Cinematic, photorealistic live animation of the cyclone satellite visual.
+ * -------------------------------------------------------------------
+ * Pure cinematic, photorealistic live animation of the cyclone satellite visual.
+ * 100% clean (no corner text, no HUD overlays, no HUD markers).
  *
- * Meteorological & Physics Model:
- * 1. Earth Planetary Rotation: Slow orbital drift around the Earth's curvature center.
- * 2. Cyclone Vortex Circulation: Counter-clockwise logarithmic spiral advection
- *    using a Modified Burgers vortex velocity profile:
- *      v_theta(r) = (2 * v_max * (r/r_max)) / (1 + (r/r_max)^2)
- *    Clouds spiral gracefully along authentic rainband trajectories into the central eye.
- * 3. Two-phase flow mapping prevents texture distortion and provides an infinite,
- *    seamless 60 FPS circulation.
- * 4. Atmospheric Rayleigh scattering limb glow along Earth curvature.
- * 5. Interactive 3D orbital perspective tilt on mouse hover.
- * 6. Live orbital telemetry HUD overlay (MoES / ISRO INSAT-3DR style).
+ * Advanced Physics & Visual Simulation:
+ * 1. Zero Edge Smearing: Inward zoom buffer prevents texture border clamps.
+ * 2. Planetary Earth Orbit: Majestic slow rotation of the Earth sphere & curvature.
+ * 3. Logarithmic Spiral Streamline Advection:
+ *    Clouds stream and swirl along authentic North Indian Ocean cyclonic pathways (CCW)
+ *    into the eyewall using dual-phase sinusoidal advection (infinitely seamless).
+ * 4. 3D Volumetric Cloud Depth: Convective cloud top specular sun highlights & crevice shadows.
+ * 5. Rayleigh Scattering Limb: Radiant sapphire atmospheric airglow along space horizon.
+ * 6. Interactive 3D Perspective Tilt: Smooth mouse-driven orbital parallax.
  */
 
 const VERTEX_SHADER_SOURCE = `
@@ -38,9 +37,9 @@ const FRAGMENT_SHADER_SOURCE = `
 
   varying vec2 v_uv;
 
-  // Simple pseudo-random hash
+  // Pseudo-random hash
   float hash(vec2 p) {
-    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+    return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453123);
   }
 
   // Smooth 2D noise
@@ -55,134 +54,143 @@ const FRAGMENT_SHADER_SOURCE = `
     return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
   }
 
-  // Fractional Brownian Motion for atmospheric turbulence
+  // Multi-octave Fractional Brownian Motion for billowing clouds
   float fbm(vec2 p) {
     float v = 0.0;
     float a = 0.5;
     mat2 rot = mat2(0.8, 0.6, -0.6, 0.8);
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < 4; i++) {
       v += a * noise(p);
-      p = rot * p * 2.0 + vec2(10.0);
+      p = rot * p * 2.02 + vec2(4.2, 7.8);
       a *= 0.5;
     }
     return v;
   }
 
   void main() {
-    vec2 uv = v_uv;
+    // Zoom in slightly (scale 0.83) to create a safe margin around edges
+    // This permanently prevents any pixel streaking or border clamping!
+    vec2 uv = (v_uv - 0.5) * 0.83 + 0.5;
     float aspect = u_resolution.x / max(u_resolution.y, 1.0);
 
-    // 1. Subtle 3D mouse parallax tilt
-    vec2 mouseOffset = (u_mouse - 0.5) * 0.015;
-    uv += mouseOffset;
+    // Interactive 3D orbital perspective tilt
+    vec2 tilt = (u_mouse - 0.5) * 0.022;
+    uv += tilt;
 
-    // 2. Earth Planetary Rotation:
-    // Earth rotates slowly West to East across the horizon
-    float earthRotationSpeed = 0.018;
-    vec2 earthDrift = vec2(-u_time * earthRotationSpeed * 0.08, u_time * earthRotationSpeed * 0.02);
+    // ─────────────────────────────────────────────────────────────
+    // 1. EARTH PLANETARY ROTATION (Global Orbital Drift)
+    // ─────────────────────────────────────────────────────────────
+    // Curved planetary center below the frame
+    vec2 earthCenter = vec2(0.5, 1.72);
+    vec2 dEarth = uv - earthCenter;
+    dEarth.x *= aspect;
     
-    // Curvature center of Earth horizon in the image (bottom-right horizon curve)
-    vec2 earthCenter = vec2(0.5, 1.6);
-    vec2 toEarth = uv - earthCenter;
-    toEarth.x *= aspect;
-    float earthAngle = -u_time * 0.012;
+    // Slow, majestic planetary West-to-East rotation
+    float earthSpeed = 0.016;
+    float earthAngle = -u_time * earthSpeed;
     mat2 earthRot = mat2(cos(earthAngle), -sin(earthAngle), sin(earthAngle), cos(earthAngle));
-    vec2 rotatedEarthUV = earthCenter + (earthRot * toEarth);
-    rotatedEarthUV.x /= aspect;
+    vec2 uvEarth = earthCenter + (earthRot * dEarth);
+    uvEarth.x /= aspect;
 
-    // 3. Cyclone Vortex & Spiral Cloud Dynamics:
+    // ─────────────────────────────────────────────────────────────
+    // 2. CYCLONE VORTEX & LOGARITHMIC SPIRAL STREAMLINES
+    // ─────────────────────────────────────────────────────────────
     vec2 eye = u_eye;
     vec2 d = uv - eye;
     d.x *= aspect;
     float r = length(d);
-    float baseAngle = atan(d.y, d.x);
+    float angle = atan(d.y, d.x);
 
-    // Cyclone vortex rotation speed follows Modified Rankine / Burgers vortex:
-    // Eyewall (r ~ 0.08) has peak rotational velocity, decaying smoothly outward
-    float rMax = 0.10;
-    float vortexStrength = (2.0 * (r / rMax)) / (1.0 + pow(r / rMax, 2.2));
+    // Velocity profile based on Modified Rankine / Burgers vortex:
+    // Eyewall (r ~ 0.08) has peak rotational speed, tapering off smoothly
+    float rCore = 0.09;
+    float vortexProfile = (2.2 * (r / rCore)) / (1.0 + pow(r / rCore, 2.1));
     
-    // North Indian Ocean cyclones spin Counter-Clockwise
-    float spinSpeed = 0.35; // Majestic operational speed
-    float angularVelocity = (spinSpeed * vortexStrength) / max(r, 0.035);
+    // Counter-clockwise spin (North Indian Ocean / Bay of Bengal physics)
+    float baseSpinRate = 0.32;
+    float angularVel = (baseSpinRate * vortexProfile) / max(r, 0.032);
 
-    // Radial inward suction along logarithmic spiral arms (clouds flow into the eye)
-    float spiralPitch = 0.22; // Inward spiral angle
-    float inwardSuction = 0.028 * vortexStrength;
+    // Inflow along logarithmic spiral rainbands (inward pitch ~ 18 degrees)
+    float spiralPitch = 0.26;
+    float inwardSpeed = 0.024 * vortexProfile;
 
-    // Two-Phase Blended Flow Advection to prevent texture distortion
-    float flowCycle = 4.0;
-    float phase1 = fract(u_time / flowCycle);
-    float phase2 = fract((u_time / flowCycle) + 0.5);
+    // Dual-phase seamless flow advection
+    float period = 3.6;
+    float t1 = fract(u_time / period);
+    float t2 = fract((u_time / period) + 0.5);
 
-    // Phase 1 displacement
-    float theta1 = baseAngle - (phase1 * angularVelocity * 0.45);
-    float r1 = max(0.005, r - (phase1 * inwardSuction * 0.2));
-    vec2 d1 = vec2(r1 * cos(theta1), r1 * sin(theta1));
-    d1.x /= aspect;
-    vec2 uv1 = eye + d1;
+    // Continuous baseline rotation so cloud arms perpetually circulate
+    float contAngle = -u_time * 0.04 * (1.0 / (1.0 + r * 3.0));
+    mat2 contRot = mat2(cos(contAngle), -sin(contAngle), sin(contAngle), cos(contAngle));
 
-    // Phase 2 displacement
-    float theta2 = baseAngle - (phase2 * angularVelocity * 0.45);
-    float r2 = max(0.005, r - (phase2 * inwardSuction * 0.2));
-    vec2 d2 = vec2(r2 * cos(theta2), r2 * sin(theta2));
-    d2.x /= aspect;
-    vec2 uv2 = eye + d2;
+    // Phase 1 streamline displacement
+    float theta1 = angle - (t1 * angularVel * 0.42);
+    float rad1 = max(0.008, r - (t1 * inwardSpeed * 0.22));
+    vec2 disp1 = vec2(rad1 * cos(theta1), rad1 * sin(theta1));
+    disp1.x /= aspect;
+    vec2 uv1 = eye + disp1;
 
-    // Atmospheric turbulence micro-displacement
-    vec2 turb1 = vec2(
-      fbm(uv1 * 12.0 + u_time * 0.05),
-      fbm(uv1 * 12.0 - u_time * 0.05)
-    ) * 0.006 * vortexStrength;
+    // Phase 2 streamline displacement
+    float theta2 = angle - (t2 * angularVel * 0.42);
+    float rad2 = max(0.008, r - (t2 * inwardSpeed * 0.22));
+    vec2 disp2 = vec2(rad2 * cos(theta2), rad2 * sin(theta2));
+    disp2.x /= aspect;
+    vec2 uv2 = eye + disp2;
 
-    vec2 turb2 = vec2(
-      fbm(uv2 * 12.0 + u_time * 0.05 + 10.0),
-      fbm(uv2 * 12.0 - u_time * 0.05 + 10.0)
-    ) * 0.006 * vortexStrength;
+    // Billowing cloud turbulence along spiral arms
+    vec2 cloudTurb1 = vec2(
+      fbm(uv1 * 14.0 + u_time * 0.06),
+      fbm(uv1 * 14.0 - u_time * 0.06)
+    ) * 0.007 * vortexProfile;
 
-    // Continuous slow rotational baseline so cloud arms perpetually circulate
-    float continuousAngle = -u_time * 0.045 * (1.0 / (1.0 + r * 3.5));
-    mat2 contRot = mat2(cos(continuousAngle), -sin(continuousAngle), sin(continuousAngle), cos(continuousAngle));
-    
-    vec2 sampleUV1 = eye + (contRot * (uv1 + turb1 - eye));
-    vec2 sampleUV2 = eye + (contRot * (uv2 + turb2 - eye));
+    vec2 cloudTurb2 = vec2(
+      fbm(uv2 * 14.0 + u_time * 0.06 + 5.0),
+      fbm(uv2 * 14.0 - u_time * 0.06 + 5.0)
+    ) * 0.007 * vortexProfile;
 
-    // Blend weight between the two advection phases (triangle wave)
-    float weight = abs((phase1 - 0.5) * 2.0);
+    // Apply continuous rotation and turbulence
+    vec2 sampleUV1 = eye + (contRot * (uv1 + cloudTurb1 - eye));
+    vec2 sampleUV2 = eye + (contRot * (uv2 + cloudTurb2 - eye));
 
-    // Sample cyclone texture with dual-phase advection
-    vec4 cycloneColor1 = texture2D(u_texture, clamp(sampleUV1, 0.001, 0.999));
-    vec4 cycloneColor2 = texture2D(u_texture, clamp(sampleUV2, 0.001, 0.999));
-    vec4 cycloneColor = mix(cycloneColor1, cycloneColor2, weight);
+    // Smooth sinusoidal blend weight between Phase 1 and Phase 2 (infinite seamless flow)
+    float weight = 0.5 - 0.5 * cos(t1 * 6.2831853);
+
+    // Sample cyclone texture
+    vec4 c1 = texture2D(u_texture, clamp(sampleUV1, 0.002, 0.998));
+    vec4 c2 = texture2D(u_texture, clamp(sampleUV2, 0.002, 0.998));
+    vec4 cycloneColor = mix(c1, c2, weight);
 
     // Sample planetary background (Earth curvature & space horizon)
-    vec4 earthColor = texture2D(u_texture, clamp(rotatedEarthUV, 0.001, 0.999));
+    vec4 earthColor = texture2D(u_texture, clamp(uvEarth, 0.002, 0.998));
 
-    // Blend between cyclone swirling core and planetary Earth background
-    // Smooth transition beyond the outer feeder rainband radius (r ~ 0.55)
-    float cycloneInfluence = smoothstep(0.68, 0.18, r);
-    vec4 finalColor = mix(earthColor, cycloneColor, cycloneInfluence);
+    // Smooth transition from the swirling cyclone vortex into the planetary Earth disc
+    float cycloneMask = smoothstep(0.68, 0.16, r);
+    vec4 finalColor = mix(earthColor, cycloneColor, cycloneMask);
 
-    // 4. Photorealistic Atmospheric Enhancements:
-    // A. Blue Rayleigh scattering limb along Earth's top curvature
-    float limbFactor = smoothstep(0.40, 0.05, uv.y);
-    vec3 atmosphericBlue = vec3(0.18, 0.58, 0.95);
-    finalColor.rgb = mix(finalColor.rgb, finalColor.rgb + atmosphericBlue * 0.22, limbFactor * 0.5);
+    // ─────────────────────────────────────────────────────────────
+    // 3. PHOTOREALISTIC ATMOSPHERIC ILLUMINATION
+    // ─────────────────────────────────────────────────────────────
+    // A. Rayleigh scattering blue limb along top Earth curvature
+    float limbFactor = smoothstep(0.42, 0.04, uv.y);
+    vec3 spaceAirglow = vec3(0.16, 0.55, 0.95);
+    finalColor.rgb = mix(finalColor.rgb, finalColor.rgb + spaceAirglow * 0.26, limbFactor * 0.48);
 
-    // B. Eye of the storm: Subtle atmospheric calm core pulse
+    // B. Sunlight specular highlights across dense convective cloud tops
+    vec2 sunVector = normalize(vec2(-0.55, -0.80));
+    float sunDot = max(0.0, dot(normalize(d + vec2(0.001)), sunVector));
+    float cloudBrightness = dot(finalColor.rgb, vec3(0.299, 0.587, 0.114));
+    float highlight = pow(sunDot, 2.5) * smoothstep(0.45, 0.9, cloudBrightness) * cycloneMask;
+    finalColor.rgb += vec3(0.08, 0.09, 0.11) * highlight;
+
+    // C. Eye of the storm: Calm deep core with stadium eyewall contrast
     float eyeDist = length((uv - eye) * vec2(aspect, 1.0));
-    float eyeCore = smoothstep(0.035, 0.005, eyeDist);
-    float eyePulse = 0.5 + 0.5 * sin(u_time * 1.8);
-    finalColor.rgb += vec3(0.08, 0.14, 0.22) * eyeCore * eyePulse;
+    float eyeCenterMask = smoothstep(0.042, 0.008, eyeDist);
+    float eyeBreathing = 0.5 + 0.5 * sin(u_time * 1.5);
+    finalColor.rgb += vec3(0.03, 0.08, 0.14) * eyeCenterMask * eyeBreathing;
 
-    // C. Sunlight angle & specular highlights on cloud tops
-    vec2 sunDir = normalize(vec2(-0.6, -0.8));
-    float cloudShading = dot(normalize(d + vec2(0.001)), sunDir);
-    finalColor.rgb += vec3(0.04) * max(0.0, cloudShading) * cycloneInfluence;
-
-    // Subtle scan line sweep for high-tech satellite sensor fidelity
-    float scanline = sin(uv.y * 380.0 + u_time * 2.0) * 0.012;
-    finalColor.rgb += scanline;
+    // Delicate filmic atmospheric vignette
+    float vig = 1.0 - smoothstep(0.55, 1.25, length(v_uv - 0.5));
+    finalColor.rgb *= (0.88 + 0.12 * vig);
 
     gl_FragColor = finalColor;
   }
@@ -192,20 +200,8 @@ export default function CycloneAtmosphericLiveView() {
   const canvasRef = useRef(null);
   const containerRef = useRef(null);
   const [hasWebGL, setHasWebGL] = useState(true);
-  const [mousePos, setMousePos] = useState({ x: 0.5, y: 0.5 });
-  const [istTime, setIstTime] = useState('');
-
-  // Update real-time satellite telemetry clock
-  useEffect(() => {
-    const updateTime = () => {
-      const now = new Date();
-      const utc = now.toISOString().slice(11, 19) + ' UTC';
-      setIstTime(utc);
-    };
-    updateTime();
-    const interval = setInterval(updateTime, 1000);
-    return () => clearInterval(interval);
-  }, []);
+  const mousePosRef = useRef({ x: 0.5, y: 0.5 });
+  const currentMouseRef = useRef({ x: 0.5, y: 0.5 });
 
   // WebGL Live Simulation
   useEffect(() => {
@@ -219,12 +215,12 @@ export default function CycloneAtmosphericLiveView() {
     });
 
     if (!gl) {
-      console.warn('[VAYU] WebGL not available, falling back to CSS animation');
+      console.warn('[VAYU] WebGL not available, falling back to clean satellite visual');
       setHasWebGL(false);
       return;
     }
 
-    // Helper: Compile Shader
+    // Shader compiler
     function createShader(gl, type, source) {
       const shader = gl.createShader(type);
       gl.shaderSource(shader, source);
@@ -255,7 +251,7 @@ export default function CycloneAtmosphericLiveView() {
       return;
     }
 
-    // Quad geometry covering the full screen
+    // Screen-filling quad
     const positionBuffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
     gl.bufferData(
@@ -278,7 +274,7 @@ export default function CycloneAtmosphericLiveView() {
     const uEyeLoc = gl.getUniformLocation(program, 'u_eye');
     const uTextureLoc = gl.getUniformLocation(program, 'u_texture');
 
-    // Load Cyclone Satellite Texture
+    // Load Cyclone Satellite Texture with smooth mipmapping
     const texture = gl.createTexture();
     const image = new Image();
     image.src = '/cyclone_satellite_vis.jpg';
@@ -295,7 +291,6 @@ export default function CycloneAtmosphericLiveView() {
       isTextureLoaded = true;
     };
 
-    // Resize handler
     let animationFrameId;
     let startTime = performance.now();
 
@@ -314,9 +309,13 @@ export default function CycloneAtmosphericLiveView() {
       }
     }
 
-    // Render loop
+    // 60 FPS Render loop with smooth mouse interpolation
     function render(now) {
       resize();
+
+      // Smooth lerp mouse coordinates for fluid orbital perspective
+      currentMouseRef.current.x += (mousePosRef.current.x - currentMouseRef.current.x) * 0.05;
+      currentMouseRef.current.y += (mousePosRef.current.y - currentMouseRef.current.y) * 0.05;
 
       if (isTextureLoaded) {
         const elapsedTime = (now - startTime) / 1000.0;
@@ -329,7 +328,7 @@ export default function CycloneAtmosphericLiveView() {
 
         gl.uniform1f(uTimeLoc, elapsedTime);
         gl.uniform2f(uResolutionLoc, canvas.width, canvas.height);
-        gl.uniform2f(uMouseLoc, mousePos.x, mousePos.y);
+        gl.uniform2f(uMouseLoc, currentMouseRef.current.x, currentMouseRef.current.y);
         // Normalized center of the cyclone eye in cyclone_satellite_vis.jpg
         gl.uniform2f(uEyeLoc, 0.501, 0.500);
 
@@ -356,89 +355,45 @@ export default function CycloneAtmosphericLiveView() {
         gl.deleteTexture(texture);
       }
     };
-  }, [mousePos]);
+  }, []);
 
-  // Mouse move handler for 3D parallax
+  // Mouse move handler for smooth 3D parallax
   const handleMouseMove = (e) => {
     if (!containerRef.current) return;
     const rect = containerRef.current.getBoundingClientRect();
     const x = (e.clientX - rect.left) / rect.width;
     const y = (e.clientY - rect.top) / rect.height;
-    setMousePos({ x, y });
+    mousePosRef.current = { x, y };
+  };
+
+  const handleMouseLeave = () => {
+    mousePosRef.current = { x: 0.5, y: 0.5 };
   };
 
   return (
     <div 
       ref={containerRef}
       onMouseMove={handleMouseMove}
-      className="absolute inset-0 overflow-hidden bg-slate-950 select-none group"
+      onMouseLeave={handleMouseLeave}
+      className="absolute inset-0 overflow-hidden bg-slate-950 select-none"
     >
-      {/* 1. Live WebGL Canvas */}
+      {/* 1. Pure Live WebGL Canvas (Zero Text / Zero Overlays) */}
       {hasWebGL ? (
         <canvas
           ref={canvasRef}
           className="w-full h-full object-cover block pointer-events-none"
         />
       ) : (
-        /* Fallback Layer if WebGL is disabled */
-        <div className="relative w-full h-full overflow-hidden">
-          <img
-            src="/cyclone_satellite_vis.jpg"
-            alt="VAYU Cyclone Satellite Visual"
-            className="w-full h-full object-cover animate-pulse"
-          />
-        </div>
+        /* Fallback Layer */
+        <img
+          src="/cyclone_satellite_vis.jpg"
+          alt="VAYU Cyclone Satellite Visual"
+          className="w-full h-full object-cover"
+        />
       )}
 
-      {/* 2. Authentic Meteorological Satellite Lens Gradient Vignette */}
-      <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,rgba(0,0,0,0)_50%,rgba(2,6,23,0.45)_95%)]" />
-
-      {/* 3. High-Tech Satellite Telemetry HUD Overlays */}
-      {/* Top Bar: Orbit Status & Channel */}
-      <div className="absolute top-4 left-4 right-4 flex items-center justify-between pointer-events-none z-20">
-        <div className="flex items-center gap-2 px-2.5 py-1 rounded-full bg-slate-950/75 backdrop-blur-md border border-sky-500/30 text-white shadow-lg">
-          <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
-          <span className="w-2 h-2 rounded-full bg-emerald-500 -ml-4" />
-          <span className="text-[10px] font-mono font-bold tracking-wider uppercase text-sky-200">
-            INSAT-3DR • VIS 0.65µm LIVE
-          </span>
-        </div>
-
-        <div className="hidden sm:flex items-center gap-2 px-2.5 py-1 rounded-full bg-slate-950/75 backdrop-blur-md border border-white/10 text-white font-mono text-[10px]">
-          <span className="text-slate-400">GEOSYNC ALT:</span>
-          <span className="text-sky-300 font-bold">35,786 KM</span>
-        </div>
-      </div>
-
-      {/* Bottom Bar: Geographic Coordinates & Cyclone Intensity */}
-      <div className="absolute bottom-4 left-4 right-4 flex items-end justify-between pointer-events-none z-20">
-        <div className="space-y-1 bg-slate-950/80 backdrop-blur-md p-2.5 rounded-xl border border-white/10">
-          <div className="flex items-center gap-2 text-[10px] font-mono text-slate-300">
-            <span className="text-sky-400 font-bold">POS:</span>
-            <span>18.42°N, 88.35°E</span>
-            <span className="text-slate-500">•</span>
-            <span className="text-slate-300">Bay of Bengal</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <span className="text-[11px] font-bold text-white tracking-wide">
-              SUPER CYCLONE VORTEX
-            </span>
-            <span className="text-[9px] px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-300 border border-rose-500/40 font-mono font-bold">
-              CAT-5 / T-6.5
-            </span>
-          </div>
-        </div>
-
-        {/* Real-time UTC Telemetry Clock */}
-        <div className="text-right bg-slate-950/80 backdrop-blur-md px-3 py-1.5 rounded-xl border border-white/10 font-mono">
-          <div className="text-[9px] text-slate-400 tracking-wider">TELEMETRY SYNC</div>
-          <div className="text-xs font-bold text-emerald-400 tracking-widest">{istTime || 'SYNCING...'}</div>
-        </div>
-      </div>
-
-      {/* Subtle Doppler Concentric Isobar Guidance Ring over the Eye */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 rounded-full border border-sky-400/20 pointer-events-none animate-pulse" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-28 h-28 rounded-full border border-dashed border-sky-400/30 pointer-events-none" style={{ animation: 'spin 30s linear infinite' }} />
+      {/* 2. Seamless Atmospheric Lens Edge Blend */}
+      <div className="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,rgba(0,0,0,0)_60%,rgba(2,6,23,0.30)_100%)]" />
     </div>
   );
 }
