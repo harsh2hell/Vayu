@@ -73,6 +73,15 @@ export default function VayuRouteLoader({ message = 'Initializing meteorological
         {/* Eye of the Cyclone (Subtle Pulsing Core) */}
         <div className="absolute z-20 w-3.5 h-3.5 rounded-full bg-white border-2 border-sky-500 shadow-[0_0_12px_rgba(14,165,233,0.85)] animate-pulse pointer-events-none" />
       </div>
+
+      {/* Consistent Welcome Headline matching LanguageWelcomeAnimation */}
+      <div className="mt-6 text-center z-10 px-4">
+        <h1 className="text-2xl sm:text-3xl font-heading font-black tracking-tight text-slate-950 leading-tight">
+          {typeof window !== 'undefined' && localStorage.getItem('vayu_is_hindi') === 'true' 
+            ? 'वायु में आपका स्वागत है' 
+            : 'Welcome to VAYU'}
+        </h1>
+      </div>
     </div>
   );
 }

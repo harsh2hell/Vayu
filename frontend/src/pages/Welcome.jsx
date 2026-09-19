@@ -1161,14 +1161,10 @@ const Welcome = () => {
     }, 1200);
   };
 
-  // Opening & Language Transition Animation state
+  // Opening & Language Transition Animation state (plays on every reload & visit)
   const [animState, setAnimState] = useState(() => {
-    const hasSeenIntro = sessionStorage.getItem('vayu_intro_animated');
-    if (!hasSeenIntro) {
-      sessionStorage.setItem('vayu_intro_animated', 'true');
-      return { isOpen: true, mode: 'first-visit', targetLang: 'en', animKey: 1 };
-    }
-    return { isOpen: false, mode: 'first-visit', targetLang: 'en', animKey: 0 };
+    const isHi = typeof window !== 'undefined' && localStorage.getItem('vayu_is_hindi') === 'true';
+    return { isOpen: true, mode: 'first-visit', targetLang: isHi ? 'hi' : 'en', animKey: 1 };
   });
 
   const handleLanguageToggle = (nextVal) => {
