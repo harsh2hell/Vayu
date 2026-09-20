@@ -14,6 +14,7 @@ playServicesLocation = "21.3.0"
 junit = "4.13.2"
 extJunit = "1.2.1"
 espressoCore = "3.6.1"
+googleServices = "4.4.2"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -48,3 +49,4 @@ androidx-junit = { group = "androidx.test.ext", name = "junit", version.ref = "e
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }

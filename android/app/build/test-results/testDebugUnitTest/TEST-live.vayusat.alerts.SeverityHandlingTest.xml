@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="live.vayusat.alerts.SeverityHandlingTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-09-20T15:33:33.546Z" hostname="Harshs-MacBook-Air-4.local" time="0.0">
+<testsuite name="live.vayusat.alerts.SeverityHandlingTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-09-20T15:51:00.467Z" hostname="Harshs-MacBook-Air-4.local" time="0.0">
   <properties/>
   <testcase name="testAlertSourceParsingAndStatutoryDisclaimer" classname="live.vayusat.alerts.SeverityHandlingTest" time="0.0"/>
   <testcase name="testSeverityFromStringParsing" classname="live.vayusat.alerts.SeverityHandlingTest" time="0.0"/>

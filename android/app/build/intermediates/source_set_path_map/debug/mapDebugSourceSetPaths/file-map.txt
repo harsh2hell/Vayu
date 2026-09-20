@@ -1,60 +1,61 @@
-live.vayusat.alerts.app-annotation-experimental-1.4.1-0 /Users/harsh/.gradle/caches/9.6.1/transforms/0c235722b92a927cb4b4876762c29886/transformed/annotation-experimental-1.4.1/res
-live.vayusat.alerts.app-savedstate-ktx-1.2.1-1 /Users/harsh/.gradle/caches/9.6.1/transforms/127ea312f1d720acf4de35f7435075a1/transformed/savedstate-ktx-1.2.1/res
-live.vayusat.alerts.app-animation-core-release-2 /Users/harsh/.gradle/caches/9.6.1/transforms/1645f7df35136dc561537f8e126ff951/transformed/animation-core-release/res
-live.vayusat.alerts.app-lifecycle-runtime-release-3 /Users/harsh/.gradle/caches/9.6.1/transforms/1a920290bde5db6e38f54602a33dc3a0/transformed/lifecycle-runtime-release/res
-live.vayusat.alerts.app-lifecycle-viewmodel-release-4 /Users/harsh/.gradle/caches/9.6.1/transforms/1b0be1aa150493e852b5840ee5947888/transformed/lifecycle-viewmodel-release/res
-live.vayusat.alerts.app-material-icons-extended-release-5 /Users/harsh/.gradle/caches/9.6.1/transforms/282f6f15863c4a7309e55b6f9cde6a79/transformed/material-icons-extended-release/res
-live.vayusat.alerts.app-runtime-saveable-release-6 /Users/harsh/.gradle/caches/9.6.1/transforms/2845c53a5150c62b3af84ea3e590811a/transformed/runtime-saveable-release/res
-live.vayusat.alerts.app-core-1.13.1-7 /Users/harsh/.gradle/caches/9.6.1/transforms/330267a26c25c89f1b88cb093652d739/transformed/core-1.13.1/res
-live.vayusat.alerts.app-lifecycle-livedata-core-2.8.6-8 /Users/harsh/.gradle/caches/9.6.1/transforms/34de42a1f9cb313984e8f9d4496ef1c8/transformed/lifecycle-livedata-core-2.8.6/res
-live.vayusat.alerts.app-firebase-common-21.0.0-9 /Users/harsh/.gradle/caches/9.6.1/transforms/35c56257d19a84ff9bd9b4c46fa2d850/transformed/firebase-common-21.0.0/res
-live.vayusat.alerts.app-navigation-common-ktx-2.8.1-10 /Users/harsh/.gradle/caches/9.6.1/transforms/36a0f8faa523eade32953ebc74da58ac/transformed/navigation-common-ktx-2.8.1/res
-live.vayusat.alerts.app-foundation-release-11 /Users/harsh/.gradle/caches/9.6.1/transforms/3804fd7dbaa30f35eff7b35778fc2a98/transformed/foundation-release/res
-live.vayusat.alerts.app-ui-tooling-preview-release-12 /Users/harsh/.gradle/caches/9.6.1/transforms/3a0faea58ce04e478fc4478673a24a7d/transformed/ui-tooling-preview-release/res
-live.vayusat.alerts.app-lifecycle-viewmodel-ktx-2.8.6-13 /Users/harsh/.gradle/caches/9.6.1/transforms/3cfbf2c72388c9004afd35af752d0e85/transformed/lifecycle-viewmodel-ktx-2.8.6/res
-live.vayusat.alerts.app-material-release-14 /Users/harsh/.gradle/caches/9.6.1/transforms/429f57641703e2b94d3bdc2d3d711a85/transformed/material-release/res
-live.vayusat.alerts.app-core-ktx-1.13.1-15 /Users/harsh/.gradle/caches/9.6.1/transforms/42f1b7ee6ce86102150ef5de1f4ada36/transformed/core-ktx-1.13.1/res
-live.vayusat.alerts.app-play-services-base-18.5.0-16 /Users/harsh/.gradle/caches/9.6.1/transforms/446c6b07869ca8586d202d60b66adc25/transformed/play-services-base-18.5.0/res
-live.vayusat.alerts.app-lifecycle-viewmodel-compose-release-17 /Users/harsh/.gradle/caches/9.6.1/transforms/49775ebc2cdfb62be9cec0e9654da73a/transformed/lifecycle-viewmodel-compose-release/res
-live.vayusat.alerts.app-foundation-layout-release-18 /Users/harsh/.gradle/caches/9.6.1/transforms/4b525d85149c4ed11ef4944bd548599d/transformed/foundation-layout-release/res
-live.vayusat.alerts.app-ui-geometry-release-19 /Users/harsh/.gradle/caches/9.6.1/transforms/4ca4b8852b098e9ed9cecbb7b7a3bfd6/transformed/ui-geometry-release/res
-live.vayusat.alerts.app-emoji2-1.3.0-20 /Users/harsh/.gradle/caches/9.6.1/transforms/500d382aa73f97ba2474acd315aea2b5/transformed/emoji2-1.3.0/res
-live.vayusat.alerts.app-startup-runtime-1.1.1-21 /Users/harsh/.gradle/caches/9.6.1/transforms/59a2d5ebf7cb88e71acb349af9809654/transformed/startup-runtime-1.1.1/res
-live.vayusat.alerts.app-navigation-runtime-2.8.1-22 /Users/harsh/.gradle/caches/9.6.1/transforms/5ab8d98110ccea01beb0e040fcb303a8/transformed/navigation-runtime-2.8.1/res
-live.vayusat.alerts.app-graphics-path-1.0.1-23 /Users/harsh/.gradle/caches/9.6.1/transforms/5d4b354b4f7f6fdc6a45ce0ef7eb812d/transformed/graphics-path-1.0.1/res
-live.vayusat.alerts.app-animation-release-24 /Users/harsh/.gradle/caches/9.6.1/transforms/60afc0713da73c88ababff5173bfb7cf/transformed/animation-release/res
-live.vayusat.alerts.app-ui-tooling-data-release-25 /Users/harsh/.gradle/caches/9.6.1/transforms/6eb87736c56649eee63cb5af70408fe7/transformed/ui-tooling-data-release/res
-live.vayusat.alerts.app-material-ripple-release-26 /Users/harsh/.gradle/caches/9.6.1/transforms/6ec6c454026805de4a2c9b243ef9bcfd/transformed/material-ripple-release/res
-live.vayusat.alerts.app-activity-1.9.2-27 /Users/harsh/.gradle/caches/9.6.1/transforms/72cc92e97c68d1e3c0b978d5178fd30f/transformed/activity-1.9.2/res
-live.vayusat.alerts.app-firebase-messaging-24.0.2-28 /Users/harsh/.gradle/caches/9.6.1/transforms/80e2e05a508d36efe07bc0367399c5a6/transformed/firebase-messaging-24.0.2/res
-live.vayusat.alerts.app-navigation-runtime-ktx-2.8.1-29 /Users/harsh/.gradle/caches/9.6.1/transforms/8f28793b4cc91c5bb91f89523c84a065/transformed/navigation-runtime-ktx-2.8.1/res
-live.vayusat.alerts.app-navigation-compose-2.8.1-30 /Users/harsh/.gradle/caches/9.6.1/transforms/9623dc49a4f8585f79df806445063eb4/transformed/navigation-compose-2.8.1/res
-live.vayusat.alerts.app-lifecycle-process-2.8.6-31 /Users/harsh/.gradle/caches/9.6.1/transforms/a7ff78a56a10ef9f02cc2e2f96cc0752/transformed/lifecycle-process-2.8.6/res
-live.vayusat.alerts.app-ui-release-32 /Users/harsh/.gradle/caches/9.6.1/transforms/ab5763640053febeb2c4f079ec4c21fd/transformed/ui-release/res
-live.vayusat.alerts.app-customview-poolingcontainer-1.0.0-33 /Users/harsh/.gradle/caches/9.6.1/transforms/ad8203b2688b69beaaf0a08479685b75/transformed/customview-poolingcontainer-1.0.0/res
-live.vayusat.alerts.app-activity-compose-1.9.2-34 /Users/harsh/.gradle/caches/9.6.1/transforms/b325ed5b3e7409461731321c366d2379/transformed/activity-compose-1.9.2/res
-live.vayusat.alerts.app-navigation-common-2.8.1-35 /Users/harsh/.gradle/caches/9.6.1/transforms/b4f2d194e8947f5d212f90d29fb4db80/transformed/navigation-common-2.8.1/res
-live.vayusat.alerts.app-savedstate-1.2.1-36 /Users/harsh/.gradle/caches/9.6.1/transforms/b72af0dbf5cf651c84ddfab266622bbe/transformed/savedstate-1.2.1/res
-live.vayusat.alerts.app-ui-util-release-37 /Users/harsh/.gradle/caches/9.6.1/transforms/be75ceaf410adad9be1112fc235a3212/transformed/ui-util-release/res
-live.vayusat.alerts.app-lifecycle-viewmodel-savedstate-2.8.6-38 /Users/harsh/.gradle/caches/9.6.1/transforms/c1110f1108d230783b713e58812a097e/transformed/lifecycle-viewmodel-savedstate-2.8.6/res
-live.vayusat.alerts.app-core-runtime-2.2.0-39 /Users/harsh/.gradle/caches/9.6.1/transforms/ca109a7d20dc460e26051048f4445523/transformed/core-runtime-2.2.0/res
-live.vayusat.alerts.app-lifecycle-livedata-core-ktx-2.8.6-40 /Users/harsh/.gradle/caches/9.6.1/transforms/cabf57276cb06509a52f7ba5dabd1a80/transformed/lifecycle-livedata-core-ktx-2.8.6/res
-live.vayusat.alerts.app-ui-tooling-release-41 /Users/harsh/.gradle/caches/9.6.1/transforms/d3cd6906f855cf1ec88a3bec1e30445d/transformed/ui-tooling-release/res
-live.vayusat.alerts.app-profileinstaller-1.3.1-42 /Users/harsh/.gradle/caches/9.6.1/transforms/d8dd152ebf670444a3e0c04dbed01a5f/transformed/profileinstaller-1.3.1/res
-live.vayusat.alerts.app-activity-ktx-1.9.2-43 /Users/harsh/.gradle/caches/9.6.1/transforms/db785a284ebfaf854ef20dd8f8efa24d/transformed/activity-ktx-1.9.2/res
-live.vayusat.alerts.app-play-services-basement-18.4.0-44 /Users/harsh/.gradle/caches/9.6.1/transforms/db949bdb827695a18c6f3ede9cffa74a/transformed/play-services-basement-18.4.0/res
-live.vayusat.alerts.app-material3-release-45 /Users/harsh/.gradle/caches/9.6.1/transforms/deecf08c9c213ad404da4e68cdcc529d/transformed/material3-release/res
-live.vayusat.alerts.app-runtime-release-46 /Users/harsh/.gradle/caches/9.6.1/transforms/e04033323a1518424d13fc75d6cc1109/transformed/runtime-release/res
-live.vayusat.alerts.app-ui-unit-release-47 /Users/harsh/.gradle/caches/9.6.1/transforms/e243992a62211bad28144594adb8df3e/transformed/ui-unit-release/res
-live.vayusat.alerts.app-ui-graphics-release-48 /Users/harsh/.gradle/caches/9.6.1/transforms/e4a9e7c725258f6730599e1050d8b5bc/transformed/ui-graphics-release/res
-live.vayusat.alerts.app-material-icons-core-release-49 /Users/harsh/.gradle/caches/9.6.1/transforms/e750a1b21b17b055ce19668165f1a740/transformed/material-icons-core-release/res
-live.vayusat.alerts.app-lifecycle-runtime-ktx-release-50 /Users/harsh/.gradle/caches/9.6.1/transforms/e80913a804ee81fe110632c32c64a4b0/transformed/lifecycle-runtime-ktx-release/res
-live.vayusat.alerts.app-ui-text-release-51 /Users/harsh/.gradle/caches/9.6.1/transforms/ef159170f3faef1978ecc2bf3cfa729b/transformed/ui-text-release/res
-live.vayusat.alerts.app-lifecycle-livedata-2.8.6-52 /Users/harsh/.gradle/caches/9.6.1/transforms/f1cd6c038918bd51c0689b6a4d8bb6c0/transformed/lifecycle-livedata-2.8.6/res
-live.vayusat.alerts.app-lifecycle-runtime-compose-release-53 /Users/harsh/.gradle/caches/9.6.1/transforms/f29e13a4f63849cfad6af04192b582f5/transformed/lifecycle-runtime-compose-release/res
-live.vayusat.alerts.app-resValues-54 /Users/harsh/Library/CloudStorage/GoogleDrive-harendrapratap5828@gmail.com/My Drive/Tahoe/Documents/ai-cyclone/android/app/build/generated/res/resValues/debug
-live.vayusat.alerts.app-packageDebugResources-55 /Users/harsh/Library/CloudStorage/GoogleDrive-harendrapratap5828@gmail.com/My Drive/Tahoe/Documents/ai-cyclone/android/app/build/intermediates/incremental/debug/packageDebugResources/merged.dir
-live.vayusat.alerts.app-packageDebugResources-56 /Users/harsh/Library/CloudStorage/GoogleDrive-harendrapratap5828@gmail.com/My Drive/Tahoe/Documents/ai-cyclone/android/app/build/intermediates/incremental/debug/packageDebugResources/stripped.dir
-live.vayusat.alerts.app-debug-57 /Users/harsh/Library/CloudStorage/GoogleDrive-harendrapratap5828@gmail.com/My Drive/Tahoe/Documents/ai-cyclone/android/app/build/intermediates/merged_res/debug/mergeDebugResources
-live.vayusat.alerts.app-debug-58 /Users/harsh/Library/CloudStorage/GoogleDrive-harendrapratap5828@gmail.com/My Drive/Tahoe/Documents/ai-cyclone/android/app/src/debug/res
-live.vayusat.alerts.app-main-59 /Users/harsh/Library/CloudStorage/GoogleDrive-harendrapratap5828@gmail.com/My Drive/Tahoe/Documents/ai-cyclone/android/app/src/main/res
+live.vayusat.alerts.app-ui-tooling-preview-release-0 /Users/harsh/.gradle/caches/9.6.1/transforms/0ca26fc9c53ad579fa0ff4391a23599a/transformed/ui-tooling-preview-release/res
+live.vayusat.alerts.app-material-ripple-release-1 /Users/harsh/.gradle/caches/9.6.1/transforms/0dbb0967cd0e84774b8bfcbb5c531929/transformed/material-ripple-release/res
+live.vayusat.alerts.app-ui-geometry-release-2 /Users/harsh/.gradle/caches/9.6.1/transforms/0f4ef504f1619d2565056af4436f0884/transformed/ui-geometry-release/res
+live.vayusat.alerts.app-ui-graphics-release-3 /Users/harsh/.gradle/caches/9.6.1/transforms/10b49041858b6c44f1cd34219a823a24/transformed/ui-graphics-release/res
+live.vayusat.alerts.app-lifecycle-runtime-compose-release-4 /Users/harsh/.gradle/caches/9.6.1/transforms/11b23f4b8bbac9782b34ad77668124b3/transformed/lifecycle-runtime-compose-release/res
+live.vayusat.alerts.app-emoji2-1.3.0-5 /Users/harsh/.gradle/caches/9.6.1/transforms/170a690b987e295fcde2c53ee4486d77/transformed/emoji2-1.3.0/res
+live.vayusat.alerts.app-ui-tooling-release-6 /Users/harsh/.gradle/caches/9.6.1/transforms/195319a785ce1b3d237e5bfdf51ecec0/transformed/ui-tooling-release/res
+live.vayusat.alerts.app-material-icons-extended-release-7 /Users/harsh/.gradle/caches/9.6.1/transforms/19615a2271e42f30936b539b8da3755a/transformed/material-icons-extended-release/res
+live.vayusat.alerts.app-customview-poolingcontainer-1.0.0-8 /Users/harsh/.gradle/caches/9.6.1/transforms/1f1621bda4701bc958d485244206c03f/transformed/customview-poolingcontainer-1.0.0/res
+live.vayusat.alerts.app-activity-1.9.2-9 /Users/harsh/.gradle/caches/9.6.1/transforms/21f30f5459e8b4f7fffc26d51743f2c9/transformed/activity-1.9.2/res
+live.vayusat.alerts.app-firebase-messaging-24.0.2-10 /Users/harsh/.gradle/caches/9.6.1/transforms/2ad5515d81957187123c3455038951ae/transformed/firebase-messaging-24.0.2/res
+live.vayusat.alerts.app-core-ktx-1.13.1-11 /Users/harsh/.gradle/caches/9.6.1/transforms/3302b13afd84b66b21ac0ec174858c33/transformed/core-ktx-1.13.1/res
+live.vayusat.alerts.app-ui-util-release-12 /Users/harsh/.gradle/caches/9.6.1/transforms/3405566b55e0894afe4bc8ed0c51e59f/transformed/ui-util-release/res
+live.vayusat.alerts.app-lifecycle-viewmodel-release-13 /Users/harsh/.gradle/caches/9.6.1/transforms/3e35a44680c126f4593fe89e07dd67fc/transformed/lifecycle-viewmodel-release/res
+live.vayusat.alerts.app-core-1.13.1-14 /Users/harsh/.gradle/caches/9.6.1/transforms/3e7c43c1f523f90eb7c30bfd7a7a1475/transformed/core-1.13.1/res
+live.vayusat.alerts.app-ui-tooling-data-release-15 /Users/harsh/.gradle/caches/9.6.1/transforms/40be6eca9bc9301f7552b9d8268eb1db/transformed/ui-tooling-data-release/res
+live.vayusat.alerts.app-activity-compose-1.9.2-16 /Users/harsh/.gradle/caches/9.6.1/transforms/451175ef467515075d46c2fe0e21a107/transformed/activity-compose-1.9.2/res
+live.vayusat.alerts.app-runtime-saveable-release-17 /Users/harsh/.gradle/caches/9.6.1/transforms/48da1496ecd59b9511e042ad4c029d75/transformed/runtime-saveable-release/res
+live.vayusat.alerts.app-navigation-runtime-ktx-2.8.1-18 /Users/harsh/.gradle/caches/9.6.1/transforms/4a3987b7934a351713e1114607703aae/transformed/navigation-runtime-ktx-2.8.1/res
+live.vayusat.alerts.app-foundation-layout-release-19 /Users/harsh/.gradle/caches/9.6.1/transforms/4b3d3284add1527bc51a294035252d6b/transformed/foundation-layout-release/res
+live.vayusat.alerts.app-navigation-compose-2.8.1-20 /Users/harsh/.gradle/caches/9.6.1/transforms/4d352d6d623ab4afda4c3dc7aabd188a/transformed/navigation-compose-2.8.1/res
+live.vayusat.alerts.app-lifecycle-runtime-ktx-release-21 /Users/harsh/.gradle/caches/9.6.1/transforms/5a95f3114339c80885c196b7e8b92987/transformed/lifecycle-runtime-ktx-release/res
+live.vayusat.alerts.app-material3-release-22 /Users/harsh/.gradle/caches/9.6.1/transforms/5e3dc8d7227858673042f189bdda9654/transformed/material3-release/res
+live.vayusat.alerts.app-ui-unit-release-23 /Users/harsh/.gradle/caches/9.6.1/transforms/5e4d75c1a1204355747787162471a318/transformed/ui-unit-release/res
+live.vayusat.alerts.app-activity-ktx-1.9.2-24 /Users/harsh/.gradle/caches/9.6.1/transforms/5f748a0385049121490198d0b405d0bb/transformed/activity-ktx-1.9.2/res
+live.vayusat.alerts.app-play-services-base-18.5.0-25 /Users/harsh/.gradle/caches/9.6.1/transforms/6027d1459b63ae016e07fb58a2937fed/transformed/play-services-base-18.5.0/res
+live.vayusat.alerts.app-animation-release-26 /Users/harsh/.gradle/caches/9.6.1/transforms/6554cce26d816feb66e41243363ccb40/transformed/animation-release/res
+live.vayusat.alerts.app-navigation-common-ktx-2.8.1-27 /Users/harsh/.gradle/caches/9.6.1/transforms/662053c85cafb4abcec4d161bfe7f437/transformed/navigation-common-ktx-2.8.1/res
+live.vayusat.alerts.app-lifecycle-livedata-2.8.6-28 /Users/harsh/.gradle/caches/9.6.1/transforms/66ca091e392640d23e72ab86159adfc6/transformed/lifecycle-livedata-2.8.6/res
+live.vayusat.alerts.app-material-release-29 /Users/harsh/.gradle/caches/9.6.1/transforms/74954cb17aa89d8fecc212cb6877e958/transformed/material-release/res
+live.vayusat.alerts.app-lifecycle-viewmodel-savedstate-2.8.6-30 /Users/harsh/.gradle/caches/9.6.1/transforms/7eb24052d23ee7eac7777bf12b8a7c05/transformed/lifecycle-viewmodel-savedstate-2.8.6/res
+live.vayusat.alerts.app-lifecycle-viewmodel-ktx-2.8.6-31 /Users/harsh/.gradle/caches/9.6.1/transforms/86565444204b181d0a2f67345927c767/transformed/lifecycle-viewmodel-ktx-2.8.6/res
+live.vayusat.alerts.app-lifecycle-livedata-core-2.8.6-32 /Users/harsh/.gradle/caches/9.6.1/transforms/8b339c80a3c90898412613b1f97aa538/transformed/lifecycle-livedata-core-2.8.6/res
+live.vayusat.alerts.app-play-services-basement-18.4.0-33 /Users/harsh/.gradle/caches/9.6.1/transforms/8b9ee71f03b09f7aa9f637636434fe96/transformed/play-services-basement-18.4.0/res
+live.vayusat.alerts.app-graphics-path-1.0.1-34 /Users/harsh/.gradle/caches/9.6.1/transforms/8c52cb671a2f93dd1c9c706cad980b3e/transformed/graphics-path-1.0.1/res
+live.vayusat.alerts.app-profileinstaller-1.3.1-35 /Users/harsh/.gradle/caches/9.6.1/transforms/8d1bed14f3f24b17e4486984a7c135dd/transformed/profileinstaller-1.3.1/res
+live.vayusat.alerts.app-firebase-common-21.0.0-36 /Users/harsh/.gradle/caches/9.6.1/transforms/91ea1e40dac70fdd7e8d9f413d7cb737/transformed/firebase-common-21.0.0/res
+live.vayusat.alerts.app-material-icons-core-release-37 /Users/harsh/.gradle/caches/9.6.1/transforms/98543b6f4d89d87231690346034e5d66/transformed/material-icons-core-release/res
+live.vayusat.alerts.app-animation-core-release-38 /Users/harsh/.gradle/caches/9.6.1/transforms/9a62e81fddcc12c51c0374d9f5758076/transformed/animation-core-release/res
+live.vayusat.alerts.app-lifecycle-process-2.8.6-39 /Users/harsh/.gradle/caches/9.6.1/transforms/9c5e48cc1a9ecbec8386c04e01de3da1/transformed/lifecycle-process-2.8.6/res
+live.vayusat.alerts.app-foundation-release-40 /Users/harsh/.gradle/caches/9.6.1/transforms/9fbd50ad5bfb6dcbf277f739de60e12a/transformed/foundation-release/res
+live.vayusat.alerts.app-navigation-runtime-2.8.1-41 /Users/harsh/.gradle/caches/9.6.1/transforms/b34db0d64b69cb8b5c948cdd57e31fea/transformed/navigation-runtime-2.8.1/res
+live.vayusat.alerts.app-ui-text-release-42 /Users/harsh/.gradle/caches/9.6.1/transforms/b3b4355eb495bdc50f30b512934ec699/transformed/ui-text-release/res
+live.vayusat.alerts.app-lifecycle-runtime-release-43 /Users/harsh/.gradle/caches/9.6.1/transforms/bd69f105997c20d840e0b4c39ef96371/transformed/lifecycle-runtime-release/res
+live.vayusat.alerts.app-annotation-experimental-1.4.1-44 /Users/harsh/.gradle/caches/9.6.1/transforms/bea93f77cd1763e0e962f2e0386da775/transformed/annotation-experimental-1.4.1/res
+live.vayusat.alerts.app-savedstate-ktx-1.2.1-45 /Users/harsh/.gradle/caches/9.6.1/transforms/c13ad48c2beca7e344b2603fdc254ccd/transformed/savedstate-ktx-1.2.1/res
+live.vayusat.alerts.app-startup-runtime-1.1.1-46 /Users/harsh/.gradle/caches/9.6.1/transforms/ce67e0ac013dafae3086c2bdbcf25f83/transformed/startup-runtime-1.1.1/res
+live.vayusat.alerts.app-core-runtime-2.2.0-47 /Users/harsh/.gradle/caches/9.6.1/transforms/d34c099b0ccabce7c7703e30ed5c8415/transformed/core-runtime-2.2.0/res
+live.vayusat.alerts.app-savedstate-1.2.1-48 /Users/harsh/.gradle/caches/9.6.1/transforms/d34e0581d62239dbe03125a1caed65a3/transformed/savedstate-1.2.1/res
+live.vayusat.alerts.app-lifecycle-livedata-core-ktx-2.8.6-49 /Users/harsh/.gradle/caches/9.6.1/transforms/d6ecdc898f5b5a779e6e648ef7d6b6cc/transformed/lifecycle-livedata-core-ktx-2.8.6/res
+live.vayusat.alerts.app-navigation-common-2.8.1-50 /Users/harsh/.gradle/caches/9.6.1/transforms/da16fb657a7b244e11e43ffd755f9b6c/transformed/navigation-common-2.8.1/res
+live.vayusat.alerts.app-runtime-release-51 /Users/harsh/.gradle/caches/9.6.1/transforms/e028dc62cac7c6517275e3518ad63116/transformed/runtime-release/res
+live.vayusat.alerts.app-lifecycle-viewmodel-compose-release-52 /Users/harsh/.gradle/caches/9.6.1/transforms/e15e66d812180e57c5085b8fb3d7cba1/transformed/lifecycle-viewmodel-compose-release/res
+live.vayusat.alerts.app-ui-release-53 /Users/harsh/.gradle/caches/9.6.1/transforms/ff7ebf14ebede2fa68955e38fb4f6179/transformed/ui-release/res
+live.vayusat.alerts.app-res-54 /Users/harsh/Library/CloudStorage/GoogleDrive-harendrapratap5828@gmail.com/My Drive/Tahoe/Documents/ai-cyclone/android/app/build/generated/res/processDebugGoogleServices
+live.vayusat.alerts.app-resValues-55 /Users/harsh/Library/CloudStorage/GoogleDrive-harendrapratap5828@gmail.com/My Drive/Tahoe/Documents/ai-cyclone/android/app/build/generated/res/resValues/debug
+live.vayusat.alerts.app-packageDebugResources-56 /Users/harsh/Library/CloudStorage/GoogleDrive-harendrapratap5828@gmail.com/My Drive/Tahoe/Documents/ai-cyclone/android/app/build/intermediates/incremental/debug/packageDebugResources/merged.dir
+live.vayusat.alerts.app-packageDebugResources-57 /Users/harsh/Library/CloudStorage/GoogleDrive-harendrapratap5828@gmail.com/My Drive/Tahoe/Documents/ai-cyclone/android/app/build/intermediates/incremental/debug/packageDebugResources/stripped.dir
+live.vayusat.alerts.app-debug-58 /Users/harsh/Library/CloudStorage/GoogleDrive-harendrapratap5828@gmail.com/My Drive/Tahoe/Documents/ai-cyclone/android/app/build/intermediates/merged_res/debug/mergeDebugResources
+live.vayusat.alerts.app-debug-59 /Users/harsh/Library/CloudStorage/GoogleDrive-harendrapratap5828@gmail.com/My Drive/Tahoe/Documents/ai-cyclone/android/app/src/debug/res
+live.vayusat.alerts.app-main-60 /Users/harsh/Library/CloudStorage/GoogleDrive-harendrapratap5828@gmail.com/My Drive/Tahoe/Documents/ai-cyclone/android/app/src/main/res

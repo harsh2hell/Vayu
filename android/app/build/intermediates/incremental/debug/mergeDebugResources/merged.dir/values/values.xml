@@ -165,6 +165,11 @@
     <string name="default_popup_window_title" ns2:ignore="ExtraTranslation">"Pop-Up Window"</string>
     <string name="dropdown_menu">"Dropdown menu"</string>
     <string name="fcm_fallback_notification_channel_label">Miscellaneous</string>
+    <string name="gcm_defaultSenderId" translatable="false">435457281890</string>
+    <string name="google_api_key" translatable="false">AIzaSyBETmdk3Un_YFtA9AI_nBwrewxDLK_7pBo</string>
+    <string name="google_app_id" translatable="false">1:435457281890:android:6c3255d7759b74199c263b</string>
+    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyBETmdk3Un_YFtA9AI_nBwrewxDLK_7pBo</string>
+    <string name="google_storage_bucket" translatable="false">vayusat-live.firebasestorage.app</string>
     <string name="in_progress">In progress</string>
     <string name="indeterminate">Partially checked</string>
     <string name="m3c_bottom_sheet_collapse_description">Collapse bottom sheet</string>
@@ -230,6 +235,7 @@
     <string name="m3c_tooltip_pane_description">Tooltip</string>
     <string name="navigation_menu">"Navigation menu"</string>
     <string name="not_selected">Not selected</string>
+    <string name="project_id" translatable="false">vayusat-live</string>
     <string name="range_end">"Range end"</string>
     <string name="range_start">"Range start"</string>
     <string name="selected">Selected</string>

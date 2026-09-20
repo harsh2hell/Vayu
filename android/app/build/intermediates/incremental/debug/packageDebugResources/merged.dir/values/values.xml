@@ -25,6 +25,12 @@
     <string name="channel_warning_name">Cyclone Warnings (24h)</string>
     <string name="channel_watch_desc">Developing depressions and trajectory monitoring</string>
     <string name="channel_watch_name">Pre-Cyclone Watch (48h-72h)</string>
+    <string name="gcm_defaultSenderId" translatable="false">435457281890</string>
+    <string name="google_api_key" translatable="false">AIzaSyBETmdk3Un_YFtA9AI_nBwrewxDLK_7pBo</string>
+    <string name="google_app_id" translatable="false">1:435457281890:android:6c3255d7759b74199c263b</string>
+    <string name="google_crash_reporting_api_key" translatable="false">AIzaSyBETmdk3Un_YFtA9AI_nBwrewxDLK_7pBo</string>
+    <string name="google_storage_bucket" translatable="false">vayusat-live.firebasestorage.app</string>
+    <string name="project_id" translatable="false">vayusat-live</string>
     <style name="Theme.VayuAlerts" parent="android:Theme.Material.Light.NoActionBar">
         <item name="android:statusBarColor">@color/slate_950</item>
         <item name="android:navigationBarColor">@color/slate_950</item>

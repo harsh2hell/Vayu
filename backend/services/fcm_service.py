@@ -32,10 +32,29 @@ class FcmService:
     ):
         self.project_id = project_id or os.environ.get("FIREBASE_PROJECT_ID")
         self._service_account_info = service_account_info
-        self._service_account_path = service_account_path or os.environ.get(
+        
+        # 1. Resolve key / path from environment variables
+        key_env = os.environ.get("FIREBASE_SERVICE_ACCOUNT_KEY")
+        if key_env and not self._service_account_info:
+            if os.path.exists(key_env):
+                self._service_account_path = key_env
+            else:
+                try:
+                    self._service_account_info = json.loads(key_env)
+                except Exception:
+                    pass
+
+        self._service_account_path = getattr(self, "_service_account_path", None) or service_account_path or os.environ.get(
             "FIREBASE_SERVICE_ACCOUNT_PATH",
             os.environ.get("GOOGLE_APPLICATION_CREDENTIALS")
         )
+
+        # Fallback to standard secure location outside workspace
+        if not self._service_account_path and not self._service_account_info:
+            default_secure_path = os.path.expanduser("~/.config/vayu/vayusat-live-firebase-adminsdk.json")
+            if os.path.exists(default_secure_path):
+                self._service_account_path = default_secure_path
+
         self._cached_token: Optional[str] = None
         self._token_expiry: float = 0.0
 
@@ -241,27 +260,19 @@ class FcmService:
             extra_data=extra_data
         )
 
-        if dry_run or not self.is_configured:
-            # Simulate or report missing credentials
-            if not self.is_configured:
-                logger.info("FCM Service not configured with server credentials. Running in simulated mode.")
-                return {
-                    "success": True,
-                    "status": "ACCEPTED_SIMULATED",
-                    "fcm_status": "Simulated (FCM credentials pending)",
-                    "message_id": f"simulated-{int(time.time() * 1000)}",
-                    "alert_id": alert_id,
-                    "fcm_token_prefix": fcm_token[:12] + "..." if len(fcm_token) > 12 else fcm_token
-                }
-            # True dry run with credentials
-            token, token_err = self._get_access_token()
-            if not token:
-                return {
-                    "success": False,
-                    "status": "FAILED",
-                    "error": token_err,
-                    "alert_id": alert_id
-                }
+        if not self.is_configured:
+            logger.info("FCM Service not configured with server credentials. Running in simulated mode.")
+            return {
+                "success": True,
+                "status": "ACCEPTED_SIMULATED",
+                "fcm_status": "Simulated (FCM credentials pending)",
+                "message_id": f"simulated-{int(time.time() * 1000)}",
+                "alert_id": alert_id,
+                "fcm_token_prefix": fcm_token[:12] + "..." if len(fcm_token) > 12 else fcm_token
+            }
+
+        if dry_run:
+            payload["validate_only"] = True
 
         token, token_err = self._get_access_token()
         if not token:
@@ -288,9 +299,9 @@ class FcmService:
                     message_name = resp_data.get("name", "")
                     return {
                         "success": True,
-                        "status": "ACCEPTED",
-                        "fcm_status": "Accepted by FCM HTTP v1",
-                        "message_id": message_name,
+                        "status": "ACCEPTED_DRY_RUN" if dry_run else "ACCEPTED",
+                        "fcm_status": "Validated by FCM (dry-run)" if dry_run else "Accepted by FCM HTTP v1",
+                        "message_id": message_name or f"validated-{int(time.time() * 1000)}",
                         "alert_id": alert_id,
                         "fcm_token_prefix": fcm_token[:12] + "..."
                     }
@@ -300,6 +311,28 @@ class FcmService:
                         "status": "TOKEN_INVALID",
                         "error": "Device token is expired or unregistered on FCM",
                         "fcm_status": "Token Unregistered",
+                        "alert_id": alert_id
+                    }
+                elif status_code == 400:
+                    try:
+                        resp_json = response.json()
+                        err_msg = resp_json.get("error", {}).get("message", "Bad request")
+                    except Exception:
+                        err_msg = response.text
+                    
+                    if "registration token" in err_msg.lower() or "invalid_argument" in err_msg.lower():
+                        return {
+                            "success": False,
+                            "status": "TOKEN_INVALID",
+                            "error": f"FCM token invalid: {err_msg}",
+                            "fcm_status": "Token Invalid Format",
+                            "alert_id": alert_id
+                        }
+                    return {
+                        "success": False,
+                        "status": "FAILED",
+                        "error": f"FCM Bad Request (400): {err_msg}",
+                        "fcm_status": "FCM 400 Error",
                         "alert_id": alert_id
                     }
                 elif status_code in (401, 403):

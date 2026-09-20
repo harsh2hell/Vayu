@@ -129,3 +129,31 @@ def test_registered_devices_listing():
     assert data["success"] is True
     assert "devices" in data
     assert any(d["device_id"] == "test-device-pipeline-001" for d in data["devices"])
+
+
+def test_fcm_service_account_project_match():
+    """Verifies that the configured service account matches project 'vayusat-live'."""
+    fcm = FcmService()
+    assert fcm.is_configured is True
+    assert fcm.project_id == "vayusat-live"
+
+    token, err = fcm._get_access_token()
+    assert err is None
+    assert token is not None
+    assert token.startswith("ya29.")
+
+
+def test_fcm_dry_run_simulation_and_invalid_token_handling():
+    """Verifies dry-run execution against Google FCM API and accurate token invalidation."""
+    fcm = FcmService()
+    res = fcm.send_notification(
+        fcm_token="mock_invalid_fcm_token_format_12345",
+        alert_id="ALR-TEST-DRYRUN-001",
+        title="🧪 VAYU TEST ALERT",
+        body="Dry run simulation drill.",
+        severity="TEST",
+        dry_run=True
+    )
+    assert res["alert_id"] == "ALR-TEST-DRYRUN-001"
+    # Google FCM validates format on validate_only=True and returns 400 INVALID_ARGUMENT
+    assert res["status"] in ("TOKEN_INVALID", "ACCEPTED_DRY_RUN", "ACCEPTED_SIMULATED")

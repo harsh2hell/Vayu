@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="live.vayusat.alerts.DeviceRegistrationModelTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-09-20T15:33:33.523Z" hostname="Harshs-MacBook-Air-4.local" time="0.018">
+<testsuite name="live.vayusat.alerts.DeviceRegistrationModelTest" tests="2" skipped="0" failures="0" errors="0" timestamp="2026-09-20T15:51:00.446Z" hostname="Harshs-MacBook-Air-4.local" time="0.017">
   <properties/>
-  <testcase name="testNotificationPreferencesSerialization" classname="live.vayusat.alerts.DeviceRegistrationModelTest" time="0.011"/>
+  <testcase name="testNotificationPreferencesSerialization" classname="live.vayusat.alerts.DeviceRegistrationModelTest" time="0.01"/>
   <testcase name="testDeviceRegistrationSerialization" classname="live.vayusat.alerts.DeviceRegistrationModelTest" time="0.007"/>
   <system-out><![CDATA[]]></system-out>
   <system-err><![CDATA[]]></system-err>
