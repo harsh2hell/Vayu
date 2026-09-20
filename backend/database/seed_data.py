@@ -185,9 +185,11 @@ def seed_database():
     for src in SATELLITE_CATALOG:
         db.upsert_satellite_source(src)
 
-    # 2. Seed Ocean Buoys
-    for buoy in OCEAN_BUOY_CATALOG:
-        db.insert_buoy_telemetry(buoy)
+    # 2. Seed Ocean Buoys (idempotent: only seed if no buoys exist)
+    existing_buoys = db.get_latest_buoy_telemetry()
+    if not existing_buoys:
+        for buoy in OCEAN_BUOY_CATALOG:
+            db.insert_buoy_telemetry(buoy)
 
     # 3. Seed AI Model Registry
     for model in AI_MODELS_CATALOG:

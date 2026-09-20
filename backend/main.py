@@ -35,12 +35,7 @@ from .routers.training import router as training_router
 from .routers.wind import router as wind_router
 from .routers.notifications import router as notifications_router
 
-# Initialize enterprise database tables & seeds
-seed_database()
-
-# Start background asynchronous telemetry poller
-telemetry_worker.start()
-
+# FastAPI Application Instance
 app = FastAPI(
     title="VAYU Enterprise Intelligence Gateway",
     description="Operational AI/ML Multi-Source Satellite & Spatiotemporal Cyclone Prediction Platform (SIH 2026 — Team Chakravat Crew)",
@@ -79,6 +74,31 @@ app.add_middleware(
 )
 
 @app.on_event("startup")
+async def startup_event():
+    """Initializes database seeds, telemetry worker, and verifies models."""
+    is_test = bool(os.environ.get("PYTEST_CURRENT_TEST") or os.environ.get("VAYU_ENV") == "test")
+    if not is_test:
+        try:
+            seed_database()
+        except Exception as e:
+            print(f"⚠️ [VAYU Startup] Seed error: {e}")
+        try:
+            telemetry_worker.start()
+        except Exception as e:
+            print(f"⚠️ [VAYU Startup] Telemetry poller start error: {e}")
+
+    await startup_model_verification()
+
+@app.on_event("shutdown")
+async def shutdown_event():
+    """Stops background workers and cleans up connection pool on shutdown."""
+    try:
+        telemetry_worker.stop()
+    except Exception:
+        pass
+    if hasattr(db, "close"):
+        db.close()
+
 async def startup_model_verification():
     """Logs model name, checkpoint path, SHA-256, and parameter count at startup."""
     import os
@@ -178,6 +198,22 @@ class AlertCreationRequest(BaseModel):
 @app.get("/api/health")
 def health_check():
     """Health check endpoint to verify backend operational status, active models, and background workers."""
+    db_status = db.health_check()
+    if not db_status.get("connected", False):
+        raise HTTPException(
+            status_code=503,
+            detail={
+                "status": "UNHEALTHY",
+                "service": "VAYU Enterprise Deep Learning Gateway",
+                "database": db_status
+            }
+        )
+
+    db_desc = (
+        "PostgreSQL (Supabase Connected)"
+        if db_status.get("engine") == "PostgreSQL"
+        else f"SQLite ({db_status.get('database_file', 'cyclone_intel.db')} Active)"
+    )
     return {
         "status": "ONLINE",
         "service": "VAYU Enterprise Deep Learning Gateway",
@@ -190,8 +226,9 @@ def health_check():
             "prediction": "CycloneTrajectoryGRU-Seq2Seq (Phase 3D 3-Hourly Spatiotemporal, 41,764 params)",
             "fusion": "CycloneFusion-Engine v2.5 (Multispectral + Ocean + Shear)"
         },
-        "database": "SQLite (cyclone_intel.db Active with 9 Tables)",
-        "background_poller": "ACTIVE",
+        "database": db_desc,
+        "database_info": db_status,
+        "background_poller": "ACTIVE" if telemetry_worker.running else "STANDBY",
         "timestamp": time.time()
     }
 
