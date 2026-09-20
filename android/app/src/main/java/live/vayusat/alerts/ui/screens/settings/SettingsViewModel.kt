@@ -13,7 +13,9 @@ class SettingsViewModel(
 
     val preferences: StateFlow<NotificationPreferences> = deviceRepository.preferences
     val fcmToken: StateFlow<String?> = deviceRepository.fcmToken
+    val isBackendConnected: StateFlow<Boolean> = deviceRepository.isBackendConnected
     val deviceId: String = deviceRepository.deviceId
+    val lastTokenSync: String get() = deviceRepository.lastTokenSync
 
     fun toggleCritical(enabled: Boolean) {
         viewModelScope.launch {

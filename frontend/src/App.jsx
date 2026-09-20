@@ -41,6 +41,7 @@ const ModelTraining = lazy(() => import('./pages/ModelTraining'));
 const Bulletin = lazy(() => import('./pages/Bulletin'));
 const VayuEarth = lazy(() => import('./pages/VayuEarth'));
 const StatusPage = lazy(() => import('./pages/StatusPage'));
+const AlertsNotifications = lazy(() => import('./pages/AlertsNotifications'));
 
 // Redirect helper when accessing /login on production apex domain (vayusat.live)
 const ProductionLoginRedirect = () => {
@@ -145,7 +146,8 @@ function App() {
             {/* 5. AI SYSTEM */}
             <Route path="models" element={<ModelTraining />} />
 
-            {/* 6. REPORTS & STATUS */}
+            {/* 6. REPORTS, ALERTS & STATUS */}
+            <Route path="alerts" element={<AlertsNotifications />} />
             <Route path="bulletin" element={<Bulletin />} />
             <Route path="status" element={<StatusPage />} />
 
@@ -159,6 +161,7 @@ function App() {
               <Route path="classification" element={<Classification />} />
               <Route path="trajectory" element={<Prediction />} />
               <Route path="impact" element={<Impact />} />
+              <Route path="alerts" element={<AlertsNotifications />} />
               <Route path="archives" element={<Analytics />} />
               <Route path="models" element={<ModelTraining />} />
               <Route path="bulletin" element={<Bulletin />} />
@@ -167,7 +170,6 @@ function App() {
               <Route path="trackmap" element={<Navigate to="/trajectory" replace />} />
               <Route path="prediction" element={<Navigate to="/trajectory" replace />} />
               <Route path="wind" element={<Navigate to="/trajectory" replace />} />
-              <Route path="alerts" element={<Navigate to="/impact" replace />} />
               <Route path="analytics" element={<Navigate to="/archives" replace />} />
               <Route path="training" element={<Navigate to="/models" replace />} />
               <Route path="performance" element={<Navigate to="/models" replace />} />
@@ -181,7 +183,6 @@ function App() {
             <Route path="trackmap" element={<Navigate to="/trajectory" replace />} />
             <Route path="prediction" element={<Navigate to="/trajectory" replace />} />
             <Route path="wind" element={<Navigate to="/trajectory" replace />} />
-            <Route path="alerts" element={<Navigate to="/impact" replace />} />
             <Route path="analytics" element={<Navigate to="/archives" replace />} />
             <Route path="training" element={<Navigate to="/models" replace />} />
             <Route path="performance" element={<Navigate to="/models" replace />} />
@@ -309,7 +310,8 @@ function App() {
               {/* 5. AI SYSTEM */}
               <Route path="models" element={<ModelTraining />} />
 
-              {/* 6. REPORTS & STATUS */}
+              {/* 6. REPORTS, ALERTS & STATUS */}
+              <Route path="alerts" element={<AlertsNotifications />} />
               <Route path="bulletin" element={<Bulletin />} />
               <Route path="status" element={<StatusPage />} />
 
@@ -318,7 +320,6 @@ function App() {
               <Route path="trackmap" element={<Navigate to="/dashboard/trajectory" replace />} />
               <Route path="prediction" element={<Navigate to="/dashboard/trajectory" replace />} />
               <Route path="wind" element={<Navigate to="/dashboard/trajectory" replace />} />
-              <Route path="alerts" element={<Navigate to="/dashboard/impact" replace />} />
               <Route path="analytics" element={<Navigate to="/dashboard/archives" replace />} />
               <Route path="training" element={<Navigate to="/dashboard/models" replace />} />
               <Route path="performance" element={<Navigate to="/dashboard/models" replace />} />
@@ -344,6 +345,7 @@ function App() {
               <Route path="classification" element={<Classification />} />
               <Route path="trajectory" element={<Prediction />} />
               <Route path="impact" element={<Impact />} />
+              <Route path="alerts" element={<AlertsNotifications />} />
               <Route path="archives" element={<Analytics />} />
               <Route path="models" element={<ModelTraining />} />
               <Route path="bulletin" element={<Bulletin />} />
@@ -352,7 +354,6 @@ function App() {
               <Route path="trackmap" element={<Navigate to="/portal/trajectory" replace />} />
               <Route path="prediction" element={<Navigate to="/portal/trajectory" replace />} />
               <Route path="wind" element={<Navigate to="/portal/trajectory" replace />} />
-              <Route path="alerts" element={<Navigate to="/portal/impact" replace />} />
               <Route path="analytics" element={<Navigate to="/portal/archives" replace />} />
               <Route path="training" element={<Navigate to="/portal/models" replace />} />
               <Route path="performance" element={<Navigate to="/portal/models" replace />} />

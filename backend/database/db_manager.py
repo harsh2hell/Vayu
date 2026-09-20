@@ -2,6 +2,7 @@ import sqlite3
 import json
 import os
 import time
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Union
 
@@ -955,6 +956,119 @@ class DatabaseManager:
             d["is_active"] = bool(d.get("is_active", 1))
             return d
 
+    # =========================================================
+    # MOBILE DEVICE & NOTIFICATION DISPATCH CRUD
+    # =========================================================
+    def get_active_devices(self) -> List[Dict[str, Any]]:
+        """Retrieves all active devices registered for notifications."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM devices WHERE is_active = 1 ORDER BY updated_at DESC")
+            return [dict(r) for r in cursor.fetchall()]
+
+    def get_all_registered_devices(self, limit: int = 100) -> List[Dict[str, Any]]:
+        """Retrieves all registered devices with their notification preference summary."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+            SELECT d.*, 
+                   COALESCE(p.enable_critical, 1) as critical_alerts, 
+                   COALESCE(p.enable_warning, 1) as warning_alerts, 
+                   COALESCE(p.enable_watch, 1) as watch_alerts, 
+                   COALESCE(p.enable_info, 0) as info_alerts,
+                   COALESCE(p.enable_sound, 1) as sound_enabled, 
+                   COALESCE(p.enable_vibration, 1) as vibration_enabled, 
+                   COALESCE(p.max_alert_radius_km, 250.0) as distance_radius_km
+            FROM devices d
+            LEFT JOIN notification_preferences p ON d.device_id = p.device_id
+            ORDER BY d.updated_at DESC LIMIT ?
+            """, (limit,))
+            return [dict(r) for r in cursor.fetchall()]
+
+    def deactivate_device(self, device_id: str) -> bool:
+        """Marks a device token as inactive (e.g. on token invalidation or explicit unregister)."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("UPDATE devices SET is_active = 0, updated_at = CURRENT_TIMESTAMP WHERE device_id = ?", (device_id,))
+            conn.commit()
+            return cursor.rowcount > 0
+
+    def record_alert_delivery(
+        self,
+        delivery_id: str,
+        alert_id: str,
+        device_id: str,
+        status: str = "PENDING",
+        sent_at: Optional[str] = None
+    ) -> int:
+        """Records an initial dispatch attempt into alert_deliveries."""
+        if not sent_at:
+            sent_at = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+            INSERT INTO alert_deliveries (alert_id, device_id, delivery_status, attempted_at)
+            VALUES (?, ?, ?, ?)
+            """, (alert_id, device_id, status, sent_at))
+            conn.commit()
+            return cursor.lastrowid
+
+    def update_alert_delivery_status(
+        self,
+        delivery_id: Any,
+        status: str,
+        fcm_message_id: Optional[str] = None
+    ) -> bool:
+        """Updates delivery status (e.g., ACCEPTED, FAILED, TOKEN_INVALID)."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+            UPDATE alert_deliveries 
+            SET delivery_status = ?, fcm_message_id = COALESCE(?, fcm_message_id) 
+            WHERE id = ?
+            """, (status, fcm_message_id, delivery_id))
+            conn.commit()
+            return cursor.rowcount > 0
+
+    def record_alert_opened(
+        self,
+        alert_id: str,
+        device_id: Optional[str] = None
+    ) -> int:
+        """Records that a user tapped and opened an alert on their device."""
+        now = datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            if device_id:
+                cursor.execute("""
+                UPDATE alert_deliveries
+                SET delivery_status = 'OPENED', acknowledged_at = ?
+                WHERE alert_id = ? AND device_id = ?
+                """, (now, alert_id, device_id))
+            else:
+                cursor.execute("""
+                UPDATE alert_deliveries
+                SET delivery_status = 'OPENED', acknowledged_at = ?
+                WHERE alert_id = ?
+                """, (now, alert_id))
+            conn.commit()
+            return cursor.rowcount
+
+    def get_recent_deliveries(self, limit: int = 50) -> List[Dict[str, Any]]:
+        """Retrieves recent notification deliveries with alert and device context."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+            SELECT del.id as delivery_id, del.alert_id, del.device_id, del.delivery_status as status,
+                   del.attempted_at as sent_at, del.acknowledged_at as opened_at, del.fcm_message_id,
+                   a.title as alert_title, a.severity, a.storm_name, d.device_model, d.platform
+            FROM alert_deliveries del
+            LEFT JOIN vayu_alerts a ON del.alert_id = a.alert_id
+            LEFT JOIN devices d ON del.device_id = d.device_id
+            ORDER BY del.attempted_at DESC LIMIT ?
+            """, (limit,))
+            return [dict(r) for r in cursor.fetchall()]
+
     def _ensure_seed_vayu_alerts(self):
         """Seeds initial verified alerts if the table is currently empty."""
         with self._get_connection() as conn:
@@ -1030,4 +1144,5 @@ class DatabaseManager:
 
 # Singleton Database Instance
 db = DatabaseManager()
+db_manager = db
 

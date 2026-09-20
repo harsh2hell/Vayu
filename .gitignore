@@ -40,3 +40,19 @@ env/
 # Documentation Reports
 VAYU_MASTER_PROJECT_REPORT.md
 
+# Android & Gradle
+android/.gradle/
+android/build/
+android/app/build/
+android/local.properties
+android/**/google-services.json
+!android/app/google-services.json.placeholder
+*.apk
+*.aab
+
+# Firebase & Cloud Credentials
+*service-account*.json
+*firebase-adminsdk*.json
+firebase-credentials.json
+
+

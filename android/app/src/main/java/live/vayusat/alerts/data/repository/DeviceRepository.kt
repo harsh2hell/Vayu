@@ -47,6 +47,12 @@ class DeviceRepository(
         prefs.edit().putBoolean(KEY_ONBOARDING_COMPLETED, completed).apply()
     }
 
+    private val _isBackendConnected = MutableStateFlow(true)
+    val isBackendConnected: StateFlow<Boolean> = _isBackendConnected.asStateFlow()
+
+    val lastTokenSync: String
+        get() = prefs.getString(KEY_LAST_SYNC, "Pending initial sync") ?: "Pending initial sync"
+
     suspend fun saveAndRegisterFcmToken(token: String): Result<Boolean> = withContext(Dispatchers.IO) {
         prefs.edit().putString(KEY_FCM_TOKEN, token).apply()
         _fcmToken.value = token
@@ -63,9 +69,12 @@ class DeviceRepository(
 
         val result = apiService.registerDevice(request)
         if (result.isSuccess) {
+            val nowFormatted = java.text.SimpleDateFormat("dd MMM yyyy, HH:mm:ss", java.util.Locale.getDefault()).format(java.util.Date())
+            prefs.edit().putString(KEY_LAST_SYNC, nowFormatted).apply()
+            _isBackendConnected.value = true
             Result.success(true)
         } else {
-            // Token is saved locally, will retry on next sync
+            _isBackendConnected.value = false
             Result.failure(result.exceptionOrNull() ?: Exception("Failed to register device token"))
         }
     }
@@ -153,6 +162,7 @@ class DeviceRepository(
         private const val KEY_DEVICE_ID = "device_id"
         private const val KEY_FCM_TOKEN = "fcm_token"
         private const val KEY_ONBOARDING_COMPLETED = "onboarding_completed"
+        private const val KEY_LAST_SYNC = "last_token_sync"
         private const val KEY_CRITICAL = "pref_critical"
         private const val KEY_WARNING = "pref_warning"
         private const val KEY_WATCH = "pref_watch"

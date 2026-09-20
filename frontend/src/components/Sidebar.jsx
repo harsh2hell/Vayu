@@ -5,7 +5,7 @@ import {
   PieChart, Globe, Satellite, Crosshair, Layers,
   Compass, MapPin, Database, Cpu, FileText,
   User, Briefcase, BookOpen, MessageSquare, ShieldCheck,
-  Activity
+  Activity, Bell
 } from 'lucide-react';
 import { OfficerAccountDisplay, SafeSignOutButton } from './auth/ClerkAuth';
 import { getWebsiteUrl, isProductionDomain, toPortalPath } from '../utils/domain';
@@ -134,6 +134,7 @@ const Sidebar = () => {
         { path: toPortalPath('/dashboard/impact'), label: 'Impact & Alerts' }
       ]
     },
+    { path: toPortalPath('/dashboard/alerts'), label: 'Alerts & Notifications', icon: Bell },
     { path: toPortalPath('/dashboard/classification'), label: 'Morphology', icon: Layers },
     { path: toPortalPath('/dashboard/archives'), label: 'Historical', icon: Database },
     { path: toPortalPath('/dashboard/models'), label: 'AI Intelligence', icon: Cpu },

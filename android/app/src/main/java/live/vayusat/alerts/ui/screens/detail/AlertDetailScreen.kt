@@ -171,6 +171,13 @@ fun AlertDetailScreen(
                 Spacer(modifier = Modifier.height(14.dp))
 
                 // Source Attribution Card
+                val sourceDescriptor = when (alert.source) {
+                    live.vayusat.alerts.data.model.AlertSource.VAYU_MODEL -> "Model-derived VAYU alert"
+                    live.vayusat.alerts.data.model.AlertSource.VAYU_OPERATOR -> "VAYU operator alert"
+                    live.vayusat.alerts.data.model.AlertSource.OFFICIAL_ADVISORY -> "Official advisory — source explicitly identified"
+                    live.vayusat.alerts.data.model.AlertSource.TEST -> "🧪 VAYU Diagnostic Drill Alert"
+                }
+
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(8.dp),
@@ -181,14 +188,14 @@ fun AlertDetailScreen(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Text(
-                            text = "SOURCE: ${alert.source.name}",
+                            text = sourceDescriptor,
                             style = MaterialTheme.typography.labelSmall,
                             color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.Bold
                         )
                         if (alert.sourceModule != null) {
                             Text(
-                                text = " (${alert.sourceModule})",
+                                text = " • ${alert.sourceModule}",
                                 style = MaterialTheme.typography.labelSmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )

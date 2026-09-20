@@ -75,9 +75,12 @@ class AlertRepository(
         null
     }
 
-    suspend fun markAlertAsRead(alertId: String) = withContext(Dispatchers.IO) {
+    suspend fun markAlertAsRead(alertId: String, deviceId: String? = null) = withContext(Dispatchers.IO) {
         database.markAlertAsRead(alertId)
         _alerts.value = database.getAllAlerts()
+        try {
+            apiService.recordAlertOpened(alertId, deviceId)
+        } catch (_: Exception) {}
     }
 
     suspend fun acknowledgeAlert(alertId: String) = withContext(Dispatchers.IO) {

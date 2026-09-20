@@ -224,3 +224,13 @@ class VayuAlertModel(BaseModel):
     created_at: str
     expires_at: str
 
+
+class TestNotificationRequest(BaseModel):
+    title: Optional[str] = "VAYU Test Alert"
+    message: Optional[str] = "Notification pipeline is operational."
+    severity: Optional[str] = "TEST"
+    target_mode: Optional[str] = "all"  # "my_device", "selected", "all"
+    target_device_ids: Optional[List[str]] = None
+    alert_id: Optional[str] = None
+
+

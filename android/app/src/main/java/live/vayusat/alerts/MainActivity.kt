@@ -5,6 +5,9 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import androidx.compose.runtime.mutableStateOf
 import androidx.navigation.compose.rememberNavController
 import live.vayusat.alerts.data.local.VayuDatabase
@@ -38,6 +41,23 @@ class MainActivity : ComponentActivity() {
 
         // Extract deep link destination if launched via notification or URL
         handleIncomingIntent(intent)
+
+        // Query FCM token on launch and register with VAYU backend
+        try {
+            com.google.firebase.messaging.FirebaseMessaging.getInstance().token
+                .addOnCompleteListener { task ->
+                    if (task.isSuccessful) {
+                        val token = task.result
+                        if (!token.isNullOrBlank()) {
+                            lifecycleScope.launch(Dispatchers.IO) {
+                                deviceRepository.saveAndRegisterFcmToken(token)
+                            }
+                        }
+                    }
+                }
+        } catch (e: Exception) {
+            android.util.Log.w("MainActivity", "Firebase not yet initialized or config pending: ${e.message}")
+        }
 
         setContent {
             VayuAlertsTheme {

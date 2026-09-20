@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<testsuite name="live.vayusat.alerts.NotificationPayloadParserTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-09-20T15:18:47.861Z" hostname="Harshs-MacBook-Air-4.local" time="0.002">
+<testsuite name="live.vayusat.alerts.NotificationPayloadParserTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-09-20T15:33:33.544Z" hostname="Harshs-MacBook-Air-4.local" time="0.001">
   <properties/>
   <testcase name="testValidPayloadParsing" classname="live.vayusat.alerts.NotificationPayloadParserTest" time="0.001"/>
   <testcase name="testMalformedCoordinatesFallback" classname="live.vayusat.alerts.NotificationPayloadParserTest" time="0.0"/>

@@ -1084,4 +1084,96 @@ export async function fetchLiveCycloneWindTelemetry(systemId) {
   return null;
 }
 
+/**
+ * Fetches the registry of connected mobile devices.
+ */
+export async function fetchRegisteredDevices(limit = 50) {
+  try {
+    const baseUrl = await getLiveBaseUrl();
+    if (!baseUrl) return [];
+    const res = await fetch(`${baseUrl}/api/notifications/devices?limit=${limit}`);
+    if (res.ok) {
+      const data = await res.json();
+      return data.devices || [];
+    }
+  } catch (err) {
+    console.warn('[VAYU API] Failed to fetch registered devices:', err);
+  }
+  return [];
+}
 
+/**
+ * Dispatches a test push notification to targeted devices via FCM HTTP v1.
+ */
+export async function sendTestNotification(payload) {
+  const baseUrl = await getLiveBaseUrl();
+  if (!baseUrl) {
+    throw new Error('Backend API is not reachable. Ensure FastAPI server is running.');
+  }
+  const res = await fetch(`${baseUrl}/api/notifications/test`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.detail || 'Failed to dispatch test notification.');
+  }
+  return data;
+}
+
+/**
+ * Fetches audit log of alert push notification deliveries and opened telemetry.
+ */
+export async function fetchDeliveryHistory(limit = 50) {
+  try {
+    const baseUrl = await getLiveBaseUrl();
+    if (!baseUrl) return [];
+    const res = await fetch(`${baseUrl}/api/notifications/deliveries?limit=${limit}`);
+    if (res.ok) {
+      const data = await res.json();
+      return data.deliveries || [];
+    }
+  } catch (err) {
+    console.warn('[VAYU API] Failed to fetch delivery history:', err);
+  }
+  return [];
+}
+
+/**
+ * Fetches VAYU consumer & mobile early warning alerts list.
+ */
+export async function fetchVayuAlerts(limit = 50, activeOnly = false) {
+  try {
+    const baseUrl = await getLiveBaseUrl();
+    if (!baseUrl) return [];
+    const res = await fetch(`${baseUrl}/api/alerts?limit=${limit}&active_only=${activeOnly}`);
+    if (res.ok) {
+      const data = await res.json();
+      return data.alerts || [];
+    }
+  } catch (err) {
+    console.warn('[VAYU API] Failed to fetch VAYU alerts:', err);
+  }
+  return [];
+}
+
+/**
+ * Creates an operator broadcast alert.
+ */
+export async function createVayuAlert(payload) {
+  const baseUrl = await getLiveBaseUrl();
+  if (!baseUrl) {
+    throw new Error('Backend API is not reachable.');
+  }
+  const res = await fetch(`${baseUrl}/api/alerts/create`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    throw new Error(data.detail || 'Failed to create alert.');
+  }
+  return data;
+}

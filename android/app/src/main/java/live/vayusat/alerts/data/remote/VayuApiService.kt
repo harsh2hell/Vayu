@@ -186,6 +186,27 @@ class VayuApiService(
             }
         }
 
+    suspend fun recordAlertOpened(alertId: String, deviceId: String?): Result<Boolean> =
+        withContext(Dispatchers.IO) {
+            try {
+                val url = if (deviceId != null) {
+                    "$baseUrl/api/alerts/$alertId/opened?device_id=$deviceId"
+                } else {
+                    "$baseUrl/api/alerts/$alertId/opened"
+                }
+                val httpRequest = Request.Builder()
+                    .url(url)
+                    .post("{}".toRequestBody(jsonMediaType))
+                    .build()
+
+                okHttpClient.newCall(httpRequest).execute().use { response ->
+                    Result.success(response.isSuccessful)
+                }
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+
     companion object {
         // Default URL points to local emulator host mapping (10.0.2.2 points to 127.0.0.1 on the dev machine)
         const val DEFAULT_BASE_URL = "http://10.0.2.2:8000"
