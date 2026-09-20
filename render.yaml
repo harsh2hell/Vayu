@@ -1,0 +1,31 @@
+# ==============================================================================
+# VAYU FastAPI Backend — Render Blueprint Specification
+# Blueprint documentation: https://render.com/docs/blueprint-spec
+# ==============================================================================
+
+services:
+  - type: web
+    name: vayu-backend
+    env: docker
+    dockerContext: backend
+    dockerfilePath: Dockerfile
+    plan: starter
+    region: singapore
+    healthCheckPath: /api/health
+    autoDeploy: false
+    envVars:
+      - key: PORT
+        value: 8000
+      - key: HOST
+        value: 0.0.0.0
+      - key: RELOAD
+        value: false
+      - key: CORS_ORIGINS
+        value: https://portal.vayusat.live,https://www.vayusat.live,https://vayusat.live
+      - key: FIREBASE_PROJECT_ID
+        value: vayusat-live
+      # Set this in the Render Dashboard Secret Environment Variables (never commit plaintext):
+      - key: FIREBASE_SERVICE_ACCOUNT_KEY
+        sync: false
+      - key: WINDY_API_KEY
+        sync: false

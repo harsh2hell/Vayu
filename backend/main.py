@@ -1,4 +1,5 @@
 import io
+import os
 import time
 from typing import Optional, List, Dict, Any
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException, Response, Query
@@ -48,10 +49,30 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-# Enable CORS for all frontend clients
+# CORS Origins: Production domains + Local development origins
+DEFAULT_ALLOWED_ORIGINS = [
+    "https://portal.vayusat.live",
+    "https://www.vayusat.live",
+    "https://vayusat.live",
+    "http://localhost:5173",
+    "http://127.0.0.1:5173",
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "http://localhost:8000",
+    "http://127.0.0.1:8000",
+]
+
+_custom_origins_env = os.environ.get("CORS_ORIGINS", "").strip()
+_allowed_origins = list(DEFAULT_ALLOWED_ORIGINS)
+if _custom_origins_env:
+    for _orig in _custom_origins_env.split(","):
+        _cleaned = _orig.strip()
+        if _cleaned and _cleaned not in _allowed_origins:
+            _allowed_origins.append(_cleaned)
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=_allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

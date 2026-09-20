@@ -1,0 +1,30 @@
+# Ignore Python runtime artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Ignore local editor and OS files
+.DS_Store
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Ignore local environment files (NEVER bundle secrets)
+.env
+.env.*
+!.env.example
+
+# Ignore temporary test and scratch files
+tests/
+scratch/
+tmp/
+
+# CRITICAL: Preserve these essential files (Do NOT ignore):
+# !cyclone_intel.db
+# !ml_engine/checkpoints/phase3b/*.pt
+# !data/datasets/tracks/processed/landmark_tracks_processed.json
