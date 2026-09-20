@@ -273,6 +273,86 @@ class DatabaseManager:
             );
             """)
 
+            # 10. Mobile & Client Devices (Phase 10A)
+            cursor.execute("""
+            CREATE TABLE IF NOT EXISTS devices (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                device_id TEXT UNIQUE NOT NULL,
+                fcm_token TEXT NOT NULL,
+                platform TEXT DEFAULT 'android',
+                app_version TEXT,
+                os_version TEXT,
+                device_model TEXT,
+                locale TEXT DEFAULT 'en_IN',
+                last_known_lat REAL,
+                last_known_lon REAL,
+                last_known_district TEXT,
+                last_known_state TEXT,
+                is_active INTEGER DEFAULT 1,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+            """)
+
+            # 11. Notification Preferences (Phase 10A)
+            cursor.execute("""
+            CREATE TABLE IF NOT EXISTS notification_preferences (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                device_id TEXT UNIQUE NOT NULL,
+                enable_critical INTEGER DEFAULT 1,
+                enable_warning INTEGER DEFAULT 1,
+                enable_watch INTEGER DEFAULT 1,
+                enable_info INTEGER DEFAULT 0,
+                enable_test INTEGER DEFAULT 0,
+                enable_sound INTEGER DEFAULT 1,
+                enable_vibration INTEGER DEFAULT 1,
+                subscribed_basins_json TEXT DEFAULT '["Bay of Bengal","Arabian Sea"]',
+                subscribed_states_json TEXT DEFAULT '[]',
+                max_alert_radius_km REAL DEFAULT 300.0,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                FOREIGN KEY(device_id) REFERENCES devices(device_id) ON DELETE CASCADE
+            );
+            """)
+
+            # 12. Standardized VAYU Alerts (Phase 10A)
+            cursor.execute("""
+            CREATE TABLE IF NOT EXISTS vayu_alerts (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                alert_id TEXT UNIQUE NOT NULL,
+                storm_id TEXT,
+                storm_name TEXT NOT NULL,
+                severity TEXT NOT NULL, -- INFO, WATCH, WARNING, CRITICAL, TEST
+                title TEXT NOT NULL,
+                message TEXT NOT NULL,
+                source TEXT NOT NULL, -- VAYU_MODEL, VAYU_OPERATOR, OFFICIAL_ADVISORY, TEST
+                source_module TEXT, -- Trajectory-GRU, LandfallCorridor, DvorakResNet, Manual
+                location_region TEXT,
+                latitude REAL,
+                longitude REAL,
+                radius_km REAL DEFAULT 150.0,
+                metadata_json TEXT DEFAULT '{}',
+                is_active INTEGER DEFAULT 1,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                expires_at TIMESTAMP NOT NULL
+            );
+            """)
+
+            # 13. Alert Delivery Audit Trail (Phase 10A)
+            cursor.execute("""
+            CREATE TABLE IF NOT EXISTS alert_deliveries (
+                id INTEGER PRIMARY KEY AUTOINCREMENT,
+                alert_id TEXT NOT NULL,
+                device_id TEXT NOT NULL,
+                delivery_status TEXT DEFAULT 'QUEUED', -- QUEUED, SENT, DELIVERED, FAILED, ACKNOWLEDGED
+                fcm_message_id TEXT,
+                error_message TEXT,
+                attempted_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                acknowledged_at TIMESTAMP,
+                FOREIGN KEY(alert_id) REFERENCES vayu_alerts(alert_id),
+                FOREIGN KEY(device_id) REFERENCES devices(device_id)
+            );
+            """)
+
             conn.commit()
 
     # =========================================================
@@ -620,5 +700,334 @@ class DatabaseManager:
             cursor.execute("SELECT * FROM ai_models_registry ORDER BY id")
             return [dict(r) for r in cursor.fetchall()]
 
+    # =========================================================
+    # MOBILE DEVICES & NOTIFICATION PREFERENCES (PHASE 10A)
+    # =========================================================
+    def register_device(self, device_data: Dict[str, Any]) -> Dict[str, Any]:
+        """Registers or updates a mobile device and ensures default notification preferences."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+            INSERT INTO devices (
+                device_id, fcm_token, platform, app_version, os_version,
+                device_model, locale, last_known_lat, last_known_lon,
+                last_known_district, last_known_state, is_active, updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, CURRENT_TIMESTAMP)
+            ON CONFLICT(device_id) DO UPDATE SET
+                fcm_token=excluded.fcm_token,
+                platform=excluded.platform,
+                app_version=excluded.app_version,
+                os_version=excluded.os_version,
+                device_model=excluded.device_model,
+                locale=excluded.locale,
+                last_known_lat=COALESCE(excluded.last_known_lat, devices.last_known_lat),
+                last_known_lon=COALESCE(excluded.last_known_lon, devices.last_known_lon),
+                last_known_district=COALESCE(excluded.last_known_district, devices.last_known_district),
+                last_known_state=COALESCE(excluded.last_known_state, devices.last_known_state),
+                is_active=1,
+                updated_at=CURRENT_TIMESTAMP
+            """, (
+                device_data["device_id"],
+                device_data["fcm_token"],
+                device_data.get("platform", "android"),
+                device_data.get("app_version", "1.0.0"),
+                device_data.get("os_version"),
+                device_data.get("device_model"),
+                device_data.get("locale", "en_IN"),
+                device_data.get("latitude"),
+                device_data.get("longitude"),
+                device_data.get("district"),
+                device_data.get("state")
+            ))
+
+            # Ensure default preferences exist
+            cursor.execute("""
+            INSERT OR IGNORE INTO notification_preferences (device_id)
+            VALUES (?)
+            """, (device_data["device_id"],))
+
+            conn.commit()
+            return {
+                "success": True,
+                "device_id": device_data["device_id"],
+                "status": "REGISTERED",
+                "message": "Device registered for real-time VAYU cyclone alerts."
+            }
+
+    def unregister_device(self, device_id: str) -> bool:
+        """Deactivates a device registration so alerts are no longer dispatched to it."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+            UPDATE devices SET is_active = 0, updated_at = CURRENT_TIMESTAMP
+            WHERE device_id = ?
+            """, (device_id,))
+            conn.commit()
+            return cursor.rowcount > 0
+
+    def get_notification_preferences(self, device_id: str) -> Dict[str, Any]:
+        """Retrieves notification preferences for a device, falling back to sensible defaults."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM notification_preferences WHERE device_id = ?", (device_id,))
+            row = cursor.fetchone()
+            if row:
+                d = dict(row)
+                return {
+                    "device_id": d["device_id"],
+                    "enable_critical": bool(d["enable_critical"]),
+                    "enable_warning": bool(d["enable_warning"]),
+                    "enable_watch": bool(d["enable_watch"]),
+                    "enable_info": bool(d["enable_info"]),
+                    "enable_test": bool(d["enable_test"]),
+                    "enable_sound": bool(d["enable_sound"]),
+                    "enable_vibration": bool(d["enable_vibration"]),
+                    "subscribed_basins": json.loads(d.get("subscribed_basins_json") or '["Bay of Bengal","Arabian Sea"]'),
+                    "subscribed_states": json.loads(d.get("subscribed_states_json") or '[]'),
+                    "max_alert_radius_km": float(d.get("max_alert_radius_km") or 300.0),
+                    "updated_at": d.get("updated_at")
+                }
+
+            # Return defaults if not configured
+            return {
+                "device_id": device_id,
+                "enable_critical": True,
+                "enable_warning": True,
+                "enable_watch": True,
+                "enable_info": False,
+                "enable_test": False,
+                "enable_sound": True,
+                "enable_vibration": True,
+                "subscribed_basins": ["Bay of Bengal", "Arabian Sea"],
+                "subscribed_states": [],
+                "max_alert_radius_km": 300.0,
+                "updated_at": None
+            }
+
+    def update_notification_preferences(self, device_id: str, prefs: Dict[str, Any]) -> Dict[str, Any]:
+        """Updates notification channels and filters for a registered device."""
+        current = self.get_notification_preferences(device_id)
+        
+        # Merge updates
+        enable_crit = prefs.get("enable_critical", current["enable_critical"])
+        enable_warn = prefs.get("enable_warning", current["enable_warning"])
+        enable_watch = prefs.get("enable_watch", current["enable_watch"])
+        enable_info = prefs.get("enable_info", current["enable_info"])
+        enable_test = prefs.get("enable_test", current["enable_test"])
+        enable_snd = prefs.get("enable_sound", current["enable_sound"])
+        enable_vib = prefs.get("enable_vibration", current["enable_vibration"])
+        basins = prefs.get("subscribed_basins", current["subscribed_basins"])
+        states = prefs.get("subscribed_states", current["subscribed_states"])
+        radius = prefs.get("max_alert_radius_km", current["max_alert_radius_km"])
+
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+            INSERT INTO notification_preferences (
+                device_id, enable_critical, enable_warning, enable_watch,
+                enable_info, enable_test, enable_sound, enable_vibration,
+                subscribed_basins_json, subscribed_states_json, max_alert_radius_km,
+                updated_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+            ON CONFLICT(device_id) DO UPDATE SET
+                enable_critical=excluded.enable_critical,
+                enable_warning=excluded.enable_warning,
+                enable_watch=excluded.enable_watch,
+                enable_info=excluded.enable_info,
+                enable_test=excluded.enable_test,
+                enable_sound=excluded.enable_sound,
+                enable_vibration=excluded.enable_vibration,
+                subscribed_basins_json=excluded.subscribed_basins_json,
+                subscribed_states_json=excluded.subscribed_states_json,
+                max_alert_radius_km=excluded.max_alert_radius_km,
+                updated_at=CURRENT_TIMESTAMP
+            """, (
+                device_id,
+                1 if enable_crit else 0,
+                1 if enable_warn else 0,
+                1 if enable_watch else 0,
+                1 if enable_info else 0,
+                1 if enable_test else 0,
+                1 if enable_snd else 0,
+                1 if enable_vib else 0,
+                json.dumps(basins),
+                json.dumps(states),
+                radius
+            ))
+            conn.commit()
+
+        return self.get_notification_preferences(device_id)
+
+    # =========================================================
+    # STANDARDIZED VAYU ALERTS (PHASE 10A)
+    # =========================================================
+    def create_vayu_alert(self, alert_data: Dict[str, Any]) -> str:
+        """Creates a standardized VAYU alert record."""
+        import datetime
+        alert_id = alert_data.get("alert_id") or f"ALR-2026-{int(time.time() * 1000) % 1000000:06d}"
+        
+        # Calculate expiration: default 24h from now
+        expires_at = alert_data.get("expires_at")
+        if not expires_at:
+            expires_at = (datetime.datetime.utcnow() + datetime.timedelta(hours=24)).strftime("%Y-%m-%d %H:%M:%S")
+
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("""
+            INSERT INTO vayu_alerts (
+                alert_id, storm_id, storm_name, severity, title, message,
+                source, source_module, location_region, latitude, longitude,
+                radius_km, metadata_json, is_active, expires_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 1, ?)
+            ON CONFLICT(alert_id) DO UPDATE SET
+                severity=excluded.severity,
+                title=excluded.title,
+                message=excluded.message,
+                location_region=excluded.location_region,
+                latitude=excluded.latitude,
+                longitude=excluded.longitude,
+                radius_km=excluded.radius_km,
+                metadata_json=excluded.metadata_json,
+                is_active=excluded.is_active,
+                expires_at=excluded.expires_at
+            """, (
+                alert_id,
+                alert_data.get("storm_id"),
+                alert_data["storm_name"],
+                alert_data.get("severity", "WARNING").upper(),
+                alert_data["title"],
+                alert_data["message"],
+                alert_data.get("source", "VAYU_MODEL"),
+                alert_data.get("source_module", "Trajectory-GRU"),
+                alert_data.get("location_region"),
+                alert_data.get("latitude"),
+                alert_data.get("longitude"),
+                alert_data.get("radius_km", 150.0),
+                json.dumps(alert_data.get("metadata_json") or alert_data.get("metadata") or {}),
+                expires_at
+            ))
+            conn.commit()
+            return alert_id
+
+    def get_vayu_alerts(
+        self,
+        limit: int = 50,
+        active_only: bool = True,
+        severity: Optional[str] = None
+    ) -> List[Dict[str, Any]]:
+        """Retrieves alerts, optionally filtering by active state and severity."""
+        self._ensure_seed_vayu_alerts()
+        query = "SELECT * FROM vayu_alerts WHERE 1=1"
+        params: List[Any] = []
+
+        if active_only:
+            query += " AND is_active = 1 AND datetime(expires_at) >= datetime('now')"
+        if severity:
+            query += " AND severity = ?"
+            params.append(severity.upper())
+
+        query += " ORDER BY created_at DESC LIMIT ?"
+        params.append(limit)
+
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute(query, params)
+            rows = cursor.fetchall()
+            results = []
+            for r in rows:
+                d = dict(r)
+                d["metadata"] = json.loads(d.get("metadata_json") or "{}")
+                d["is_active"] = bool(d.get("is_active", 1))
+                results.append(d)
+            return results
+
+    def get_vayu_alert_by_id(self, alert_id: str) -> Optional[Dict[str, Any]]:
+        """Retrieves a single VAYU alert by its canonical identifier."""
+        self._ensure_seed_vayu_alerts()
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT * FROM vayu_alerts WHERE alert_id = ?", (alert_id,))
+            row = cursor.fetchone()
+            if not row:
+                return None
+            d = dict(row)
+            d["metadata"] = json.loads(d.get("metadata_json") or "{}")
+            d["is_active"] = bool(d.get("is_active", 1))
+            return d
+
+    def _ensure_seed_vayu_alerts(self):
+        """Seeds initial verified alerts if the table is currently empty."""
+        with self._get_connection() as conn:
+            cursor = conn.cursor()
+            cursor.execute("SELECT COUNT(*) FROM vayu_alerts")
+            count = cursor.fetchone()[0]
+            if count > 0:
+                return
+
+        # Pre-seed realistic alerts
+        initial_alerts = [
+            {
+                "alert_id": "ALR-2026-00001",
+                "storm_id": "DANA",
+                "storm_name": "Cyclone DANA (2024)",
+                "severity": "CRITICAL",
+                "title": "Severe Coastal Strike & Evacuation Alert",
+                "message": "Cyclone DANA landfall corridor locked: Northern Odisha / West Bengal coast between Dhamra and Bhitarkanika. Peak winds 120 km/h with 2.5m storm surge. Immediate relocation to concrete cyclone shelters advised.",
+                "source": "VAYU_MODEL",
+                "source_module": "LandfallCorridor-GRU",
+                "location_region": "Odisha & West Bengal Coastal Corridor",
+                "latitude": 20.8,
+                "longitude": 86.9,
+                "radius_km": 120.0,
+                "metadata_json": {
+                    "estimated_landfall_eta": "18h",
+                    "wind_speed_kmh": 120,
+                    "central_pressure_hpa": 984,
+                    "affected_districts": ["Bhadrak", "Kendrapara", "Balasore", "Purba Medinipur"],
+                    "shelters_active": 142
+                }
+            },
+            {
+                "alert_id": "ALR-2026-00002",
+                "storm_id": "BIPARJOY",
+                "storm_name": "Cyclone BIPARJOY (2023)",
+                "severity": "WARNING",
+                "title": "Trajectory Recurvature Warning: Saurashtra & Kutch",
+                "message": "Cyclone BIPARJOY spatiotemporal trajectory confirms northeast recurvature heading towards Saurashtra & Kutch near Jakhau Port. Gale force winds reaching 115 km/h. Sea conditions phenomenal.",
+                "source": "VAYU_MODEL",
+                "source_module": "Trajectory-GRU",
+                "location_region": "Gujarat Coastal Seaboard",
+                "latitude": 22.8,
+                "longitude": 68.6,
+                "radius_km": 180.0,
+                "metadata_json": {
+                    "wind_speed_kmh": 115,
+                    "central_pressure_hpa": 972,
+                    "affected_districts": ["Kutch", "Devbhumi Dwarka", "Jamnagar", "Porbandar"]
+                }
+            },
+            {
+                "alert_id": "ALR-2026-00003",
+                "storm_id": "DRILL-01",
+                "storm_name": "Pre-Cyclone Siren Test (Drill)",
+                "severity": "TEST",
+                "title": "Civil Defense Early Warning Channel Verification",
+                "message": "Routine notification channel and acoustic siren readiness verification. No action required by residents.",
+                "source": "TEST",
+                "source_module": "SystemDiagnostics",
+                "location_region": "National Coastal Mesh",
+                "latitude": 19.8,
+                "longitude": 85.8,
+                "radius_km": 500.0,
+                "metadata_json": {
+                    "drill_code": "VAYU-VERIFY-001",
+                    "is_test": True
+                }
+            }
+        ]
+        for a in initial_alerts:
+            self.create_vayu_alert(a)
+
 # Singleton Database Instance
 db = DatabaseManager()
+

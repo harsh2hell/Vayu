@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="live.vayusat.alerts.DeepLinkHandlerTest" tests="3" skipped="0" failures="0" errors="0" timestamp="2026-09-20T15:18:47.840Z" hostname="Harshs-MacBook-Air-4.local" time="0.001">
+  <properties/>
+  <testcase name="testScreenRoutes" classname="live.vayusat.alerts.DeepLinkHandlerTest" time="0.001"/>
+  <testcase name="testAlertDeepLinkParsing" classname="live.vayusat.alerts.DeepLinkHandlerTest" time="0.0"/>
+  <testcase name="testNullAndInvalidHandling" classname="live.vayusat.alerts.DeepLinkHandlerTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>

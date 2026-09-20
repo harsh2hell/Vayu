@@ -32,6 +32,7 @@ from .routers.bulletins import router as bulletins_router
 from .routers.analytics import router as analytics_router
 from .routers.training import router as training_router
 from .routers.wind import router as wind_router
+from .routers.notifications import router as notifications_router
 
 # Initialize enterprise database tables & seeds
 seed_database()
@@ -102,6 +103,7 @@ app.include_router(bulletins_router)
 app.include_router(analytics_router)
 app.include_router(training_router)
 app.include_router(wind_router)
+app.include_router(notifications_router)
 
 
 # -------------------------------------------------------------
@@ -269,8 +271,14 @@ def legacy_live_ocean(basin: str = "Bay of Bengal"):
     return {"success": True, "data": fetch_live_ocean_telemetry(basin=basin)}
 
 @app.get("/api/alerts")
-def legacy_alerts():
-    alerts = db.get_active_alerts()
+def legacy_alerts(
+    limit: int = Query(50, ge=1, le=100),
+    active_only: bool = Query(True),
+    severity: Optional[str] = Query(None)
+):
+    alerts = db.get_vayu_alerts(limit=limit, active_only=active_only, severity=severity)
+    if not alerts:
+        alerts = db.get_active_alerts()
     return {"success": True, "count": len(alerts), "alerts": alerts}
 
 @app.post("/api/alerts")

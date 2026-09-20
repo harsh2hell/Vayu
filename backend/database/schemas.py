@@ -137,3 +137,90 @@ class MultiSourceFusionRequest(BaseModel):
     mid_level_rh_pct: float = 82.0
     surface_wind_kmh: float = 85.0
     basin: str = "Bay of Bengal"
+
+
+# -------------------------------------------------------------
+# 7. VAYU ALERTS & MOBILE DEVICE FOUNDATION (PHASE 10A)
+# -------------------------------------------------------------
+class DeviceRegisterRequest(BaseModel):
+    device_id: str
+    fcm_token: str
+    platform: str = "android"
+    app_version: Optional[str] = "1.0.0"
+    os_version: Optional[str] = None
+    device_model: Optional[str] = None
+    locale: Optional[str] = "en_IN"
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    district: Optional[str] = None
+    state: Optional[str] = None
+
+
+class DeviceUnregisterRequest(BaseModel):
+    device_id: str
+
+
+class NotificationPreferencesUpdate(BaseModel):
+    device_id: str
+    enable_critical: Optional[bool] = None
+    enable_warning: Optional[bool] = None
+    enable_watch: Optional[bool] = None
+    enable_info: Optional[bool] = None
+    enable_test: Optional[bool] = None
+    enable_sound: Optional[bool] = None
+    enable_vibration: Optional[bool] = None
+    subscribed_basins: Optional[List[str]] = None
+    subscribed_states: Optional[List[str]] = None
+    max_alert_radius_km: Optional[float] = None
+
+
+class NotificationPreferencesResponse(BaseModel):
+    device_id: str
+    enable_critical: bool = True
+    enable_warning: bool = True
+    enable_watch: bool = True
+    enable_info: bool = False
+    enable_test: bool = False
+    enable_sound: bool = True
+    enable_vibration: bool = True
+    subscribed_basins: List[str] = ["Bay of Bengal", "Arabian Sea"]
+    subscribed_states: List[str] = []
+    max_alert_radius_km: float = 300.0
+    updated_at: Optional[str] = None
+
+
+class VayuAlertCreate(BaseModel):
+    alert_id: Optional[str] = None
+    storm_id: Optional[str] = None
+    storm_name: str
+    severity: str = "WARNING"  # INFO, WATCH, WARNING, CRITICAL, TEST
+    title: str
+    message: str
+    source: str = "VAYU_MODEL"  # VAYU_MODEL, VAYU_OPERATOR, OFFICIAL_ADVISORY, TEST
+    source_module: Optional[str] = "Trajectory-GRU"
+    location_region: Optional[str] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    radius_km: Optional[float] = 150.0
+    metadata_json: Optional[Dict[str, Any]] = {}
+    expires_at: Optional[str] = None
+
+
+class VayuAlertModel(BaseModel):
+    alert_id: str
+    storm_id: Optional[str] = None
+    storm_name: str
+    severity: str
+    title: str
+    message: str
+    source: str
+    source_module: Optional[str] = None
+    location_region: Optional[str] = None
+    latitude: Optional[float] = None
+    longitude: Optional[float] = None
+    radius_km: Optional[float] = None
+    metadata: Optional[Dict[str, Any]] = {}
+    is_active: bool = True
+    created_at: str
+    expires_at: str
+

@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">VAYU Alerts</string>
+    <string name="channel_critical_name">Critical Evacuation &amp; Landfall</string>
+    <string name="channel_critical_desc">Immediate life-safety and coastal evacuation orders</string>
+    <string name="channel_warning_name">Cyclone Warnings (24h)</string>
+    <string name="channel_warning_desc">Severe cyclonic strike and gale wind warnings</string>
+    <string name="channel_watch_name">Pre-Cyclone Watch (48h-72h)</string>
+    <string name="channel_watch_desc">Developing depressions and trajectory monitoring</string>
+    <string name="channel_info_name">Advisories &amp; Post-Storm Updates</string>
+    <string name="channel_info_desc">Cyclone bulletins, shelter updates, and sea conditions</string>
+    <string name="channel_test_name">Diagnostic &amp; Test Drills</string>
+    <string name="channel_test_desc">Verification and civil defense alert drills</string>
+</resources>

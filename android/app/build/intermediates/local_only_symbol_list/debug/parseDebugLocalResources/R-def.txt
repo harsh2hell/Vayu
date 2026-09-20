@@ -1,0 +1,33 @@
+R_DEF: Internal format may change without notice
+local
+color severity_critical
+color severity_info
+color severity_test
+color severity_warning
+color severity_watch
+color slate_100
+color slate_200
+color slate_50
+color slate_500
+color slate_700
+color slate_800
+color slate_900
+color slate_950
+color white
+drawable ic_vayu_cyclone
+mipmap ic_launcher
+mipmap ic_launcher_round
+string app_name
+string channel_critical_desc
+string channel_critical_name
+string channel_info_desc
+string channel_info_name
+string channel_test_desc
+string channel_test_name
+string channel_warning_desc
+string channel_warning_name
+string channel_watch_desc
+string channel_watch_name
+style Theme.VayuAlerts
+xml backup_rules
+xml data_extraction_rules

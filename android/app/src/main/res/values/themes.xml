@@ -1,0 +1,7 @@
+<resources>
+    <style name="Theme.VayuAlerts" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:statusBarColor">@color/slate_950</item>
+        <item name="android:navigationBarColor">@color/slate_950</item>
+        <item name="android:windowLightStatusBar">false</item>
+    </style>
+</resources>
