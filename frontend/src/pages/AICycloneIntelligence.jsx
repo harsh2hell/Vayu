@@ -171,13 +171,10 @@ const AICycloneIntelligence = () => {
                 <span className="text-[11px] font-mono text-slate-600 font-semibold">SIH-2026-AI</span>
               </div>
 
-              <h1 className="text-2xl sm:text-3xl font-heading font-black tracking-tight leading-tight">
-                <span className="text-slate-950">
-                  {isHindi ? 'बहु-स्रोत उपग्रह डेटा आधारित ' : 'AI-Based Tropical Cyclone '}
-                </span>
-                <span className="bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 bg-clip-text text-transparent">
-                  {isHindi ? 'पहचान, वर्गीकरण एवं पूर्वानुमान' : 'Identification, Classification & Trajectory Prediction'}
-                </span>
+              <h1 className="text-2xl sm:text-3xl font-heading font-black tracking-tight leading-tight text-slate-950">
+                {isHindi
+                  ? 'बहु-स्रोत उपग्रह डेटा आधारित पहचान, वर्गीकरण एवं पूर्वानुमान'
+                  : 'AI-Based Tropical Cyclone Identification, Classification & Trajectory Prediction'}
               </h1>
 
               <p className="text-xs sm:text-sm text-slate-500 max-w-2xl leading-relaxed">
