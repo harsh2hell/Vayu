@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useSearchParams, useLocation } from 'react-router-dom';
 import { 
   SignIn, 
@@ -11,7 +11,6 @@ import { CLERK_PUBLISHABLE_KEY, AuthConfigurationNotice } from '../components/au
 import { clerkLightTheme } from '../utils/clerkTheme';
 import VayuRouteLoader from '../components/VayuRouteLoader';
 import CycloneAtmosphericLiveView from '../components/CycloneAtmosphericLiveView';
-import LanguageWelcomeAnimation from '../components/LanguageWelcomeAnimation';
 
 /* ═══════════════════════════════════════════════════════════════════════════
    ATMOSPHERIC BACKGROUND — Live Animated Cyclone Satellite Visual
@@ -82,7 +81,6 @@ const Login = ({ initialMode }) => {
     location.pathname === '/sign-up' || 
     location.pathname === '/signup' || 
     searchParams.get('mode') === 'signup';
-  const [showWelcomeAnim, setShowWelcomeAnim] = useState(true);
 
   if (!CLERK_PUBLISHABLE_KEY) {
     return <AuthConfigurationNotice />;
@@ -90,15 +88,6 @@ const Login = ({ initialMode }) => {
 
   return (
     <div className="min-h-screen w-full bg-white flex items-center justify-center p-4 sm:p-6 lg:p-10 font-sans relative overflow-x-hidden touch-pan-y">
-      {showWelcomeAnim && (
-        <LanguageWelcomeAnimation
-          isOpen={showWelcomeAnim}
-          mode="first-visit"
-          targetLanguage={typeof window !== 'undefined' && localStorage.getItem('vayu_is_hindi') === 'true' ? 'hi' : 'en'}
-          onLanguageSwitch={() => {}}
-          onComplete={() => setShowWelcomeAnim(false)}
-        />
-      )}
       {/* 2px National Tricolor Stripe */}
       <div className="fixed top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#FF9933] via-slate-300 to-[#138808] z-50" />
 
