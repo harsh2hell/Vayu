@@ -88,11 +88,6 @@ const PublicNavbar = ({
       path: '/safety-updates',
       label: isHindi ? 'बुलेटिन व सुरक्षा' : 'Bulletins & Safety',
       match: ['/safety-updates', '/bulletins', '/safety-guide', '/safety', '/updates']
-    },
-    {
-      path: '/status',
-      label: isHindi ? 'सिस्टम स्थिति' : 'System Status',
-      match: ['/status']
     }
   ];
 
