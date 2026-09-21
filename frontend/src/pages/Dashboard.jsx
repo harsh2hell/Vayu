@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { 
-  LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
   BarChart, Bar, PieChart, Pie, Cell
 } from 'recharts';
 import { 
@@ -41,52 +41,52 @@ const BENCHMARK_PROFILES = {
     name: 'Cyclone BIPARJOY (2023)',
     basin: 'Arabian Sea',
     date: '2023-06-12',
-    center: '21.9°N, 66.3°E (IMD Fix)',
-    classification: 'Extremely Severe (T5.5)',
-    stage: 'ESCS • Eye Pattern',
-    windKmh: 140,
-    windKt: 75,
-    mslpHpa: 968,
-    trajectoryStatus: '72h Recurvature Track',
-    trajectoryMilestones: '7 Waypoints (72h)',
-    landfallSector: 'Saurashtra & Kutch Coast',
-    surgeHeight: '2.8',
+    center: '20.6°N, 66.8°E (IMD Fix)',
+    classification: 'Extremely Severe CS (T4.5)',
+    stage: 'ESCS • Extremely Severe',
+    windKmh: 165,
+    windKt: 90,
+    mslpHpa: 966,
+    trajectoryStatus: 'Recurving Northeast',
+    trajectoryMilestones: '9 Waypoints (72h)',
+    landfallSector: 'Saurashtra & Kutch, Gujarat',
+    surgeHeight: '3.0',
     surgeEstimate: '2.5 – 3.5m projected',
     criticalDistricts: [
-      { district: 'Kutch', strike_prob_pct: 82 },
-      { district: 'Devbhumi Dwarka', strike_prob_pct: 74 },
-      { district: 'Jamnagar', strike_prob_pct: 65 },
-      { district: 'Porbandar', strike_prob_pct: 54 },
+      { district: 'Kutch', strike_prob_pct: 86 },
+      { district: 'Devbhumi Dwarka', strike_prob_pct: 82 },
+      { district: 'Jamnagar', strike_prob_pct: 71 },
+      { district: 'Porbandar', strike_prob_pct: 65 },
       { district: 'Morbi', strike_prob_pct: 48 }
     ]
   }
 };
 
-// Datasets for line chart metric tabs (Climatological Baselines)
+// Climatological Reference Datasets for the Lower Analytics Grid
 const METRIC_DATASETS = {
   wind: [
-    { month: 'Jan', currentYear: 10, lastYear: 5 },
-    { month: 'Feb', currentYear: 5, lastYear: 12 },
-    { month: 'Mar', currentYear: 12, lastYear: 11 },
-    { month: 'Apr', currentYear: 23, lastYear: 10 },
-    { month: 'May', currentYear: 26, lastYear: 18 },
-    { month: 'Jun', currentYear: 16, lastYear: 23 },
-    { month: 'Jul', currentYear: 22, lastYear: 25 },
+    { month: 'Jan', currentYear: 18, lastYear: 12 },
+    { month: 'Feb', currentYear: 10, lastYear: 15 },
+    { month: 'Mar', currentYear: 12, lastYear: 14 },
+    { month: 'Apr', currentYear: 24, lastYear: 13 },
+    { month: 'May', currentYear: 28, lastYear: 21 },
+    { month: 'Jun', currentYear: 17, lastYear: 25 },
+    { month: 'Jul', currentYear: 22, lastYear: 26 },
   ],
   pressure: [
-    { month: 'Jan', currentYear: 1008, lastYear: 1012 },
-    { month: 'Feb', currentYear: 1004, lastYear: 1009 },
-    { month: 'Mar', currentYear: 998, lastYear: 1005 },
-    { month: 'Apr', currentYear: 988, lastYear: 996 },
-    { month: 'May', currentYear: 982, lastYear: 990 },
-    { month: 'Jun', currentYear: 992, lastYear: 988 },
-    { month: 'Jul', currentYear: 986, lastYear: 994 },
+    { month: 'Jan', currentYear: 1012, lastYear: 1014 },
+    { month: 'Feb', currentYear: 1010, lastYear: 1012 },
+    { month: 'Mar', currentYear: 1008, lastYear: 1009 },
+    { month: 'Apr', currentYear: 1002, lastYear: 1006 },
+    { month: 'May', currentYear: 984, lastYear: 996 },
+    { month: 'Jun', currentYear: 994, lastYear: 998 },
+    { month: 'Jul', currentYear: 1000, lastYear: 1004 },
   ],
   rainfall: [
-    { month: 'Jan', currentYear: 15, lastYear: 10 },
-    { month: 'Feb', currentYear: 25, lastYear: 18 },
-    { month: 'Mar', currentYear: 45, lastYear: 32 },
-    { month: 'Apr', currentYear: 120, lastYear: 85 },
+    { month: 'Jan', currentYear: 15, lastYear: 25 },
+    { month: 'Feb', currentYear: 20, lastYear: 18 },
+    { month: 'Mar', currentYear: 35, lastYear: 40 },
+    { month: 'Apr', currentYear: 110, lastYear: 85 },
     { month: 'May', currentYear: 240, lastYear: 190 },
     { month: 'Jun', currentYear: 180, lastYear: 210 },
     { month: 'Jul', currentYear: 290, lastYear: 245 },
@@ -94,19 +94,19 @@ const METRIC_DATASETS = {
 };
 
 const warningsRegionData = [
-  { name: 'OD', val: 18, fill: '#334155' },
-  { name: 'WB', val: 28, fill: '#0F172A' },
-  { name: 'AP', val: 22, fill: '#475569' },
-  { name: 'GJ', val: 32, fill: '#0F172A' },
-  { name: 'MH', val: 13, fill: '#64748B' },
-  { name: 'TN', val: 26, fill: '#334155' },
+  { name: 'OD', val: 18, fill: '#2563eb' },
+  { name: 'WB', val: 28, fill: '#e11d48' },
+  { name: 'AP', val: 22, fill: '#f59e0b' },
+  { name: 'GJ', val: 32, fill: '#0284c7' },
+  { name: 'MH', val: 13, fill: '#0d9488' },
+  { name: 'TN', val: 26, fill: '#8b5cf6' },
 ];
 
 const severityData = [
-  { name: 'Severe', value: 52.1, color: '#0F172A' },
-  { name: 'Very Severe', value: 22.8, color: '#334155' },
-  { name: 'Super', value: 13.9, color: '#64748B' },
-  { name: 'Depression', value: 11.2, color: '#94A3B8' },
+  { name: 'Severe', value: 52.1, color: '#2563eb' },
+  { name: 'Very Severe', value: 22.8, color: '#f59e0b' },
+  { name: 'Super', value: 13.9, color: '#e11d48' },
+  { name: 'Depression', value: 11.2, color: '#06b6d4' },
 ];
 
 const Dashboard = () => {
@@ -442,25 +442,42 @@ const Dashboard = () => {
             </div>
 
             <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200/70 dark:border-slate-700 text-xs font-medium self-start sm:self-auto">
-              {['wind', 'pressure', 'rainfall'].map((tab) => (
-                <button 
-                  key={tab}
-                  onClick={() => setActiveMetricTab(tab)}
-                  className={`px-3 py-1 rounded-lg transition-all capitalize cursor-pointer ${
-                    activeMetricTab === tab
-                      ? 'bg-white dark:bg-slate-950 text-slate-900 dark:text-white font-semibold shadow-2xs'
-                      : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
-                  }`}
-                >
-                  {tab}
-                </button>
-              ))}
+              {['wind', 'pressure', 'rainfall'].map((tab) => {
+                const isActive = activeMetricTab === tab;
+                return (
+                  <button 
+                    key={tab}
+                    onClick={() => setActiveMetricTab(tab)}
+                    className={`px-3 py-1 rounded-lg transition-all capitalize cursor-pointer ${
+                      isActive
+                        ? 'bg-white dark:bg-slate-950 text-blue-600 dark:text-blue-400 font-semibold shadow-2xs'
+                        : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
+                    }`}
+                  >
+                    {tab}
+                  </button>
+                );
+              })}
             </div>
           </div>
           
           <div className="h-[250px] w-full pt-2">
             <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={currentChartData} margin={{ top: 5, right: 10, left: -25, bottom: 0 }}>
+              <AreaChart data={currentChartData} margin={{ top: 5, right: 10, left: -25, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="climatologyGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop 
+                      offset="5%" 
+                      stopColor={activeMetricTab === 'rainfall' ? '#0d9488' : activeMetricTab === 'pressure' ? '#0284c7' : '#2563eb'} 
+                      stopOpacity={0.2} 
+                    />
+                    <stop 
+                      offset="95%" 
+                      stopColor={activeMetricTab === 'rainfall' ? '#0d9488' : activeMetricTab === 'pressure' ? '#0284c7' : '#2563eb'} 
+                      stopOpacity={0.0} 
+                    />
+                  </linearGradient>
+                </defs>
                 <CartesianGrid vertical={false} stroke="#E2E8F0" strokeDasharray="3 3" className="stroke-slate-200/80 dark:stroke-slate-800" />
                 <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#94A3B8' }} dy={8} />
                 <YAxis 
@@ -478,9 +495,31 @@ const Dashboard = () => {
                   contentStyle={{ borderRadius: '12px', border: '1px solid #E2E8F0', backgroundColor: '#0F172A', color: '#FFF' }}
                   itemStyle={{ fontSize: '12px', color: '#FFF' }}
                 />
-                <Line type="monotone" dataKey="currentYear" name="Current Observation" stroke="#0F172A" strokeWidth={2} dot={false} activeDot={{ r: 4, fill: '#FFFFFF', stroke: '#0F172A', strokeWidth: 2 }} className="dark:stroke-white" />
-                <Line type="monotone" dataKey="lastYear" name="Historical Average" stroke="#94A3B8" strokeWidth={2} strokeDasharray="4 4" dot={false} />
-              </LineChart>
+                <Area 
+                  type="monotone" 
+                  dataKey="currentYear" 
+                  name="Current Observation" 
+                  stroke={activeMetricTab === 'rainfall' ? '#0d9488' : activeMetricTab === 'pressure' ? '#0284c7' : '#2563eb'} 
+                  strokeWidth={2.5} 
+                  fill="url(#climatologyGrad)" 
+                  dot={false} 
+                  activeDot={{ 
+                    r: 5, 
+                    fill: activeMetricTab === 'rainfall' ? '#0d9488' : activeMetricTab === 'pressure' ? '#0284c7' : '#2563eb', 
+                    stroke: '#FFFFFF', 
+                    strokeWidth: 2 
+                  }} 
+                />
+                <Line 
+                  type="monotone" 
+                  dataKey="lastYear" 
+                  name="Historical Average" 
+                  stroke="#94A3B8" 
+                  strokeWidth={1.5} 
+                  strokeDasharray="4 4" 
+                  dot={false} 
+                />
+              </AreaChart>
             </ResponsiveContainer>
           </div>
         </div>
@@ -494,7 +533,7 @@ const Dashboard = () => {
             </div>
             <span className={`text-[10px] font-mono px-2 py-0.5 rounded border ${
               criticalDistricts.length > 0 
-                ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-950 border-slate-900 dark:border-white'
+                ? 'bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300 border-rose-200 dark:border-rose-900 font-bold'
                 : 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400 border-slate-200 dark:border-slate-700'
             }`}>
               {criticalDistricts.length > 0 ? `${criticalDistricts.length} Sectors` : 'STANDBY'}
@@ -505,6 +544,16 @@ const Dashboard = () => {
             <div className="space-y-3.5">
               {criticalDistricts.slice(0, 5).map((district, idx) => {
                 const prob = district.strike_prob_pct ?? district.probability_pct ?? 50;
+                
+                // Minimal semantic color mapping
+                const getRiskTheme = (p) => {
+                  if (p >= 75) return { bar: 'bg-gradient-to-r from-rose-500 to-amber-500', text: 'text-rose-600 dark:text-rose-400' };
+                  if (p >= 65) return { bar: 'bg-gradient-to-r from-amber-500 to-yellow-500', text: 'text-amber-600 dark:text-amber-400' };
+                  if (p >= 50) return { bar: 'bg-gradient-to-r from-blue-500 to-sky-400', text: 'text-blue-600 dark:text-blue-400' };
+                  return { bar: 'bg-gradient-to-r from-teal-500 to-emerald-400', text: 'text-teal-600 dark:text-teal-400' };
+                };
+                const theme = getRiskTheme(prob);
+
                 return (
                   <div 
                     key={idx} 
@@ -512,14 +561,14 @@ const Dashboard = () => {
                     className="cursor-pointer group space-y-1.5"
                   >
                     <div className="flex items-center justify-between text-xs">
-                      <span className="font-medium text-slate-800 dark:text-slate-200 group-hover:text-slate-900 dark:group-hover:text-white truncate max-w-[180px]">
+                      <span className="font-medium text-slate-800 dark:text-slate-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate max-w-[180px]">
                         {district.district || district.name}
                       </span>
-                      <span className="font-mono font-bold text-slate-900 dark:text-white text-[11px]">{prob}% Strike Prob.</span>
+                      <span className={`font-mono font-bold text-[11px] ${theme.text}`}>{prob}% Strike Prob.</span>
                     </div>
                     <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                       <div 
-                        className="h-full bg-slate-900 dark:bg-white rounded-full transition-all duration-300" 
+                        className={`h-full ${theme.bar} rounded-full transition-all duration-500`} 
                         style={{ width: `${Math.min(100, prob)}%` }}
                       />
                     </div>
@@ -531,7 +580,7 @@ const Dashboard = () => {
                 <span className="text-slate-400 font-mono text-[11px]">Corridor: {landfallSector}</span>
                 <button
                   onClick={() => navigate(toPortalPath('/dashboard/impact'))}
-                  className="inline-flex items-center gap-1 font-semibold text-slate-900 dark:text-white hover:underline cursor-pointer"
+                  className="inline-flex items-center gap-1 font-semibold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
                 >
                   <span>Impact Studio</span>
                   <ArrowRight className="w-3 h-3" />
@@ -545,7 +594,7 @@ const Dashboard = () => {
               </p>
               <button
                 onClick={() => navigate(toPortalPath('/dashboard/impact'))}
-                className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-900 dark:text-white hover:underline cursor-pointer"
+                className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
               >
                 <span>Evaluate Coastal Risk</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -556,7 +605,7 @@ const Dashboard = () => {
 
       </div>
 
-      {/* 5. Bottom Row: 2 Clean Analytics Cards */}
+      {/* 5. Bottom Row: 2 Clean Analytics Cards with Minimal Colors */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-6">
         <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 sm:p-6 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-3">
           <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
@@ -571,22 +620,32 @@ const Dashboard = () => {
           </div>
           <div className="h-[200px] w-full">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart 
-                data={criticalDistricts.length > 0 
+              {(() => {
+                const barData = criticalDistricts.length > 0 
                   ? criticalDistricts.slice(0, 6).map((d) => ({
                       name: (d.district || d.name || '').slice(0, 8),
                       val: d.strike_prob_pct ?? d.probability_pct ?? 50,
                     }))
-                  : warningsRegionData} 
-                barSize={24} 
-                margin={{ top: 5, right: 0, left: -20, bottom: 0 }}
-              >
-                <CartesianGrid vertical={false} stroke="#E2E8F0" strokeDasharray="3 3" className="stroke-slate-200/80 dark:stroke-slate-800" />
-                <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#94A3B8' }} dy={6} />
-                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#94A3B8' }} tickFormatter={(val) => val > 0 ? `${val}%` : '0'} />
-                <Tooltip cursor={{ fill: 'transparent' }} contentStyle={{ borderRadius: '12px', border: '1px solid #E2E8F0', backgroundColor: '#0F172A', color: '#FFF' }} />
-                <Bar dataKey="val" fill="#0F172A" className="dark:fill-slate-200" radius={[4, 4, 0, 0]} />
-              </BarChart>
+                  : warningsRegionData;
+                const barColors = ['#2563eb', '#3b82f6', '#0284c7', '#06b6d4', '#0d9488', '#f59e0b'];
+                return (
+                  <BarChart 
+                    data={barData} 
+                    barSize={24} 
+                    margin={{ top: 5, right: 0, left: -20, bottom: 0 }}
+                  >
+                    <CartesianGrid vertical={false} stroke="#E2E8F0" strokeDasharray="3 3" className="stroke-slate-200/80 dark:stroke-slate-800" />
+                    <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#94A3B8' }} dy={6} />
+                    <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#94A3B8' }} tickFormatter={(val) => val > 0 ? `${val}%` : '0'} />
+                    <Tooltip cursor={{ fill: 'rgba(241,245,249,0.5)' }} contentStyle={{ borderRadius: '12px', border: '1px solid #E2E8F0', backgroundColor: '#0F172A', color: '#FFF' }} />
+                    <Bar dataKey="val" radius={[4, 4, 0, 0]}>
+                      {barData.map((entry, index) => (
+                        <Cell key={`bar-${index}`} fill={entry.fill || barColors[index % barColors.length]} />
+                      ))}
+                    </Bar>
+                  </BarChart>
+                );
+              })()}
             </ResponsiveContainer>
           </div>
         </div>
@@ -618,8 +677,8 @@ const Dashboard = () => {
             <div className="flex flex-col gap-2.5 justify-center">
               {severityData.map((item, idx) => (
                 <div key={idx} className="flex items-center gap-2.5">
-                  <span className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }} />
-                  <span className="text-[11px] font-medium text-slate-500 dark:text-slate-400 w-24">{item.name}</span>
+                  <span className="w-2.5 h-2.5 rounded-full shadow-2xs" style={{ backgroundColor: item.color }} />
+                  <span className="text-[11px] font-medium text-slate-600 dark:text-slate-400 w-24">{item.name}</span>
                   <span className="text-xs font-mono font-bold text-slate-900 dark:text-white">{item.value}%</span>
                 </div>
               ))}

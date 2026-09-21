@@ -44,15 +44,15 @@ export default function VayuRouteLoader({ message = 'Initializing meteorological
         <div className="absolute w-64 h-64 rounded-full bg-slate-100/90 dark:bg-slate-900/50 blur-3xl -z-10 pointer-events-none" />
 
         <div className="relative overflow-hidden p-3 rounded-3xl">
-          <img 
-            src="/vayu.png" 
-            alt="VAYU" 
-            className="h-20 sm:h-24 md:h-28 lg:h-32 w-auto object-contain filter drop-shadow-[0_12px_24px_rgba(0,0,0,0.06)]" 
+          <img
+            src="/vayu.png"
+            alt="VAYU"
+            className="h-20 sm:h-24 md:h-28 lg:h-32 w-auto object-contain filter drop-shadow-[0_12px_24px_rgba(0,0,0,0.06)]"
           />
 
           {/* Specular Diagonal Shining Sweep */}
-          <div 
-            className="ae-sheen-sweep absolute inset-y-0 w-32 bg-gradient-to-r from-transparent via-white/90 dark:via-white/60 to-transparent pointer-events-none" 
+          <div
+            className="ae-sheen-sweep absolute inset-y-0 w-32 bg-gradient-to-r from-transparent via-white/90 dark:via-white/60 to-transparent pointer-events-none"
           />
         </div>
       </div>
