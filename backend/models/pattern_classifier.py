@@ -1,8 +1,11 @@
 import time
+import logging
 import threading
 from typing import Dict, List, Any, Optional
 from ..ml_engine.models.dvorak_classifier import load_dvorak_classifier_model, PHASE3B_CLASSES, INSUFFICIENT_CLASSES
 from ..database.db_manager import db
+
+logger = logging.getLogger("vayu.classification")
 
 MORPHOLOGICAL_CLASSES = PHASE3B_CLASSES
 
@@ -36,6 +39,10 @@ class MorphologyPatternClassifier:
         """
         Runs deep morphological pattern classification on satellite image bytes.
         """
+        # Ensure model is ready (lazy load on first call)
+        _ = self.model
+        logger.info("[VAYU Classification] Stage 3: Model ready")
+
         raw_pred = self.model.classify_frame(image_bytes=image_bytes, basin=basin, shear_knots=shear_knots)
         
         # Approximate Dvorak intensity from top predicted pattern
@@ -75,7 +82,8 @@ class MorphologyPatternClassifier:
             "_model_meta": raw_pred["_model_meta"]
         }
 
-        # Persist to database
+        # Persist to database with bounded timeout (pool wait cannot hang request)
+        logger.info("[VAYU Classification] Stage 8: DB logging started")
         try:
             db.log_inference_run({
                 "model_name": "MorphologyPatternClassifier",
@@ -97,9 +105,10 @@ class MorphologyPatternClassifier:
                     "distribution": raw_pred["class_probability_distribution"],
                     "model_meta": raw_pred["_model_meta"]
                 }
-            })
+            }, timeout=3.0)
+            logger.info("[VAYU Classification] Stage 9: DB logging completed")
         except Exception as e:
-            print(f"[Classification Log Error]: {e}")
+            logger.warning(f"[VAYU Classification] Stage 9: DB logging warning (non-fatal): {e}")
 
         return result
 

@@ -1,6 +1,7 @@
 import os
 import time
 import hashlib
+import logging
 from typing import Dict, List, Tuple, Any, Optional
 import numpy as np
 from PIL import Image
@@ -9,6 +10,8 @@ import torch.nn as nn
 import torch.nn.functional as F
 import torchvision.models as models
 from ..preprocessor import preprocess_satellite_image
+
+logger = logging.getLogger("vayu.classification")
 
 CHECKPOINT_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), "checkpoints", "phase3b", "vayu_morph_resnet18_p3b.pt")
 
@@ -128,14 +131,15 @@ class DvorakResNetClassifier(nn.Module):
         )
         self.classifier_head = nn.Linear(32, num_classes)
         
-        # Variables for Grad-CAM
+        # Hook placeholders for backward compatibility
         self.gradients = None
         self.activations = None
 
-    def activations_hook(self, grad):
-        self.gradients = grad
-
     def forward_features(self, x: torch.Tensor) -> Tuple[torch.Tensor, torch.Tensor]:
+        """
+        Pure, stateless forward feature extraction.
+        Executes without mutating module instance variables or leaving stale tensors.
+        """
         x = self.conv1(x)
         x = self.bn1(x)
         x = self.relu(x)
@@ -146,15 +150,10 @@ class DvorakResNetClassifier(nn.Module):
         x = self.layer3(x)
         x = self.layer4(x)
         
-        # Register hook on layer4 for Grad-CAM
-        if x.requires_grad:
-            h = x.register_hook(self.activations_hook)
-        self.activations = x
-        
         pooled = self.avgpool(x)
         pooled = torch.flatten(pooled, 1) # [B, 512]
         emb = self.embedding_head(pooled) # [B, 32]
-        logits = self.classifier_head(emb) # [B, 5]
+        logits = self.classifier_head(emb) # [B, num_classes]
         return logits, emb
 
     def forward(self, x: torch.Tensor) -> Dict[str, torch.Tensor]:
@@ -169,68 +168,90 @@ class DvorakResNetClassifier(nn.Module):
     def generate_gradcam(self, x: torch.Tensor, target_class: int) -> Tuple[np.ndarray, List[Dict[str, Any]]]:
         """
         Computes mathematically authentic Grad-CAM saliency map from layer4 feature gradients.
+        Uses an isolated autograd graph and safely removes hooks in a finally block.
         """
-        self.zero_grad()
-        x.requires_grad_(True)
-        logits, _ = self.forward_features(x)
-        
-        score = logits[0, target_class]
-        score.backward(retain_graph=False)
-        
-        gradients = self.gradients[0]     # [512, 7, 7]
-        activations = self.activations[0] # [512, 7, 7]
-        
-        # Global average pooling of gradients
-        weights = torch.mean(gradients, dim=(1, 2)) # [512]
-        cam = torch.zeros(activations.shape[1:], dtype=torch.float32) # [7, 7]
-        
-        for i, w in enumerate(weights):
-            cam += w * activations[i]
-            
-        cam = torch.relu(cam)
-        cam_np = cam.detach().cpu().numpy()
-        cam_min, cam_max = np.min(cam_np), np.max(cam_np)
-        if cam_max > cam_min:
-            cam_norm = (cam_np - cam_min) / (cam_max - cam_min)
-        else:
-            cam_norm = np.zeros_like(cam_np)
+        activations = None
+        gradients = None
 
-        # Free computational graph and cached activation/gradient hooks immediately
-        self.zero_grad(set_to_none=True)
-        self.gradients = None
-        self.activations = None
-        x.grad = None
-        del score, logits, gradients, activations, weights, cam
+        def backward_hook(grad):
+            nonlocal gradients
+            gradients = grad
+
+        def forward_hook(module, inp, out):
+            nonlocal activations
+            activations = out
+            if out.requires_grad:
+                out.register_hook(backward_hook)
+
+        # Register forward hook specifically on layer4
+        hook_handle = self.layer4.register_forward_hook(forward_hook)
+        
+        try:
+            self.zero_grad(set_to_none=True)
+            # Create a dedicated autograd input tensor, completely detached and cloned
+            cam_input = x.detach().clone().requires_grad_(True)
             
-        # Extract top-3 activation foci coordinates from normalized 7x7 grid
-        flat_indices = np.argsort(cam_norm.ravel())[::-1]
-        foci = []
-        labels = [
-            "Primary Eyewall Convective Core",
-            "Inflow Feeder Band Curvature Root",
-            "Outer Spiral Cloud Band Tail"
-        ]
-        used_points = []
-        for idx in flat_indices:
-            row, col = divmod(idx, cam_norm.shape[1])
-            y_norm = round(float((row + 0.5) / cam_norm.shape[0]), 3)
-            x_norm = round(float((col + 0.5) / cam_norm.shape[1]), 3)
-            intensity = round(float(cam_norm[row, col]), 3)
-            
-            # Ensure spatial separation between foci
-            if not any(abs(y_norm - uy) < 0.2 and abs(x_norm - ux) < 0.2 for uy, ux in used_points):
-                used_points.append((y_norm, x_norm))
-                label = labels[len(foci)] if len(foci) < len(labels) else f"Convective Cluster #{len(foci)+1}"
-                foci.append({
-                    "label": label,
-                    "x_norm": x_norm,
-                    "y_norm": y_norm,
-                    "activation_intensity": intensity
-                })
-            if len(foci) >= 3:
-                break
-                
-        return cam_norm, foci
+            with torch.enable_grad():
+                logits, _ = self.forward_features(cam_input)
+                score = logits[0, target_class]
+                score.backward(retain_graph=False)
+
+            if gradients is None or activations is None:
+                raise RuntimeError("Grad-CAM hook failed to capture layer4 activations or gradients.")
+
+            grad_tensor = gradients[0]      # [512, 7, 7]
+            act_tensor = activations[0]     # [512, 7, 7]
+
+            # Global average pooling of gradients
+            weights = torch.mean(grad_tensor, dim=(1, 2)) # [512]
+            cam = torch.zeros(act_tensor.shape[1:], dtype=torch.float32, device=act_tensor.device) # [7, 7]
+
+            for i, w in enumerate(weights):
+                cam += w * act_tensor[i]
+
+            cam = torch.relu(cam)
+            cam_np = cam.detach().cpu().numpy()
+            cam_min, cam_max = np.min(cam_np), np.max(cam_np)
+            if cam_max > cam_min:
+                cam_norm = (cam_np - cam_min) / (cam_max - cam_min)
+            else:
+                cam_norm = np.zeros_like(cam_np)
+
+            # Extract top-3 activation foci coordinates from normalized 7x7 grid
+            flat_indices = np.argsort(cam_norm.ravel())[::-1]
+            foci = []
+            labels = [
+                "Primary Eyewall Convective Core",
+                "Inflow Feeder Band Curvature Root",
+                "Outer Spiral Cloud Band Tail"
+            ]
+            used_points = []
+            for idx in flat_indices:
+                row, col = divmod(idx, cam_norm.shape[1])
+                y_norm = round(float((row + 0.5) / cam_norm.shape[0]), 3)
+                x_norm = round(float((col + 0.5) / cam_norm.shape[1]), 3)
+                intensity = round(float(cam_norm[row, col]), 3)
+
+                # Ensure spatial separation between foci
+                if not any(abs(y_norm - uy) < 0.2 and abs(x_norm - ux) < 0.2 for uy, ux in used_points):
+                    used_points.append((y_norm, x_norm))
+                    label = labels[len(foci)] if len(foci) < len(labels) else f"Convective Cluster #{len(foci)+1}"
+                    foci.append({
+                        "label": label,
+                        "x_norm": x_norm,
+                        "y_norm": y_norm,
+                        "activation_intensity": intensity
+                    })
+                if len(foci) >= 3:
+                    break
+
+            return cam_norm, foci
+        finally:
+            # Guarantee hook removal and memory cleanup even on exception
+            hook_handle.remove()
+            self.zero_grad(set_to_none=True)
+            self.gradients = None
+            self.activations = None
 
     def classify_frame(
         self, 
@@ -240,16 +261,17 @@ class DvorakResNetClassifier(nn.Module):
     ) -> Dict[str, Any]:
         """
         Executes genuine ResNet18 inference and Grad-CAM generation.
+        Strictly requires valid satellite image bytes (>= 50 bytes).
         """
         start_time = time.perf_counter()
         
-        if image_bytes and len(image_bytes) > 50:
-            prep = preprocess_satellite_image(image_bytes)
-            img_tensor = prep["tensor"]
-        else:
-            # Fallback zero-centered frame if no image uploaded
-            img_tensor = torch.zeros((1, 3, 224, 224), dtype=torch.float32)
+        if not image_bytes or len(image_bytes) < 50:
+            raise ValueError("A valid satellite image payload (>= 50 bytes) is required for morphological classification.")
 
+        prep = preprocess_satellite_image(image_bytes)
+        img_tensor = prep["tensor"]
+
+        logger.info("[VAYU Classification] Stage 4: Inference started")
         self.eval()
         with torch.inference_mode():
             logits, emb = self.forward_features(img_tensor)
@@ -262,6 +284,8 @@ class DvorakResNetClassifier(nn.Module):
         predicted_class_info = active_classes[top_idx]
         confidence_pct = round(float(probs[top_idx]) * 100.0, 1)
         
+        logger.info(f"[VAYU Classification] Stage 5: Inference completed (top_class={predicted_class_info['name']}, confidence={confidence_pct}%)")
+
         # Build probability distribution list
         dist_list = []
         for i, cls_info in enumerate(active_classes):
@@ -275,8 +299,10 @@ class DvorakResNetClassifier(nn.Module):
             })
         dist_list = sorted(dist_list, key=lambda x: x["probability_pct"], reverse=True)
         
-        # Generate Grad-CAM attention foci
+        # Generate Grad-CAM attention foci using isolated autograd graph
+        logger.info(f"[VAYU Classification] Stage 6: Grad-CAM started (target_class={top_idx})")
         _, gradcam_foci = self.generate_gradcam(img_tensor, target_class=top_idx)
+        logger.info(f"[VAYU Classification] Stage 7: Grad-CAM completed ({len(gradcam_foci)} foci identified)")
         
         inference_time_ms = round((time.perf_counter() - start_time) * 1000, 2)
         

@@ -214,17 +214,17 @@ class DatabaseManager:
         return conn
 
     @contextmanager
-    def _cursor(self):
+    def _cursor(self, timeout: Optional[float] = None):
         """
         Unified transaction context manager:
-        - In PostgreSQL: checks out connection from pool, runs within transaction, commits on exit,
-          rolls back on exception, returns connection to pool.
+        - In PostgreSQL: checks out connection from pool with optional bounded timeout,
+          runs within transaction, commits on exit, rolls back on exception, returns connection to pool.
         - In SQLite: opens connection, yields cursor, commits on exit, rolls back on exception.
         """
         if self.is_postgres:
             if not self.pool:
                 raise RuntimeError(f"PostgreSQL connection pool unavailable: {self.postgres_error}")
-            with self.pool.connection() as conn:
+            with self.pool.connection(timeout=timeout) as conn:
                 with conn.transaction():
                     with conn.cursor() as cur:
                         yield cur
@@ -822,7 +822,7 @@ class DatabaseManager:
     # =========================================================
     # AI INFERENCE LOGS CRUD
     # =========================================================
-    def log_inference_run(self, log_data: Dict[str, Any]) -> int:
+    def log_inference_run(self, log_data: Dict[str, Any], timeout: Optional[float] = 3.0) -> int:
         sql = """
         INSERT INTO inference_logs (
             model_name, model_version, inference_type, basin, input_source,
@@ -849,7 +849,7 @@ class DatabaseManager:
             log_data["execution_time_ms"],
             json.dumps(log_data.get("metadata", {}))
         )
-        with self._cursor() as cursor:
+        with self._cursor(timeout=timeout) as cursor:
             cursor.execute(self._format_sql(sql), params)
             row = cursor.fetchone()
             return self._extract_id(row)

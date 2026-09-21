@@ -6,13 +6,9 @@ from fastapi import FastAPI, File, UploadFile, Form, HTTPException, Response, Qu
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-# Initialize single-thread allocation once at startup to prevent memory fragmentation on 512MB hosts
+# Initialize single intra-op thread allocation once at startup for bounded memory on CPU
 import torch
 torch.set_num_threads(1)
-try:
-    torch.set_num_interop_threads(1)
-except RuntimeError:
-    pass
 
 # Database Initialization
 from .database.seed_data import seed_database
