@@ -187,7 +187,7 @@ class FcmService:
             self._cached_token = credentials.token
             self._token_expiry = time.time() + 3500
             return self._cached_token, None
-        except ImportError:
+        except (ImportError, Exception):
             pass
 
         # Fallback: self-contained JWT generation with cryptography / jwt if available

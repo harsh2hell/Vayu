@@ -1,5 +1,7 @@
 import time
+import threading
 from typing import Dict, List, Any, Optional
+import torch
 from ..ml_engine.models.trajectory_gru import load_trajectory_gru_model, COASTAL_SECTORS
 from ..database.db_manager import db
 
@@ -12,7 +14,8 @@ class CycloneForecastLSTM:
     """
     def __init__(self):
         self.model_version = "CycloneForecast-GRU-Phase3D"
-        self.model = load_trajectory_gru_model()
+        self._model = None
+        self._lock = threading.Lock()
         self.benchmark_metrics = {
             "track_mae_6h_km": 68.9,
             "track_mae_12h_km": 114.9,
@@ -23,6 +26,15 @@ class CycloneForecastLSTM:
             "persistence_baseline_72h_km": 397.9,
             "gru_beats_persistence_72h": True
         }
+
+    @property
+    def model(self):
+        """Thread-safe lazy initializer for GRU trajectory model weights."""
+        if self._model is None:
+            with self._lock:
+                if self._model is None:
+                    self._model = load_trajectory_gru_model()
+        return self._model
 
     def predict_trajectory(self, 
                            current_lat: float = 18.2, 
@@ -50,11 +62,12 @@ class CycloneForecastLSTM:
             "dvorak_t": 3.5
         }
         
-        raw_pred = self.model.predict_trajectory(
-            historical_track=past_track,
-            initial_state=initial_state,
-            num_mc_samples=25
-        )
+        with torch.inference_mode():
+            raw_pred = self.model.predict_trajectory(
+                historical_track=past_track,
+                initial_state=initial_state,
+                num_mc_samples=25
+            )
 
         if not raw_pred.get("success", False) or raw_pred.get("forecast_status") == "INSUFFICIENT_HISTORY":
             return raw_pred

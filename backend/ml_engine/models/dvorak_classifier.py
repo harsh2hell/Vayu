@@ -175,7 +175,7 @@ class DvorakResNetClassifier(nn.Module):
         logits, _ = self.forward_features(x)
         
         score = logits[0, target_class]
-        score.backward(retain_graph=True)
+        score.backward(retain_graph=False)
         
         gradients = self.gradients[0]     # [512, 7, 7]
         activations = self.activations[0] # [512, 7, 7]
@@ -194,6 +194,13 @@ class DvorakResNetClassifier(nn.Module):
             cam_norm = (cam_np - cam_min) / (cam_max - cam_min)
         else:
             cam_norm = np.zeros_like(cam_np)
+
+        # Free computational graph and cached activation/gradient hooks immediately
+        self.zero_grad(set_to_none=True)
+        self.gradients = None
+        self.activations = None
+        x.grad = None
+        del score, logits, gradients, activations, weights, cam
             
         # Extract top-3 activation foci coordinates from normalized 7x7 grid
         flat_indices = np.argsort(cam_norm.ravel())[::-1]
@@ -244,8 +251,9 @@ class DvorakResNetClassifier(nn.Module):
             img_tensor = torch.zeros((1, 3, 224, 224), dtype=torch.float32)
 
         self.eval()
-        logits, emb = self.forward_features(img_tensor)
-        probs = F.softmax(logits, dim=-1)[0].detach().cpu().numpy()
+        with torch.inference_mode():
+            logits, emb = self.forward_features(img_tensor)
+            probs = F.softmax(logits, dim=-1)[0].detach().cpu().numpy()
         
         active_classes = PHASE3B_CLASSES if self.num_classes == 4 else DVORAK_CLASSES
         top_idx = int(np.argmax(probs))

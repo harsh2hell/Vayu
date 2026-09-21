@@ -122,13 +122,14 @@ class DatabaseManager:
         self.postgres_configured = False
         self.db_url: Optional[str] = None
 
-        # 1. Check if SQLite is explicitly requested
+        # 1. Check if SQLite is explicitly requested and check production mode
         force_sqlite = os.environ.get("USE_SQLITE", "").lower() in ("true", "1", "yes")
+        is_prod = (os.environ.get("VAYU_ENV") == "production")
 
         # 2. Resolve PostgreSQL URL if not forcing SQLite
         target_pg_url = database_url or os.environ.get("DATABASE_URL")
-        if not target_pg_url and not force_sqlite:
-            # Fallback to local secure config if available in dev
+        if not target_pg_url and not force_sqlite and not is_prod:
+            # Fallback to local secure config if available in dev ONLY
             conf_file = Path.home() / ".config/vayu/supabase.env"
             if conf_file.exists():
                 try:
@@ -178,7 +179,18 @@ class DatabaseManager:
                     print(f"✗ [VAYU DB] Failed to connect to PostgreSQL: {e}")
                     # Note: We do NOT silently switch to SQLite if DATABASE_URL was explicitly provided in production.
 
-        # 4. If not using PostgreSQL, initialize SQLite fallback
+        # 4. Strict Production Enforcement: Prohibit silent fallback to SQLite
+        is_prod = (os.environ.get("VAYU_ENV") == "production")
+        if is_prod and not force_sqlite:
+            if not self.postgres_configured or not self.is_postgres:
+                err = self.postgres_error or "DATABASE_URL environment variable is not configured."
+                raise RuntimeError(
+                    f"Production startup failed: VAYU_ENV=production is set, but Supabase PostgreSQL "
+                    f"is unavailable ({err}). Silent fallback to SQLite is strictly forbidden in production. "
+                    f"Configure DATABASE_URL in cloud secrets, or set USE_SQLITE=true for explicit fallback."
+                )
+
+        # 5. If not using PostgreSQL, initialize SQLite fallback for local development or explicit fallback
         self.db_path_obj = resolve_database_path(db_path)
         self.db_path = str(self.db_path_obj)
         if not self.is_postgres:
@@ -217,6 +229,12 @@ class DatabaseManager:
                     with conn.cursor() as cur:
                         yield cur
         else:
+            force_sqlite = os.environ.get("USE_SQLITE", "").lower() in ("true", "1", "yes")
+            if self.postgres_configured and not force_sqlite:
+                raise RuntimeError(
+                    f"PostgreSQL was configured via DATABASE_URL but connection failed: {self.postgres_error}. "
+                    "Refusing silent fallback to SQLite. Set USE_SQLITE=true to explicitly force fallback."
+                )
             with sqlite3.connect(self.db_path, check_same_thread=False) as conn:
                 conn.row_factory = sqlite3.Row
                 cur = conn.cursor()

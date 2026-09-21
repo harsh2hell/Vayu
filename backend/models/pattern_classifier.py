@@ -1,4 +1,5 @@
 import time
+import threading
 from typing import Dict, List, Any, Optional
 from ..ml_engine.models.dvorak_classifier import load_dvorak_classifier_model, PHASE3B_CLASSES, INSUFFICIENT_CLASSES
 from ..database.db_manager import db
@@ -14,9 +15,19 @@ class MorphologyPatternClassifier:
     """
     def __init__(self):
         self.model_version = "PatternNet-ResNet18-Phase3B"
-        self.model = load_dvorak_classifier_model()
+        self._model = None
+        self._lock = threading.Lock()
         self.num_classes = 4
         self.classes = [c["name"] for c in PHASE3B_CLASSES]
+
+    @property
+    def model(self):
+        """Thread-safe lazy initializer for ResNet18 model weights."""
+        if self._model is None:
+            with self._lock:
+                if self._model is None:
+                    self._model = load_dvorak_classifier_model()
+        return self._model
 
     def classify(self, 
                  image_bytes: Optional[bytes] = None, 

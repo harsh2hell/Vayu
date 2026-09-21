@@ -25,6 +25,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 # Copy backend requirements first to leverage Docker layer caching
 COPY requirements.txt /app/backend/requirements.txt
 RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir torch torchvision --index-url https://download.pytorch.org/whl/cpu && \
     pip install --no-cache-dir -r /app/backend/requirements.txt
 
 # Copy complete backend application code (including models, checkpoints, database, routers, and services)
@@ -33,9 +34,9 @@ COPY . /app/backend
 # Expose default HTTP port
 EXPOSE 8000
 
-# Container healthcheck targeting the unauthenticated /api/health endpoint
+# Container healthcheck targeting the lightweight liveness endpoint
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 \
-    CMD curl -f http://127.0.0.1:${PORT:-8000}/api/health || exit 1
+    CMD curl -f http://127.0.0.1:${PORT:-8000}/health || exit 1
 
 # Start FastAPI using Uvicorn ASGI server honoring dynamic cloud PORT
 CMD ["sh", "-c", "exec uvicorn backend.main:app --host 0.0.0.0 --port ${PORT:-8000} --workers 1"]

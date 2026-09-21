@@ -9,9 +9,10 @@ services:
     env: docker
     dockerContext: backend
     dockerfilePath: Dockerfile
-    plan: starter
+    # Render instance tiers: starter=512MB, standard=2GB. Standard provides the required >= 1GB RAM headroom.
+    plan: standard
     region: singapore
-    healthCheckPath: /api/health
+    healthCheckPath: /health
     autoDeploy: false
     envVars:
       - key: PORT
@@ -20,11 +21,19 @@ services:
         value: 0.0.0.0
       - key: RELOAD
         value: false
+      - key: VAYU_ENV
+        value: production
       - key: CORS_ORIGINS
         value: https://portal.vayusat.live,https://www.vayusat.live,https://vayusat.live
       - key: FIREBASE_PROJECT_ID
         value: vayusat-live
-      # Set this in the Render Dashboard Secret Environment Variables (never commit plaintext):
+      - key: DB_POOL_MIN_SIZE
+        value: "1"
+      - key: DB_POOL_MAX_SIZE
+        value: "3"
+      # Set these in the Render Dashboard Secret Environment Variables (never commit plaintext):
+      - key: DATABASE_URL
+        sync: false
       - key: FIREBASE_SERVICE_ACCOUNT_KEY
         sync: false
       - key: WINDY_API_KEY

@@ -1,7 +1,9 @@
 import time
 import os
 import hashlib
+import threading
 from typing import Dict, Any, Optional, List
+import torch
 from ..ml_engine.models.center_detector import load_center_detector_model
 from ..ml_engine.geolocation import haversine_distance_km
 from ..database.db_manager import db
@@ -14,8 +16,18 @@ class CycloneVisionCNN:
     """
     def __init__(self):
         self.model_version = "CycloneVision-MobileNetV3 v2.5"
-        self.model = load_center_detector_model()
+        self._model = None
+        self._lock = threading.Lock()
         self.input_shape = [1, 3, 224, 224]
+
+    @property
+    def model(self):
+        """Thread-safe lazy initializer for MobileNetV3 model weights."""
+        if self._model is None:
+            with self._lock:
+                if self._model is None:
+                    self._model = load_center_detector_model()
+        return self._model
 
     def predict(
         self, 
@@ -31,11 +43,12 @@ class CycloneVisionCNN:
         - Radiometric intensity estimates (Vmax, MSLP)
         - Rejection of ambient non-cyclone images
         """
-        raw_pred = self.model.predict_frame(
-            image_bytes=image_bytes, 
-            bbox_geo=bbox_geo, 
-            basin=basin
-        )
+        with torch.inference_mode():
+            raw_pred = self.model.predict_frame(
+                image_bytes=image_bytes, 
+                bbox_geo=bbox_geo, 
+                basin=basin
+            )
         
         # Calculate Dvorak CI proxy from estimated intensity
         vmax_kts = raw_pred["estimated_intensity"]["vmax_knots"]

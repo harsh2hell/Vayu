@@ -6,6 +6,14 @@ from fastapi import FastAPI, File, UploadFile, Form, HTTPException, Response, Qu
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
+# Initialize single-thread allocation once at startup to prevent memory fragmentation on 512MB hosts
+import torch
+torch.set_num_threads(1)
+try:
+    torch.set_num_interop_threads(1)
+except RuntimeError:
+    pass
+
 # Database Initialization
 from .database.seed_data import seed_database
 from .database.db_manager import db
@@ -44,11 +52,14 @@ app = FastAPI(
     redoc_url="/redoc"
 )
 
-# CORS Origins: Production domains + Local development origins
-DEFAULT_ALLOWED_ORIGINS = [
+# CORS Origins: Production domains + Optional Local development origins
+PRODUCTION_ORIGINS = [
     "https://portal.vayusat.live",
     "https://www.vayusat.live",
     "https://vayusat.live",
+]
+
+DEV_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "http://localhost:3000",
@@ -57,8 +68,13 @@ DEFAULT_ALLOWED_ORIGINS = [
     "http://127.0.0.1:8000",
 ]
 
+# Only enable dev origins if not in production mode
+is_prod = (os.environ.get("VAYU_ENV") == "production")
+_allowed_origins = list(PRODUCTION_ORIGINS)
+if not is_prod:
+    _allowed_origins.extend(DEV_ORIGINS)
+
 _custom_origins_env = os.environ.get("CORS_ORIGINS", "").strip()
-_allowed_origins = list(DEFAULT_ALLOWED_ORIGINS)
 if _custom_origins_env:
     for _orig in _custom_origins_env.split(","):
         _cleaned = _orig.strip()
@@ -72,6 +88,14 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# -------------------------------------------------------------
+# Lightweight Orchestrator Liveness Probe (Render / Koyeb)
+# -------------------------------------------------------------
+@app.get("/health")
+def liveness_check():
+    """Ultra-lightweight liveness probe for cloud orchestrators. Responds immediately with status OK."""
+    return {"status": "OK"}
 
 @app.on_event("startup")
 async def startup_event():
@@ -100,7 +124,7 @@ async def shutdown_event():
         db.close()
 
 async def startup_model_verification():
-    """Logs model name, checkpoint path, SHA-256, and parameter count at startup."""
+    """Logs model checkpoint paths, file sizes, and SHA-256 hashes on disk without loading full neural networks into RAM."""
     import os
     import hashlib
     import backend.ml_engine.models.center_detector as cd
@@ -108,24 +132,26 @@ async def startup_model_verification():
     import backend.ml_engine.models.trajectory_gru as tg
 
     print("=" * 80)
-    print("VAYU PHASE 3D — PRODUCTION MODEL WIRING VERIFICATION")
+    print("VAYU PHASE 3D/6B — PRODUCTION CHECKPOINT INTEGRITY VERIFICATION")
     print("=" * 80)
     models_to_log = [
-        ("CenterDetector", cyclone_vision_model.model, cd.CHECKPOINT_PATH, "MobileNetV3-Small-CenterFix"),
-        ("DvorakClassifier", pattern_classifier.model, dc.CHECKPOINT_PATH, "ResNet18-Dvorak-Morphology (4 Validated Classes)"),
-        ("TrajectoryGRU", cyclone_forecast_engine.model, tg.CHECKPOINT_PATH, "2-Layer GRU Seq2Seq (+6h to +72h 3-Hourly)")
+        ("CenterDetector", cd.CHECKPOINT_PATH, "MobileNetV3-Small-CenterFix", 1075431),
+        ("DvorakClassifier", dc.CHECKPOINT_PATH, "ResNet18-Dvorak-Morphology (4 Validated Classes)", 11246436),
+        ("TrajectoryGRU", tg.CHECKPOINT_PATH, "2-Layer GRU Seq2Seq (+6h to +72h 3-Hourly)", 41764)
     ]
-    for label, m, ckpt, arch in models_to_log:
+    for label, ckpt, arch, p_count in models_to_log:
         sha = "file_not_found"
+        size_str = "N/A"
         if os.path.exists(ckpt):
+            stat = os.stat(ckpt)
+            size_str = f"{stat.st_size / (1024 * 1024):.2f} MB"
             with open(ckpt, "rb") as f:
                 sha = hashlib.sha256(f.read()).hexdigest()
-        p_count = sum(p.numel() for p in m.parameters())
         print(f"[{label}]")
         print(f"  Architecture:     {arch}")
-        print(f"  Checkpoint Path:  {ckpt}")
+        print(f"  Checkpoint Path:  {ckpt} ({size_str})")
         print(f"  SHA-256:          {sha}")
-        print(f"  Parameter Count:  {p_count:,}")
+        print(f"  Parameter Count:  {p_count:,} (Lazy-loaded on first inference)")
         print("-" * 80)
     print("=" * 80)
 
