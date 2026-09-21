@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
-import { PhoneCall, Menu, X, ChevronRight } from 'lucide-react';
+import { PhoneCall, Menu, X, ChevronRight, LogIn } from 'lucide-react';
 import { useLiveClock } from '../utils/liveDateTime';
-import { getStatusUrl, isProductionDomain } from '../utils/domain';
+import { getStatusUrl, getAuthUrl, isProductionDomain } from '../utils/domain';
 
 export const FONT_SCALE_MAP = {
   '-3': 75,
@@ -28,6 +28,8 @@ export const applyGlobalFontScale = (offset) => {
     // ignore
   }
 };
+
+const LOGIN_GATEWAY_URL = 'https://login.vayusat.live/?redirect_url=https%3A%2F%2Fportal.vayusat.live%2F';
 
 const PublicNavbar = ({
   isHindi,
@@ -148,15 +150,15 @@ const PublicNavbar = ({
         {/* Right: Operational Portal CTA & Language Switcher */}
         <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
           
-          {/* Operations Console Button */}
-          <button
-            onClick={() => navigate('/threat-map')}
-            className="hidden sm:inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-950 text-xs font-semibold shadow-xs transition-all duration-150 cursor-pointer"
-            title={isHindi ? "परिचालन नियंत्रण कक्ष खोलें" : "Open Operational Command Console"}
+          {/* Login Portal Button */}
+          <a
+            href={LOGIN_GATEWAY_URL}
+            className="hidden sm:inline-flex items-center gap-2 px-3.5 py-1.5 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-950 text-xs font-semibold shadow-xs transition-all duration-150 cursor-pointer group no-underline"
+            title={isHindi ? "लॉगिन पोर्टल खोलें" : "Open Login Portal"}
           >
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>{isHindi ? 'अधिकारी नियंत्रण कक्ष' : 'Operations Console'}</span>
-          </button>
+            <LogIn className="w-3.5 h-3.5 text-slate-300 group-hover:text-white dark:text-slate-600 dark:group-hover:text-slate-950 transition-colors" />
+            <span>{isHindi ? 'लॉग इन' : 'Login'}</span>
+          </a>
 
           {/* Language Switcher */}
           {setIsHindi && (
@@ -246,17 +248,15 @@ const PublicNavbar = ({
             })}
           </div>
 
-          {/* Mobile Operations Console Button */}
-          <button
-            onClick={() => {
-              setIsMobileMenuOpen(false);
-              navigate('/threat-map');
-            }}
-            className="w-full flex items-center justify-center gap-2 p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-950 text-xs font-semibold transition-colors cursor-pointer"
+          {/* Mobile Login Button */}
+          <a
+            href={LOGIN_GATEWAY_URL}
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="w-full flex items-center justify-center gap-2 p-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-950 text-xs font-semibold transition-colors cursor-pointer group no-underline"
           >
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            <span>{isHindi ? 'अधिकारी नियंत्रण कक्ष' : 'Operations Console'}</span>
-          </button>
+            <LogIn className="w-4 h-4 text-slate-300 group-hover:text-white dark:text-slate-600 dark:group-hover:text-slate-950 transition-colors" />
+            <span>{isHindi ? 'लॉग इन' : 'Login'}</span>
+          </a>
 
           {/* Mobile Language Switcher */}
           {setIsHindi && (
