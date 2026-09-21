@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
+import React, { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { 
   ArrowLeft, ArrowUpRight, Search, MapPin, 
-  PhoneCall, Filter
+  PhoneCall, Filter, ChevronLeft, ChevronRight
 } from 'lucide-react';
 import LanguageWelcomeAnimation from '../components/LanguageWelcomeAnimation';
 import { COASTAL_CITIES_DATA } from '../data/coastalCitiesData';
@@ -92,6 +92,69 @@ const CityTracker = () => {
   const [activeCategoryFilter, setActiveCategoryFilter] = useState('ALL'); // ALL, HOTSPOT, TRENDING, RED, ORANGE, PORTS
   const [selectedCityId, setSelectedCityId] = useState(null);
   const [lastUpdated] = useState(() => getFormattedLastUpdated());
+
+  // Auto-moving State Carousel state (moves every 2.5 seconds, similar to Welcome.jsx weather carousel)
+  const [stateCarouselIndex, setStateCarouselIndex] = useState(0);
+  const [isStateCarouselPaused, setIsStateCarouselPaused] = useState(false);
+  const stateTrackRef = useRef(null);
+
+  // Extended array with duplicates for seamless infinite looping
+  const extendedStateOptions = useMemo(() => {
+    return [...STATE_OPTIONS, ...STATE_OPTIONS];
+  }, []);
+
+  const scrollToStateIndex = useCallback((index, behavior = 'smooth') => {
+    if (!stateTrackRef.current) return;
+    const track = stateTrackRef.current;
+    const children = track.children;
+    if (!children || children.length === 0) return;
+    const targetChild = children[index];
+    const firstChild = children[0];
+    if (targetChild && firstChild) {
+      const targetLeft = targetChild.offsetLeft - firstChild.offsetLeft;
+      track.scrollTo({ left: targetLeft, behavior });
+    }
+  }, []);
+
+  const handleNextState = useCallback(() => {
+    setStateCarouselIndex((prev) => {
+      const next = prev + 1;
+      scrollToStateIndex(next, 'smooth');
+      if (next >= STATE_OPTIONS.length) {
+        setTimeout(() => {
+          scrollToStateIndex(0, 'instant');
+          setStateCarouselIndex(0);
+        }, 550);
+      }
+      return next >= STATE_OPTIONS.length ? next : next;
+    });
+  }, [scrollToStateIndex]);
+
+  const handlePrevState = useCallback(() => {
+    setStateCarouselIndex((prev) => {
+      if (prev <= 0) {
+        scrollToStateIndex(STATE_OPTIONS.length, 'instant');
+        const next = STATE_OPTIONS.length - 1;
+        setTimeout(() => {
+          scrollToStateIndex(next, 'smooth');
+        }, 30);
+        return next;
+      } else {
+        const next = prev - 1;
+        scrollToStateIndex(next, 'smooth');
+        return next;
+      }
+    });
+  }, [scrollToStateIndex]);
+
+  // Auto-move every 2.5 seconds (2500ms)
+  useEffect(() => {
+    if (isStateCarouselPaused) return;
+    const timer = setInterval(() => {
+      handleNextState();
+    }, 2500);
+    return () => clearInterval(timer);
+  }, [isStateCarouselPaused, handleNextState]);
 
   // Filter 100+ cities based on search, state, and category
   const filteredCities = useMemo(() => {
@@ -197,25 +260,61 @@ const CityTracker = () => {
             </div>
           </div>
 
-          {/* State Filter Buttons */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs">
-            <span className="font-semibold text-slate-500 dark:text-slate-400 mr-1 shrink-0 flex items-center gap-1">
-              <Filter className="w-3.5 h-3.5" />
-              <span>{isHindi ? 'राज्य:' : 'State:'}</span>
-            </span>
-            {STATE_OPTIONS.map((st) => (
-              <button
-                key={st.id}
-                onClick={() => setSelectedState(st.id)}
-                className={`px-3 py-1.5 rounded-2xl font-semibold transition-all cursor-pointer whitespace-nowrap shrink-0 ${
-                  selectedState === st.id
-                    ? 'bg-slate-700 text-white dark:bg-white dark:text-slate-900 shadow-2xs'
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
-                }`}
-              >
-                {isHindi ? (st.nameHindi || st.name) : st.name}
-              </button>
-            ))}
+          {/* State Filter Carousel Bar */}
+          <div 
+            className="flex items-center gap-2 pb-1 text-xs relative group/statecarousel"
+            onMouseEnter={() => setIsStateCarouselPaused(true)}
+            onMouseLeave={() => setIsStateCarouselPaused(false)}
+            onTouchStart={() => setIsStateCarouselPaused(true)}
+            onTouchEnd={() => setIsStateCarouselPaused(false)}
+          >
+            <div className="flex items-center gap-1.5 shrink-0">
+              <span className="font-semibold text-slate-500 dark:text-slate-400 mr-0.5 flex items-center gap-1">
+                <Filter className="w-3.5 h-3.5" />
+                <span>{isHindi ? 'राज्य:' : 'State:'}</span>
+              </span>
+
+              {/* Prev / Next controls */}
+              <div className="flex items-center gap-1 mr-1">
+                <button
+                  type="button"
+                  onClick={handlePrevState}
+                  aria-label="Previous State"
+                  className="p-1 rounded-lg border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 shadow-2xs transition-all cursor-pointer"
+                >
+                  <ChevronLeft className="w-3 h-3" />
+                </button>
+                <button
+                  type="button"
+                  onClick={handleNextState}
+                  aria-label="Next State"
+                  className="p-1 rounded-lg border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 shadow-2xs transition-all cursor-pointer"
+                >
+                  <ChevronRight className="w-3 h-3" />
+                </button>
+              </div>
+            </div>
+
+            {/* Auto-moving Carousel Track */}
+            <div 
+              ref={stateTrackRef}
+              className="flex items-center gap-1.5 overflow-x-hidden scroll-smooth scrollbar-none py-0.5 min-w-0 flex-1"
+            >
+              {extendedStateOptions.map((st, idx) => (
+                <button
+                  key={`${st.id}-${idx}`}
+                  type="button"
+                  onClick={() => setSelectedState(st.id)}
+                  className={`px-3 py-1.5 rounded-2xl font-semibold transition-all cursor-pointer whitespace-nowrap shrink-0 ${
+                    selectedState === st.id
+                      ? 'bg-slate-700 text-white dark:bg-white dark:text-slate-900 shadow-2xs'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
+                  }`}
+                >
+                  {isHindi ? (st.nameHindi || st.name) : st.name}
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Special Category & Severity Filter Pills */}
