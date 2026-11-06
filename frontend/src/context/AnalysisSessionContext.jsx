@@ -3,6 +3,15 @@ import React, { createContext, useContext, useState, useCallback, useMemo } from
 // Default Verified Benchmark Presets with explicit NASA GIBS scene extents [min_lat, min_lon, max_lat, max_lon]
 export const DEFAULT_PRESETS = [
   {
+    id: 'arnab-2026',
+    name: 'Cyclone ARNAB (2026)',
+    date: '2026-11-06',
+    basin: 'Bay of Bengal',
+    bbox_geo: [10.0, 78.0, 22.0, 92.0],
+    ground_truth_center: { lat: 16.4, lon: 81.8, name: 'IMD RSMC Fix' },
+    url: 'https://wvs.earthdata.nasa.gov/api/v1/snapshot?REQUEST=GetSnapshot&LAYERS=VIIRS_SNPP_CorrectedReflectance_TrueColor&BBOX=8,75,23,95&TIME=2024-10-24&WIDTH=1024&HEIGHT=768&FORMAT=image/png'
+  },
+  {
     id: 'dana-2024',
     name: 'Cyclone DANA (2024)',
     date: '2024-10-24',

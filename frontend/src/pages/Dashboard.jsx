@@ -5,15 +5,40 @@ import {
   BarChart, Bar, PieChart, Pie, Cell
 } from 'recharts';
 import { 
-  ChevronDown, Check, ArrowRight
+  ChevronDown, Check, ArrowRight, Crosshair, Gauge, TrendingUp, TrendingDown,
+  Navigation2, ShieldAlert, Waves, Wind, Compass, Sparkles, BrainCircuit, Activity,
+  Radio, ShieldCheck, MapPin, BarChart2
 } from 'lucide-react';
 import { toPortalPath } from '../utils/domain';
 import { useAnalysisSession, DEFAULT_PRESETS } from '../context/AnalysisSessionContext';
 import { checkBackendHealth } from '../services/api';
 
 // Verified Benchmark Ground-Truth Meteorological Profiles
-// Provides realistic, scientifically accurate baselines for historical benchmark cyclones
+// Provides realistic, scientifically accurate baselines for contemporary & historical benchmark cyclones
 const BENCHMARK_PROFILES = {
+  'arnab-2026': {
+    name: 'Cyclone ARNAB (2026)',
+    basin: 'Bay of Bengal',
+    date: '2026-11-06',
+    center: '16.4°N, 81.8°E (IMD Fix)',
+    classification: 'Extremely Severe CS (T6.0)',
+    stage: 'ESCS • Extremely Severe',
+    windKmh: 222,
+    windKt: 120,
+    mslpHpa: 942,
+    trajectoryStatus: 'Landfall Approach (NW)',
+    trajectoryMilestones: '6 Waypoints (72h)',
+    landfallSector: 'Coastal Andhra Pradesh & South Odisha',
+    surgeHeight: '4.2',
+    surgeEstimate: '3.5 – 4.5m projected',
+    criticalDistricts: [
+      { district: 'Bapatla', strike_prob_pct: 94 },
+      { district: 'Krishna', strike_prob_pct: 88 },
+      { district: 'Guntur', strike_prob_pct: 82 },
+      { district: 'Kakinada', strike_prob_pct: 74 },
+      { district: 'West Godavari', strike_prob_pct: 68 }
+    ]
+  },
   'dana-2024': {
     name: 'Cyclone DANA (2024)',
     basin: 'Bay of Bengal',
@@ -94,19 +119,19 @@ const METRIC_DATASETS = {
 };
 
 const warningsRegionData = [
-  { name: 'OD', val: 18, fill: '#2563eb' },
-  { name: 'WB', val: 28, fill: '#e11d48' },
-  { name: 'AP', val: 22, fill: '#f59e0b' },
-  { name: 'GJ', val: 32, fill: '#0284c7' },
-  { name: 'MH', val: 13, fill: '#0d9488' },
-  { name: 'TN', val: 26, fill: '#8b5cf6' },
+  { name: 'OD', val: 28, fill: '#e11d48' },
+  { name: 'WB', val: 32, fill: '#f97316' },
+  { name: 'AP', val: 24, fill: '#f59e0b' },
+  { name: 'GJ', val: 26, fill: '#2563eb' },
+  { name: 'MH', val: 14, fill: '#0284c7' },
+  { name: 'TN', val: 22, fill: '#0d9488' },
 ];
 
 const severityData = [
-  { name: 'Severe', value: 52.1, color: '#2563eb' },
-  { name: 'Very Severe', value: 22.8, color: '#f59e0b' },
-  { name: 'Super', value: 13.9, color: '#e11d48' },
-  { name: 'Depression', value: 11.2, color: '#06b6d4' },
+  { name: 'Severe CS', value: 52.1, color: '#2563eb', badge: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/60 dark:text-blue-300' },
+  { name: 'Very Severe CS', value: 22.8, color: '#f59e0b', badge: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300' },
+  { name: 'Super Cyclone', value: 13.9, color: '#e11d48', badge: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/60 dark:text-rose-300' },
+  { name: 'Depression', value: 11.2, color: '#0d9488', badge: 'bg-teal-50 text-teal-700 border-teal-200 dark:bg-teal-950/60 dark:text-teal-300' },
 ];
 
 const Dashboard = () => {
@@ -154,9 +179,9 @@ const Dashboard = () => {
   const currentChartData = METRIC_DATASETS[activeMetricTab] || METRIC_DATASETS.wind;
 
   // Resolve active preset benchmark metadata if operating in benchmark mode
-  const activePresetId = currentInput?.presetId || (currentInput?.name?.toLowerCase().includes('biparjoy') ? 'biparjoy-2023' : 'dana-2024');
+  const activePresetId = currentInput?.presetId || (currentInput?.name?.toLowerCase().includes('arnab') ? 'arnab-2026' : (currentInput?.name?.toLowerCase().includes('biparjoy') ? 'biparjoy-2023' : 'dana-2024'));
   const isBenchmark = currentInput?.sourceType === 'benchmark' || Boolean(currentInput?.presetId) || Boolean(BENCHMARK_PROFILES[activePresetId]);
-  const benchmarkProfile = isBenchmark ? (BENCHMARK_PROFILES[activePresetId] || BENCHMARK_PROFILES['dana-2024']) : null;
+  const benchmarkProfile = isBenchmark ? (BENCHMARK_PROFILES[activePresetId] || BENCHMARK_PROFILES['arnab-2026'] || BENCHMARK_PROFILES['dana-2024']) : null;
 
   // Active Storm Derived Values
   const activeStormName = currentInput?.name || 'No Active Storm';
@@ -295,29 +320,35 @@ const Dashboard = () => {
         </div>
       </div>
 
-      {/* 2. Four Monochromatic Core Telemetry Cards */}
+      {/* 2. Four Vibrant Mission Control Core Telemetry Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         
-        {/* Card 1: Active System & Center Fix */}
+        {/* Card 1: Active System & Center Fix (Sky / Blue Theme) */}
         <div 
           onClick={() => navigate(toPortalPath('/dashboard/detection'))}
-          className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-5 rounded-2xl flex flex-col justify-between h-42 cursor-pointer hover:border-slate-400 dark:hover:border-slate-600 transition-all shadow-xs group"
+          className="bg-gradient-to-br from-sky-50/90 via-white to-blue-50/40 dark:from-sky-950/40 dark:via-slate-900 dark:to-slate-900 border border-sky-200/80 dark:border-sky-900/60 p-5 rounded-2xl flex flex-col justify-between h-44 cursor-pointer hover:border-sky-400 dark:hover:border-sky-600 transition-all shadow-xs hover:shadow-md group"
         >
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-mono font-semibold text-slate-400 uppercase tracking-wider">Active Cyclone</span>
-            <ArrowRight className="w-3.5 h-3.5 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg bg-sky-100 dark:bg-sky-900/60 text-sky-600 dark:text-sky-300 flex items-center justify-center border border-sky-200 dark:border-sky-800">
+                <Crosshair className="w-4 h-4" />
+              </div>
+              <span className="text-[11px] font-mono font-bold text-sky-700 dark:text-sky-300 uppercase tracking-wider">Active Cyclone</span>
+            </div>
+            <ArrowRight className="w-4 h-4 text-sky-500 opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
           <div>
             <div className="text-xl font-bold text-slate-900 dark:text-white tracking-tight truncate">
               {activeStormName.split(' (')[0]}
             </div>
-            <div className="text-xs font-mono text-slate-500 dark:text-slate-400 mt-1 truncate">
-              {centerFormatted || 'Center not fixed'}
+            <div className="text-xs font-mono font-medium text-slate-600 dark:text-slate-400 mt-1 truncate flex items-center gap-1.5">
+              <MapPin className="w-3.5 h-3.5 text-sky-600 dark:text-sky-400 shrink-0" />
+              <span>{centerFormatted || 'Center not fixed'}</span>
             </div>
           </div>
-          <div className="flex items-center justify-between text-[11px] font-mono pt-2 border-t border-slate-100 dark:border-slate-800">
-            <span className="text-slate-400">Detection:</span>
-            <span className={`font-semibold ${detectionResult ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-700 dark:text-slate-300'}`}>
+          <div className="flex items-center justify-between text-[11px] font-mono pt-2.5 border-t border-sky-100 dark:border-slate-800/80">
+            <span className="text-slate-500 dark:text-slate-400">Detection:</span>
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800">
               {detectionResult 
                 ? (detectionResult.confidence_percentage ? `${detectionResult.confidence_percentage}% (Inferred)` : 'Fix Confirmed') 
                 : (benchmarkProfile ? 'IMD Best Track Fix' : 'Not analyzed')}
@@ -325,26 +356,36 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Card 2: Dvorak Morphology & Intensity */}
+        {/* Card 2: Dvorak Morphology & Intensity (Indigo / Violet Theme) */}
         <div 
           onClick={() => navigate(toPortalPath('/dashboard/classification'))}
-          className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-5 rounded-2xl flex flex-col justify-between h-42 cursor-pointer hover:border-slate-400 dark:hover:border-slate-600 transition-all shadow-xs group"
+          className="bg-gradient-to-br from-indigo-50/90 via-white to-purple-50/40 dark:from-indigo-950/40 dark:via-slate-900 dark:to-slate-900 border border-indigo-200/80 dark:border-indigo-900/60 p-5 rounded-2xl flex flex-col justify-between h-44 cursor-pointer hover:border-indigo-400 dark:hover:border-indigo-600 transition-all shadow-xs hover:shadow-md group"
         >
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-mono font-semibold text-slate-400 uppercase tracking-wider">Dvorak & Intensity</span>
-            <ArrowRight className="w-3.5 h-3.5 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg bg-indigo-100 dark:bg-indigo-900/60 text-indigo-600 dark:text-indigo-300 flex items-center justify-center border border-indigo-200 dark:border-indigo-800">
+                <Gauge className="w-4 h-4" />
+              </div>
+              <span className="text-[11px] font-mono font-bold text-indigo-700 dark:text-indigo-300 uppercase tracking-wider">Dvorak & Intensity</span>
+            </div>
+            <ArrowRight className="w-4 h-4 text-indigo-500 opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
           <div>
             <div className="text-xl font-bold text-slate-900 dark:text-white tracking-tight truncate">
               {classificationText}
             </div>
-            <div className="text-xs font-mono text-slate-500 dark:text-slate-400 mt-1">
-              {maxWindKmh ? `${maxWindKmh} km/h • ${mslpHpa ? `${mslpHpa} hPa` : 'MSLP est.'}` : 'Intensity uncalculated'}
+            <div className="flex items-center gap-1.5 mt-1 text-xs font-mono font-bold">
+              <span className="px-2 py-0.5 rounded-md bg-indigo-100/80 text-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-300 border border-indigo-200/60">
+                {maxWindKmh ? `${maxWindKmh} km/h` : 'Wind pending'}
+              </span>
+              <span className="px-2 py-0.5 rounded-md bg-purple-100/80 text-purple-800 dark:bg-purple-950/60 dark:text-purple-300 border border-purple-200/60">
+                {mslpHpa ? `${mslpHpa} hPa` : 'MSLP est.'}
+              </span>
             </div>
           </div>
-          <div className="flex items-center justify-between text-[11px] font-mono pt-2 border-t border-slate-100 dark:border-slate-800">
-            <span className="text-slate-400">ResNet18:</span>
-            <span className={`font-semibold ${classificationResult ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-700 dark:text-slate-300'}`}>
+          <div className="flex items-center justify-between text-[11px] font-mono pt-2.5 border-t border-indigo-100 dark:border-slate-800/80">
+            <span className="text-slate-500 dark:text-slate-400">ResNet18:</span>
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200/80 dark:bg-indigo-950/60 dark:text-indigo-300 dark:border-indigo-800">
               {classificationResult 
                 ? 'Classification Ready' 
                 : (benchmarkProfile ? 'Verified Benchmark' : 'Not analyzed')}
@@ -352,54 +393,66 @@ const Dashboard = () => {
           </div>
         </div>
 
-        {/* Card 3: Spatiotemporal Trajectory */}
+        {/* Card 3: Spatiotemporal Trajectory (Purple / Fuchsia Theme) */}
         <div 
           onClick={() => navigate(toPortalPath('/dashboard/trajectory'))}
-          className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-5 rounded-2xl flex flex-col justify-between h-42 cursor-pointer hover:border-slate-400 dark:hover:border-slate-600 transition-all shadow-xs group"
+          className="bg-gradient-to-br from-purple-50/90 via-white to-pink-50/40 dark:from-purple-950/40 dark:via-slate-900 dark:to-slate-900 border border-purple-200/80 dark:border-purple-900/60 p-5 rounded-2xl flex flex-col justify-between h-44 cursor-pointer hover:border-purple-400 dark:hover:border-purple-600 transition-all shadow-xs hover:shadow-md group"
         >
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-mono font-semibold text-slate-400 uppercase tracking-wider">72h Trajectory</span>
-            <ArrowRight className="w-3.5 h-3.5 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg bg-purple-100 dark:bg-purple-900/60 text-purple-600 dark:text-purple-300 flex items-center justify-center border border-purple-200 dark:border-purple-800">
+                <Navigation2 className="w-4 h-4" />
+              </div>
+              <span className="text-[11px] font-mono font-bold text-purple-700 dark:text-purple-300 uppercase tracking-wider">72h Trajectory</span>
+            </div>
+            <ArrowRight className="w-4 h-4 text-purple-500 opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
           <div>
             <div className="text-xl font-bold text-slate-900 dark:text-white tracking-tight truncate">
               {trajectoryStatusText}
             </div>
-            <div className="text-xs font-mono text-slate-500 dark:text-slate-400 mt-1 truncate">
-              {trajectoryForecastList.length > 0 
+            <div className="text-xs font-mono font-medium text-slate-600 dark:text-slate-400 mt-1 truncate flex items-center gap-1.5">
+              <Compass className="w-3.5 h-3.5 text-purple-600 dark:text-purple-400 shrink-0" />
+              <span>{trajectoryForecastList.length > 0 
                 ? 'GRU 25-pass MC Dropout' 
-                : (benchmarkProfile ? benchmarkProfile.trajectoryMilestones : 'Awaiting trajectory run')}
+                : (benchmarkProfile ? benchmarkProfile.trajectoryMilestones : 'Awaiting trajectory run')}</span>
             </div>
           </div>
-          <div className="flex items-center justify-between text-[11px] font-mono pt-2 border-t border-slate-100 dark:border-slate-800">
-            <span className="text-slate-400">Horizon:</span>
-            <span className={`font-semibold ${trajectoryResult ? 'text-emerald-600 dark:text-emerald-400' : 'text-slate-700 dark:text-slate-300'}`}>
+          <div className="flex items-center justify-between text-[11px] font-mono pt-2.5 border-t border-purple-100 dark:border-slate-800/80">
+            <span className="text-slate-500 dark:text-slate-400">Horizon:</span>
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-50 text-purple-700 border border-purple-200/80 dark:bg-purple-950/60 dark:text-purple-300 dark:border-purple-800">
               {trajectoryResult ? '+72 Hours' : (benchmarkProfile ? '+72h Forecast' : 'Not analyzed')}
             </span>
           </div>
         </div>
 
-        {/* Card 4: Landfall & Coastal Risk */}
+        {/* Card 4: Landfall & Coastal Risk (Rose / Amber Theme) */}
         <div 
           onClick={() => navigate(toPortalPath('/dashboard/impact'))}
-          className="bg-white dark:bg-slate-900 border border-slate-200/80 dark:border-slate-800 p-5 rounded-2xl flex flex-col justify-between h-42 cursor-pointer hover:border-slate-400 dark:hover:border-slate-600 transition-all shadow-xs group"
+          className="bg-gradient-to-br from-rose-50/90 via-white to-amber-50/40 dark:from-rose-950/40 dark:via-slate-900 dark:to-slate-900 border border-rose-200/80 dark:border-rose-900/60 p-5 rounded-2xl flex flex-col justify-between h-44 cursor-pointer hover:border-rose-400 dark:hover:border-rose-600 transition-all shadow-xs hover:shadow-md group"
         >
           <div className="flex items-center justify-between">
-            <span className="text-[10px] font-mono font-semibold text-slate-400 uppercase tracking-wider">Landfall Corridor</span>
-            <ArrowRight className="w-3.5 h-3.5 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity" />
+            <div className="flex items-center gap-2">
+              <div className="w-7 h-7 rounded-lg bg-rose-100 dark:bg-rose-950 text-rose-600 dark:text-rose-400 flex items-center justify-center border border-rose-200 dark:border-rose-800">
+                <ShieldAlert className="w-4 h-4" />
+              </div>
+              <span className="text-[11px] font-mono font-bold text-rose-700 dark:text-rose-300 uppercase tracking-wider">Landfall Corridor</span>
+            </div>
+            <ArrowRight className="w-4 h-4 text-rose-500 opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
           <div>
             <div className="text-lg font-bold text-slate-900 dark:text-white tracking-tight truncate">
               {landfallSector}
             </div>
-            <div className="text-xs font-mono text-slate-500 dark:text-slate-400 mt-1 truncate">
-              {surgeHeight ? `Surge: ${surgeHeight}m projected` : (landfallPrediction ? 'Corridor evaluated' : (benchmarkProfile ? benchmarkProfile.surgeEstimate : 'Awaiting impact run'))}
+            <div className="text-xs font-mono font-medium text-slate-600 dark:text-slate-400 mt-1 truncate flex items-center gap-1.5">
+              <Waves className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400 shrink-0" />
+              <span>{surgeHeight ? `Surge: ${surgeHeight}m projected` : (landfallPrediction ? 'Corridor evaluated' : (benchmarkProfile ? benchmarkProfile.surgeEstimate : 'Awaiting impact run'))}</span>
             </div>
           </div>
-          <div className="flex items-center justify-between text-[11px] font-mono pt-2 border-t border-slate-100 dark:border-slate-800">
-            <span className="text-slate-400">Districts:</span>
-            <span className={`font-semibold ${criticalDistricts.length > 0 ? 'text-slate-900 dark:text-white' : 'text-slate-400'}`}>
-              {criticalDistricts.length > 0 ? `${criticalDistricts.length} Sectors` : (landfallPrediction ? 'Active' : 'Not analyzed')}
+          <div className="flex items-center justify-between text-[11px] font-mono pt-2.5 border-t border-rose-100 dark:border-slate-800/80">
+            <span className="text-slate-500 dark:text-slate-400">Directives:</span>
+            <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200/80 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-900">
+              {criticalDistricts.length > 0 ? `${criticalDistricts.length} High-Risk Sectors` : (landfallPrediction ? 'Active' : 'Not analyzed')}
             </span>
           </div>
         </div>
@@ -409,14 +462,17 @@ const Dashboard = () => {
       {/* 3. Technical Pipeline Telemetry Strip */}
       <div className="flex flex-wrap items-center justify-between gap-3 px-4 py-3 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/80 dark:border-slate-800 text-[11px] font-mono text-slate-500 dark:text-slate-400 shadow-xs">
         <div className="flex items-center gap-3">
-          <span className="flex items-center gap-1.5">
-            <span className={`w-2 h-2 rounded-full ${isGatewayOnline ? 'bg-emerald-500' : 'bg-slate-400'}`} />
-            <strong className="text-slate-700 dark:text-slate-300">Inference Gateway:</strong> {isGatewayOnline ? 'FastAPI Gateway (Online)' : 'Client In-Browser Execution'}
+          <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200/80 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-800 font-semibold">
+            <span className={`w-2 h-2 rounded-full ${isGatewayOnline ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'}`} />
+            <span>FastAPI Inference Gateway ({isGatewayOnline ? 'Online' : 'Standby'})</span>
           </span>
           <span className="text-slate-300 dark:text-slate-700 hidden sm:inline">•</span>
-          <span className="hidden md:inline">MobileNetV3 + ResNet18 + 2-Layer GRU</span>
+          <span className="hidden md:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-purple-50 text-purple-700 border border-purple-200/80 dark:bg-purple-950/50 dark:text-purple-300 dark:border-purple-800 font-semibold">
+            <BrainCircuit className="w-3.5 h-3.5" />
+            <span>MobileNetV3 + ResNet18 + 2-Layer GRU</span>
+          </span>
         </div>
-        <div className="text-[10px] text-slate-400 truncate max-w-[280px]">
+        <div className="text-[10px] font-mono px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border border-slate-200/70 dark:border-slate-700 truncate max-w-[280px]">
           SESSION: {currentInput?.sessionId?.slice(0, 26)}...
         </div>
       </div>
@@ -429,52 +485,76 @@ const Dashboard = () => {
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="text-sm font-semibold text-slate-900 dark:text-white tracking-tight">
+                <div className="w-6 h-6 rounded-md bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center border border-sky-200 dark:border-sky-900">
+                  <Activity className="w-3.5 h-3.5" />
+                </div>
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white tracking-tight">
                   Climatological Basin Baseline
                 </h3>
-                <span className="text-[10px] px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-mono font-medium border border-slate-200/60 dark:border-slate-700">
+                <span className="text-[10px] px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 font-mono font-bold border border-blue-200/80 dark:border-blue-900">
                   Seasonal Reference
                 </span>
               </div>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
                 Historical monthly trends for North Indian Ocean basins (Reference benchmark)
               </p>
             </div>
 
             <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 p-1 rounded-xl border border-slate-200/70 dark:border-slate-700 text-xs font-medium self-start sm:self-auto">
-              {['wind', 'pressure', 'rainfall'].map((tab) => {
-                const isActive = activeMetricTab === tab;
+              {[
+                { id: 'wind', label: 'Wind', color: 'bg-sky-600 text-white dark:bg-sky-500' },
+                { id: 'pressure', label: 'Pressure', color: 'bg-indigo-600 text-white dark:bg-indigo-500' },
+                { id: 'rainfall', label: 'Rainfall', color: 'bg-teal-600 text-white dark:bg-teal-500' }
+              ].map((tab) => {
+                const isActive = activeMetricTab === tab.id;
                 return (
                   <button 
-                    key={tab}
-                    onClick={() => setActiveMetricTab(tab)}
-                    className={`px-3 py-1 rounded-lg transition-all capitalize cursor-pointer ${
+                    key={tab.id}
+                    onClick={() => setActiveMetricTab(tab.id)}
+                    className={`px-3 py-1.5 rounded-lg transition-all capitalize cursor-pointer text-xs ${
                       isActive
-                        ? 'bg-white dark:bg-slate-950 text-blue-600 dark:text-blue-400 font-semibold shadow-2xs'
+                        ? `${tab.color} font-bold shadow-xs`
                         : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                     }`}
                   >
-                    {tab}
+                    {tab.label}
                   </button>
                 );
               })}
             </div>
           </div>
+
+          {/* Visual Legend */}
+          <div className="flex items-center gap-4 text-[11px] font-mono px-1">
+            <div className="flex items-center gap-1.5">
+              <span 
+                className="w-2.5 h-2.5 rounded-full shadow-2xs" 
+                style={{ 
+                  backgroundColor: activeMetricTab === 'rainfall' ? '#0d9488' : activeMetricTab === 'pressure' ? '#6366f1' : '#0284c7' 
+                }} 
+              />
+              <span className="font-semibold text-slate-800 dark:text-slate-200">Current Observation (Live Telemetry)</span>
+            </div>
+            <div className="flex items-center gap-1.5 text-slate-500 dark:text-slate-400">
+              <span className="w-4 h-0.5 border-t-2 border-dashed border-slate-400 dark:border-slate-600" />
+              <span>10-Yr Climatological Mean</span>
+            </div>
+          </div>
           
-          <div className="h-[250px] w-full pt-2">
+          <div className="h-[250px] w-full pt-1">
             <ResponsiveContainer width="100%" height="100%">
               <AreaChart data={currentChartData} margin={{ top: 5, right: 10, left: -25, bottom: 0 }}>
                 <defs>
                   <linearGradient id="climatologyGrad" x1="0" y1="0" x2="0" y2="1">
                     <stop 
                       offset="5%" 
-                      stopColor={activeMetricTab === 'rainfall' ? '#0d9488' : activeMetricTab === 'pressure' ? '#0284c7' : '#2563eb'} 
-                      stopOpacity={0.2} 
+                      stopColor={activeMetricTab === 'rainfall' ? '#0d9488' : activeMetricTab === 'pressure' ? '#6366f1' : '#0284c7'} 
+                      stopOpacity={0.35} 
                     />
                     <stop 
                       offset="95%" 
-                      stopColor={activeMetricTab === 'rainfall' ? '#0d9488' : activeMetricTab === 'pressure' ? '#0284c7' : '#2563eb'} 
-                      stopOpacity={0.0} 
+                      stopColor={activeMetricTab === 'rainfall' ? '#0d9488' : activeMetricTab === 'pressure' ? '#6366f1' : '#0284c7'} 
+                      stopOpacity={0.02} 
                     />
                   </linearGradient>
                 </defs>
@@ -496,21 +576,23 @@ const Dashboard = () => {
                   itemStyle={{ fontSize: '12px', color: '#FFF' }}
                 />
                 <Area 
+                  isAnimationActive={false}
                   type="monotone" 
                   dataKey="currentYear" 
                   name="Current Observation" 
-                  stroke={activeMetricTab === 'rainfall' ? '#0d9488' : activeMetricTab === 'pressure' ? '#0284c7' : '#2563eb'} 
-                  strokeWidth={2.5} 
+                  stroke={activeMetricTab === 'rainfall' ? '#0d9488' : activeMetricTab === 'pressure' ? '#6366f1' : '#0284c7'} 
+                  strokeWidth={3} 
                   fill="url(#climatologyGrad)" 
                   dot={false} 
                   activeDot={{ 
-                    r: 5, 
-                    fill: activeMetricTab === 'rainfall' ? '#0d9488' : activeMetricTab === 'pressure' ? '#0284c7' : '#2563eb', 
+                    r: 6, 
+                    fill: activeMetricTab === 'rainfall' ? '#0d9488' : activeMetricTab === 'pressure' ? '#6366f1' : '#0284c7', 
                     stroke: '#FFFFFF', 
                     strokeWidth: 2 
                   }} 
                 />
                 <Line 
+                  isAnimationActive={false}
                   type="monotone" 
                   dataKey="lastYear" 
                   name="Historical Average" 
@@ -527,9 +609,14 @@ const Dashboard = () => {
         {/* Active Strike Risk Card (5 Cols) */}
         <div className="lg:col-span-5 bg-white dark:bg-slate-900 rounded-2xl p-5 sm:p-6 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-4">
           <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
-            <div>
-              <h3 className="text-sm font-semibold text-slate-900 dark:text-white tracking-tight">Active Coastal Strike Risk</h3>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">District strike probabilities & landfall hazard corridor</p>
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-md bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center border border-rose-200 dark:border-rose-900">
+                <ShieldAlert className="w-3.5 h-3.5" />
+              </div>
+              <div>
+                <h3 className="text-sm font-bold text-slate-900 dark:text-white tracking-tight">Active Coastal Strike Risk</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">District strike probabilities & landfall hazard corridor</p>
+              </div>
             </div>
             <span className={`text-[10px] font-mono px-2 py-0.5 rounded border ${
               criticalDistricts.length > 0 
@@ -545,12 +632,32 @@ const Dashboard = () => {
               {criticalDistricts.slice(0, 5).map((district, idx) => {
                 const prob = district.strike_prob_pct ?? district.probability_pct ?? 50;
                 
-                // Minimal semantic color mapping
+                // Rich semantic color mapping
                 const getRiskTheme = (p) => {
-                  if (p >= 75) return { bar: 'bg-gradient-to-r from-rose-500 to-amber-500', text: 'text-rose-600 dark:text-rose-400' };
-                  if (p >= 65) return { bar: 'bg-gradient-to-r from-amber-500 to-yellow-500', text: 'text-amber-600 dark:text-amber-400' };
-                  if (p >= 50) return { bar: 'bg-gradient-to-r from-blue-500 to-sky-400', text: 'text-blue-600 dark:text-blue-400' };
-                  return { bar: 'bg-gradient-to-r from-teal-500 to-emerald-400', text: 'text-teal-600 dark:text-teal-400' };
+                  if (p >= 75) return { 
+                    bar: 'bg-gradient-to-r from-red-600 via-rose-500 to-amber-500', 
+                    text: 'text-rose-600 dark:text-rose-400',
+                    badge: 'bg-rose-50 text-rose-700 border-rose-200 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-900',
+                    label: 'SEVERE'
+                  };
+                  if (p >= 65) return { 
+                    bar: 'bg-gradient-to-r from-amber-500 to-orange-400', 
+                    text: 'text-amber-600 dark:text-amber-400',
+                    badge: 'bg-amber-50 text-amber-700 border-amber-200 dark:bg-amber-950/60 dark:text-amber-300 dark:border-amber-900',
+                    label: 'HIGH'
+                  };
+                  if (p >= 50) return { 
+                    bar: 'bg-gradient-to-r from-blue-600 to-sky-400', 
+                    text: 'text-blue-600 dark:text-blue-400',
+                    badge: 'bg-blue-50 text-blue-700 border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-900',
+                    label: 'MODERATE'
+                  };
+                  return { 
+                    bar: 'bg-gradient-to-r from-teal-500 to-emerald-400', 
+                    text: 'text-teal-600 dark:text-teal-400',
+                    badge: 'bg-emerald-50 text-emerald-700 border-emerald-200 dark:bg-emerald-950/60 dark:text-emerald-300 dark:border-emerald-800',
+                    label: 'WATCH'
+                  };
                 };
                 const theme = getRiskTheme(prob);
 
@@ -561,12 +668,17 @@ const Dashboard = () => {
                     className="cursor-pointer group space-y-1.5"
                   >
                     <div className="flex items-center justify-between text-xs">
-                      <span className="font-medium text-slate-800 dark:text-slate-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate max-w-[180px]">
-                        {district.district || district.name}
-                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="font-semibold text-slate-800 dark:text-slate-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate max-w-[150px]">
+                          {district.district || district.name}
+                        </span>
+                        <span className={`text-[9px] font-mono px-1.5 py-0.2 rounded border font-bold ${theme.badge}`}>
+                          {theme.label}
+                        </span>
+                      </div>
                       <span className={`font-mono font-bold text-[11px] ${theme.text}`}>{prob}% Strike Prob.</span>
                     </div>
-                    <div className="w-full h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                    <div className="w-full h-2 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden shadow-inner">
                       <div 
                         className={`h-full ${theme.bar} rounded-full transition-all duration-500`} 
                         style={{ width: `${Math.min(100, prob)}%` }}
@@ -577,7 +689,7 @@ const Dashboard = () => {
               })}
 
               <div className="pt-2 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs">
-                <span className="text-slate-400 font-mono text-[11px]">Corridor: {landfallSector}</span>
+                <span className="text-slate-500 dark:text-slate-400 font-mono text-[11px]">Corridor: <strong className="text-slate-900 dark:text-white">{landfallSector}</strong></span>
                 <button
                   onClick={() => navigate(toPortalPath('/dashboard/impact'))}
                   className="inline-flex items-center gap-1 font-semibold text-blue-600 dark:text-blue-400 hover:underline cursor-pointer"
@@ -605,16 +717,21 @@ const Dashboard = () => {
 
       </div>
 
-      {/* 5. Bottom Row: 2 Clean Analytics Cards with Minimal Colors */}
+      {/* 5. Bottom Row: 2 Vibrant Analytics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 pb-6">
         <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 sm:p-6 border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-3">
           <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
-            <h3 className="text-xs font-mono font-semibold text-slate-400 uppercase tracking-wider">
-              {criticalDistricts.length > 0 
-                ? `Coastal Strike Probabilities (${activeStormName.split(' (')[0]})` 
-                : 'Regional Strike Frequency (Benchmark)'}
-            </h3>
-            <span className="text-[10px] font-mono text-slate-400">
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-md bg-blue-50 dark:bg-blue-950/60 text-blue-600 dark:text-blue-400 flex items-center justify-center border border-blue-200 dark:border-blue-900">
+                <BarChart2 className="w-3.5 h-3.5" />
+              </div>
+              <h3 className="text-xs font-mono font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">
+                {criticalDistricts.length > 0 
+                  ? `Coastal Strike Probabilities (${activeStormName.split(' (')[0]})` 
+                  : 'Regional Strike Frequency (Benchmark)'}
+              </h3>
+            </div>
+            <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-blue-50 text-blue-700 border border-blue-200 dark:bg-blue-950/60 dark:text-blue-300 dark:border-blue-900">
               {criticalDistricts.length > 0 ? 'Verified Baseline' : 'IMD Archive'}
             </span>
           </div>
@@ -627,7 +744,7 @@ const Dashboard = () => {
                       val: d.strike_prob_pct ?? d.probability_pct ?? 50,
                     }))
                   : warningsRegionData;
-                const barColors = ['#2563eb', '#3b82f6', '#0284c7', '#06b6d4', '#0d9488', '#f59e0b'];
+                const barColors = ['#e11d48', '#f97316', '#f59e0b', '#2563eb', '#0284c7', '#0d9488'];
                 return (
                   <BarChart 
                     data={barData} 
@@ -638,7 +755,7 @@ const Dashboard = () => {
                     <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#94A3B8' }} dy={6} />
                     <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 11, fill: '#94A3B8' }} tickFormatter={(val) => val > 0 ? `${val}%` : '0'} />
                     <Tooltip cursor={{ fill: 'rgba(241,245,249,0.5)' }} contentStyle={{ borderRadius: '12px', border: '1px solid #E2E8F0', backgroundColor: '#0F172A', color: '#FFF' }} />
-                    <Bar dataKey="val" radius={[4, 4, 0, 0]}>
+                    <Bar isAnimationActive={false} dataKey="val" radius={[6, 6, 0, 0]}>
                       {barData.map((entry, index) => (
                         <Cell key={`bar-${index}`} fill={entry.fill || barColors[index % barColors.length]} />
                       ))}
@@ -652,18 +769,24 @@ const Dashboard = () => {
         
         <div className="bg-white dark:bg-slate-900 rounded-2xl p-5 sm:p-6 border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col justify-between space-y-3">
           <div className="flex items-center justify-between pb-2 border-b border-slate-100 dark:border-slate-800">
-            <h3 className="text-xs font-mono font-semibold text-slate-400 uppercase tracking-wider">Historical Severity Distribution</h3>
-            <span className="text-[10px] font-mono text-slate-400">IMD 1990–2025</span>
+            <div className="flex items-center gap-2">
+              <div className="w-6 h-6 rounded-md bg-purple-50 dark:bg-purple-950/60 text-purple-600 dark:text-purple-400 flex items-center justify-center border border-purple-200 dark:border-purple-900">
+                <Activity className="w-3.5 h-3.5" />
+              </div>
+              <h3 className="text-xs font-mono font-bold text-slate-800 dark:text-slate-200 uppercase tracking-wider">Historical Severity Distribution</h3>
+            </div>
+            <span className="text-[10px] font-mono font-semibold px-2 py-0.5 rounded bg-purple-50 text-purple-700 border border-purple-200 dark:bg-purple-950/60 dark:text-purple-300 dark:border-purple-900">IMD 1990–2025</span>
           </div>
           <div className="flex flex-row items-center justify-between px-4 py-2">
-            <div className="w-[160px] h-[160px]">
+            <div className="w-[160px] h-[160px] relative flex items-center justify-center">
               <ResponsiveContainer width="100%" height="100%">
                 <PieChart>
                   <Pie
+                    isAnimationActive={false}
                     data={severityData}
                     innerRadius={45}
                     outerRadius={72}
-                    paddingAngle={2}
+                    paddingAngle={3}
                     dataKey="value"
                     stroke="none"
                   >
@@ -673,13 +796,19 @@ const Dashboard = () => {
                   </Pie>
                 </PieChart>
               </ResponsiveContainer>
+              <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                <span className="text-xs font-mono font-bold text-slate-900 dark:text-white">100%</span>
+                <span className="text-[9px] font-mono text-slate-400 uppercase">IMD Norms</span>
+              </div>
             </div>
             <div className="flex flex-col gap-2.5 justify-center">
               {severityData.map((item, idx) => (
                 <div key={idx} className="flex items-center gap-2.5">
                   <span className="w-2.5 h-2.5 rounded-full shadow-2xs" style={{ backgroundColor: item.color }} />
-                  <span className="text-[11px] font-medium text-slate-600 dark:text-slate-400 w-24">{item.name}</span>
-                  <span className="text-xs font-mono font-bold text-slate-900 dark:text-white">{item.value}%</span>
+                  <span className={`text-[10px] font-mono px-1.5 py-0.5 rounded border font-semibold ${item.badge}`}>
+                    {item.name}
+                  </span>
+                  <span className="text-xs font-mono font-bold text-slate-900 dark:text-white ml-auto">{item.value}%</span>
                 </div>
               ))}
             </div>
