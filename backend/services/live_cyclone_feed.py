@@ -451,3 +451,4 @@ def get_live_cyclone_catalog() -> Dict[str, Any]:
     _cached_feed = result
     _last_feed_time = now
     return result
+
