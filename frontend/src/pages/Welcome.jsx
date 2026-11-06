@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PublicNavbar from '../components/PublicNavbar';
 import {
-  Wind, Gauge, Compass, MapPin, Crosshair, ArrowRight,
+  Wind, Gauge, MapPin, Crosshair, ArrowRight,
   ShieldAlert, RefreshCw, Eye, Sparkles, BrainCircuit,
-  ExternalLink, Layers, Radio, ChevronRight, Activity
+  Layers, Radio, ChevronRight, Activity, Bell, Compass
 } from 'lucide-react';
 import ThreeCycloneGlobe from '../components/ThreeCycloneGlobe';
 import { 
@@ -299,7 +299,7 @@ const Welcome = () => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-white text-zinc-900 flex flex-col font-sans selection:bg-zinc-900 selection:text-white">
+    <div className="min-h-screen bg-[#F8FAFC] dark:bg-slate-950 text-slate-800 dark:text-slate-100 flex flex-col font-sans selection:bg-blue-600 selection:text-white transition-colors duration-200">
       
       {/* 1. Global Navigation Bar */}
       <PublicNavbar 
@@ -307,171 +307,252 @@ const Welcome = () => {
         onToggleHindi={() => setIsHindi(!isHindi)} 
       />
 
-      {/* 2. Urgent Live Meteorological Advisory Ticker */}
-      <div className="border-b border-zinc-200 bg-zinc-50/80 py-2.5 px-4 sm:px-6 overflow-hidden">
+      {/* 2. Vibrant Meteorological Advisory Ticker */}
+      <div className="border-b border-slate-200/80 dark:border-slate-800 bg-white/80 dark:bg-slate-900/80 backdrop-blur-md py-2.5 px-4 sm:px-6 overflow-hidden shadow-xs">
         <div className="max-w-7xl mx-auto flex items-center gap-3 text-xs font-mono">
-          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-black text-white font-bold tracking-wider text-[10px] shrink-0 uppercase">
-            <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+          <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-rose-500 text-white font-bold tracking-wider text-[10px] shrink-0 uppercase shadow-2xs">
+            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
             {isHindi ? 'राष्ट्रीय चेतावनी' : 'NATIONAL ADVISORY'}
           </span>
-          <div className="overflow-x-auto whitespace-nowrap text-zinc-600 flex items-center gap-4 scrollbar-none">
+          <div className="overflow-x-auto whitespace-nowrap text-slate-600 dark:text-slate-300 flex items-center gap-4 scrollbar-none text-[11px]">
             {liveNews.slice(0, 4).map((item, idx) => (
               <span key={item.id || idx} className="inline-flex items-center gap-2">
-                <span className="text-zinc-900 font-semibold">{item.source || 'IMD RSMC'}:</span>
-                <span>{item.title}</span>
-                {idx < 3 && <span className="text-zinc-300">•</span>}
+                <span className="font-semibold text-blue-600 dark:text-sky-400">{item.source || 'IMD RSMC'}:</span>
+                <span className="text-slate-800 dark:text-slate-200">{item.title}</span>
+                {idx < 3 && <span className="text-slate-300 dark:text-slate-700">•</span>}
               </span>
             ))}
           </div>
         </div>
       </div>
 
-      {/* 3. HERO SECTION (FOCUSED, CLEAN, MINIMALISTIC HERO) */}
+      {/* 3. HERO SECTION (COLORFUL, MODERN, DASHBOARD-INSPIRED HERO) */}
       <section 
         id="hero-cyclone-view" 
         className="flex-1 flex flex-col justify-center py-8 sm:py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full"
       >
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
           
-          {/* LEFT COLUMN: Clean Identity, Live Stats, and Action CTAs (6 cols) */}
+          {/* LEFT COLUMN: Clean Identity, Colorful Stats, and Action CTAs (6 cols) */}
           <div className="lg:col-span-6 space-y-6">
             
-            {/* Top Operational Telemetry Meta */}
+            {/* Top Operational Status Badges */}
             <div className="space-y-3">
-              <div className="flex flex-wrap items-center gap-2 text-xs font-mono uppercase tracking-wider text-zinc-400">
-                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md text-[10px] font-mono uppercase font-bold tracking-wider bg-black text-white">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              <div className="flex flex-wrap items-center gap-2 text-xs font-mono">
+                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[10px] font-mono uppercase font-bold tracking-wider bg-rose-50 text-rose-700 border border-rose-200/80 dark:bg-rose-950/60 dark:text-rose-300 dark:border-rose-900 shadow-2xs">
+                  <span className="relative flex h-2 w-2">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
+                    <span className="relative inline-flex rounded-full h-2 w-2 bg-rose-500"></span>
+                  </span>
                   {current.isLive ? 'ACTIVE CYCLONE WATCH' : 'LIVE OBSERVATION'}
                 </span>
-                <span>•</span>
-                <span>{isHindi ? current.basinHindi : current.basin}</span>
-                <span>•</span>
-                <span>INSAT-3DR / ISRO MOSDAC</span>
+                
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-mono uppercase font-semibold bg-blue-50 text-blue-700 border border-blue-200/80 dark:bg-blue-950/50 dark:text-blue-300 dark:border-blue-900">
+                  <Compass className="w-3 h-3 text-blue-500" />
+                  {isHindi ? current.basinHindi : current.basin}
+                </span>
+
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-mono uppercase font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200/80 dark:bg-emerald-950/50 dark:text-emerald-300 dark:border-emerald-900">
+                  <Activity className="w-3 h-3 text-emerald-500" />
+                  INSAT-3DR / ISRO
+                </span>
               </div>
 
-              {/* Bold Minimalist Title */}
-              <div className="space-y-1">
-                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black text-black tracking-tight uppercase font-sans leading-none">
-                  {isHindi ? (current.shortNameHindi || current.shortName) : current.shortName}
+              {/* Cyclone Title & Category Tag */}
+              <div className="space-y-1.5">
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-black tracking-tight text-slate-900 dark:text-white font-heading leading-tight">
+                  <span className="bg-gradient-to-r from-slate-950 via-blue-950 to-indigo-900 dark:from-white dark:via-sky-200 dark:to-blue-400 bg-clip-text text-transparent">
+                    {isHindi ? (current.shortNameHindi || current.shortName) : current.shortName}
+                  </span>
+                  <span className="text-slate-400 dark:text-slate-500 font-mono text-2xl sm:text-3xl ml-2 font-normal">
+                    (2026)
+                  </span>
                 </h1>
-                <p className="text-sm sm:text-base font-mono text-zinc-500 font-medium pt-1">
-                  (2026) • <span className="text-zinc-900 font-semibold">{isHindi ? current.stageHindi : current.stage}</span>
-                </p>
+                
+                <div className="flex flex-wrap items-center gap-2 pt-0.5">
+                  <span className="px-2.5 py-0.5 rounded-md text-xs font-semibold bg-amber-50 text-amber-800 border border-amber-200 dark:bg-amber-950/50 dark:text-amber-300 dark:border-amber-900">
+                    {isHindi ? current.stageHindi : current.stage}
+                  </span>
+                  <span className="px-2.5 py-0.5 rounded-md text-xs font-semibold bg-rose-50 text-rose-800 border border-rose-200 dark:bg-rose-950/50 dark:text-rose-300 dark:border-rose-900">
+                    {isHindi ? current.threatHindi : current.threat}
+                  </span>
+                </div>
               </div>
 
               {/* 2-Line Concise Intelligence Summary */}
-              <p className="text-sm sm:text-[15px] text-zinc-600 leading-relaxed max-w-xl pt-1">
+              <p className="text-sm sm:text-[15px] text-slate-600 dark:text-slate-300 leading-relaxed max-w-xl pt-1">
                 {isHindi 
                   ? `वर्तमान स्थिति ${current.lat}°N, ${current.lon}°E पर केंद्रित है, जिसमें ${current.wind} किमी/घंटा की सतत हवाएं दर्ज की गई हैं। एआई न्यूरल प्रक्षेपवक्र मॉडल द्वारा ${current.targetHindi || current.target} की ओर अग्रगमन अनुमानित है।`
-                  : `Currently centered at ${current.lat}°N, ${current.lon}°E with sustained core winds of ${current.wind} km/h. Autonomous AI trajectory ensemble projects high-impact landfall along the ${current.target}.`
+                  : `Centered at ${current.lat}°N, ${current.lon}°E with sustained core winds of ${current.wind} km/h (Gusts: ${current.gusts || Math.round(current.wind * 1.25)} km/h). Autonomous AI trajectory ensemble projects high-impact landfall along the ${current.target}.`
                 }
               </p>
             </div>
 
-            {/* 4 Core Quick Telemetry Metrics (Minimalist Ribbon) */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 py-2">
-              {/* Metric 1: Sustained Wind */}
-              <div className="bg-zinc-50 border border-zinc-200/80 rounded-xl p-3">
-                <div className="flex items-center gap-1 text-[11px] font-mono text-zinc-500 uppercase">
-                  <Wind className="w-3.5 h-3.5 text-zinc-800" />
-                  <span>Wind</span>
+            {/* 4 Colorful Telemetry Metric Cards (Vibrant Dashboard Aesthetic) */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 py-1">
+              
+              {/* Card 1: Sustained Wind (Sky / Blue Theme) */}
+              <div 
+                onClick={() => navigate('/threat-map')}
+                className="bg-white dark:bg-slate-900 border border-sky-200/80 dark:border-sky-900/60 hover:border-sky-400 dark:hover:border-sky-600 rounded-2xl p-3.5 shadow-xs hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-center justify-between">
+                    <div className="w-7 h-7 rounded-lg bg-sky-50 dark:bg-sky-950/60 text-sky-600 dark:text-sky-400 flex items-center justify-center border border-sky-100 dark:border-sky-900">
+                      <Wind className="w-3.5 h-3.5" />
+                    </div>
+                    <span className="text-[10px] font-mono font-bold text-sky-600 dark:text-sky-400 uppercase">
+                      {Math.round(parseInt(current.wind || 40) * 0.539957)} KT
+                    </span>
+                  </div>
+                  <div className="mt-2.5 flex items-baseline gap-1">
+                    <span className="text-2xl sm:text-3xl font-bold font-mono text-slate-900 dark:text-white">{current.wind}</span>
+                    <span className="text-[11px] font-mono font-semibold text-slate-400">km/h</span>
+                  </div>
                 </div>
-                <div className="mt-1 flex items-baseline gap-1">
-                  <span className="text-2xl font-mono font-bold text-black">{current.wind}</span>
-                  <span className="text-[10px] font-mono text-zinc-400">km/h</span>
+                <div className="mt-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                  <div className="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden mb-1">
+                    <div className="bg-gradient-to-r from-sky-400 to-blue-600 h-full rounded-full" style={{ width: `${Math.min(100, (parseInt(current.wind || 40) / 250) * 100)}%` }} />
+                  </div>
+                  <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400 truncate block">
+                    Gusts: {current.gusts || Math.round(current.wind * 1.25)} km/h
+                  </span>
                 </div>
-                <span className="text-[10px] font-mono text-zinc-500 block truncate">
-                  Gusts: {current.gusts || Math.round(current.wind * 1.25)}
-                </span>
               </div>
 
-              {/* Metric 2: Central Pressure */}
-              <div className="bg-zinc-50 border border-zinc-200/80 rounded-xl p-3">
-                <div className="flex items-center gap-1 text-[11px] font-mono text-zinc-500 uppercase">
-                  <Gauge className="w-3.5 h-3.5 text-zinc-800" />
-                  <span>Pressure</span>
+              {/* Card 2: Central Pressure (Indigo / Violet Theme) */}
+              <div 
+                onClick={() => navigate('/threat-map')}
+                className="bg-white dark:bg-slate-900 border border-indigo-200/80 dark:border-indigo-900/60 hover:border-indigo-400 dark:hover:border-indigo-600 rounded-2xl p-3.5 shadow-xs hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-center justify-between">
+                    <div className="w-7 h-7 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center border border-indigo-100 dark:border-indigo-900">
+                      <Gauge className="w-3.5 h-3.5" />
+                    </div>
+                    <span className="text-[10px] font-mono font-bold text-indigo-600 dark:text-indigo-400 uppercase">
+                      MSLP
+                    </span>
+                  </div>
+                  <div className="mt-2.5 flex items-baseline gap-1">
+                    <span className="text-2xl sm:text-3xl font-bold font-mono text-slate-900 dark:text-white">{current.pressure}</span>
+                    <span className="text-[11px] font-mono font-semibold text-slate-400">hPa</span>
+                  </div>
                 </div>
-                <div className="mt-1 flex items-baseline gap-1">
-                  <span className="text-2xl font-mono font-bold text-black">{current.pressure}</span>
-                  <span className="text-[10px] font-mono text-zinc-400">hPa</span>
+                <div className="mt-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                  <div className="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden mb-1">
+                    <div className="bg-gradient-to-r from-indigo-500 to-purple-600 h-full rounded-full" style={{ width: `${Math.max(15, Math.min(100, (1013 - parseInt(current.pressure || 1000)) * 1.5))}%` }} />
+                  </div>
+                  <span className="text-[10px] font-mono text-indigo-600 dark:text-indigo-400 truncate block font-medium">
+                    -{Math.max(0, 1013 - parseInt(current.pressure || 1004))} hPa Deficit
+                  </span>
                 </div>
-                <span className="text-[10px] font-mono text-zinc-500 block truncate">
-                  MSLP Deficit
-                </span>
               </div>
 
-              {/* Metric 3: Category / Intensity */}
-              <div className="bg-zinc-50 border border-zinc-200/80 rounded-xl p-3">
-                <div className="flex items-center gap-1 text-[11px] font-mono text-zinc-500 uppercase">
-                  <Activity className="w-3.5 h-3.5 text-zinc-800" />
-                  <span>Intensity</span>
+              {/* Card 3: Intensity / Dvorak (Rose / Red Theme) */}
+              <div 
+                onClick={() => navigate('/ai-cyclone')}
+                className="bg-white dark:bg-slate-900 border border-rose-200/80 dark:border-rose-900/60 hover:border-rose-400 dark:hover:border-rose-600 rounded-2xl p-3.5 shadow-xs hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-center justify-between">
+                    <div className="w-7 h-7 rounded-lg bg-rose-50 dark:bg-rose-950/60 text-rose-600 dark:text-rose-400 flex items-center justify-center border border-rose-100 dark:border-rose-900">
+                      <Activity className="w-3.5 h-3.5" />
+                    </div>
+                    <span className="text-[10px] font-mono font-bold text-rose-600 dark:text-rose-400 uppercase">
+                      Category 4
+                    </span>
+                  </div>
+                  <div className="mt-2.5 flex items-baseline gap-1">
+                    <span className="text-2xl sm:text-3xl font-bold font-mono text-slate-900 dark:text-white">{current.dvorak || 'T6.0'}</span>
+                    <span className="text-[11px] font-mono font-semibold text-slate-400">Dvorak</span>
+                  </div>
                 </div>
-                <div className="mt-1 flex items-baseline gap-1">
-                  <span className="text-2xl font-mono font-bold text-black">{current.dvorak || 'T6.0'}</span>
+                <div className="mt-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                  <div className="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden mb-1">
+                    <div className="bg-gradient-to-r from-rose-500 to-amber-500 h-full rounded-full w-4/5" />
+                  </div>
+                  <span className="text-[10px] font-mono text-rose-600 dark:text-rose-400 truncate block font-medium">
+                    Extreme Eyewall
+                  </span>
                 </div>
-                <span className="text-[10px] font-mono text-zinc-500 block truncate">
-                  Cat 4 Equiv
-                </span>
               </div>
 
-              {/* Metric 4: Eye Fix */}
-              <div className="bg-zinc-50 border border-zinc-200/80 rounded-xl p-3">
-                <div className="flex items-center gap-1 text-[11px] font-mono text-zinc-500 uppercase">
-                  <Crosshair className="w-3.5 h-3.5 text-zinc-800" />
-                  <span>Eye Fix</span>
+              {/* Card 4: Eye Fix Coordinates (Emerald / Teal Theme) */}
+              <div 
+                onClick={() => navigate('/threat-map')}
+                className="bg-white dark:bg-slate-900 border border-emerald-200/80 dark:border-emerald-900/60 hover:border-emerald-400 dark:hover:border-emerald-600 rounded-2xl p-3.5 shadow-xs hover:shadow-md transition-all cursor-pointer group flex flex-col justify-between"
+              >
+                <div>
+                  <div className="flex items-center justify-between">
+                    <div className="w-7 h-7 rounded-lg bg-emerald-50 dark:bg-emerald-950/60 text-emerald-600 dark:text-emerald-400 flex items-center justify-center border border-emerald-100 dark:border-emerald-900">
+                      <Crosshair className="w-3.5 h-3.5" />
+                    </div>
+                    <span className="text-[10px] font-mono font-bold text-emerald-600 dark:text-emerald-400 uppercase">
+                      Eye Fix
+                    </span>
+                  </div>
+                  <div className="mt-2.5 flex items-baseline gap-1">
+                    <span className="text-xl sm:text-2xl font-bold font-mono text-slate-900 dark:text-white">{current.lat}°N</span>
+                    <span className="text-[11px] font-mono font-semibold text-emerald-600 dark:text-emerald-400">{current.lon}°E</span>
+                  </div>
                 </div>
-                <div className="mt-1 flex items-baseline gap-1">
-                  <span className="text-base font-mono font-bold text-black">{current.lat}°N</span>
+                <div className="mt-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+                  <div className="w-full bg-slate-100 dark:bg-slate-800 h-1.5 rounded-full overflow-hidden mb-1">
+                    <div className="bg-gradient-to-r from-emerald-400 to-teal-600 h-full rounded-full w-full" />
+                  </div>
+                  <span className="text-[10px] font-mono text-slate-500 dark:text-slate-400 truncate block">
+                    Telemetry Active
+                  </span>
                 </div>
-                <span className="text-[10px] font-mono text-zinc-500 block truncate">
-                  {current.lon}°E Lon
-                </span>
               </div>
+
             </div>
 
             {/* Primary Action Buttons (Call To Actions) */}
             <div className="flex flex-wrap items-center gap-3 pt-1">
               <button
                 onClick={() => navigate('/ai-cyclone')}
-                className="px-6 py-3 rounded-xl bg-black hover:bg-zinc-800 text-white font-semibold text-xs transition-all shadow-sm flex items-center gap-2 cursor-pointer"
+                className="px-6 py-3 rounded-xl bg-gradient-to-r from-blue-600 via-indigo-600 to-blue-700 hover:from-blue-700 hover:to-indigo-800 text-white font-semibold text-xs sm:text-sm transition-all shadow-sm hover:shadow-md flex items-center gap-2 cursor-pointer"
               >
-                <BrainCircuit className="w-4 h-4 text-emerald-400" />
+                <BrainCircuit className="w-4 h-4 text-sky-200" />
                 <span>{isHindi ? 'लाइव ट्रैक एवं एआई मॉडल खोलें' : 'Track Cyclone Live'}</span>
                 <ArrowRight className="w-4 h-4" />
               </button>
 
               <button
                 onClick={() => navigate('/threat-map')}
-                className="px-5 py-3 rounded-xl border border-zinc-300 bg-white hover:bg-zinc-100 text-zinc-800 font-semibold text-xs transition-all shadow-2xs flex items-center gap-2 cursor-pointer"
+                className="px-5 py-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-800 dark:text-slate-200 font-semibold text-xs sm:text-sm transition-all shadow-xs flex items-center gap-2 cursor-pointer"
               >
-                <ShieldAlert className="w-4 h-4 text-zinc-900" />
+                <ShieldAlert className="w-4 h-4 text-rose-500" />
                 <span>{isHindi ? 'तटीय खतरा मैट्रिक्स' : 'Coastal Threat Matrix'}</span>
               </button>
 
               <button
                 onClick={() => navigate('/bulletin')}
-                className="px-4 py-3 rounded-xl text-zinc-600 hover:text-black font-semibold text-xs transition-colors cursor-pointer"
+                className="px-4 py-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs sm:text-sm transition-colors cursor-pointer flex items-center gap-1.5"
               >
+                <Bell className="w-3.5 h-3.5 text-amber-500" />
                 <span>{isHindi ? 'आधिकारिक बुलेटिन' : 'Bulletins & Advisories'}</span>
               </button>
             </div>
 
             {/* Live Cyclone Switcher Pills */}
-            <div className="pt-2 border-t border-zinc-100 space-y-2">
-              <div className="flex items-center justify-between text-[11px] font-mono text-zinc-400">
-                <span className="uppercase tracking-wider">Active Monitored Storms</span>
+            <div className="pt-2 border-t border-slate-200/80 dark:border-slate-800 space-y-2">
+              <div className="flex items-center justify-between text-[11px] font-mono text-slate-400">
+                <span className="uppercase tracking-wider font-semibold">Active Monitored Systems</span>
                 <button
                   onClick={fetchLiveBackendData}
                   disabled={isSyncing}
                   title="Refresh Telemetry"
-                  className="flex items-center gap-1 text-zinc-500 hover:text-black transition-colors cursor-pointer"
+                  className="flex items-center gap-1 text-blue-600 dark:text-sky-400 hover:underline transition-colors cursor-pointer font-medium"
                 >
                   <RefreshCw className={`w-3 h-3 ${isSyncing ? 'animate-spin' : ''}`} />
                   <span>{isSyncing ? 'Syncing...' : 'Sync Live'}</span>
                 </button>
               </div>
 
-              <div className="flex items-center gap-1.5 overflow-x-auto max-w-full pb-1 scrollbar-none">
+              <div className="flex items-center gap-2 overflow-x-auto max-w-full pb-1 scrollbar-none">
                 {Object.values(systems).map((sys) => {
                   const isSelected = activeId === sys.id;
                   const label = sys.shortName || sys.name || sys.id.toUpperCase();
@@ -479,18 +560,18 @@ const Welcome = () => {
                     <button
                       key={sys.id}
                       onClick={() => setActiveId(sys.id)}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer text-xs font-mono font-medium whitespace-nowrap ${
+                      className={`flex items-center gap-2 px-3.5 py-2 rounded-xl transition-all cursor-pointer text-xs font-mono font-medium whitespace-nowrap border ${
                         isSelected
-                          ? 'bg-black text-white shadow-xs font-semibold'
-                          : 'bg-zinc-100 text-zinc-600 hover:text-black hover:bg-zinc-200/80 border border-zinc-200'
+                          ? 'bg-slate-900 text-white dark:bg-white dark:text-slate-950 font-bold border-transparent shadow-sm'
+                          : 'bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-300 hover:text-blue-600 dark:hover:text-sky-400 border-slate-200/80 dark:border-slate-800 hover:border-blue-300 shadow-2xs'
                       }`}
                     >
-                      <span className={`w-1.5 h-1.5 rounded-full ${
-                        isSelected ? 'bg-emerald-400 animate-pulse' : 'bg-emerald-600'
+                      <span className={`w-2 h-2 rounded-full ${
+                        isSelected ? 'bg-emerald-400 animate-pulse' : 'bg-emerald-500'
                       }`} />
                       <span>{label}</span>
                       {isSelected && (
-                        <span className="text-[9px] px-1 rounded bg-zinc-800 text-emerald-400 uppercase font-mono font-medium">
+                        <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold uppercase tracking-wider">
                           Live
                         </span>
                       )}
@@ -502,26 +583,26 @@ const Welcome = () => {
 
           </div>
 
-          {/* RIGHT COLUMN: Daylight 3D Earth Globe Console (6 cols) */}
+          {/* RIGHT COLUMN: 3D Earth Globe Aerospace Console (6 cols) */}
           <div className="lg:col-span-6 flex flex-col items-center justify-center">
-            <div className="w-full h-[460px] sm:h-[520px] rounded-3xl border border-zinc-200 bg-zinc-950 overflow-hidden shadow-sm relative group">
+            <div className="w-full h-[480px] sm:h-[540px] rounded-3xl border border-slate-800/80 bg-slate-950 overflow-hidden shadow-2xl relative group ring-1 ring-white/10">
               
               {/* Tactical Corner Crosshairs */}
-              <div className="absolute top-3 left-3 text-zinc-500 font-mono text-xs select-none pointer-events-none z-10">+</div>
-              <div className="absolute top-3 right-3 text-zinc-500 font-mono text-xs select-none pointer-events-none z-10">+</div>
-              <div className="absolute bottom-3 left-3 text-zinc-500 font-mono text-xs select-none pointer-events-none z-10">+</div>
-              <div className="absolute bottom-3 right-3 text-zinc-500 font-mono text-xs select-none pointer-events-none z-10">+</div>
+              <div className="absolute top-3 left-3 text-cyan-500/40 font-mono text-xs select-none pointer-events-none z-10">+</div>
+              <div className="absolute top-3 right-3 text-cyan-500/40 font-mono text-xs select-none pointer-events-none z-10">+</div>
+              <div className="absolute bottom-3 left-3 text-cyan-500/40 font-mono text-xs select-none pointer-events-none z-10">+</div>
+              <div className="absolute bottom-3 right-3 text-cyan-500/40 font-mono text-xs select-none pointer-events-none z-10">+</div>
 
               {/* Top HUD Console */}
               <div className="absolute top-3 inset-x-3 flex items-center justify-between pointer-events-none z-10 px-2">
-                <div className="bg-black/80 backdrop-blur-md px-3 py-1.5 rounded-xl border border-zinc-800 text-[11px] text-zinc-200 font-mono flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                <div className="bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700/60 shadow-lg text-[11px] text-slate-200 font-mono flex items-center gap-2">
+                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
                   <span className="font-bold text-white uppercase">{current.shortName}</span>
-                  <span className="text-zinc-500">•</span>
-                  <span>{current.lat}°N, {current.lon}°E</span>
+                  <span className="text-slate-500">•</span>
+                  <span className="text-cyan-400">{current.lat}°N, {current.lon}°E</span>
                 </div>
 
-                <div className="bg-black/80 backdrop-blur-md px-2.5 py-1.5 rounded-xl border border-zinc-800 text-[11px] text-zinc-400 font-mono">
+                <div className="bg-slate-900/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-slate-700/60 shadow-lg text-[11px] text-rose-400 font-mono font-bold">
                   {current.wind} KM/H
                 </div>
               </div>
@@ -534,11 +615,12 @@ const Welcome = () => {
               />
 
               {/* Bottom HUD Helper */}
-              <div className="absolute bottom-3 inset-x-3 flex items-center justify-between pointer-events-none z-10 px-2 text-[10px] font-mono text-zinc-400">
-                <span className="bg-black/70 backdrop-blur-sm px-2 py-1 rounded-md border border-zinc-800">
-                  INSAT-3DR SATELLITE TELEMETRY
+              <div className="absolute bottom-3 inset-x-3 flex items-center justify-between pointer-events-none z-10 px-2 text-[10px] font-mono text-slate-300">
+                <span className="bg-slate-900/80 backdrop-blur-sm px-2.5 py-1 rounded-md border border-slate-700/60 flex items-center gap-1.5">
+                  <span className="w-1.5 h-1.5 rounded-full bg-blue-400" />
+                  INSAT-3DR ORBITAL SATELLITE
                 </span>
-                <span className="bg-black/70 backdrop-blur-sm px-2 py-1 rounded-md border border-zinc-800">
+                <span className="bg-slate-900/80 backdrop-blur-sm px-2.5 py-1 rounded-md border border-slate-700/60 text-slate-400">
                   DRAG TO ROTATE • SCROLL TO ZOOM
                 </span>
               </div>
@@ -549,87 +631,103 @@ const Welcome = () => {
         </div>
       </section>
 
-      {/* 4. BOTTOM SHELF: Minimalist Quick Gateways (No clutter, 3 clean cards) */}
-      <section className="border-t border-zinc-200 bg-zinc-50/60 py-10 px-4 sm:px-6 lg:px-8 mt-auto">
+      {/* 4. BOTTOM SHELF: Vibrant, Dashboard-Inspired Quick Gateways (3 Colorful Cards) */}
+      <section className="border-t border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-900 py-10 px-4 sm:px-6 lg:px-8 mt-auto">
         <div className="max-w-7xl mx-auto space-y-4">
-          <div className="flex items-center justify-between text-xs font-mono uppercase tracking-wider text-zinc-400">
-            <span>Specialized Intelligence Modules</span>
+          <div className="flex items-center justify-between text-xs font-mono uppercase tracking-wider text-slate-400">
+            <span className="font-semibold text-slate-700 dark:text-slate-300">Operational Mission Modules</span>
             <span>National Early Warning Framework</span>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Module 1: AI Cyclone Intelligence */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            
+            {/* Module 1: AI Cyclone Intelligence (Purple Theme) */}
             <div 
               onClick={() => navigate('/ai-cyclone')}
-              className="bg-white border border-zinc-200 hover:border-zinc-400 p-5 rounded-2xl cursor-pointer transition-all shadow-2xs group flex flex-col justify-between"
+              className="bg-slate-50/60 dark:bg-slate-800/50 hover:bg-purple-50/40 dark:hover:bg-purple-950/30 border border-slate-200/80 dark:border-slate-700/80 hover:border-purple-300 dark:hover:border-purple-800 p-5 rounded-2xl cursor-pointer transition-all shadow-xs hover:shadow-md group flex flex-col justify-between"
             >
-              <div className="space-y-2">
-                <div className="w-8 h-8 rounded-lg bg-zinc-100 flex items-center justify-center text-black">
-                  <BrainCircuit className="w-4 h-4" />
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="w-9 h-9 rounded-xl bg-purple-100 dark:bg-purple-900/60 text-purple-700 dark:text-purple-300 flex items-center justify-center border border-purple-200 dark:border-purple-800 group-hover:scale-105 transition-transform">
+                    <BrainCircuit className="w-5 h-5" />
+                  </div>
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 border border-purple-200 dark:border-purple-800">
+                    Neural GRU
+                  </span>
                 </div>
-                <h3 className="font-sans font-bold text-sm text-black group-hover:text-zinc-600 transition-colors">
-                  {isHindi ? 'एआई चक्रवात इंटेलिजेंस' : 'AI Cyclone Intelligence'}
+                <h3 className="font-heading font-bold text-sm sm:text-base text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                  {isHindi ? 'एआई चक्रवात इंटेलिजेंस' : 'AI Cyclone Intelligence & Track Studio'}
                 </h3>
-                <p className="text-xs text-zinc-500 leading-relaxed">
+                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
                   {isHindi 
                     ? '72 घंटे का न्यूरल ट्रैक पूर्वानुमान, वोर्टेक्स केंद्र पहचान (MobileNetV3) और डोवोरक संरचना वर्गीकरण।'
                     : '72-hour neural spatiotemporal track predictions, automated vortex localization & Dvorak structural classification.'
                   }
                 </p>
               </div>
-              <div className="pt-4 mt-3 border-t border-zinc-100 flex items-center justify-between text-xs font-semibold text-zinc-700 group-hover:text-black">
-                <span>{isHindi ? 'मॉडल खोलें' : 'Launch Studio'}</span>
-                <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+              <div className="pt-4 mt-3 border-t border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between text-xs font-semibold text-purple-600 dark:text-purple-400">
+                <span>{isHindi ? 'मॉडल स्टूडियो खोलें' : 'Launch AI Studio'}</span>
+                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
 
-            {/* Module 2: GIS Threat Map & Surge */}
+            {/* Module 2: GIS Threat Map & Surge (Rose / Amber Theme) */}
             <div 
               onClick={() => navigate('/threat-map')}
-              className="bg-white border border-zinc-200 hover:border-zinc-400 p-5 rounded-2xl cursor-pointer transition-all shadow-2xs group flex flex-col justify-between"
+              className="bg-slate-50/60 dark:bg-slate-800/50 hover:bg-rose-50/40 dark:hover:bg-rose-950/30 border border-slate-200/80 dark:border-slate-700/80 hover:border-rose-300 dark:hover:border-rose-800 p-5 rounded-2xl cursor-pointer transition-all shadow-xs hover:shadow-md group flex flex-col justify-between"
             >
-              <div className="space-y-2">
-                <div className="w-8 h-8 rounded-lg bg-zinc-100 flex items-center justify-center text-black">
-                  <Layers className="w-4 h-4" />
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="w-9 h-9 rounded-xl bg-rose-100 dark:bg-rose-900/60 text-rose-700 dark:text-rose-300 flex items-center justify-center border border-rose-200 dark:border-rose-800 group-hover:scale-105 transition-transform">
+                    <Layers className="w-5 h-5" />
+                  </div>
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-rose-100 dark:bg-rose-950 text-rose-700 dark:text-rose-300 border border-rose-200 dark:border-rose-800">
+                    Live GIS Radar
+                  </span>
                 </div>
-                <h3 className="font-sans font-bold text-sm text-black group-hover:text-zinc-600 transition-colors">
-                  {isHindi ? 'तटीय खतरा एवं राडार मैप' : 'Coastal Threat Matrix & Radar'}
+                <h3 className="font-heading font-bold text-sm sm:text-base text-slate-900 dark:text-white group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors">
+                  {isHindi ? 'तटीय खतरा एवं राडार मैप' : 'Coastal Threat Matrix & Surge Map'}
                 </h3>
-                <p className="text-xs text-zinc-500 leading-relaxed">
+                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
                   {isHindi 
                     ? 'तटीय जिला भेद्यता मैट्रिक्स, तूफानी लहर बाढ़ क्षेत्र एवं लाइव डॉपलर मौसम रडार नेटवर्क।'
                     : 'Coastal district vulnerability matrix, storm surge inundation zones & live Doppler weather radar network.'
                   }
                 </p>
               </div>
-              <div className="pt-4 mt-3 border-t border-zinc-100 flex items-center justify-between text-xs font-semibold text-zinc-700 group-hover:text-black">
+              <div className="pt-4 mt-3 border-t border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between text-xs font-semibold text-rose-600 dark:text-rose-400">
                 <span>{isHindi ? 'मैप देखें' : 'Inspect Radar Map'}</span>
-                <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
 
-            {/* Module 3: City Weather & Safety Bulletins */}
+            {/* Module 3: City Weather & Safety Bulletins (Sky / Blue Theme) */}
             <div 
               onClick={() => navigate('/city-tracker')}
-              className="bg-white border border-zinc-200 hover:border-zinc-400 p-5 rounded-2xl cursor-pointer transition-all shadow-2xs group flex flex-col justify-between"
+              className="bg-slate-50/60 dark:bg-slate-800/50 hover:bg-sky-50/40 dark:hover:bg-sky-950/30 border border-slate-200/80 dark:border-slate-700/80 hover:border-sky-300 dark:hover:border-sky-800 p-5 rounded-2xl cursor-pointer transition-all shadow-xs hover:shadow-md group flex flex-col justify-between"
             >
-              <div className="space-y-2">
-                <div className="w-8 h-8 rounded-lg bg-zinc-100 flex items-center justify-center text-black">
-                  <Radio className="w-4 h-4" />
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="w-9 h-9 rounded-xl bg-sky-100 dark:bg-sky-900/60 text-sky-700 dark:text-sky-300 flex items-center justify-center border border-sky-200 dark:border-sky-800 group-hover:scale-105 transition-transform">
+                    <Radio className="w-5 h-5" />
+                  </div>
+                  <span className="text-[10px] font-mono font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-sky-100 dark:bg-sky-950 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800">
+                    30+ Cities
+                  </span>
                 </div>
-                <h3 className="font-sans font-bold text-sm text-black group-hover:text-zinc-600 transition-colors">
+                <h3 className="font-heading font-bold text-sm sm:text-base text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-sky-400 transition-colors">
                   {isHindi ? 'अखिल भारतीय शहर मौसम' : 'All-India City Weather Watch'}
                 </h3>
-                <p className="text-xs text-zinc-500 leading-relaxed">
+                <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
                   {isHindi 
                     ? '30+ प्रमुख तटीय एवं महानगरीय केंद्रों के लिए वास्तविक समय तापमान, हवा की गति और 7-दिवसीय पूर्वानुमान।'
                     : 'Real-time observation, wind speeds, barometric pressures and 7-day outlook across 30+ major coastal centers.'
                   }
                 </p>
               </div>
-              <div className="pt-4 mt-3 border-t border-zinc-100 flex items-center justify-between text-xs font-semibold text-zinc-700 group-hover:text-black">
+              <div className="pt-4 mt-3 border-t border-slate-200/60 dark:border-slate-700/60 flex items-center justify-between text-xs font-semibold text-blue-600 dark:text-sky-400">
                 <span>{isHindi ? 'शहर देखें' : 'View All Cities'}</span>
-                <ChevronRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
+                <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
             </div>
 
@@ -637,10 +735,10 @@ const Welcome = () => {
         </div>
       </section>
 
-      {/* 5. Minimalist Clean Footer */}
-      <footer className="border-t border-zinc-200 py-6 px-4 sm:px-6 lg:px-8 text-center text-xs font-mono text-zinc-400">
+      {/* 5. Clean Modern Footer */}
+      <footer className="border-t border-slate-200/80 dark:border-slate-800 py-6 px-4 sm:px-6 lg:px-8 text-center text-xs font-mono text-slate-400 bg-white dark:bg-slate-950">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-3">
-          <span>VAYU NATIONAL CYCLONE EARLY WARNING OBSERVATORY</span>
+          <span className="font-semibold text-slate-600 dark:text-slate-400">VAYU NATIONAL CYCLONE EARLY WARNING OBSERVATORY</span>
           <span>IMD RSMC NEW DELHI • ISRO MOSDAC • GDACS TELEMETRY</span>
         </div>
       </footer>
