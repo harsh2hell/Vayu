@@ -61,8 +61,8 @@ html, body {
   }
 
   body {
-    background-color: #F8FAFC;
-    color: #0F172A;
+    background-color: #ffffff;
+    color: #09090b;
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;

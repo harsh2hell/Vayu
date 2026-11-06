@@ -94,9 +94,7 @@ const PublicNavbar = ({
   ];
 
   return (
-    <header className="sticky top-0 z-[1000] w-full bg-white/95 dark:bg-slate-950/95 backdrop-blur-md border-b border-slate-200/80 dark:border-slate-800 transition-colors duration-200 font-sans">
-      {/* Subtle National Tricolor Accent Line */}
-      <div className="h-[1.5px] bg-gradient-to-r from-[#FF9933] via-slate-300 dark:via-slate-700 to-[#138808] opacity-80" />
+    <header className="sticky top-0 z-[1000] w-full bg-white/95 backdrop-blur-md border-b border-zinc-200 font-sans">
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 h-16 sm:h-20 flex items-center justify-between gap-3">
         
