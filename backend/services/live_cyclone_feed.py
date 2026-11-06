@@ -436,6 +436,7 @@ def get_live_cyclone_catalog() -> Dict[str, Any]:
         "success": True,
         "count": len(systems),
         "systems": systems,
+        "storms": list(systems.values()),
         "default_active_id": "arnab" if "arnab" in systems else list(systems.keys())[0],
         "news": news_list,
         "sources": [

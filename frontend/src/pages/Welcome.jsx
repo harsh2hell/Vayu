@@ -714,116 +714,6 @@ const INITIAL_SYSTEMS = {
       [14.8, 66.2], [16.8, 68.5], [19.0, 70.2], [22.0, 71.0],
       [22.2, 68.5], [19.0, 67.2], [16.5, 65.5], [14.8, 66.2]
     ]
-  },
-  dana: {
-    id: 'dana',
-    name: "Severe Cyclonic Storm DANA (Historical Benchmark)",
-    shortName: "Cyclone DANA",
-    shortNameHindi: "चक्रवात दाना",
-    hindiName: "भीषण चक्रवाती तूफान दाना (ऐतिहासिक केस अध्ययन)",
-    basin: "North Bay of Bengal",
-    basinHindi: "उत्तरी बंगाल की खाड़ी",
-    stage: "Severe Cyclonic Storm (Landfall Phase)",
-    stageHindi: "भीषण चक्रवाती तूफान (लैंडफॉल चरण)",
-    dvorak: "T3.5",
-    risk48h: "Formed Cyclone",
-    wind: "110",
-    gusts: "125",
-    pressure: "970",
-    speed: "16",
-    direction: "North-Northwest",
-    directionHindi: "उत्तर-उत्तर-पश्चिम",
-    lat: 19.4,
-    lon: 87.2,
-    target: "Dhamra Port & Kendrapara Coast, Odisha",
-    targetHindi: "धामरा बंदरगाह एवं केंद्रपड़ा तट, ओडिशा",
-    window: "Landfall Recorded",
-    windowHindi: "लैंडफॉल दर्ज किया गया",
-    threat: "Red Alert",
-    threatHindi: "रेड अलर्ट",
-    threatColor: "text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/50 border-red-200 dark:border-red-800",
-    sst: 29.8,
-    shear: 11.5,
-    vitPattern: "Curved Banding (Eye Formation)",
-    vitConfidence: 91.5,
-    waypoints: [
-      { step: '+00h', label: 'Genesis Phase', labelHindi: 'जनन चरण', lat: 18.2, lon: 88.5, wind: '65 km/h', gusts: '80 km/h', pressure: '996 hPa', cat: 'Cyclonic Storm', catHindi: 'चक्रवाती तूफान' },
-      { step: '+12h', label: 'Rapid Intensification', labelHindi: 'तीव्र गति वृद्धि', lat: 18.9, lon: 88.0, wind: '85 km/h', gusts: '105 km/h', pressure: '988 hPa', cat: 'Severe Cyclonic Storm', catHindi: 'भीषण चक्रवाती तूफान' },
-      { step: '+24h', label: 'Peak Maritime Velocity', labelHindi: 'शीर्ष समुद्री वेग', lat: 19.7, lon: 87.5, wind: '110 km/h', gusts: '125 km/h', pressure: '974 hPa', cat: 'Severe Cyclonic Storm', catHindi: 'भीषण चक्रवाती तूफान' },
-      { step: '+36h', label: 'Dhamra Port Landfall', labelHindi: 'धामरा बंदरगाह लैंडफॉल', lat: 20.8, lon: 86.9, wind: '115 km/h', gusts: '135 km/h', pressure: '970 hPa', cat: 'Severe Cyclonic Storm', catHindi: 'भीषण चक्रवाती तूफान' },
-      { step: '+48h', label: 'Inland Dissipation', labelHindi: 'अंतर्देशीय क्षीणता', lat: 22.1, lon: 85.8, wind: '60 km/h', gusts: '75 km/h', pressure: '992 hPa', cat: 'Depression', catHindi: 'अवसाद' },
-      { step: '+60h', label: 'Remnant Low', labelHindi: 'अवशेष निम्न दबाव', lat: 23.4, lon: 84.8, wind: '35 km/h', gusts: '45 km/h', pressure: '1004 hPa', cat: 'Well Marked Low', catHindi: 'सुस्पष्ट निम्न दबाव' }
-    ],
-    intensityCurve: [
-      { time: '23 Oct', speed: 65, pressure: 998 },
-      { time: '24 Oct 08:30', speed: 85, pressure: 990 },
-      { time: '24 Oct 20:30', speed: 105, pressure: 986 },
-      { time: '25 Oct (Landfall)', speed: 115, pressure: 970 },
-      { time: '25 Oct 14:30', speed: 70, pressure: 992 },
-      { time: '26 Oct', speed: 45, pressure: 1004 },
-    ],
-    track: [
-      [18.2, 88.5], [18.9, 88.0], [19.7, 87.5], [20.8, 86.9], [22.1, 85.8], [23.4, 84.8]
-    ],
-    cone: [
-      [18.2, 88.5], [19.4, 89.4], [21.0, 88.8], [23.8, 87.2],
-      [23.5, 83.2], [20.8, 84.8], [19.0, 86.8], [18.2, 88.5]
-    ]
-  },
-  biparjoy: {
-    id: 'biparjoy',
-    name: "Extremely Severe Cyclonic Storm BIPARJOY (Arabian Sea Benchmark)",
-    shortName: "Cyclone BIPARJOY",
-    shortNameHindi: "चक्रवात बिपरजॉय",
-    hindiName: "अत्यंत भीषण चक्रवाती तूफान बिपरजॉय (ऐतिहासिक केस अध्ययन)",
-    basin: "Arabian Sea",
-    basinHindi: "अरब सागर",
-    stage: "Extremely Severe Cyclonic Storm (Cat 3)",
-    stageHindi: "अत्यंत भीषण चक्रवाती तूफान",
-    dvorak: "T5.0",
-    risk48h: "Formed Cyclone",
-    wind: "145",
-    gusts: "170",
-    pressure: "965",
-    speed: "12",
-    direction: "North-North-East",
-    directionHindi: "उत्तर-उत्तर-पूर्व",
-    lat: 23.3,
-    lon: 68.6,
-    target: "Jakhau Port & Kutch Coast, Gujarat",
-    targetHindi: "जखौ बंदरगाह एवं कच्छ तट, गुजरात",
-    window: "Landfall Recorded",
-    windowHindi: "लैंडफॉल दर्ज किया गया",
-    threat: "Red Alert",
-    threatHindi: "रेड अलर्ट",
-    threatColor: "text-red-700 dark:text-red-300 bg-red-50 dark:bg-red-950/50 border-red-200 dark:border-red-800",
-    sst: 31.0,
-    shear: 10.5,
-    vitPattern: "Eye / Embedded Center",
-    vitConfidence: 94.2,
-    waypoints: [
-      { step: '+00h', label: 'Genesis Phase', labelHindi: 'जनन चरण', lat: 12.1, lon: 66.0, wind: '55 km/h', gusts: '70 km/h', pressure: '1000 hPa', cat: 'Deep Depression', catHindi: 'गहरा अवसाद' },
-      { step: '+12h', label: 'Intensification', labelHindi: 'तीव्रता चरण', lat: 14.5, lon: 66.2, wind: '85 km/h', gusts: '105 km/h', pressure: '988 hPa', cat: 'Cyclonic Storm', catHindi: 'चक्रवाती तूफान' },
-      { step: '+24h', label: 'Severe Stage', labelHindi: 'भीषण चरण', lat: 17.2, lon: 67.0, wind: '120 km/h', gusts: '145 km/h', pressure: '975 hPa', cat: 'Very Severe Cyclonic Storm', catHindi: 'अति भीषण चक्रवाती तूफान' },
-      { step: '+48h', label: 'Peak Maritime Intensity', labelHindi: 'शीर्ष समुद्री तीव्रता', lat: 19.8, lon: 67.4, wind: '165 km/h', gusts: '190 km/h', pressure: '958 hPa', cat: 'Extremely Severe Cyclonic Storm', catHindi: 'अत्यंत भीषण चक्रवाती तूफान' },
-      { step: '+60h', label: 'Jakhau Port Landfall', labelHindi: 'जखौ बंदरगाह लैंडफॉल', lat: 23.3, lon: 68.6, wind: '125 km/h', gusts: '150 km/h', pressure: '975 hPa', cat: 'Very Severe Cyclonic Storm', catHindi: 'अति भीषण चक्रवाती तूफान' },
-      { step: '+72h', label: 'Rajasthan Weakening', labelHindi: 'राजस्थान में क्षीण', lat: 24.6, lon: 71.4, wind: '50 km/h', gusts: '65 km/h', pressure: '995 hPa', cat: 'Depression', catHindi: 'अवसाद' }
-    ],
-    intensityCurve: [
-      { time: '08 Jun', speed: 110, pressure: 980 },
-      { time: '11 Jun (Peak)', speed: 165, pressure: 958 },
-      { time: '14 Jun', speed: 135, pressure: 970 },
-      { time: '15 Jun (Landfall)', speed: 125, pressure: 975 },
-      { time: '16 Jun', speed: 80, pressure: 988 },
-      { time: '17 Jun', speed: 45, pressure: 998 },
-    ],
-    track: [
-      [12.1, 66.0], [14.5, 66.2], [17.2, 67.0], [19.8, 67.4], [21.5, 66.8], [23.3, 68.6]
-    ],
-    cone: [
-      [12.1, 66.0], [14.0, 68.0], [18.0, 70.0], [24.5, 71.0], 
-      [25.0, 67.0], [20.5, 65.0], [15.0, 64.5], [12.1, 66.0]
-    ]
   }
 };
 
@@ -1384,22 +1274,10 @@ const Welcome = () => {
             .catch(() => null)
         : Promise.resolve(null);
 
-      const danaPromise = baseUrl
-        ? fetch(`${baseUrl}/api/v1/cyclones/cyclone-dana-2024`, { signal: AbortSignal.timeout(2500) })
-            .then(r => r.ok ? r.json() : null)
-            .catch(() => null)
-        : Promise.resolve(null);
-
-      const biparjoyPromise = baseUrl
-        ? fetch(`${baseUrl}/api/v1/cyclones/cyclone-biparjoy-2023`, { signal: AbortSignal.timeout(2500) })
-            .then(r => r.ok ? r.json() : null)
-            .catch(() => null)
-        : Promise.resolve(null);
-
       const oceanPromise = fetchLiveOceanTelemetry('Bay of Bengal').catch(() => null);
 
-      const [bayRes, arabRes, danaRes, biparjoyRes, oceanRes, feedRes, newsRes] = await Promise.all([
-        bayPromise, arabPromise, danaPromise, biparjoyPromise, oceanPromise, feedPromise, newsPromise
+      const [bayRes, arabRes, oceanRes, feedRes, newsRes] = await Promise.all([
+        bayPromise, arabPromise, oceanPromise, feedPromise, newsPromise
       ]);
 
       if (newsRes && Array.isArray(newsRes) && newsRes.length > 0) {
@@ -1409,13 +1287,28 @@ const Welcome = () => {
       setSystems((prev) => {
         const next = { ...prev };
 
-        // Ingest dynamic real-time cyclone feed (Arnab, Murasu, and any newly detected GDACS systems)
-        if (feedRes && feedRes.storms && Array.isArray(feedRes.storms)) {
-          feedRes.storms.forEach((storm) => {
+        // Ensure legacy historical benchmarks are completely excised from live tracking
+        delete next.dana;
+        delete next.biparjoy;
+
+        // Ingest dynamic real-time cyclone feed (Arnab, Murasu, and any newly detected GDACS / IMD systems)
+        if (feedRes) {
+          const stormsList = feedRes.storms || (feedRes.systems ? Object.values(feedRes.systems) : []);
+          stormsList.forEach((storm) => {
             if (storm && storm.id) {
-              next[storm.id] = {
-                ...(next[storm.id] || {}),
+              let targetId = storm.id.toLowerCase();
+              if (targetId.includes('arnab')) targetId = 'arnab';
+              else if (targetId.includes('murasu')) targetId = 'murasu';
+              else if (targetId.includes('92b')) targetId = 'invest92b';
+              else if (targetId.includes('91a')) targetId = 'invest91a';
+
+              // Ignore old historical systems
+              if (targetId === 'dana' || targetId === 'biparjoy') return;
+
+              next[targetId] = {
+                ...(next[targetId] || {}),
                 ...storm,
+                id: targetId,
                 isLive: true
               };
             }
@@ -1516,30 +1409,6 @@ const Welcome = () => {
           }
         }
 
-        if (danaRes && danaRes.success && danaRes.data) {
-          const d = danaRes.data;
-          next.dana = {
-            ...next.dana,
-            name: d.name || next.dana.name,
-            wind: String(Math.round(d.peak_intensity_kmh || 115)),
-            gusts: String(Math.round((d.peak_intensity_kmh || 115) * 1.2)),
-            pressure: String(Math.round(d.lowest_mslp_hpa || 970)),
-            isLive: true,
-          };
-        }
-
-        if (biparjoyRes && biparjoyRes.success && biparjoyRes.data) {
-          const d = biparjoyRes.data;
-          next.biparjoy = {
-            ...next.biparjoy,
-            name: d.name || next.biparjoy.name,
-            wind: String(Math.round(d.peak_intensity_kmh || d.wind_speed_kmh || 145)),
-            gusts: String(Math.round((d.peak_intensity_kmh || d.wind_speed_kmh || 145) * 1.2)),
-            pressure: String(Math.round(d.lowest_mslp_hpa || d.pressure_hpa || 965)),
-            isLive: true,
-          };
-        }
-
         if (oceanRes && oceanRes.status === 'LIVE_OCEAN_ACTIVE') {
           if (next.invest92b) {
             next.invest92b = {
@@ -1550,6 +1419,14 @@ const Welcome = () => {
               gusts: oceanRes.surface_wind_gusts_kmh ? String(Math.round(oceanRes.surface_wind_gusts_kmh)) : next.invest92b.gusts,
               isLive: true
             };
+          }
+        }
+
+        // Safety fallback if active storm was ever invalid
+        if (!next[activeId]) {
+          const keys = Object.keys(next);
+          if (keys.length > 0) {
+            setActiveId(keys[0]);
           }
         }
 
@@ -1764,8 +1641,8 @@ const Welcome = () => {
             <div className="space-y-2">
               <div className="flex flex-wrap items-center gap-2 text-[11px] font-mono uppercase tracking-wider text-zinc-400">
                 <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-mono uppercase font-bold tracking-wider bg-black text-white">
-                  <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                  {current.systemType === 'CONTEMPORARY_BENCHMARK' ? 'BENCHMARK SYSTEM' : 'LIVE MONITORED'}
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  {current.isLive ? 'ACTIVE CYCLONE WATCH' : 'LIVE OBSERVATION'}
                 </span>
                 <span>•</span>
                 <span>{isHindi ? 'उपग्रह टेलीमेट्री सिंक' : 'IMD RSMC NEW DELHI • JTWC TELESYNC'}</span>
@@ -1805,11 +1682,11 @@ const Welcome = () => {
             </div>
 
             {/* Storm Switcher Pills */}
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="inline-flex p-1 bg-zinc-100 rounded-xl border border-zinc-200 text-xs gap-1">
+            <div className="flex items-center gap-2 max-w-full">
+              <div className="flex items-center p-1 bg-zinc-100 rounded-xl border border-zinc-200 text-xs gap-1 overflow-x-auto max-w-full scrollbar-none">
                 {Object.values(systems).map((sys) => {
                   const isSelected = activeId === sys.id;
-                  const isBenchmark = sys.id === 'dana' || sys.id === 'biparjoy';
+                  const label = sys.shortName || sys.name || sys.id.toUpperCase();
                   return (
                     <button
                       key={sys.id}
@@ -1818,19 +1695,19 @@ const Welcome = () => {
                         setActiveStepIndex(0);
                         setIsPlayingTimeline(false);
                       }}
-                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer text-xs font-mono font-medium ${
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer text-xs font-mono font-medium whitespace-nowrap ${
                         isSelected
                           ? 'bg-black text-white shadow-xs font-semibold'
                           : 'text-zinc-600 hover:text-black hover:bg-zinc-200/60'
                       }`}
                     >
                       <span className={`w-1.5 h-1.5 rounded-full ${
-                        isSelected ? 'bg-white' : 'bg-zinc-400'
+                        isSelected ? 'bg-emerald-400 animate-pulse' : 'bg-emerald-600'
                       }`} />
-                      <span>{sys.id.toUpperCase()}</span>
+                      <span>{label}</span>
                       {isSelected && (
-                        <span className="text-[9px] px-1 rounded bg-zinc-800 text-zinc-200 uppercase font-mono">
-                          {isBenchmark ? 'Ref' : 'Live'}
+                        <span className="text-[9px] px-1 rounded bg-zinc-800 text-emerald-400 uppercase font-mono font-medium">
+                          Live
                         </span>
                       )}
                     </button>
