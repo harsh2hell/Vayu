@@ -1,0 +1,532 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>VAYU — Mobile Vertical Promo (9:16)</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        padding: 0;
+        background: #000000;
+        color: #ffffff;
+        font-family: 'Montserrat', -apple-system, sans-serif;
+        overflow: hidden;
+        -webkit-font-smoothing: antialiased;
+      }
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background: #000000;
+      }
+      .font-mono {
+        font-family: 'JetBrains Mono', monospace;
+      }
+      .font-display {
+        font-family: 'Montserrat', sans-serif;
+      }
+      .clip {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+      /* Grid Background Lines */
+      .grid-backdrop {
+        position: absolute;
+        inset: 0;
+        background-image: 
+          linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+        background-size: 60px 60px;
+        opacity: 0.55;
+        pointer-events: none;
+      }
+      /* Glass Card Base */
+      .glass-card {
+        background: rgba(15, 23, 42, 0.88);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.7);
+      }
+      /* Radar scanning circles */
+      .radar-ring {
+        position: absolute;
+        border-radius: 50%;
+        border: 1px dashed rgba(56, 189, 248, 0.25);
+        pointer-events: none;
+      }
+      .radar-sweep {
+        position: absolute;
+        width: 600px;
+        height: 600px;
+        border-radius: 50%;
+        background: conic-gradient(from 0deg, rgba(2, 132, 199, 0.35) 0deg, transparent 60deg, transparent 360deg);
+        pointer-events: none;
+      }
+      .badge-glow {
+        box-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+      }
+      .danger-glow {
+        box-shadow: 0 0 25px rgba(220, 38, 38, 0.5);
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="main"
+      data-width="1080"
+      data-height="1920"
+      data-duration="20"
+    >
+      <!-- Audio Tracks -->
+      <audio id="bgm" data-start="0" data-duration="20" data-volume="0.65" src="assets/music/happy-beats-business-moves-vol-12-by-ende-dot-app.mp3"></audio>
+      <audio id="sfx-ping1" data-start="0.4" data-duration="0.10" data-volume="0.5" src="assets/sfx/interface/click_001.ogg"></audio>
+      <audio id="sfx-glitch" data-start="2.1" data-duration="0.17" data-volume="0.6" src="assets/sfx/impact/impactMetal_heavy_000.ogg"></audio>
+      <audio id="sfx-mod1" data-start="3.8" data-duration="0.62" data-volume="0.5" src="assets/sfx/interface/switch_001.ogg"></audio>
+      <audio id="sfx-mod2" data-start="4.8" data-duration="0.62" data-volume="0.5" src="assets/sfx/interface/switch_001.ogg"></audio>
+      <audio id="sfx-mod3" data-start="5.8" data-duration="0.62" data-volume="0.5" src="assets/sfx/interface/switch_001.ogg"></audio>
+      <audio id="sfx-impact" data-start="6.8" data-duration="1.48" data-volume="0.85" src="assets/sfx/impact/impactBell_heavy_000.ogg"></audio>
+      <audio id="sfx-radar" data-start="8.6" data-duration="0.03" data-volume="0.5" src="assets/sfx/ui/switch13.ogg"></audio>
+      <audio id="sfx-city" data-start="12.8" data-duration="0.01" data-volume="0.5" src="assets/sfx/interface/click_002.ogg"></audio>
+      <audio id="sfx-final" data-start="16.6" data-duration="1.48" data-volume="0.85" src="assets/sfx/impact/impactBell_heavy_000.ogg"></audio>
+
+      <!-- Persistent Global Grid Backdrop -->
+      <div class="grid-backdrop"></div>
+      
+      <!-- Top Persistent Mobile Bar (Safe Zone: 80px from top) -->
+      <div style="position: absolute; top: 80px; left: 48px; right: 48px; display: flex; justify-content: space-between; align-items: center; z-index: 50; border-bottom: 1px solid rgba(255, 255, 255, 0.15); padding-bottom: 20px;">
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <img src="assets/images/vayu-icon.png" alt="VAYU Icon" style="height: 44px; width: 44px; object-fit: contain;" />
+          <span class="font-mono" style="font-size: 15px; letter-spacing: 2px; color: #7dd3fc; font-weight: 700;">VAYU INTELLIGENCE</span>
+        </div>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div style="width: 10px; height: 10px; border-radius: 50%; background: #10b981; box-shadow: 0 0 10px #10b981;"></div>
+          <span class="font-mono" style="font-size: 14px; color: #f1f5f9; font-weight: 700;">LIVE TELEMETRY</span>
+        </div>
+      </div>
+
+      <!-- Bottom Persistent Mobile Footer (Safe Zone: 70px from bottom) -->
+      <div style="position: absolute; bottom: 70px; left: 48px; right: 48px; display: flex; flex-direction: column; gap: 8px; text-align: center; z-index: 50; border-top: 1px solid rgba(255, 255, 255, 0.15); padding-top: 18px;">
+        <span class="font-mono" style="font-size: 13px; color: #cbd5e1; letter-spacing: 1px;">SIH 2026 • MoES / IMD ALIGNED</span>
+        <span class="font-mono" style="font-size: 14px; color: #7dd3fc; font-weight: 700;">PORTAL.VAYUSAT.LIVE • VAYUSAT.LIVE</span>
+      </div>
+
+      <!-- ============================================================ -->
+      <!-- SCENE 1: The NIO Threat & Crisis Hook (0.0s – 3.5s) -->
+      <!-- ============================================================ -->
+      <section id="scene-1" class="clip" data-start="0" data-duration="3.5">
+        <!-- Visual Radar Center -->
+        <div id="s1-radar-box" style="position: absolute; top: 45%; left: 50%; width: 600px; height: 600px; margin-left: -300px; margin-top: -300px;">
+          <div class="radar-ring" style="inset: 0;"></div>
+          <div class="radar-ring" style="inset: 60px;"></div>
+          <div class="radar-ring" style="inset: 130px;"></div>
+          <div class="radar-ring" style="inset: 200px;"></div>
+          <div id="s1-sweep" class="radar-sweep" style="inset: 0;"></div>
+        </div>
+
+        <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 48px;">
+          <div id="s1-badge" class="font-mono danger-glow" style="display: inline-flex; align-items: center; gap: 10px; background: #991b1b; border: 1px solid #ef4444; border-radius: 9999px; padding: 10px 24px; margin-bottom: 40px;">
+            <div style="width: 10px; height: 10px; border-radius: 50%; background: #ffffff;"></div>
+            <span style="font-size: 14px; font-weight: 800; letter-spacing: 2px; color: #ffffff;">NORTH INDIAN OCEAN CRISIS</span>
+          </div>
+
+          <div style="position: relative; width: 980px; height: 420px; display: flex; align-items: center; justify-content: center;">
+            <div id="s1-headline-1" style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center;" data-layout-allow-overlap>
+              <h1 class="font-display" style="font-size: 64px; font-weight: 900; line-height: 1.15; margin: 0; text-transform: uppercase; color: #ffffff;">
+                70% OF GLOBAL CYCLONE FATALITIES
+              </h1>
+              <div class="font-display" style="font-size: 56px; font-weight: 900; color: #7dd3fc; margin-top: 18px;">
+                STRIKE THIS BASIN.
+              </div>
+            </div>
+
+            <div id="s1-headline-2" style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; opacity: 0;" data-layout-allow-overlap>
+              <div class="font-mono" style="font-size: 22px; color: #fca5a5; letter-spacing: 2px; margin-bottom: 16px; font-weight: 700;">
+                THE COMPUTATIONAL BOTTLENECK
+              </div>
+              <h2 class="font-display" style="font-size: 58px; font-weight: 900; line-height: 1.2; margin: 0; color: #ffffff;">
+                NUMERICAL SIMULATIONS TAKE 4 HOURS.
+              </h2>
+              <div class="font-display" style="font-size: 46px; font-weight: 800; color: #7dd3fc; margin-top: 18px;">
+                WHAT IF FORECASTING TOOK MILLISECONDS?
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- SCENE 2: The 95.5ms Neural Pipeline (3.5s – 8.0s) -->
+      <!-- ============================================================ -->
+      <section id="scene-2" class="clip" data-start="3.5" data-duration="4.5">
+        <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 160px 48px 140px 48px;">
+          <!-- Section Title -->
+          <div id="s2-title-block" style="text-align: center; margin-bottom: 32px;">
+            <div class="font-mono" style="font-size: 14px; color: #7dd3fc; letter-spacing: 3px; font-weight: 700; margin-bottom: 8px;">
+              DEEP LEARNING NEURAL PIPELINE
+            </div>
+            <h2 class="font-display" style="font-size: 46px; font-weight: 900; margin: 0; color: #ffffff; line-height: 1.2;">
+              SUB-100MS AUTONOMOUS INFERENCE
+            </h2>
+          </div>
+
+          <!-- 3 Stacked Cards for Vertical Layout -->
+          <div style="display: flex; flex-direction: column; gap: 20px; width: 100%; max-width: 980px; margin-bottom: 24px;">
+            <!-- Card 1 -->
+            <div id="s2-card-1" class="glass-card" style="border-radius: 20px; padding: 24px 32px; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 6px;">
+                  <span class="font-mono" style="font-size: 12px; color: #cbd5e1;">STAGE 01</span>
+                  <span class="font-mono" style="font-size: 11px; color: #000000; font-weight: 800; background: #34d399; padding: 3px 8px; border-radius: 6px;">ONLINE</span>
+                </div>
+                <h3 class="font-display" style="font-size: 22px; font-weight: 800; margin: 0 0 4px 0; color: #ffffff;">VORTEX CENTER FIXATION</h3>
+                <p class="font-mono" style="font-size: 13px; color: #94a3b8; margin: 0;">MobileNetV3 Neural Architecture</p>
+              </div>
+              <div style="display: flex; align-items: baseline; gap: 6px;">
+                <span class="font-mono" style="font-size: 44px; font-weight: 900; color: #38bdf8;">37.8</span>
+                <span class="font-mono" style="font-size: 18px; color: #cbd5e1;">ms</span>
+              </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div id="s2-card-2" class="glass-card" style="border-radius: 20px; padding: 24px 32px; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 6px;">
+                  <span class="font-mono" style="font-size: 12px; color: #cbd5e1;">STAGE 02</span>
+                  <span class="font-mono" style="font-size: 11px; color: #000000; font-weight: 800; background: #34d399; padding: 3px 8px; border-radius: 6px;">ONLINE</span>
+                </div>
+                <h3 class="font-display" style="font-size: 22px; font-weight: 800; margin: 0 0 4px 0; color: #ffffff;">DVORAK INTENSITY</h3>
+                <p class="font-mono" style="font-size: 13px; color: #94a3b8; margin: 0;">ResNet18 (4-Class Morphology)</p>
+              </div>
+              <div style="display: flex; align-items: baseline; gap: 6px;">
+                <span class="font-mono" style="font-size: 44px; font-weight: 900; color: #fbbf24;">42.9</span>
+                <span class="font-mono" style="font-size: 18px; color: #cbd5e1;">ms</span>
+              </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div id="s2-card-3" class="glass-card" style="border-radius: 20px; padding: 24px 32px; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div style="display: flex; gap: 12px; align-items: center; margin-bottom: 6px;">
+                  <span class="font-mono" style="font-size: 12px; color: #cbd5e1;">STAGE 03</span>
+                  <span class="font-mono" style="font-size: 11px; color: #000000; font-weight: 800; background: #34d399; padding: 3px 8px; border-radius: 6px;">ONLINE</span>
+                </div>
+                <h3 class="font-display" style="font-size: 22px; font-weight: 800; margin: 0 0 4px 0; color: #ffffff;">72-HOUR TRAJECTORY</h3>
+                <p class="font-mono" style="font-size: 13px; color: #94a3b8; margin: 0;">Recurrent GRU + MC Uncertainty</p>
+              </div>
+              <div style="display: flex; align-items: baseline; gap: 6px;">
+                <span class="font-mono" style="font-size: 44px; font-weight: 900; color: #34d399;">14.8</span>
+                <span class="font-mono" style="font-size: 18px; color: #cbd5e1;">ms</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Total Pipeline Latency Banner -->
+          <div id="s2-grand-total" class="glass-card badge-glow" style="width: 100%; max-width: 980px; border-radius: 20px; padding: 24px 36px; border: 2px solid #38bdf8; display: flex; justify-content: space-between; align-items: center; background: rgba(2, 132, 199, 0.25);">
+            <div>
+              <div class="font-mono" style="font-size: 13px; color: #7dd3fc; letter-spacing: 2px; font-weight: 700; margin-bottom: 4px;">
+                END-TO-END PIPELINE LATENCY
+              </div>
+              <div class="font-display" style="font-size: 26px; font-weight: 900; color: #ffffff;">
+                ZERO-MOCK FAIL-SAFE CORE
+              </div>
+            </div>
+            <div style="display: flex; align-items: baseline; gap: 8px;">
+              <span class="font-mono" style="font-size: 56px; font-weight: 900; color: #38bdf8; text-shadow: 0 0 30px rgba(56, 189, 248, 0.6);">95.5</span>
+              <span class="font-mono" style="font-size: 24px; font-weight: 700; color: #ffffff;">ms</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- SCENE 3: 72h Trajectory & Monte Carlo Cone (8.0s – 12.5s) -->
+      <!-- ============================================================ -->
+      <section id="scene-3" class="clip" data-start="8.0" data-duration="4.5">
+        <div style="position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 150px 48px 140px 48px; gap: 24px;">
+          <!-- Top: 4D Spatiotemporal Radar Map -->
+          <div id="s3-map-container" class="glass-card" style="width: 100%; max-width: 980px; height: 680px; border-radius: 24px; position: relative; overflow: hidden; border: 1px solid rgba(56, 189, 248, 0.3); background: #030712;">
+            <img src="assets/images/radar-bay-bengal.jpg" alt="Bay of Bengal" style="position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0.25; filter: contrast(130%) saturate(150%);" />
+            
+            <!-- Map Header Box -->
+            <div style="position: absolute; top: 20px; left: 24px; z-index: 10; background: rgba(0, 0, 0, 0.88); padding: 10px 18px; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.15);">
+              <div class="font-mono" style="font-size: 12px; color: #7dd3fc; font-weight: 700; letter-spacing: 2px;">BAY OF BENGAL — 4D TRAJECTORY VISUALIZER</div>
+              <div class="font-display" style="font-size: 24px; font-weight: 900; color: #ffffff; margin-top: 2px;">CYCLONE DANA (2024)</div>
+            </div>
+
+            <!-- SVG Animated Trajectory Cone & Path -->
+            <svg style="position: absolute; inset: 0; width: 100%; height: 100%; z-index: 5;">
+              <polygon
+                id="s3-mc-cone"
+                points="160,520 400,380 720,200 760,350 480,500"
+                fill="rgba(56, 189, 248, 0.18)"
+                stroke="rgba(56, 189, 248, 0.6)"
+                stroke-dasharray="6 4"
+                stroke-width="2"
+              />
+              <path
+                id="s3-track-line"
+                d="M 160 520 Q 440 440 740 260"
+                fill="none"
+                stroke="#38bdf8"
+                stroke-width="5"
+                stroke-linecap="round"
+              />
+              <!-- Waypoints -->
+              <circle cx="160" cy="520" r="9" fill="#ffffff" stroke="#0284c7" stroke-width="4" />
+              <g>
+                <rect x="120" y="542" width="85" height="24" rx="6" fill="#000000" stroke="rgba(255,255,255,0.25)" stroke-width="1" />
+                <text x="130" y="559" fill="#ffffff" font-family="JetBrains Mono" font-size="12" font-weight="700">00h (Fix)</text>
+              </g>
+
+              <circle cx="310" cy="460" r="7" fill="#38bdf8" />
+              <circle cx="460" cy="390" r="8" fill="#fbbf24" />
+              <g>
+                <rect x="420" y="412" width="85" height="24" rx="6" fill="#000000" stroke="#f59e0b" stroke-width="1" />
+                <text x="430" y="429" fill="#fbbf24" font-family="JetBrains Mono" font-size="12" font-weight="800">+24h (RI)</text>
+              </g>
+
+              <circle cx="600" cy="320" r="7" fill="#38bdf8" />
+              <circle cx="740" cy="260" r="11" fill="#ef4444" stroke="#ffffff" stroke-width="3" />
+              <g>
+                <rect x="660" y="210" width="160" height="28" rx="8" fill="#b91c1c" stroke="#ffffff" stroke-width="1.5" />
+                <text x="672" y="230" fill="#ffffff" font-family="JetBrains Mono" font-size="13" font-weight="900">LANDFALL (+72h)</text>
+              </g>
+            </svg>
+
+            <!-- Bottom Left Badge -->
+            <div class="glass-card" style="position: absolute; bottom: 20px; left: 24px; padding: 10px 16px; border-radius: 10px; z-index: 10; background: rgba(0,0,0,0.88);">
+              <div class="font-mono" style="font-size: 11px; color: #7dd3fc; font-weight: 700;">ACTIVE UNCERTAINTY</div>
+              <div class="font-mono" style="font-size: 12px; color: #ffffff; font-weight: 600;">25-Pass Monte Carlo Cone</div>
+            </div>
+          </div>
+
+          <!-- Bottom: Telemetry Mission Card -->
+          <div id="s3-hud-card" class="glass-card" style="width: 100%; max-width: 980px; border-radius: 24px; padding: 32px 36px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid rgba(255, 255, 255, 0.15); padding-bottom: 14px;">
+              <div>
+                <span class="font-mono" style="font-size: 12px; color: #7dd3fc; letter-spacing: 2px; font-weight: 700;">TELEMETRY PROFILE</span>
+                <h3 class="font-display" style="font-size: 28px; font-weight: 900; margin: 2px 0 0 0; color: #ffffff;">SEVERE CYCLONIC STORM</h3>
+              </div>
+              <span class="font-mono" style="font-size: 14px; color: #fbbf24; font-weight: 800; background: rgba(251, 191, 36, 0.15); padding: 6px 14px; border-radius: 8px;">DVORAK T3.5</span>
+            </div>
+
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px;">
+              <div style="background: rgba(255, 255, 255, 0.05); padding: 12px 16px; border-radius: 12px;">
+                <div class="font-mono" style="color: #cbd5e1; font-size: 12px;">SUSTAINED WIND</div>
+                <div class="font-mono" style="color: #38bdf8; font-size: 22px; font-weight: 800; margin-top: 2px;">110 km/h (60 kt)</div>
+              </div>
+              <div style="background: rgba(255, 255, 255, 0.05); padding: 12px 16px; border-radius: 12px;">
+                <div class="font-mono" style="color: #cbd5e1; font-size: 12px;">CENTRAL PRESSURE</div>
+                <div class="font-mono" style="color: #34d399; font-size: 22px; font-weight: 800; margin-top: 2px;">984 hPa</div>
+              </div>
+            </div>
+
+            <div style="background: rgba(185, 28, 28, 0.25); border: 1px solid #ef4444; border-radius: 14px; padding: 14px 20px;">
+              <div class="font-mono" style="font-size: 11px; color: #fca5a5; font-weight: 700; letter-spacing: 1px;">CRITICAL LANDFALL SECTOR</div>
+              <div class="font-display" style="font-size: 18px; font-weight: 800; color: #ffffff; margin-top: 2px;">Northern Odisha Seaboard (Bhadrak / Balasore)</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- SCENE 4: Coastal Defense & Early Warning Network (12.5s – 16.5s) -->
+      <!-- ============================================================ -->
+      <section id="scene-4" class="clip" data-start="12.5" data-duration="4.0">
+        <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 160px 48px 140px 48px;">
+          <div id="s4-header" style="text-align: center; margin-bottom: 32px;">
+            <div class="font-mono" style="font-size: 14px; color: #7dd3fc; letter-spacing: 3px; font-weight: 700; margin-bottom: 8px;">
+              COASTAL DEFENSE & PUBLIC SAFETY
+            </div>
+            <h2 class="font-display" style="font-size: 46px; font-weight: 900; margin: 0; letter-spacing: -1px; color: #ffffff; line-height: 1.2;">
+              100+ CITIES RISK DIRECTIVES
+            </h2>
+          </div>
+
+          <!-- 3 City Threat Cards Stacked -->
+          <div style="display: flex; flex-direction: column; gap: 18px; width: 100%; max-width: 980px; margin-bottom: 24px;">
+            <!-- City 1 -->
+            <div id="s4-card-1" class="glass-card" style="border-radius: 20px; padding: 24px 32px; border-left: 6px solid #dc2626; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <span class="font-mono" style="font-size: 12px; color: #cbd5e1;">ODISHA SECTOR</span>
+                <h3 class="font-display" style="font-size: 28px; font-weight: 900; margin: 4px 0 0 0; color: #ffffff;">BHADRAK</h3>
+              </div>
+              <div style="text-align: right;">
+                <span class="font-mono" style="font-size: 11px; font-weight: 800; color: #ffffff; background: #b91c1c; padding: 3px 10px; border-radius: 6px;">RED ALERT</span>
+                <div class="font-mono" style="font-size: 32px; font-weight: 900; color: #f87171; margin-top: 4px;">78% STRIKE</div>
+              </div>
+            </div>
+
+            <!-- City 2 -->
+            <div id="s4-card-2" class="glass-card" style="border-radius: 20px; padding: 24px 32px; border-left: 6px solid #ea580c; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <span class="font-mono" style="font-size: 12px; color: #cbd5e1;">GUJARAT SECTOR</span>
+                <h3 class="font-display" style="font-size: 28px; font-weight: 900; margin: 4px 0 0 0; color: #ffffff;">KUTCH</h3>
+              </div>
+              <div style="text-align: right;">
+                <span class="font-mono" style="font-size: 11px; font-weight: 800; color: #000000; background: #fb923c; padding: 3px 10px; border-radius: 6px;">ORANGE ALERT</span>
+                <div class="font-mono" style="font-size: 32px; font-weight: 900; color: #fb923c; margin-top: 4px;">86% STRIKE</div>
+              </div>
+            </div>
+
+            <!-- City 3 -->
+            <div id="s4-card-3" class="glass-card" style="border-radius: 20px; padding: 24px 32px; border-left: 6px solid #eab308; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <span class="font-mono" style="font-size: 12px; color: #cbd5e1;">ODISHA SECTOR</span>
+                <h3 class="font-display" style="font-size: 28px; font-weight: 900; margin: 4px 0 0 0; color: #ffffff;">BALASORE</h3>
+              </div>
+              <div style="text-align: right;">
+                <span class="font-mono" style="font-size: 11px; font-weight: 800; color: #000000; background: #facc15; padding: 3px 10px; border-radius: 6px;">YELLOW WATCH</span>
+                <div class="font-mono" style="font-size: 32px; font-weight: 900; color: #facc15; margin-top: 4px;">64% STRIKE</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Bulletin Banner -->
+          <div id="s4-bulletin-banner" class="glass-card" style="width: 100%; max-width: 980px; border-radius: 18px; padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(52, 211, 153, 0.4); background: rgba(6, 78, 59, 0.3);">
+            <div style="display: flex; align-items: center; gap: 14px;">
+              <div style="width: 12px; height: 12px; border-radius: 50%; background: #34d399; box-shadow: 0 0 10px #34d399;"></div>
+              <div>
+                <div class="font-mono" style="font-size: 12px; color: #34d399; font-weight: 700;">RSMC / IMD BULLETIN ENGINE</div>
+                <div class="font-display" style="font-size: 17px; font-weight: 800; color: #ffffff;">Standard WMO Compliant PDF Reports</div>
+              </div>
+            </div>
+            <span class="font-mono" style="font-size: 12px; color: #ffffff; font-weight: 800; background: #059669; padding: 6px 14px; border-radius: 6px;">ZERO DELAY</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============================================================ -->
+      <!-- SCENE 5: Official VAYU Emblem & Launch (16.5s – 20.0s) -->
+      <!-- ============================================================ -->
+      <section id="scene-5" class="clip" data-start="16.5" data-duration="3.5">
+        <div style="position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 0 48px;">
+          <!-- Glowing Emblem Mark -->
+          <div id="s5-logo-wrap" style="position: relative; margin-bottom: 28px;">
+            <div style="position: absolute; inset: -40px; border-radius: 50%; background: radial-gradient(circle, rgba(56, 189, 248, 0.5) 0%, transparent 70%); filter: blur(35px);"></div>
+            <img src="assets/images/vayu-white.png" alt="VAYU Logo" style="height: 150px; object-fit: contain; position: relative; z-index: 10; filter: drop-shadow(0 0 24px rgba(56, 189, 248, 0.65)) drop-shadow(0 0 8px rgba(255, 255, 255, 0.7));" />
+          </div>
+
+          <h1 id="s5-title" class="font-display" style="font-size: 84px; font-weight: 900; margin: 0 0 12px 0; letter-spacing: -2px; color: #ffffff;">
+            VAYU <span style="font-weight: 400; color: #38bdf8;">(वायु)</span>
+          </h1>
+
+          <p id="s5-tagline" class="font-display" style="font-size: 28px; font-weight: 700; color: #f1f5f9; margin: 0 0 36px 0; max-width: 900px; line-height: 1.3;">
+            National AI Cyclone Intelligence & 72-Hour Trajectory Platform
+          </p>
+
+          <!-- Badges Grid Stacked for Vertical Screen -->
+          <div id="s5-badges" style="display: flex; flex-direction: column; gap: 14px; align-items: center; justify-content: center; margin-bottom: 40px; width: 100%; max-width: 600px;">
+            <div class="glass-card" style="padding: 10px 24px; border-radius: 9999px; border: 1px solid rgba(56, 189, 248, 0.4); width: 100%;">
+              <span class="font-mono" style="font-size: 14px; font-weight: 700; color: #7dd3fc;">SMART INDIA HACKATHON 2026</span>
+            </div>
+            <div class="glass-card" style="padding: 10px 24px; border-radius: 9999px; border: 1px solid rgba(52, 211, 153, 0.4); width: 100%;">
+              <span class="font-mono" style="font-size: 14px; font-weight: 700; color: #6ee7b7;">MoES & IMD ALIGNED</span>
+            </div>
+            <div class="glass-card" style="padding: 10px 24px; border-radius: 9999px; border: 1px solid rgba(251, 191, 36, 0.4); width: 100%;">
+              <span class="font-mono" style="font-size: 14px; font-weight: 700; color: #fde047;">SUB-100MS INFERENCE</span>
+            </div>
+          </div>
+
+          <!-- Launch Callout (Stacked for mobile impact) -->
+          <div id="s5-launch" class="font-mono" style="display: flex; flex-direction: column; gap: 8px;">
+            <span style="font-size: 32px; font-weight: 900; color: #38bdf8; letter-spacing: 1px;">portal.vayusat.live</span>
+            <span style="font-size: 26px; font-weight: 700; color: #ffffff; letter-spacing: 1px;">vayusat.live</span>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Animation Runtime (GSAP 3) -->
+    <script>
+      const tl = gsap.timeline({ paused: true });
+
+      // ==========================================
+      // Scene 1: The NIO Threat & Crisis Hook (0.0s – 3.5s)
+      // ==========================================
+      tl.to("#s1-sweep", { rotation: 360, duration: 3.5, ease: "linear" }, 0);
+      tl.fromTo("#s1-badge", { scale: 0.8, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.5, ease: "back.out(1.7)" }, 0.2);
+      tl.fromTo("#s1-headline-1", { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: "power3.out" }, 0.4);
+
+      // Cut to second question
+      tl.to("#s1-headline-1", { opacity: 0, scale: 0.95, duration: 0.25, ease: "power2.in" }, 2.0);
+      tl.fromTo("#s1-headline-2", { opacity: 0, scale: 1.05 }, { opacity: 1, scale: 1, duration: 0.35, ease: "power3.out" }, 2.2);
+
+      // Exit Scene 1
+      tl.to("#s1-headline-2", { opacity: 0, y: -30, duration: 0.3 }, 3.3);
+      tl.to("#s1-badge", { opacity: 0, duration: 0.3 }, 3.3);
+
+      // ==========================================
+      // Scene 2: The 95.5ms Neural Pipeline (3.5s – 8.0s)
+      // ==========================================
+      tl.fromTo("#s2-title-block", { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: "power3.out" }, 3.5);
+      tl.fromTo("#s2-card-1", { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: "power3.out" }, 3.8);
+      tl.fromTo("#s2-card-2", { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: "power3.out" }, 4.8);
+      tl.fromTo("#s2-card-3", { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: "power3.out" }, 5.8);
+
+      // Grand Total reveal on beat 6.8s
+      tl.fromTo("#s2-grand-total", { scale: 0.9, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.5, ease: "back.out(1.5)" }, 6.8);
+
+      // Exit Scene 2
+      tl.to(["#s2-title-block", "#s2-card-1", "#s2-card-2", "#s2-card-3", "#s2-grand-total"], {
+        opacity: 0,
+        y: -30,
+        duration: 0.35,
+        stagger: 0.05
+      }, 7.7);
+
+      // ==========================================
+      // Scene 3: 72h Trajectory & Monte Carlo Cone (8.0s – 12.5s)
+      // ==========================================
+      tl.fromTo("#s3-map-container", { y: -40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: "power3.out" }, 8.0);
+      tl.fromTo("#s3-hud-card", { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.6, ease: "power3.out" }, 8.2);
+
+      // Animate trajectory SVG line and uncertainty polygon
+      tl.fromTo("#s3-track-line", { strokeDasharray: 800, strokeDashoffset: 800 }, { strokeDashoffset: 0, duration: 2.2, ease: "power2.inOut" }, 8.6);
+      tl.fromTo("#s3-mc-cone", { opacity: 0, scale: 0.8, transformOrigin: "160px 520px" }, { opacity: 1, scale: 1, duration: 1.5, ease: "power2.out" }, 9.2);
+
+      // Exit Scene 3
+      tl.to(["#s3-map-container", "#s3-hud-card"], { opacity: 0, scale: 0.96, duration: 0.35 }, 12.2);
+
+      // ==========================================
+      // Scene 4: Coastal Defense & Early Warning Network (12.5s – 16.5s)
+      // ==========================================
+      tl.fromTo("#s4-header", { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: "power3.out" }, 12.5);
+      tl.fromTo("#s4-card-1", { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: "power3.out" }, 12.8);
+      tl.fromTo("#s4-card-2", { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: "power3.out" }, 13.3);
+      tl.fromTo("#s4-card-3", { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: "power3.out" }, 13.8);
+      tl.fromTo("#s4-bulletin-banner", { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: "power3.out" }, 14.3);
+
+      // Exit Scene 4
+      tl.to(["#s4-header", "#s4-card-1", "#s4-card-2", "#s4-card-3", "#s4-bulletin-banner"], {
+        opacity: 0,
+        y: -30,
+        duration: 0.35,
+        stagger: 0.04
+      }, 16.2);
+
+      // ==========================================
+      // Scene 5: Official VAYU Emblem & Launch (16.5s – 20.0s)
+      // ==========================================
+      tl.fromTo("#s5-logo-wrap", { scale: 0.7, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.6, ease: "back.out(1.8)" }, 16.5);
+      tl.fromTo("#s5-title", { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "power3.out" }, 16.8);
+      tl.fromTo("#s5-tagline", { y: 20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, ease: "power3.out" }, 17.1);
+      tl.fromTo("#s5-badges", { scale: 0.9, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.5, ease: "power3.out" }, 17.4);
+      tl.fromTo("#s5-launch", { opacity: 0 }, { opacity: 1, duration: 0.6, ease: "power2.out" }, 17.8);
+
+      // Hold strong until 20.0s end
+      window.__timelines["main"] = tl;
+    </script>
+  </body>
+</html>
