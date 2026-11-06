@@ -25,7 +25,7 @@ import DataUnavailableNotice from '../components/DataUnavailableNotice';
 import CycloneLifecycleBar from '../components/CycloneLifecycleBar';
 import AIReasoningCard from '../components/AIReasoningCard';
 import DataSourceStatusCard from '../components/DataSourceStatusCard';
-import {
+import { 
   ResponsiveContainer, LineChart, Line, AreaChart, Area, XAxis, YAxis, Tooltip as RechartsTooltip,
   BarChart, Bar, PieChart, Pie, Cell, CartesianGrid
 } from 'recharts';
@@ -423,10 +423,11 @@ const CityWeather3DCard = ({
   return (
     <div className="h-full">
       <div
-        className={`relative rounded-2xl p-4 text-slate-900 dark:text-white flex flex-col justify-between h-full min-h-[180px] transition-all border ${isActive
+        className={`relative rounded-2xl p-4 text-slate-900 dark:text-white flex flex-col justify-between h-full min-h-[180px] transition-all border ${
+          isActive
             ? 'border-sky-300 dark:border-sky-500/50 bg-sky-50/40 dark:bg-sky-950/20 shadow-xs'
             : 'border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900 hover:border-slate-200 dark:hover:border-slate-700 shadow-2xs'
-          }`}
+        }`}
       >
         {/* City Name */}
         <div className="flex items-center justify-between mb-2">
@@ -820,7 +821,7 @@ const INITIAL_SYSTEMS = {
       [12.1, 66.0], [14.5, 66.2], [17.2, 67.0], [19.8, 67.4], [21.5, 66.8], [23.3, 68.6]
     ],
     cone: [
-      [12.1, 66.0], [14.0, 68.0], [18.0, 70.0], [24.5, 71.0],
+      [12.1, 66.0], [14.0, 68.0], [18.0, 70.0], [24.5, 71.0], 
       [25.0, 67.0], [20.5, 65.0], [15.0, 64.5], [12.1, 66.0]
     ]
   }
@@ -1327,7 +1328,7 @@ const Welcome = () => {
   const [isSyncing, setIsSyncing] = useState(false);
   const [lastSyncTime, setLastSyncTime] = useState('');
   const [syncStatus, setSyncStatus] = useState('LIVE_AI_CONNECTED');
-
+  
   // Dashboard Interactive States
   const [heroVisualizerMode, setHeroVisualizerMode] = useState('globe'); // 'globe' | 'trajectory' | 'radar'
   const [isGlobeAutoRotate, setIsGlobeAutoRotate] = useState(true);
@@ -1373,26 +1374,26 @@ const Welcome = () => {
 
       const bayPromise = baseUrl
         ? fetch(`${baseUrl}/api/v1/cyclones/genesis-watch?basin=Bay%20of%20Bengal`, { signal: AbortSignal.timeout(2500) })
-          .then(r => r.ok ? r.json() : null)
-          .catch(() => null)
+            .then(r => r.ok ? r.json() : null)
+            .catch(() => null)
         : Promise.resolve(null);
 
       const arabPromise = baseUrl
         ? fetch(`${baseUrl}/api/v1/cyclones/genesis-watch?basin=Arabian%20Sea`, { signal: AbortSignal.timeout(2500) })
-          .then(r => r.ok ? r.json() : null)
-          .catch(() => null)
+            .then(r => r.ok ? r.json() : null)
+            .catch(() => null)
         : Promise.resolve(null);
 
       const danaPromise = baseUrl
         ? fetch(`${baseUrl}/api/v1/cyclones/cyclone-dana-2024`, { signal: AbortSignal.timeout(2500) })
-          .then(r => r.ok ? r.json() : null)
-          .catch(() => null)
+            .then(r => r.ok ? r.json() : null)
+            .catch(() => null)
         : Promise.resolve(null);
 
       const biparjoyPromise = baseUrl
         ? fetch(`${baseUrl}/api/v1/cyclones/cyclone-biparjoy-2023`, { signal: AbortSignal.timeout(2500) })
-          .then(r => r.ok ? r.json() : null)
-          .catch(() => null)
+            .then(r => r.ok ? r.json() : null)
+            .catch(() => null)
         : Promise.resolve(null);
 
       const oceanPromise = fetchLiveOceanTelemetry('Bay of Bengal').catch(() => null);
@@ -1578,7 +1579,7 @@ const Welcome = () => {
     const root = document.documentElement;
     root.classList.remove('dark');
     root.style.colorScheme = 'light';
-    try { localStorage.removeItem('theme'); } catch (e) { }
+    try { localStorage.removeItem('theme'); } catch (e) {}
   }, []);
 
   // Dynamically scale root document font-size so all rem-based typography scales with A- / A+
@@ -1757,7 +1758,7 @@ const Welcome = () => {
         className="flex-1 flex flex-col justify-center py-6 sm:py-8 px-4 sm:px-6 lg:px-8 relative w-full bg-white border-b border-zinc-200"
       >
         <div className="max-w-7xl mx-auto w-full space-y-6">
-
+          
           {/* Top Operational Header Bar */}
           <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 border-b border-zinc-200 pb-5">
             <div className="space-y-2">
@@ -1809,13 +1810,15 @@ const Welcome = () => {
                         setActiveStepIndex(0);
                         setIsPlayingTimeline(false);
                       }}
-                      className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full transition-all cursor-pointer text-xs font-medium ${isSelected
+                      className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full transition-all cursor-pointer text-xs font-medium ${
+                        isSelected
                           ? 'bg-black text-white shadow-xs'
                           : 'text-zinc-600 hover:text-black'
-                        }`}
+                      }`}
                     >
-                      <span className={`w-1.5 h-1.5 rounded-full ${isSelected ? 'bg-white' : 'bg-zinc-400'
-                        }`} />
+                      <span className={`w-1.5 h-1.5 rounded-full ${
+                        isSelected ? 'bg-white' : 'bg-zinc-400'
+                      }`} />
                       <span>{isHindi ? (sys.shortNameHindi || sys.shortName) : sys.shortName}</span>
                       {isSelected && (
                         <span className="text-[10px] px-1 rounded bg-zinc-800 text-zinc-300 font-mono">
@@ -1841,15 +1844,15 @@ const Welcome = () => {
 
           {/* MAIN TWO-COLUMN SPLIT GRID */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-stretch">
-
+            
             {/* LEFT COLUMN: Clean Minimalist Telemetry & Forecast (7 cols) */}
             <div className="lg:col-span-7 flex flex-col gap-4">
-
+              
               {/* 4 Core Telemetry Metric Cards */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
-
+                
                 {/* Metric 1: Sustained Wind */}
-                <div
+                <div 
                   onClick={() => navigate('/threat-map')}
                   className="bg-white border border-zinc-200 hover:border-zinc-400 p-5 rounded-xl flex flex-col justify-between transition-colors cursor-pointer group"
                 >
@@ -1877,7 +1880,7 @@ const Welcome = () => {
 
                     {/* Minimalist Black Meter */}
                     <div className="w-full bg-zinc-100 h-1 rounded-full mt-3 overflow-hidden">
-                      <div
+                      <div 
                         className="h-full bg-zinc-900 rounded-full transition-all duration-500"
                         style={{ width: `${Math.min(100, (parseInt(current.wind || 40) / 220) * 100)}%` }}
                       />
@@ -1893,7 +1896,7 @@ const Welcome = () => {
                 </div>
 
                 {/* Metric 2: Central Pressure */}
-                <div
+                <div 
                   onClick={() => navigate('/threat-map')}
                   className="bg-white border border-zinc-200 hover:border-zinc-400 p-5 rounded-xl flex flex-col justify-between transition-colors cursor-pointer group"
                 >
@@ -1919,7 +1922,7 @@ const Welcome = () => {
 
                     {/* Minimalist Black Meter */}
                     <div className="w-full bg-zinc-100 h-1 rounded-full mt-3 overflow-hidden">
-                      <div
+                      <div 
                         className="h-full bg-zinc-900 rounded-full transition-all duration-500"
                         style={{ width: `${Math.min(100, Math.max(10, ((1013 - parseInt(current.pressure || 1004)) / 60) * 100))}%` }}
                       />
@@ -1935,7 +1938,7 @@ const Welcome = () => {
                 </div>
 
                 {/* Metric 3: 48h Cyclogenesis Risk */}
-                <div
+                <div 
                   onClick={() => navigate('/bulletins')}
                   className="bg-white border border-zinc-200 hover:border-zinc-400 p-5 rounded-xl flex flex-col justify-between transition-colors cursor-pointer group"
                 >
@@ -1959,7 +1962,7 @@ const Welcome = () => {
 
                     {/* Minimalist Black Meter */}
                     <div className="w-full bg-zinc-100 h-1 rounded-full mt-3 overflow-hidden">
-                      <div
+                      <div 
                         className="h-full bg-zinc-900 rounded-full transition-all duration-500"
                         style={{ width: current.risk48h?.includes('%') ? current.risk48h : '85%' }}
                       />
@@ -1975,7 +1978,7 @@ const Welcome = () => {
                 </div>
 
                 {/* Metric 4: Forward Track & Speed */}
-                <div
+                <div 
                   onClick={() => navigate('/threat-map')}
                   className="bg-white border border-zinc-200 hover:border-zinc-400 p-5 rounded-xl flex flex-col justify-between transition-colors cursor-pointer group"
                 >
@@ -2001,7 +2004,7 @@ const Welcome = () => {
 
                     {/* Minimalist Black Meter */}
                     <div className="w-full bg-zinc-100 h-1 rounded-full mt-3 overflow-hidden">
-                      <div
+                      <div 
                         className="h-full bg-zinc-900 rounded-full transition-all duration-500"
                         style={{ width: `${Math.min(100, (parseInt(current.speed || 14) / 30) * 100)}%` }}
                       />
@@ -2084,18 +2087,19 @@ const Welcome = () => {
 
             {/* RIGHT COLUMN: Minimalist Studio Viewport (5 cols) */}
             <div className="lg:col-span-5 flex flex-col">
-
+              
               <div className="bg-white border border-zinc-200 rounded-xl p-4 flex flex-col h-full min-h-[460px]">
-
+                
                 {/* Visualizer Header: Mode Switcher Tabs + Controls */}
                 <div className="flex items-center justify-between gap-2 border-b border-zinc-100 pb-3 mb-3">
                   <div className="inline-flex p-1 bg-zinc-100 rounded-lg border border-zinc-200 text-xs">
                     <button
                       onClick={() => setHeroVisualizerMode('globe')}
-                      className={`flex items-center gap-1.5 px-3 py-1 rounded transition-all cursor-pointer text-xs font-medium ${heroVisualizerMode === 'globe'
+                      className={`flex items-center gap-1.5 px-3 py-1 rounded transition-all cursor-pointer text-xs font-medium ${
+                        heroVisualizerMode === 'globe'
                           ? 'bg-black text-white shadow-xs'
                           : 'text-zinc-600 hover:text-black'
-                        }`}
+                      }`}
                     >
                       <Globe className="w-3.5 h-3.5" />
                       <span>{isHindi ? '3D ग्लोब' : '3D Globe'}</span>
@@ -2103,10 +2107,11 @@ const Welcome = () => {
 
                     <button
                       onClick={() => setHeroVisualizerMode('trajectory')}
-                      className={`flex items-center gap-1.5 px-3 py-1 rounded transition-all cursor-pointer text-xs font-medium ${heroVisualizerMode === 'trajectory'
+                      className={`flex items-center gap-1.5 px-3 py-1 rounded transition-all cursor-pointer text-xs font-medium ${
+                        heroVisualizerMode === 'trajectory'
                           ? 'bg-black text-white shadow-xs'
                           : 'text-zinc-600 hover:text-black'
-                        }`}
+                      }`}
                     >
                       <Sliders className="w-3.5 h-3.5" />
                       <span>{isHindi ? '72h ट्रैक' : '72h Track'}</span>
@@ -2114,10 +2119,11 @@ const Welcome = () => {
 
                     <button
                       onClick={() => setHeroVisualizerMode('radar')}
-                      className={`flex items-center gap-1.5 px-3 py-1 rounded transition-all cursor-pointer text-xs font-medium ${heroVisualizerMode === 'radar'
+                      className={`flex items-center gap-1.5 px-3 py-1 rounded transition-all cursor-pointer text-xs font-medium ${
+                        heroVisualizerMode === 'radar'
                           ? 'bg-black text-white shadow-xs'
                           : 'text-zinc-600 hover:text-black'
-                        }`}
+                      }`}
                     >
                       <Satellite className="w-3.5 h-3.5" />
                       <span>{isHindi ? 'उपग्रह' : 'Satellite IR'}</span>
@@ -2129,10 +2135,11 @@ const Welcome = () => {
                     {heroVisualizerMode === 'globe' && (
                       <button
                         onClick={() => setIsGlobeAutoRotate(prev => !prev)}
-                        className={`p-1.5 rounded-lg border text-xs transition-colors cursor-pointer ${isGlobeAutoRotate
-                            ? 'bg-black text-white border-black'
+                        className={`p-1.5 rounded-lg border text-xs transition-colors cursor-pointer ${
+                          isGlobeAutoRotate 
+                            ? 'bg-black text-white border-black' 
                             : 'bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-50'
-                          }`}
+                        }`}
                         title={isGlobeAutoRotate ? "Pause Globe Rotation" : "Resume Globe Rotation"}
                       >
                         {isGlobeAutoRotate ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
@@ -2142,10 +2149,11 @@ const Welcome = () => {
                     {heroVisualizerMode === 'trajectory' && (
                       <button
                         onClick={() => setIsPlayingTimeline(prev => !prev)}
-                        className={`flex items-center gap-1 px-2.5 py-1 rounded-lg border text-xs font-medium transition-colors cursor-pointer ${isPlayingTimeline
-                            ? 'bg-black text-white border-black'
+                        className={`flex items-center gap-1 px-2.5 py-1 rounded-lg border text-xs font-medium transition-colors cursor-pointer ${
+                          isPlayingTimeline 
+                            ? 'bg-black text-white border-black' 
                             : 'bg-white text-zinc-800 border-zinc-200 hover:bg-zinc-50'
-                          }`}
+                        }`}
                       >
                         {isPlayingTimeline ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
                         <span>{isPlayingTimeline ? (isHindi ? 'रोकें' : 'Pause') : (isHindi ? 'चलाएं' : 'Play 72h')}</span>
@@ -2164,7 +2172,7 @@ const Welcome = () => {
 
                 {/* Viewport Canvas Container */}
                 <div className="flex-1 w-full rounded-lg overflow-hidden relative min-h-[380px] bg-black border border-zinc-200">
-
+                  
                   {/* MODE 1: 3D THREE.JS EARTH GLOBE */}
                   {heroVisualizerMode === 'globe' && (
                     <div className="w-full h-full relative">
@@ -2178,7 +2186,7 @@ const Welcome = () => {
                         showTelemetry={false}
                         className="w-full h-full relative"
                       />
-
+                      
                       {/* Floating Minimalist HUD Badge */}
                       <div className="absolute top-3 left-3 z-10 pointer-events-none">
                         <div className="bg-black/90 backdrop-blur-md px-3 py-1.5 rounded border border-zinc-800 text-[11px] text-zinc-200 space-y-0.5">
@@ -2203,7 +2211,7 @@ const Welcome = () => {
                   {/* MODE 2: 72H TRAJECTORY SCRUBBER & INTENSITY RECHARTS */}
                   {heroVisualizerMode === 'trajectory' && (
                     <div className="w-full h-full p-4 flex flex-col justify-between bg-zinc-950 text-white select-none">
-
+                      
                       {/* Top Step Info Card */}
                       <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3">
                         <div className="flex items-center justify-between text-xs mb-1">
@@ -2215,8 +2223,8 @@ const Welcome = () => {
                           </span>
                         </div>
                         <h4 className="font-semibold text-sm text-white">
-                          {isHindi
-                            ? (current.waypoints?.[activeStepIndex]?.labelHindi || current.waypoints?.[activeStepIndex]?.label)
+                          {isHindi 
+                            ? (current.waypoints?.[activeStepIndex]?.labelHindi || current.waypoints?.[activeStepIndex]?.label) 
                             : (current.waypoints?.[activeStepIndex]?.label || 'Observed Center')}
                         </h4>
                         <div className="flex items-center gap-4 mt-2 text-xs text-zinc-300 font-mono">
@@ -2229,8 +2237,8 @@ const Welcome = () => {
                             <strong className="text-white">{current.waypoints?.[activeStepIndex]?.pressure}</strong>
                           </span>
                           <span className="text-zinc-400">
-                            {isHindi
-                              ? (current.waypoints?.[activeStepIndex]?.catHindi || current.waypoints?.[activeStepIndex]?.cat)
+                            {isHindi 
+                              ? (current.waypoints?.[activeStepIndex]?.catHindi || current.waypoints?.[activeStepIndex]?.cat) 
                               : current.waypoints?.[activeStepIndex]?.cat}
                           </span>
                         </div>
@@ -2239,25 +2247,25 @@ const Welcome = () => {
                       {/* Intensity Forecast Recharts Curve (Monochrome Clean Line) */}
                       <div className="my-2 h-36 w-full">
                         <ResponsiveContainer width="100%" height="100%">
-                          <AreaChart
+                          <AreaChart 
                             data={current.intensityCurve || (current.waypoints || []).map(w => ({
                               time: w.step,
                               speed: parseInt(w.wind) || 40,
                               pressure: parseInt(w.pressure) || 1000
-                            }))}
+                            }))} 
                             margin={{ top: 5, right: 10, left: -25, bottom: 0 }}
                           >
                             <defs>
                               <linearGradient id="speedGrad" x1="0" y1="0" x2="0" y2="1">
-                                <stop offset="5%" stopColor="#ffffff" stopOpacity={0.3} />
-                                <stop offset="95%" stopColor="#ffffff" stopOpacity={0} />
+                                <stop offset="5%" stopColor="#ffffff" stopOpacity={0.3}/>
+                                <stop offset="95%" stopColor="#ffffff" stopOpacity={0}/>
                               </linearGradient>
                             </defs>
                             <CartesianGrid stroke="#27272a" strokeDasharray="3 3" vertical={false} />
                             <XAxis dataKey="time" tick={{ fontSize: 10, fill: '#71717a' }} axisLine={false} tickLine={false} />
                             <YAxis tick={{ fontSize: 10, fill: '#71717a' }} axisLine={false} tickLine={false} domain={['dataMin - 10', 'dataMax + 10']} />
-                            <RechartsTooltip
-                              contentStyle={{ backgroundColor: '#09090b', borderColor: '#27272a', borderRadius: '8px', fontSize: '11px', color: '#ffffff' }}
+                            <RechartsTooltip 
+                              contentStyle={{ backgroundColor: '#09090b', borderColor: '#27272a', borderRadius: '8px', fontSize: '11px', color: '#ffffff' }} 
                             />
                             <Area type="monotone" dataKey="speed" stroke="#ffffff" strokeWidth={2} fillOpacity={1} fill="url(#speedGrad)" name="Wind Speed (km/h)" />
                           </AreaChart>
@@ -2278,10 +2286,11 @@ const Welcome = () => {
                                 setActiveStepIndex(idx);
                                 setIsPlayingTimeline(false);
                               }}
-                              className={`py-1.5 px-1 rounded text-center font-mono text-[11px] font-semibold transition-all cursor-pointer ${activeStepIndex === idx
+                              className={`py-1.5 px-1 rounded text-center font-mono text-[11px] font-semibold transition-all cursor-pointer ${
+                                activeStepIndex === idx
                                   ? 'bg-white text-black'
                                   : 'text-zinc-400 hover:text-white hover:bg-zinc-800'
-                                }`}
+                              }`}
                             >
                               {wp.step}
                             </button>
@@ -2296,7 +2305,7 @@ const Welcome = () => {
                   {heroVisualizerMode === 'radar' && (
                     <div className="w-full h-full relative">
                       <CycloneAtmosphericLiveView />
-
+                      
                       <div className="absolute top-3 left-3 z-10 pointer-events-none">
                         <div className="bg-black/90 backdrop-blur-md px-3 py-1.5 rounded border border-zinc-800 text-[11px] text-zinc-200">
                           <span className="font-mono text-white flex items-center gap-1.5">
@@ -2322,314 +2331,314 @@ const Welcome = () => {
       {/* Main Content Sections Container */}
       <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-4 space-y-6">
 
-        {/* =========================================================================
+          {/* =========================================================================
                CURRENT WEATHER ACROSS MAJOR CITIES (AUTO-ROTATING CAROUSEL)
                ========================================================================= */}
-        <div
-          className="rounded-[32px] bg-[#FAFAFA] dark:bg-slate-900/80 border border-slate-100/60 dark:border-slate-800/80 p-5 relative overflow-hidden group/carousel transition-colors"
-          onMouseEnter={() => setIsCityCarouselPaused(true)}
-          onMouseLeave={() => setIsCityCarouselPaused(false)}
-        >
-          {/* Header / Title */}
-          <div className="flex items-center justify-between mb-4 px-1 border-b border-slate-100 dark:border-slate-800 pb-3 relative z-10">
-            <div className="flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-sky-500 animate-pulse" />
-              <h2 className="font-heading font-bold text-xs sm:text-sm tracking-wider uppercase text-slate-900 dark:text-white">
-                {isHindi ? 'प्रमुख शहरों का वर्तमान मौसम' : 'CURRENT WEATHER ACROSS MAJOR CITIES'}
-              </h2>
+          <div
+            className="rounded-[32px] bg-[#FAFAFA] dark:bg-slate-900/80 border border-slate-100/60 dark:border-slate-800/80 p-5 relative overflow-hidden group/carousel transition-colors"
+            onMouseEnter={() => setIsCityCarouselPaused(true)}
+            onMouseLeave={() => setIsCityCarouselPaused(false)}
+          >
+            {/* Header / Title */}
+            <div className="flex items-center justify-between mb-4 px-1 border-b border-slate-100 dark:border-slate-800 pb-3 relative z-10">
+              <div className="flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-sky-500 animate-pulse" />
+                <h2 className="font-heading font-bold text-xs sm:text-sm tracking-wider uppercase text-slate-900 dark:text-white">
+                  {isHindi ? 'प्रमुख शहरों का वर्तमान मौसम' : 'CURRENT WEATHER ACROSS MAJOR CITIES'}
+                </h2>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <button
+                  onClick={handlePrevCity}
+                  aria-label="Previous City"
+                  className="p-2 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-xs transition-all cursor-pointer"
+                >
+                  <ChevronLeft className="w-3.5 h-3.5" />
+                </button>
+                <button
+                  onClick={handleNextCity}
+                  aria-label="Next City"
+                  className="p-2 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-xs transition-all cursor-pointer"
+                >
+                  <ChevronRight className="w-3.5 h-3.5" />
+                </button>
+              </div>
             </div>
-            <div className="flex items-center gap-2 shrink-0">
-              <button
-                onClick={handlePrevCity}
-                aria-label="Previous City"
-                className="p-2 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-xs transition-all cursor-pointer"
+
+            {/* 3D Glass Sliding Track Viewport with Wheel & Drag Gestures */}
+            <div
+              className="city-carousel-container relative z-10 select-none cursor-grab active:cursor-grabbing"
+              onWheel={handleCarouselWheel}
+              onMouseDown={handleDragStart}
+              onMouseMove={handleDragMove}
+              onMouseUp={handleDragEnd}
+              onMouseLeave={handleDragEnd}
+              onTouchStart={handleDragStart}
+              onTouchMove={handleDragMove}
+              onTouchEnd={handleDragEnd}
+            >
+              <div
+                className={`city-carousel-track ${isCarouselAnimated && dragOffsetPx === 0 ? 'is-animated' : ''}`}
+                style={{
+                  transform: `translateX(calc(-1 * ${cityCarouselIndex} * (100% / var(--items-per-screen)) + ${dragOffsetPx}px))`
+                }}
+                onTransitionEnd={handleCarouselTransitionEnd}
               >
-                <ChevronLeft className="w-3.5 h-3.5" />
-              </button>
-              <button
-                onClick={handleNextCity}
-                aria-label="Next City"
-                className="p-2 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 shadow-xs transition-all cursor-pointer"
-              >
-                <ChevronRight className="w-3.5 h-3.5" />
-              </button>
+                {extendedCities.map((city, idx) => {
+                  const centerIdx = cityCarouselIndex + Math.floor(itemsPerScreen / 2);
+                  const positionOffset = idx - centerIdx;
+                  const isActive = hoveredCardIdx !== null ? hoveredCardIdx === idx : idx === centerIdx;
+
+                  return (
+                    <div
+                      key={`${city.id}-${idx}`}
+                      className="city-carousel-item"
+                      onMouseEnter={() => setHoveredCardIdx(idx)}
+                      onMouseLeave={() => setHoveredCardIdx(null)}
+                    >
+                      <CityWeather3DCard
+                        city={city}
+                        idx={idx}
+                        isHindi={isHindi}
+                        isActive={isActive}
+                        positionOffset={positionOffset}
+                        renderWeatherIcon={renderWeatherIcon}
+                        onOpenForecast={(city) => navigate(`/forecast/${city.id}`)}
+                      />
+                    </div>
+                  );
+                })}
+              </div>
             </div>
           </div>
 
-          {/* 3D Glass Sliding Track Viewport with Wheel & Drag Gestures */}
-          <div
-            className="city-carousel-container relative z-10 select-none cursor-grab active:cursor-grabbing"
-            onWheel={handleCarouselWheel}
-            onMouseDown={handleDragStart}
-            onMouseMove={handleDragMove}
-            onMouseUp={handleDragEnd}
-            onMouseLeave={handleDragEnd}
-            onTouchStart={handleDragStart}
-            onTouchMove={handleDragMove}
-            onTouchEnd={handleDragEnd}
-          >
-            <div
-              className={`city-carousel-track ${isCarouselAnimated && dragOffsetPx === 0 ? 'is-animated' : ''}`}
-              style={{
-                transform: `translateX(calc(-1 * ${cityCarouselIndex} * (100% / var(--items-per-screen)) + ${dragOffsetPx}px))`
-              }}
-              onTransitionEnd={handleCarouselTransitionEnd}
-            >
-              {extendedCities.map((city, idx) => {
-                const centerIdx = cityCarouselIndex + Math.floor(itemsPerScreen / 2);
-                const positionOffset = idx - centerIdx;
-                const isActive = hoveredCardIdx !== null ? hoveredCardIdx === idx : idx === centerIdx;
+          {/* =========================================================================
+               OUR SERVICES SECTION (RAINFALL, MONSOON, CYCLONE, CLIMATE SERVICES)
+               ========================================================================= */}
+          <div className="pt-2 sm:pt-2.5 relative">
+            <div className="border-b border-slate-200 dark:border-slate-800 pb-2 mb-3.5 flex items-center justify-between">
+              <h2 className="text-xs sm:text-sm font-bold tracking-wider uppercase text-slate-900 dark:text-white font-heading flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                <span>{isHindi ? 'हमारी सेवाएं (OUR SERVICES)' : 'OUR SERVICES'}</span>
+              </h2>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium hidden sm:inline">
+                {isHindi ? 'भारत मौसम विज्ञान विभाग (IMD) अधिकृत मौसम सेवाएं' : 'National Meteorological & Early Warning Portals'}
+              </span>
+            </div>
 
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+              {SERVICES_DATA.map((srv) => {
+                const IconComponent = srv.icon === 'cyclone' ? CycloneSwirlIcon : srv.icon;
                 return (
                   <div
-                    key={`${city.id}-${idx}`}
-                    className="city-carousel-item"
-                    onMouseEnter={() => setHoveredCardIdx(idx)}
-                    onMouseLeave={() => setHoveredCardIdx(null)}
+                    key={srv.id}
+                    onClick={() => navigate(srv.route)}
+                    className={`p-4 sm:p-5 rounded-2xl cursor-pointer group flex flex-col justify-between h-full border ${srv.cardBg} ${srv.cardBorder} hover:shadow-xs transition-all duration-150`}
                   >
-                    <CityWeather3DCard
-                      city={city}
-                      idx={idx}
-                      isHindi={isHindi}
-                      isActive={isActive}
-                      positionOffset={positionOffset}
-                      renderWeatherIcon={renderWeatherIcon}
-                      onOpenForecast={(city) => navigate(`/forecast/${city.id}`)}
-                    />
+                    <div>
+                      {/* Card Header: Icon Badge + Pill Tag */}
+                      <div className="flex items-center justify-between gap-2 mb-3">
+                        <div className={`w-9 h-9 rounded-lg border ${srv.iconBg} flex items-center justify-center shrink-0`}>
+                          <IconComponent className="w-5 h-5" />
+                        </div>
+                        <span className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-md border ${srv.tagClass} shrink-0`}>
+                          {isHindi ? srv.tagHindi : srv.tag}
+                        </span>
+                      </div>
+
+                      {/* Service Title */}
+                      <h3 className="font-heading font-bold text-xs sm:text-[13px] uppercase tracking-wide leading-snug text-slate-900 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-sky-400 transition-colors">
+                        {isHindi ? srv.titleHindi : srv.title}
+                      </h3>
+
+                      {/* Teaser Description */}
+                      <p className="text-[11px] text-slate-500 dark:text-slate-400 font-normal leading-relaxed mt-1.5 line-clamp-2">
+                        {isHindi ? srv.teaserHindi : srv.teaser}
+                      </p>
+                    </div>
+
+                    {/* Card Bottom: Read More Action with subtle arrow */}
+                    <div className="pt-3 mt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-100 transition-colors">
+                      <span className="text-[11px] font-medium">
+                        {isHindi ? 'विवरण देखें' : 'Explore Service'}
+                      </span>
+                      <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-700 dark:group-hover:text-slate-200 group-hover:translate-x-0.5 transition-transform duration-150" />
+                    </div>
                   </div>
                 );
               })}
             </div>
           </div>
-        </div>
 
-        {/* =========================================================================
-               OUR SERVICES SECTION (RAINFALL, MONSOON, CYCLONE, CLIMATE SERVICES)
-               ========================================================================= */}
-        <div className="pt-2 sm:pt-2.5 relative">
-          <div className="border-b border-slate-200 dark:border-slate-800 pb-2 mb-3.5 flex items-center justify-between">
-            <h2 className="text-xs sm:text-sm font-bold tracking-wider uppercase text-slate-900 dark:text-white font-heading flex items-center gap-2">
-              <span className="w-2 h-2 rounded-full bg-emerald-500" />
-              <span>{isHindi ? 'हमारी सेवाएं (OUR SERVICES)' : 'OUR SERVICES'}</span>
-            </h2>
-            <span className="text-[11px] text-slate-500 dark:text-slate-400 font-medium hidden sm:inline">
-              {isHindi ? 'भारत मौसम विज्ञान विभाग (IMD) अधिकृत मौसम सेवाएं' : 'National Meteorological & Early Warning Portals'}
-            </span>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-            {SERVICES_DATA.map((srv) => {
-              const IconComponent = srv.icon === 'cyclone' ? CycloneSwirlIcon : srv.icon;
-              return (
-                <div
-                  key={srv.id}
-                  onClick={() => navigate(srv.route)}
-                  className={`p-4 sm:p-5 rounded-2xl cursor-pointer group flex flex-col justify-between h-full border ${srv.cardBg} ${srv.cardBorder} hover:shadow-xs transition-all duration-150`}
-                >
-                  <div>
-                    {/* Card Header: Icon Badge + Pill Tag */}
-                    <div className="flex items-center justify-between gap-2 mb-3">
-                      <div className={`w-9 h-9 rounded-lg border ${srv.iconBg} flex items-center justify-center shrink-0`}>
-                        <IconComponent className="w-5 h-5" />
-                      </div>
-                      <span className={`text-[10px] font-semibold uppercase tracking-wider px-2 py-0.5 rounded-md border ${srv.tagClass} shrink-0`}>
-                        {isHindi ? srv.tagHindi : srv.tag}
-                      </span>
-                    </div>
-
-                    {/* Service Title */}
-                    <h3 className="font-heading font-bold text-xs sm:text-[13px] uppercase tracking-wide leading-snug text-slate-900 dark:text-slate-100 group-hover:text-blue-600 dark:group-hover:text-sky-400 transition-colors">
-                      {isHindi ? srv.titleHindi : srv.title}
-                    </h3>
-
-                    {/* Teaser Description */}
-                    <p className="text-[11px] text-slate-500 dark:text-slate-400 font-normal leading-relaxed mt-1.5 line-clamp-2">
-                      {isHindi ? srv.teaserHindi : srv.teaser}
-                    </p>
-                  </div>
-
-                  {/* Card Bottom: Read More Action with subtle arrow */}
-                  <div className="pt-3 mt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-slate-100 transition-colors">
-                    <span className="text-[11px] font-medium">
-                      {isHindi ? 'विवरण देखें' : 'Explore Service'}
-                    </span>
-                    <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-slate-700 dark:group-hover:text-slate-200 group-hover:translate-x-0.5 transition-transform duration-150" />
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* =========================================================================
+          {/* =========================================================================
                SIH AI CYCLONE INTELLIGENCE & PATTERN CLASSIFICATION SUITE PREVIEW
                Problem Statement: "AI/ML system for identification, classification, and prediction of tropical cyclone patterns using multi-source satellite data"
                ========================================================================= */}
-        <div className="relative rounded-[32px] p-6 sm:p-7 bg-[#FAFAFA] dark:bg-slate-900/80 border border-slate-100/60 dark:border-slate-800/80 transition-colors">
-          <div className="space-y-5">
-            {/* Header Banner */}
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-4">
-              <div>
-                <div className="flex flex-wrap items-center gap-2 mb-2">
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-50 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300 text-[10px] font-bold border border-purple-100 dark:border-purple-900/50">
-                    <Sparkles className="w-3 h-3 text-purple-600 dark:text-purple-400" />
-                    {isHindi ? 'स्मार्ट इंडिया हैकाथॉन (SIH) एआई/एमएल सिस्टम' : 'SIH AI/ML INNOVATION SUITE'}
-                  </span>
-                  <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold border border-emerald-100 dark:border-emerald-900/50">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                    {isHindi ? 'मल्टी-सोर्स उपग्रह डेटा एकीकरण' : 'Multi-Source Satellite Fusion Active'}
-                  </span>
+          <div className="relative rounded-[32px] p-6 sm:p-7 bg-[#FAFAFA] dark:bg-slate-900/80 border border-slate-100/60 dark:border-slate-800/80 transition-colors">
+            <div className="space-y-5">
+              {/* Header Banner */}
+              <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 border-b border-slate-100 dark:border-slate-800 pb-4">
+                <div>
+                  <div className="flex flex-wrap items-center gap-2 mb-2">
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-purple-50 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300 text-[10px] font-bold border border-purple-100 dark:border-purple-900/50">
+                      <Sparkles className="w-3 h-3 text-purple-600 dark:text-purple-400" />
+                      {isHindi ? 'स्मार्ट इंडिया हैकाथॉन (SIH) एआई/एमएल सिस्टम' : 'SIH AI/ML INNOVATION SUITE'}
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-50 dark:bg-emerald-950/50 text-emerald-700 dark:text-emerald-300 text-[10px] font-bold border border-emerald-100 dark:border-emerald-900/50">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                      {isHindi ? 'मल्टी-सोर्स उपग्रह डेटा एकीकरण' : 'Multi-Source Satellite Fusion Active'}
+                    </span>
+                  </div>
+                  <h2 className="font-heading font-bold text-base sm:text-lg lg:text-xl text-slate-900 dark:text-white tracking-tight">
+                    {isHindi 
+                      ? 'उष्णकटिबंधीय चक्रवात पैटर्न पहचान, वर्गीकरण एवं पूर्वानुमान'
+                      : 'Tropical Cyclone Pattern Identification, Classification & Prediction'}
+                  </h2>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 max-w-3xl mt-1 leading-relaxed">
+                    {isHindi
+                      ? 'बहु-स्रोत उपग्रह डेटा संलयन द्वारा वोर्टेक्स केंद्र पहचान (MobileNetV3), 4 डोवोरक पैटर्न वर्गीकरण (ResNet18) और 72 घंटे का न्यूरल ट्रैक पूर्वानुमान (GRU Seq2Seq)।'
+                      : 'Multi-source satellite data fusion powering automated vortex identification (MobileNetV3 center fix), 4 validated Dvorak morphology classifications (ResNet18), and 72-hour neural spatiotemporal trajectory predictions (GRU Seq2Seq).'}
+                  </p>
                 </div>
-                <h2 className="font-heading font-bold text-base sm:text-lg lg:text-xl text-slate-900 dark:text-white tracking-tight">
-                  {isHindi
-                    ? 'उष्णकटिबंधीय चक्रवात पैटर्न पहचान, वर्गीकरण एवं पूर्वानुमान'
-                    : 'Tropical Cyclone Pattern Identification, Classification & Prediction'}
-                </h2>
-                <p className="text-xs text-slate-500 dark:text-slate-400 max-w-3xl mt-1 leading-relaxed">
-                  {isHindi
-                    ? 'बहु-स्रोत उपग्रह डेटा संलयन द्वारा वोर्टेक्स केंद्र पहचान (MobileNetV3), 4 डोवोरक पैटर्न वर्गीकरण (ResNet18) और 72 घंटे का न्यूरल ट्रैक पूर्वानुमान (GRU Seq2Seq)।'
-                    : 'Multi-source satellite data fusion powering automated vortex identification (MobileNetV3 center fix), 4 validated Dvorak morphology classifications (ResNet18), and 72-hour neural spatiotemporal trajectory predictions (GRU Seq2Seq).'}
-                </p>
+
+                {/* Primary Launch Studio Button */}
+                <div className="shrink-0 flex items-center gap-2.5">
+                  <button
+                    onClick={() => navigate('/ai-cyclone')}
+                    className="w-full sm:w-auto px-4.5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 font-semibold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+                  >
+                    <BrainCircuit className="w-4 h-4" />
+                    <span>{isHindi ? 'एआई चक्रवात स्टूडियो खोलें' : 'Launch AI Cyclone Studio'}</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </div>
 
-              {/* Primary Launch Studio Button */}
-              <div className="shrink-0 flex items-center gap-2.5">
-                <button
-                  onClick={() => navigate('/ai-cyclone')}
-                  className="w-full sm:w-auto px-4.5 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 dark:bg-white dark:hover:bg-slate-100 text-white dark:text-slate-900 font-semibold text-xs transition-colors flex items-center justify-center gap-2 cursor-pointer shadow-xs"
+              {/* 4 Feature Pillars Grid with Pastel Badges & Clean Rounded Cards */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                {/* Pillar 1: Vortex Center Localization */}
+                <div
+                  onClick={() => navigate('/ai-cyclone?tab=identification')}
+                  className="p-4.5 rounded-2xl cursor-pointer group h-full flex flex-col justify-between bg-[#EBF5FF] dark:bg-sky-950/30 border border-sky-200/70 dark:border-sky-900/50 hover:shadow-xs transition-all"
                 >
-                  <BrainCircuit className="w-4 h-4" />
-                  <span>{isHindi ? 'एआई चक्रवात स्टूडियो खोलें' : 'Launch AI Cyclone Studio'}</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </div>
-
-            {/* 4 Feature Pillars Grid with Pastel Badges & Clean Rounded Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
-              {/* Pillar 1: Vortex Center Localization */}
-              <div
-                onClick={() => navigate('/ai-cyclone?tab=identification')}
-                className="p-4.5 rounded-2xl cursor-pointer group h-full flex flex-col justify-between bg-[#EBF5FF] dark:bg-sky-950/30 border border-sky-200/70 dark:border-sky-900/50 hover:shadow-xs transition-all"
-              >
-                <div>
-                  <div className="flex items-center justify-between gap-2 mb-3">
-                    <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 border border-sky-200/60 dark:border-sky-800 shadow-2xs">
-                      <Crosshair className="w-4 h-4" />
+                  <div>
+                    <div className="flex items-center justify-between gap-2 mb-3">
+                      <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 text-sky-600 dark:text-sky-400 border border-sky-200/60 dark:border-sky-800 shadow-2xs">
+                        <Crosshair className="w-4 h-4" />
+                      </div>
+                      <span className="text-[10px] font-mono font-bold tracking-wide uppercase text-sky-700 dark:text-sky-300 bg-white/80 dark:bg-slate-900 px-2 py-0.5 rounded-full border border-sky-200/60 dark:border-sky-800">
+                        MobileNetV3
+                      </span>
                     </div>
-                    <span className="text-[10px] font-mono font-bold tracking-wide uppercase text-sky-700 dark:text-sky-300 bg-white/80 dark:bg-slate-900 px-2 py-0.5 rounded-full border border-sky-200/60 dark:border-sky-800">
-                      MobileNetV3
-                    </span>
+                    <h3 className="text-xs sm:text-[13px] font-heading font-bold text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors leading-snug">
+                      {isHindi ? '1. वोर्टेक्स पहचान व केंद्र निर्धारण' : '1. Vortex Center Localization'}
+                    </h3>
+                    <p className="text-[11px] text-slate-600 dark:text-slate-300 mt-1.5 leading-relaxed">
+                      {isHindi ? 'स्वायत्त केंद्र फिक्स, 100% ऑब्जेक्टनेस सटीकता (4 परीक्षण फ्रेम) एवं Grad-CAM ध्यान हीटमैप' : 'Autonomous vortex center regression, 100% objectness accuracy and Grad-CAM attention heatmaps.'}
+                    </p>
                   </div>
-                  <h3 className="text-xs sm:text-[13px] font-heading font-bold text-slate-900 dark:text-white group-hover:text-sky-600 dark:group-hover:text-sky-400 transition-colors leading-snug">
-                    {isHindi ? '1. वोर्टेक्स पहचान व केंद्र निर्धारण' : '1. Vortex Center Localization'}
-                  </h3>
-                  <p className="text-[11px] text-slate-600 dark:text-slate-300 mt-1.5 leading-relaxed">
-                    {isHindi ? 'स्वायत्त केंद्र फिक्स, 100% ऑब्जेक्टनेस सटीकता (4 परीक्षण फ्रेम) एवं Grad-CAM ध्यान हीटमैप' : 'Autonomous vortex center regression, 100% objectness accuracy and Grad-CAM attention heatmaps.'}
-                  </p>
                 </div>
-              </div>
 
-              {/* Pillar 2: Pattern Classification */}
-              <div
-                onClick={() => navigate('/ai-cyclone?tab=classification')}
-                className="p-4.5 rounded-2xl cursor-pointer group h-full flex flex-col justify-between bg-[#F3F0FF] dark:bg-purple-950/30 border border-purple-200/70 dark:border-purple-900/50 hover:shadow-xs transition-all"
-              >
-                <div>
-                  <div className="flex items-center justify-between gap-2 mb-3">
-                    <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 text-purple-600 dark:text-purple-400 border border-purple-200/60 dark:border-purple-800 shadow-2xs">
-                      <Layers className="w-4 h-4" />
+                {/* Pillar 2: Pattern Classification */}
+                <div
+                  onClick={() => navigate('/ai-cyclone?tab=classification')}
+                  className="p-4.5 rounded-2xl cursor-pointer group h-full flex flex-col justify-between bg-[#F3F0FF] dark:bg-purple-950/30 border border-purple-200/70 dark:border-purple-900/50 hover:shadow-xs transition-all"
+                >
+                  <div>
+                    <div className="flex items-center justify-between gap-2 mb-3">
+                      <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 text-purple-600 dark:text-purple-400 border border-purple-200/60 dark:border-purple-800 shadow-2xs">
+                        <Layers className="w-4 h-4" />
+                      </div>
+                      <span className="text-[10px] font-mono font-bold tracking-wide uppercase text-purple-700 dark:text-purple-300 bg-white/80 dark:bg-slate-900 px-2 py-0.5 rounded-full border border-purple-200/60 dark:border-purple-800">
+                        4 Patterns
+                      </span>
                     </div>
-                    <span className="text-[10px] font-mono font-bold tracking-wide uppercase text-purple-700 dark:text-purple-300 bg-white/80 dark:bg-slate-900 px-2 py-0.5 rounded-full border border-purple-200/60 dark:border-purple-800">
-                      4 Patterns
-                    </span>
+                    <h3 className="text-xs sm:text-[13px] font-heading font-bold text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors leading-snug">
+                      {isHindi ? '2. संरचनात्मक पैटर्न वर्गीकरण' : '2. Pattern Classification'}
+                    </h3>
+                    <p className="text-[11px] text-slate-600 dark:text-slate-300 mt-1.5 leading-relaxed">
+                      {isHindi ? 'डोवोरक आकारिकी (आई, कर्व्ड बैंड, शियर, शांत बेसलाइन) एवं आईएमडी विकास चक्र' : 'ResNet18 4-pattern morphology analysis (Eye, Curved Band, Shear, Calm) & IMD lifecycle stage.'}
+                    </p>
                   </div>
-                  <h3 className="text-xs sm:text-[13px] font-heading font-bold text-slate-900 dark:text-white group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors leading-snug">
-                    {isHindi ? '2. संरचनात्मक पैटर्न वर्गीकरण' : '2. Pattern Classification'}
-                  </h3>
-                  <p className="text-[11px] text-slate-600 dark:text-slate-300 mt-1.5 leading-relaxed">
-                    {isHindi ? 'डोवोरक आकारिकी (आई, कर्व्ड बैंड, शियर, शांत बेसलाइन) एवं आईएमडी विकास चक्र' : 'ResNet18 4-pattern morphology analysis (Eye, Curved Band, Shear, Calm) & IMD lifecycle stage.'}
-                  </p>
                 </div>
-              </div>
 
-              {/* Pillar 3: Multi-Source Integration */}
-              <div
-                onClick={() => navigate('/ai-cyclone?tab=multisource')}
-                className="p-4.5 rounded-2xl cursor-pointer group h-full flex flex-col justify-between bg-[#F0FDF4] dark:bg-emerald-950/30 border border-emerald-200/70 dark:border-emerald-900/50 hover:shadow-xs transition-all"
-              >
-                <div>
-                  <div className="flex items-center justify-between gap-2 mb-3">
-                    <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800 shadow-2xs">
-                      <Satellite className="w-4 h-4" />
+                {/* Pillar 3: Multi-Source Integration */}
+                <div
+                  onClick={() => navigate('/ai-cyclone?tab=multisource')}
+                  className="p-4.5 rounded-2xl cursor-pointer group h-full flex flex-col justify-between bg-[#F0FDF4] dark:bg-emerald-950/30 border border-emerald-200/70 dark:border-emerald-900/50 hover:shadow-xs transition-all"
+                >
+                  <div>
+                    <div className="flex items-center justify-between gap-2 mb-3">
+                      <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 text-emerald-600 dark:text-emerald-400 border border-emerald-200/60 dark:border-emerald-800 shadow-2xs">
+                        <Satellite className="w-4 h-4" />
+                      </div>
+                      <span className="text-[10px] font-mono font-bold tracking-wide uppercase text-emerald-700 dark:text-emerald-300 bg-white/80 dark:bg-slate-900 px-2 py-0.5 rounded-full border border-emerald-200/60 dark:border-emerald-800">
+                        6 Feeds
+                      </span>
                     </div>
-                    <span className="text-[10px] font-mono font-bold tracking-wide uppercase text-emerald-700 dark:text-emerald-300 bg-white/80 dark:bg-slate-900 px-2 py-0.5 rounded-full border border-emerald-200/60 dark:border-emerald-800">
-                      6 Feeds
-                    </span>
+                    <h3 className="text-xs sm:text-[13px] font-heading font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors leading-snug">
+                      {isHindi ? '3. बहु-स्रोत उपग्रह डेटा संलयन' : '3. Multi-Source Integration'}
+                    </h3>
+                    <p className="text-[11px] text-slate-600 dark:text-slate-300 mt-1.5 leading-relaxed">
+                      {isHindi ? 'इन्सैट-3डीआर, ओशनसैट-3, जीपीएम राडार एवं आईएमडी डॉपलर नेटवर्क' : 'INSAT-3DR IR/WV, Oceansat-3 scatterometer, GPM Radar & IMD Coastal DWR.'}
+                    </p>
                   </div>
-                  <h3 className="text-xs sm:text-[13px] font-heading font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors leading-snug">
-                    {isHindi ? '3. बहु-स्रोत उपग्रह डेटा संलयन' : '3. Multi-Source Integration'}
-                  </h3>
-                  <p className="text-[11px] text-slate-600 dark:text-slate-300 mt-1.5 leading-relaxed">
-                    {isHindi ? 'इन्सैट-3डीआर, ओशनसैट-3, जीपीएम राडार एवं आईएमडी डॉपलर नेटवर्क' : 'INSAT-3DR IR/WV, Oceansat-3 scatterometer, GPM Radar & IMD Coastal DWR.'}
-                  </p>
                 </div>
-              </div>
 
-              {/* Pillar 4: 72h Track & Intensity */}
-              <div
-                onClick={() => navigate('/ai-cyclone?tab=prediction')}
-                className="p-4.5 rounded-2xl cursor-pointer group h-full flex flex-col justify-between bg-[#FEF2F2] dark:bg-rose-950/30 border border-rose-200/70 dark:border-rose-900/50 hover:shadow-xs transition-all"
-              >
-                <div>
-                  <div className="flex items-center justify-between gap-2 mb-3">
-                    <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 text-rose-600 dark:text-rose-400 border border-rose-200/60 dark:border-rose-800 shadow-2xs">
-                      <TrendingUp className="w-4 h-4" />
+                {/* Pillar 4: 72h Track & Intensity */}
+                <div
+                  onClick={() => navigate('/ai-cyclone?tab=prediction')}
+                  className="p-4.5 rounded-2xl cursor-pointer group h-full flex flex-col justify-between bg-[#FEF2F2] dark:bg-rose-950/30 border border-rose-200/70 dark:border-rose-900/50 hover:shadow-xs transition-all"
+                >
+                  <div>
+                    <div className="flex items-center justify-between gap-2 mb-3">
+                      <div className="p-2.5 rounded-xl bg-white dark:bg-slate-900 text-rose-600 dark:text-rose-400 border border-rose-200/60 dark:border-rose-800 shadow-2xs">
+                        <TrendingUp className="w-4 h-4" />
+                      </div>
+                      <span className="text-[10px] font-mono font-bold tracking-wide uppercase text-rose-700 dark:text-rose-300 bg-white/80 dark:bg-slate-900 px-2 py-0.5 rounded-full border border-rose-200/60 dark:border-rose-800">
+                        72h Cone
+                      </span>
                     </div>
-                    <span className="text-[10px] font-mono font-bold tracking-wide uppercase text-rose-700 dark:text-rose-300 bg-white/80 dark:bg-slate-900 px-2 py-0.5 rounded-full border border-rose-200/60 dark:border-rose-800">
-                      72h Cone
-                    </span>
+                    <h3 className="text-xs sm:text-[13px] font-heading font-bold text-slate-900 dark:text-white group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors leading-snug">
+                      {isHindi ? '4. ट्रैक व तीव्रता न्यूरल पूर्वानुमान' : '4. 72h Track & Intensity'}
+                    </h3>
+                    <p className="text-[11px] text-slate-600 dark:text-slate-300 mt-1.5 leading-relaxed">
+                      {isHindi ? 'अनिश्चितता शंकु, केंद्रीय दबाव गिरावट व संवेदनशीलता सिम्युलेटर' : 'Uncertainty bounds, pressure drops & interactive What-If sensitivity sliders.'}
+                    </p>
                   </div>
-                  <h3 className="text-xs sm:text-[13px] font-heading font-bold text-slate-900 dark:text-white group-hover:text-rose-600 dark:group-hover:text-rose-400 transition-colors leading-snug">
-                    {isHindi ? '4. ट्रैक व तीव्रता न्यूरल पूर्वानुमान' : '4. 72h Track & Intensity'}
-                  </h3>
-                  <p className="text-[11px] text-slate-600 dark:text-slate-300 mt-1.5 leading-relaxed">
-                    {isHindi ? 'अनिश्चितता शंकु, केंद्रीय दबाव गिरावट व संवेदनशीलता सिम्युलेटर' : 'Uncertainty bounds, pressure drops & interactive What-If sensitivity sliders.'}
-                  </p>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Fast Actions */}
-        <div className="flex flex-wrap items-center gap-3 pt-0.5 pb-1">
-          <button
-            onClick={() => navigate('/threat-map')}
-            className="px-5 py-2.5 rounded-2xl bg-slate-950 hover:bg-slate-700 text-white dark:bg-white dark:text-slate-950 dark:hover:bg-slate-100 font-semibold text-xs transition-all shadow-sm flex items-center gap-2 cursor-pointer"
-          >
-            <Eye className="w-4 h-4" />
-            <span>{isHindi ? 'जीआईएस रडार मैप देखें' : 'Inspect GIS Radar Map'}</span>
-          </button>
+          {/* Fast Actions */}
+          <div className="flex flex-wrap items-center gap-3 pt-0.5 pb-1">
+            <button
+              onClick={() => navigate('/threat-map')}
+              className="px-5 py-2.5 rounded-2xl bg-slate-950 hover:bg-slate-700 text-white dark:bg-white dark:text-slate-950 dark:hover:bg-slate-100 font-semibold text-xs transition-all shadow-sm flex items-center gap-2 cursor-pointer"
+            >
+              <Eye className="w-4 h-4" />
+              <span>{isHindi ? 'जीआईएस रडार मैप देखें' : 'Inspect GIS Radar Map'}</span>
+            </button>
 
-          <button
-            onClick={() => navigate('/threat-map')}
-            className="px-5 py-2.5 rounded-2xl border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 font-semibold text-xs transition-all shadow-sm flex items-center gap-2 cursor-pointer"
-          >
-            <ShieldAlert className="w-4 h-4 text-red-600 dark:text-red-400" />
-            <span>{isHindi ? 'तटीय जिला आपदा मैट्रिक्स' : 'View District Threat Matrix'}</span>
-          </button>
-        </div>
+            <button
+              onClick={() => navigate('/threat-map')}
+              className="px-5 py-2.5 rounded-2xl border border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 font-semibold text-xs transition-all shadow-sm flex items-center gap-2 cursor-pointer"
+            >
+              <ShieldAlert className="w-4 h-4 text-red-600 dark:text-red-400" />
+              <span>{isHindi ? 'तटीय जिला आपदा मैट्रिक्स' : 'View District Threat Matrix'}</span>
+            </button>
+          </div>
 
       </div>
 
       {/* Service Details Modal */}
       {activeServiceModal && (
-        <div
+        <div 
           className="fixed inset-0 z-[2000] bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in duration-200"
           onClick={() => setActiveServiceModal(null)}
         >
-          <div
+          <div 
             className="bg-white/95 dark:bg-slate-950/95 backdrop-blur-2xl border border-white/80 dark:border-white/10 rounded-3xl shadow-[0_24px_64px_rgba(0,0,0,0.2)] dark:shadow-[0_24px_64px_rgba(0,0,0,0.8)] max-w-lg w-full overflow-hidden animate-in zoom-in-95 duration-200"
             onClick={(e) => e.stopPropagation()}
           >
@@ -2713,7 +2722,7 @@ const Welcome = () => {
            ACTIVE CITY FORECAST MODAL (3-DAY OUTLOOK)
            ========================================================================= */}
       {activeCityForecastModal && (
-        <div
+        <div 
           className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-200"
           onClick={() => setActiveCityForecastModal(null)}
         >
@@ -2853,11 +2862,11 @@ const Welcome = () => {
 
       {/* Field Officer Detail Modal */}
       {activeOfficerModal && (
-        <div
+        <div 
           className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs animate-in fade-in duration-150"
           onClick={() => setActiveOfficerModal(null)}
         >
-          <div
+          <div 
             className="w-full max-w-sm bg-white dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl p-5 shadow-2xl space-y-4"
             onClick={e => e.stopPropagation()}
           >
