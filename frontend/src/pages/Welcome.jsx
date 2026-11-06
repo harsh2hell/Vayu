@@ -29,7 +29,7 @@ import {
   ResponsiveContainer, LineChart, Line, AreaChart, Area, XAxis, YAxis, Tooltip as RechartsTooltip,
   BarChart, Bar, PieChart, Pie, Cell, CartesianGrid
 } from 'recharts';
-import { getLiveBaseUrl, fetchLiveOceanTelemetry, getFormattedLastUpdated } from '../services/api';
+import { getLiveBaseUrl, fetchLiveOceanTelemetry, getFormattedLastUpdated, fetchLiveCycloneFeed, fetchLiveNewsFeed, FALLBACK_CYCLONE_NEWS } from '../services/api';
 import {
   MapContainer,
   TileLayer,
@@ -495,6 +495,118 @@ const CityWeather3DCard = ({
 };
 
 const INITIAL_SYSTEMS = {
+  arnab: {
+    id: 'arnab',
+    name: "Extremely Severe Cyclonic Storm ARNAB (2026)",
+    shortName: "Cyclone ARNAB",
+    shortNameHindi: "चक्रवात अर्नब",
+    hindiName: "अत्यंत भीषण चक्रवाती तूफान अर्नब (2026)",
+    basin: "Bay of Bengal",
+    basinHindi: "बंगाल की खाड़ी",
+    stage: "Extremely Severe Cyclonic Storm (IMD)",
+    stageHindi: "अति भीषण चक्रवाती तूफान (आईएमडी)",
+    threat: "Red Alert (Cat 4 Equivalent)",
+    threatHindi: "लाल चेतावनी (अत्यधिक विनाशकारी)",
+    dvorak: "T6.0",
+    risk48h: "100%",
+    wind: "222",
+    gusts: "260",
+    pressure: "942",
+    speed: "22",
+    direction: "North-West (315°)",
+    directionHindi: "उत्तर-पश्चिम (315°)",
+    lat: 16.4,
+    lon: 81.8,
+    target: "Coastal Andhra Pradesh & South Odisha (Bapatla-Kakinada Corridor)",
+    targetHindi: "तटीय आंध्र प्रदेश एवं दक्षिण ओडिशा (बापटला-काकीनाडा कॉरिडोर)",
+    window: "Landfall Strike & Destructive Surge Benchmark",
+    windowHindi: "लैंडफॉल स्ट्राइक एवं विनाशकारी तूफानी लहर",
+    sst: 30.8,
+    shear: 8.4,
+    vitPattern: "Symmetric Eyewall with Intense Core Convection (LLCC)",
+    vitConfidence: 98.4,
+    isLive: true,
+    systemType: "CONTEMPORARY_BENCHMARK",
+    waypoints: [
+      { step: '+00h', label: 'Genesis Phase', labelHindi: 'जनन चरण', lat: 16.0, lon: 89.1, wind: '55 km/h', gusts: '70 km/h', pressure: '998 hPa', cat: 'Depression', catHindi: 'अवसाद' },
+      { step: '+12h', label: 'Rapid Consolidation', labelHindi: 'तीव्र विकास', lat: 15.3, lon: 88.4, wind: '85 km/h', gusts: '105 km/h', pressure: '988 hPa', cat: 'Cyclonic Storm', catHindi: 'चक्रवाती तूफान' },
+      { step: '+24h', label: 'Eyewall Formation', labelHindi: 'नेत्र दीवार निर्माण', lat: 15.6, lon: 86.2, wind: '140 km/h', gusts: '170 km/h', pressure: '968 hPa', cat: 'Very Severe Cyclone', catHindi: 'भीषण चक्रवात' },
+      { step: '+36h', label: 'Peak Ocean Intensity', labelHindi: 'चरम समुद्री तीव्रता', lat: 16.1, lon: 83.5, wind: '195 km/h', gusts: '235 km/h', pressure: '950 hPa', cat: 'Extremely Severe Cyclone', catHindi: 'अति भीषण चक्रवात' },
+      { step: '+48h', label: 'Andhra Coastal Impact', labelHindi: 'आंध्र तटीय लैंडफॉल', lat: 16.4, lon: 81.8, wind: '222 km/h', gusts: '260 km/h', pressure: '942 hPa', cat: 'Landfall Strike', catHindi: 'तट से टकराया' },
+      { step: '+72h', label: 'Inland Dissipation', labelHindi: 'आंतरिक क्षीणता', lat: 21.9, lon: 81.6, wind: '55 km/h', gusts: '70 km/h', pressure: '996 hPa', cat: 'Remnant Depression', catHindi: 'अवशेष अवसाद' }
+    ],
+    intensityCurve: [
+      { time: '+00h', speed: 55, pressure: 998 },
+      { time: '+12h', speed: 85, pressure: 988 },
+      { time: '+24h', speed: 140, pressure: 968 },
+      { time: '+36h', speed: 195, pressure: 950 },
+      { time: '+48h (Peak)', speed: 222, pressure: 942 },
+      { time: '+72h', speed: 55, pressure: 996 }
+    ],
+    track: [
+      [16.0, 89.1], [15.3, 88.4], [15.6, 86.2], [16.1, 83.5], [16.4, 81.8], [21.9, 81.6]
+    ],
+    cone: [
+      [16.0, 89.1], [16.8, 89.8], [17.5, 85.0], [22.8, 83.5],
+      [22.0, 80.0], [17.0, 80.5], [14.8, 87.5], [16.0, 89.1]
+    ]
+  },
+  murasu: {
+    id: 'murasu',
+    name: "Severe Cyclonic Storm MURASU (2026)",
+    shortName: "Cyclone MURASU",
+    shortNameHindi: "चक्रवात मुरासु",
+    hindiName: "भीषण चक्रवाती तूफान मुरासु (2026)",
+    basin: "Bay of Bengal",
+    basinHindi: "बंगाल की खाड़ी",
+    stage: "Severe Cyclonic Storm (IMD)",
+    stageHindi: "भीषण चक्रवाती तूफान (आईएमडी)",
+    threat: "Red Alert (Active Rainfall & Surge)",
+    threatHindi: "लाल चेतावनी (सक्रिय भारी वर्षा)",
+    dvorak: "T3.5",
+    risk48h: "88%",
+    wind: "110",
+    gusts: "135",
+    pressure: "988",
+    speed: "16",
+    direction: "West-North-West (290°)",
+    directionHindi: "पश्चिम-उत्तर-पश्चिम (290°)",
+    lat: 15.8,
+    lon: 80.2,
+    target: "South Coastal Andhra & North Tamil Nadu (Nellore-Chennai-Bapatla)",
+    targetHindi: "दक्षिण तटीय आंध्र व उत्तर तमिलनाडु (नेल्लोर-चेन्नई-बापटला)",
+    window: "Active Impact Window / Flood Warning",
+    windowHindi: "सक्रिय प्रभाव खिड़की / बाढ़ चेतावनी",
+    sst: 30.2,
+    shear: 10.5,
+    vitPattern: "Curved Banding with High Convective Precipitation",
+    vitConfidence: 94.2,
+    isLive: true,
+    systemType: "CONTEMPORARY_ACTIVE",
+    waypoints: [
+      { step: '+00h', label: 'Southwest Bay Low', labelHindi: 'दक्षिण-पश्चिम बंगाल खाड़ी', lat: 12.8, lon: 84.5, wind: '45 km/h', gusts: '60 km/h', pressure: '1002 hPa', cat: 'Depression', catHindi: 'अवसाद' },
+      { step: '+12h', label: 'Intensification Phase', labelHindi: 'तीव्रता चरण', lat: 13.6, lon: 83.2, wind: '65 km/h', gusts: '80 km/h', pressure: '996 hPa', cat: 'Deep Depression', catHindi: 'गहरा अवसाद' },
+      { step: '+24h', label: 'Storm Naming Phase', labelHindi: 'तूफान नामकरण', lat: 14.5, lon: 82.0, wind: '85 km/h', gusts: '105 km/h', pressure: '992 hPa', cat: 'Cyclonic Storm', catHindi: 'चक्रवाती तूफान' },
+      { step: '+36h', label: 'Coastal Approach', labelHindi: 'तटीय अग्रगमन', lat: 15.2, lon: 81.0, wind: '105 km/h', gusts: '125 km/h', pressure: '989 hPa', cat: 'Severe Cyclone', catHindi: 'भीषण चक्रवात' },
+      { step: '+48h', label: 'Coast Crossing', labelHindi: 'तटीय प्रवेश (लैंडफॉल)', lat: 15.8, lon: 80.2, wind: '110 km/h', gusts: '135 km/h', pressure: '988 hPa', cat: 'Severe Cyclone', catHindi: 'भीषण चक्रवात' },
+      { step: '+72h', label: 'Inland Heavy Rain', labelHindi: 'आंतरिक भारी वर्षा', lat: 17.0, lon: 79.5, wind: '45 km/h', gusts: '60 km/h', pressure: '1004 hPa', cat: 'Inland Depression', catHindi: 'आंतरिक अवसाद' }
+    ],
+    intensityCurve: [
+      { time: '+00h', speed: 45, pressure: 1002 },
+      { time: '+12h', speed: 65, pressure: 996 },
+      { time: '+24h', speed: 85, pressure: 992 },
+      { time: '+36h', speed: 105, pressure: 989 },
+      { time: '+48h (Landfall)', speed: 110, pressure: 988 },
+      { time: '+72h', speed: 45, pressure: 1004 }
+    ],
+    track: [
+      [12.8, 84.5], [13.6, 83.2], [14.5, 82.0], [15.2, 81.0], [15.8, 80.2], [17.0, 79.5]
+    ],
+    cone: [
+      [12.8, 84.5], [14.2, 85.5], [16.5, 82.5], [18.2, 80.5],
+      [17.8, 78.5], [15.0, 79.0], [13.0, 83.0], [12.8, 84.5]
+    ]
+  },
   invest92b: {
     id: 'invest92b',
     name: "Developing Low Pressure Area (INVEST-92B)",
@@ -1029,7 +1141,8 @@ const getDirectionName = (dir, isHindi) => {
 
 const Welcome = () => {
   const navigate = useNavigate();
-  const [activeId, setActiveId] = useState('invest92b');
+  const [activeId, setActiveId] = useState('arnab');
+  const [liveNews, setLiveNews] = useState(FALLBACK_CYCLONE_NEWS);
   const [activeNav, setActiveNav] = useState(null);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isHindi, setIsHindi] = useState(() => {
@@ -1254,32 +1367,60 @@ const Welcome = () => {
     setIsSyncing(true);
     try {
       const baseUrl = await getLiveBaseUrl();
-      if (!baseUrl) {
-        setIsSyncing(false);
-        return;
-      }
-      const bayPromise = fetch(`${baseUrl}/api/v1/cyclones/genesis-watch?basin=Bay%20of%20Bengal`, { signal: AbortSignal.timeout(2500) })
-        .then(r => r.ok ? r.json() : null)
-        .catch(() => null);
 
-      const arabPromise = fetch(`${baseUrl}/api/v1/cyclones/genesis-watch?basin=Arabian%20Sea`, { signal: AbortSignal.timeout(2500) })
-        .then(r => r.ok ? r.json() : null)
-        .catch(() => null);
+      // Continuous Automated Ingestion: Fetch live cyclone events (Arnab, Murasu, GDACS) & national news
+      const feedPromise = fetchLiveCycloneFeed().catch(() => null);
+      const newsPromise = fetchLiveNewsFeed().catch(() => null);
 
-      const danaPromise = fetch(`${baseUrl}/api/v1/cyclones/cyclone-dana-2024`, { signal: AbortSignal.timeout(2500) })
-        .then(r => r.ok ? r.json() : null)
-        .catch(() => null);
+      const bayPromise = baseUrl
+        ? fetch(`${baseUrl}/api/v1/cyclones/genesis-watch?basin=Bay%20of%20Bengal`, { signal: AbortSignal.timeout(2500) })
+            .then(r => r.ok ? r.json() : null)
+            .catch(() => null)
+        : Promise.resolve(null);
 
-      const biparjoyPromise = fetch(`${baseUrl}/api/v1/cyclones/cyclone-biparjoy-2023`, { signal: AbortSignal.timeout(2500) })
-        .then(r => r.ok ? r.json() : null)
-        .catch(() => null);
+      const arabPromise = baseUrl
+        ? fetch(`${baseUrl}/api/v1/cyclones/genesis-watch?basin=Arabian%20Sea`, { signal: AbortSignal.timeout(2500) })
+            .then(r => r.ok ? r.json() : null)
+            .catch(() => null)
+        : Promise.resolve(null);
+
+      const danaPromise = baseUrl
+        ? fetch(`${baseUrl}/api/v1/cyclones/cyclone-dana-2024`, { signal: AbortSignal.timeout(2500) })
+            .then(r => r.ok ? r.json() : null)
+            .catch(() => null)
+        : Promise.resolve(null);
+
+      const biparjoyPromise = baseUrl
+        ? fetch(`${baseUrl}/api/v1/cyclones/cyclone-biparjoy-2023`, { signal: AbortSignal.timeout(2500) })
+            .then(r => r.ok ? r.json() : null)
+            .catch(() => null)
+        : Promise.resolve(null);
 
       const oceanPromise = fetchLiveOceanTelemetry('Bay of Bengal').catch(() => null);
 
-      const [bayRes, arabRes, danaRes, biparjoyRes, oceanRes] = await Promise.all([bayPromise, arabPromise, danaPromise, biparjoyPromise, oceanPromise]);
+      const [bayRes, arabRes, danaRes, biparjoyRes, oceanRes, feedRes, newsRes] = await Promise.all([
+        bayPromise, arabPromise, danaPromise, biparjoyPromise, oceanPromise, feedPromise, newsPromise
+      ]);
+
+      if (newsRes && Array.isArray(newsRes) && newsRes.length > 0) {
+        setLiveNews(newsRes);
+      }
 
       setSystems((prev) => {
         const next = { ...prev };
+
+        // Ingest dynamic real-time cyclone feed (Arnab, Murasu, and any newly detected GDACS systems)
+        if (feedRes && feedRes.storms && Array.isArray(feedRes.storms)) {
+          feedRes.storms.forEach((storm) => {
+            if (storm && storm.id) {
+              next[storm.id] = {
+                ...(next[storm.id] || {}),
+                ...storm,
+                isLive: true
+              };
+            }
+          });
+        }
 
         if (bayRes && bayRes.success && bayRes.data) {
           const d = bayRes.data;
@@ -1556,34 +1697,53 @@ const Welcome = () => {
 
           {/* Continuous Right-to-Left Scrolling Marquee */}
           <div className="relative flex-1 overflow-hidden flex items-center group cursor-default">
-            <div className="animate-ticker-rtl flex items-center gap-12 font-medium">
-              <span className="inline-flex items-center gap-3 whitespace-nowrap text-zinc-700">
-                <span>{isHindi
-                  ? 'बंगाल की खाड़ी (13.5°N, 88.5°E) में चक्रवाती परिसंचरण इन्वेस्ट 92B सक्रिय। 48 घंटों में चक्रवात बनने की संभावना: 68%।'
-                  : 'Incipient cyclonic circulation Invest 92B in Bay of Bengal (13.5°N, 88.5°E). 48h cyclogenesis potential: 68%.'}</span>
-                <span className="text-zinc-300">•</span>
-                <span>{isHindi
-                  ? 'आपदा प्रबंधन बल (NDRF/SDRF) तटीय क्षेत्रों में अलर्ट पर।'
-                  : 'Disaster response authorities on vigil across coastal corridors.'}</span>
-                <span className="text-zinc-300">•</span>
-                <span>{isHindi
-                  ? 'मछुआरों को गहरे समुद्र में न जाने की आधिकारिक सलाह।'
-                  : 'Fishermen advised not to venture into deep sea.'}</span>
+            <div className="animate-ticker-rtl flex items-center gap-8 font-medium">
+              {/* Pass 1 */}
+              <span className="inline-flex items-center gap-6 whitespace-nowrap text-zinc-700">
+                {liveNews.map((item, idx) => (
+                  <span key={`news-pass1-${item.id || idx}`} className="inline-flex items-center gap-3">
+                    <span className="px-1.5 py-0.5 rounded text-[10px] font-mono uppercase font-semibold bg-zinc-100 text-zinc-900 border border-zinc-300 select-none">
+                      {item.source || 'BULLETIN'}
+                    </span>
+                    {item.link ? (
+                      <a
+                        href={item.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:underline hover:text-black transition-colors"
+                      >
+                        {isHindi ? (item.titleHindi || item.title) : item.title}
+                      </a>
+                    ) : (
+                      <span>{isHindi ? (item.titleHindi || item.title) : item.title}</span>
+                    )}
+                    <span className="text-zinc-300 select-none">•</span>
+                  </span>
+                ))}
               </span>
 
-              {/* Seamless loop duplication */}
-              <span className="inline-flex items-center gap-3 whitespace-nowrap text-zinc-700">
-                <span>{isHindi
-                  ? 'बंगाल की खाड़ी (13.5°N, 88.5°E) में चक्रवाती परिसंचरण इन्वेस्ट 92B सक्रिय। 48 घंटों में चक्रवात बनने की संभावना: 68%।'
-                  : 'Incipient cyclonic circulation Invest 92B in Bay of Bengal (13.5°N, 88.5°E). 48h cyclogenesis potential: 68%.'}</span>
-                <span className="text-zinc-300">•</span>
-                <span>{isHindi
-                  ? 'आपदा प्रबंधन बल (NDRF/SDRF) तटीय क्षेत्रों में अलर्ट पर।'
-                  : 'Disaster response authorities on vigil across coastal corridors.'}</span>
-                <span className="text-zinc-300">•</span>
-                <span>{isHindi
-                  ? 'मछुआरों को गहरे समुद्र में न जाने की आधिकारिक सलाह।'
-                  : 'Fishermen advised not to venture into deep sea.'}</span>
+              {/* Seamless loop duplication pass */}
+              <span className="inline-flex items-center gap-6 whitespace-nowrap text-zinc-700" aria-hidden="true">
+                {liveNews.map((item, idx) => (
+                  <span key={`news-pass2-${item.id || idx}`} className="inline-flex items-center gap-3">
+                    <span className="px-1.5 py-0.5 rounded text-[10px] font-mono uppercase font-semibold bg-zinc-100 text-zinc-900 border border-zinc-300 select-none">
+                      {item.source || 'BULLETIN'}
+                    </span>
+                    {item.link ? (
+                      <a
+                        href={item.link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="hover:underline hover:text-black transition-colors"
+                      >
+                        {isHindi ? (item.titleHindi || item.title) : item.title}
+                      </a>
+                    ) : (
+                      <span>{isHindi ? (item.titleHindi || item.title) : item.title}</span>
+                    )}
+                    <span className="text-zinc-300 select-none">•</span>
+                  </span>
+                ))}
               </span>
             </div>
           </div>

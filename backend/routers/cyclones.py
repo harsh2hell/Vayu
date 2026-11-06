@@ -6,7 +6,33 @@ from ..services.geojson_service import geojson_service
 from ..services.ibtracs_importer import ibtracs_importer
 from ..services.gdacs_importer import gdacs_importer
 
+from ..services.live_cyclone_feed import get_live_cyclone_catalog, fetch_live_national_news
+
 router = APIRouter(prefix="/api/v1/cyclones", tags=["Cyclone Systems & Best-Tracks"])
+
+@router.get("/live-feed")
+def get_live_cyclones_feed():
+    """
+    Automated real-time cyclone ingestion feed.
+    Fetches contemporary and newly detected live cyclones from GDACS, JTWC, and IMD,
+    along with real-time national meteorological news.
+    """
+    try:
+        data = get_live_cyclone_catalog()
+        return data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Live feed error: {str(e)}")
+
+@router.get("/live-news")
+def get_live_news_feed():
+    """
+    Returns real-time cyclone and disaster news feeds from national agencies and media.
+    """
+    try:
+        news = fetch_live_national_news()
+        return {"success": True, "count": len(news), "news": news}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"News feed error: {str(e)}")
 
 @router.get("/genesis-watch")
 def get_cyclogenesis_watch_feed(basin: str = Query("Bay of Bengal", description="Basin name")):
