@@ -1760,45 +1760,53 @@ const Welcome = () => {
         <div className="max-w-7xl mx-auto w-full space-y-6">
           
           {/* Top Operational Header Bar */}
-          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 border-b border-zinc-200 pb-5">
+          <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-5 border-b border-zinc-200 pb-5">
             <div className="space-y-2">
-              <div className="flex flex-wrap items-center gap-2 text-[11px] font-mono uppercase tracking-widest text-zinc-400">
-                <span className="font-semibold text-zinc-900">
-                  {isHindi ? 'राष्ट्रीय चक्रवात प्रारंभिक चेतावनी' : 'National Cyclone Early Warning'}
+              <div className="flex flex-wrap items-center gap-2 text-[11px] font-mono uppercase tracking-wider text-zinc-400">
+                <span className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded text-[10px] font-mono uppercase font-bold tracking-wider bg-black text-white">
+                  <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                  {current.systemType === 'CONTEMPORARY_BENCHMARK' ? 'BENCHMARK SYSTEM' : 'LIVE MONITORED'}
                 </span>
                 <span>•</span>
-                <span>{isHindi ? 'उपग्रह टेलीमेट्री' : 'Telemetry Sync'}</span>
+                <span>{isHindi ? 'उपग्रह टेलीमेट्री सिंक' : 'IMD RSMC NEW DELHI • JTWC TELESYNC'}</span>
                 <span>•</span>
-                <span>IMD RSMC / ISRO</span>
+                <span>INSAT-3DR / 1.0 KM</span>
               </div>
 
               {/* Cyclone Title & Meta Badges */}
-              <div className="flex flex-wrap items-center gap-3">
-                <h1 className="text-3xl sm:text-4xl font-semibold text-black tracking-tight">
-                  {isHindi ? (current.hindiName || current.name) : current.name}
+              <div className="flex flex-wrap items-baseline gap-3">
+                <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-black tracking-tight uppercase font-sans">
+                  {isHindi ? (current.shortNameHindi || current.shortName) : current.shortName}
                 </h1>
-
-                {/* Stage Tag */}
-                <span className="px-2.5 py-0.5 rounded-full text-xs font-mono font-medium border border-black bg-black text-white">
+                <span className="text-base sm:text-lg font-mono text-zinc-400 font-semibold">
+                  (2026)
+                </span>
+                <span className="px-3 py-1 rounded-full text-xs font-mono font-semibold bg-zinc-100 text-zinc-900 border border-zinc-300">
                   {isHindi ? (current.stageHindi || current.stage) : current.stage}
                 </span>
+              </div>
 
-                {/* Basin Badge */}
-                <span className="px-2.5 py-0.5 rounded-full border border-zinc-300 text-zinc-700 text-xs font-mono">
+              {/* Secondary Coordinates & Basin */}
+              <div className="flex flex-wrap items-center gap-3 text-xs font-mono text-zinc-500 pt-0.5">
+                <span className="flex items-center gap-1 text-zinc-900 font-medium">
+                  <MapPin className="w-3.5 h-3.5 text-zinc-700" />
                   {isHindi ? current.basinHindi : current.basin}
                 </span>
-
-                {/* Vortex Eye Coordinates */}
-                <span className="px-2.5 py-0.5 rounded-full border border-zinc-200 text-zinc-500 text-xs font-mono flex items-center gap-1.5">
-                  <Crosshair className="w-3 h-3 text-zinc-900" />
-                  <span>{current.lat}°N, {current.lon}°E</span>
+                <span className="text-zinc-300 select-none">•</span>
+                <span className="flex items-center gap-1">
+                  <Crosshair className="w-3.5 h-3.5 text-zinc-700" />
+                  <span className="font-semibold text-zinc-900">{current.lat}°N, {current.lon}°E</span>
+                </span>
+                <span className="text-zinc-300 select-none">•</span>
+                <span className="font-semibold text-zinc-900">
+                  {isHindi ? current.threatHindi : current.threat}
                 </span>
               </div>
             </div>
 
             {/* Storm Switcher Pills */}
             <div className="flex flex-wrap items-center gap-2">
-              <div className="inline-flex p-1 bg-zinc-100 rounded-full border border-zinc-200 text-xs">
+              <div className="inline-flex p-1 bg-zinc-100 rounded-xl border border-zinc-200 text-xs gap-1">
                 {Object.values(systems).map((sys) => {
                   const isSelected = activeId === sys.id;
                   const isBenchmark = sys.id === 'dana' || sys.id === 'biparjoy';
@@ -1810,19 +1818,19 @@ const Welcome = () => {
                         setActiveStepIndex(0);
                         setIsPlayingTimeline(false);
                       }}
-                      className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full transition-all cursor-pointer text-xs font-medium ${
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-all cursor-pointer text-xs font-mono font-medium ${
                         isSelected
-                          ? 'bg-black text-white shadow-xs'
-                          : 'text-zinc-600 hover:text-black'
+                          ? 'bg-black text-white shadow-xs font-semibold'
+                          : 'text-zinc-600 hover:text-black hover:bg-zinc-200/60'
                       }`}
                     >
                       <span className={`w-1.5 h-1.5 rounded-full ${
                         isSelected ? 'bg-white' : 'bg-zinc-400'
                       }`} />
-                      <span>{isHindi ? (sys.shortNameHindi || sys.shortName) : sys.shortName}</span>
+                      <span>{sys.id.toUpperCase()}</span>
                       {isSelected && (
-                        <span className="text-[10px] px-1 rounded bg-zinc-800 text-zinc-300 font-mono">
-                          {isBenchmark ? (isHindi ? 'बेंचमार्क' : 'Ref') : (isHindi ? 'लाइव' : 'Live')}
+                        <span className="text-[9px] px-1 rounded bg-zinc-800 text-zinc-200 uppercase font-mono">
+                          {isBenchmark ? 'Ref' : 'Live'}
                         </span>
                       )}
                     </button>
@@ -1835,7 +1843,7 @@ const Welcome = () => {
                 onClick={fetchLiveBackendData}
                 disabled={isSyncing}
                 title="Refresh Telemetry"
-                className="p-2 rounded-full border border-zinc-200 hover:bg-zinc-100 text-zinc-700 hover:text-black transition-all cursor-pointer"
+                className="p-2 rounded-xl border border-zinc-200 bg-white hover:bg-zinc-100 text-zinc-700 hover:text-black transition-all cursor-pointer shadow-xs"
               >
                 <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? 'animate-spin' : ''}`} />
               </button>
@@ -1854,41 +1862,51 @@ const Welcome = () => {
                 {/* Metric 1: Sustained Wind */}
                 <div 
                   onClick={() => navigate('/threat-map')}
-                  className="bg-white border border-zinc-200 hover:border-zinc-400 p-5 rounded-xl flex flex-col justify-between transition-colors cursor-pointer group"
+                  className="bg-white border border-zinc-200 hover:border-zinc-400 p-5 rounded-2xl flex flex-col justify-between transition-all cursor-pointer group shadow-2xs"
                 >
-                  <div className="flex items-center justify-between text-xs font-mono uppercase tracking-wider text-zinc-500">
-                    <span className="flex items-center gap-1.5">
+                  <div className="flex items-center justify-between text-xs font-sans font-medium uppercase tracking-wider text-zinc-500">
+                    <span className="flex items-center gap-1.5 font-semibold">
                       <Wind className="w-3.5 h-3.5 text-zinc-900" />
-                      {isHindi ? 'सतत पवन गति' : 'Sustained Wind Speed'}
+                      {isHindi ? 'सतत पवन गति' : 'Sustained Wind'}
                     </span>
-                    <span className="text-zinc-400">
+                    <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-zinc-100 text-zinc-800 border border-zinc-200">
                       {Math.round(parseInt(current.wind || 40) * 0.539957)} KT
                     </span>
                   </div>
 
-                  <div className="my-3">
-                    <div className="flex items-baseline gap-1.5">
-                      <span className="text-4xl font-light font-mono text-black tracking-tight">
-                        {current.wind}
-                      </span>
-                      <span className="text-sm font-mono text-zinc-400 uppercase">km/h</span>
-                      <span className="text-xs font-mono text-zinc-500 ml-auto">
-                        {isHindi ? 'झोंके: ' : 'Gusts: '}
-                        <strong className="text-black font-semibold">{current.gusts || Math.round(current.wind * 1.25)} km/h</strong>
+                  <div className="my-2.5">
+                    <div className="flex items-baseline justify-between gap-2">
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-4xl sm:text-5xl font-mono font-semibold text-zinc-950 tracking-tight">
+                          {current.wind}
+                        </span>
+                        <span className="text-xs font-mono font-bold uppercase text-zinc-400">km/h</span>
+                      </div>
+                      <span className="text-xs font-mono px-2 py-0.5 rounded-full border border-zinc-200 text-zinc-700 bg-zinc-50">
+                        {isHindi ? 'झोंके: ' : 'Gusts: '}<strong className="text-black">{current.gusts || Math.round(current.wind * 1.25)} km/h</strong>
                       </span>
                     </div>
 
-                    {/* Minimalist Black Meter */}
-                    <div className="w-full bg-zinc-100 h-1 rounded-full mt-3 overflow-hidden">
-                      <div 
-                        className="h-full bg-zinc-900 rounded-full transition-all duration-500"
-                        style={{ width: `${Math.min(100, (parseInt(current.wind || 40) / 220) * 100)}%` }}
-                      />
+                    {/* 5-Segment Intensity Gauge */}
+                    <div className="flex items-center gap-1.5 mt-3">
+                      {[1, 2, 3, 4, 5].map((lvl) => {
+                        const windVal = parseInt(current.wind || 40);
+                        const threshold = windVal >= 166 ? 5 : windVal >= 118 ? 4 : windVal >= 89 ? 3 : windVal >= 63 ? 2 : 1;
+                        const isLit = lvl <= threshold;
+                        return (
+                          <div
+                            key={lvl}
+                            className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${
+                              isLit ? 'bg-zinc-950' : 'bg-zinc-200'
+                            }`}
+                          />
+                        );
+                      })}
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between text-[11px] font-mono pt-2 border-t border-zinc-100 text-zinc-500">
-                    <span>{isHindi ? 'श्रेणी' : 'Category'}</span>
+                  <div className="flex items-center justify-between text-xs font-mono pt-2.5 border-t border-zinc-100 text-zinc-500">
+                    <span>{isHindi ? 'वर्गीकरण' : 'IMD Category'}</span>
                     <span className="font-semibold text-black">
                       {isHindi ? (current.stageHindi || current.stage) : current.stage}
                     </span>
@@ -1898,41 +1916,52 @@ const Welcome = () => {
                 {/* Metric 2: Central Pressure */}
                 <div 
                   onClick={() => navigate('/threat-map')}
-                  className="bg-white border border-zinc-200 hover:border-zinc-400 p-5 rounded-xl flex flex-col justify-between transition-colors cursor-pointer group"
+                  className="bg-white border border-zinc-200 hover:border-zinc-400 p-5 rounded-2xl flex flex-col justify-between transition-all cursor-pointer group shadow-2xs"
                 >
-                  <div className="flex items-center justify-between text-xs font-mono uppercase tracking-wider text-zinc-500">
-                    <span className="flex items-center gap-1.5">
+                  <div className="flex items-center justify-between text-xs font-sans font-medium uppercase tracking-wider text-zinc-500">
+                    <span className="flex items-center gap-1.5 font-semibold">
                       <Gauge className="w-3.5 h-3.5 text-zinc-900" />
                       {isHindi ? 'केंद्रीय दबाव' : 'Central Pressure'}
                     </span>
-                    <span className="text-zinc-400">MSLP</span>
+                    <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-zinc-100 text-zinc-800 border border-zinc-200">MSLP</span>
                   </div>
 
-                  <div className="my-3">
-                    <div className="flex items-baseline gap-1.5">
-                      <span className="text-4xl font-light font-mono text-black tracking-tight">
-                        {current.pressure}
-                      </span>
-                      <span className="text-sm font-mono text-zinc-400 uppercase">hPa</span>
-                      <span className="text-xs font-mono text-zinc-500 ml-auto flex items-center">
-                        -{Math.max(0, 1013 - parseInt(current.pressure || 1004))} hPa
-                        <TrendingDown className="w-3 h-3 ml-0.5 text-zinc-700" />
+                  <div className="my-2.5">
+                    <div className="flex items-baseline justify-between gap-2">
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-4xl sm:text-5xl font-mono font-semibold text-zinc-950 tracking-tight">
+                          {current.pressure}
+                        </span>
+                        <span className="text-xs font-mono font-bold uppercase text-zinc-400">hPa</span>
+                      </div>
+                      <span className="text-xs font-mono px-2 py-0.5 rounded-full border border-zinc-200 text-zinc-700 bg-zinc-50 flex items-center gap-0.5">
+                        <TrendingDown className="w-3 h-3 text-zinc-800" />
+                        <span>-{Math.max(0, 1013 - parseInt(current.pressure || 1004))} hPa</span>
                       </span>
                     </div>
 
-                    {/* Minimalist Black Meter */}
-                    <div className="w-full bg-zinc-100 h-1 rounded-full mt-3 overflow-hidden">
-                      <div 
-                        className="h-full bg-zinc-900 rounded-full transition-all duration-500"
-                        style={{ width: `${Math.min(100, Math.max(10, ((1013 - parseInt(current.pressure || 1004)) / 60) * 100))}%` }}
-                      />
+                    {/* 5-Segment Intensity Gauge */}
+                    <div className="flex items-center gap-1.5 mt-3">
+                      {[1, 2, 3, 4, 5].map((lvl) => {
+                        const pVal = parseInt(current.pressure || 1000);
+                        const threshold = pVal < 950 ? 5 : pVal < 970 ? 4 : pVal < 985 ? 3 : pVal < 1000 ? 2 : 1;
+                        const isLit = lvl <= threshold;
+                        return (
+                          <div
+                            key={lvl}
+                            className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${
+                              isLit ? 'bg-zinc-950' : 'bg-zinc-200'
+                            }`}
+                          />
+                        );
+                      })}
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between text-[11px] font-mono pt-2 border-t border-zinc-100 text-zinc-500">
+                  <div className="flex items-center justify-between text-xs font-mono pt-2.5 border-t border-zinc-100 text-zinc-500">
                     <span>{isHindi ? 'दबाव प्रवणता' : 'Gradient'}</span>
                     <span className="font-semibold text-black">
-                      {parseInt(current.pressure) < 980 ? 'Deep Intense Gradient' : 'Low Pressure System'}
+                      {parseInt(current.pressure) < 960 ? 'Extreme Central Deficit' : 'Intense Cyclonic Core'}
                     </span>
                   </div>
                 </div>
@@ -1940,39 +1969,48 @@ const Welcome = () => {
                 {/* Metric 3: 48h Cyclogenesis Risk */}
                 <div 
                   onClick={() => navigate('/bulletins')}
-                  className="bg-white border border-zinc-200 hover:border-zinc-400 p-5 rounded-xl flex flex-col justify-between transition-colors cursor-pointer group"
+                  className="bg-white border border-zinc-200 hover:border-zinc-400 p-5 rounded-2xl flex flex-col justify-between transition-all cursor-pointer group shadow-2xs"
                 >
-                  <div className="flex items-center justify-between text-xs font-mono uppercase tracking-wider text-zinc-500">
-                    <span className="flex items-center gap-1.5">
+                  <div className="flex items-center justify-between text-xs font-sans font-medium uppercase tracking-wider text-zinc-500">
+                    <span className="flex items-center gap-1.5 font-semibold">
                       <Activity className="w-3.5 h-3.5 text-zinc-900" />
-                      {isHindi ? '48h चक्रवात निर्माण जोखिम' : '48h Cyclogenesis Risk'}
+                      {isHindi ? '48h लैंडफॉल / निर्माण जोखिम' : '48h Threat / Formation'}
                     </span>
-                    <span className="text-zinc-400 font-mono">AI ENSEMBLE</span>
+                    <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-zinc-100 text-zinc-800 border border-zinc-200">ENSEMBLE</span>
                   </div>
 
-                  <div className="my-3">
-                    <div className="flex items-baseline gap-1.5">
-                      <span className="text-4xl font-light font-mono text-black tracking-tight">
-                        {current.risk48h || '68%'}
+                  <div className="my-2.5">
+                    <div className="flex items-baseline justify-between gap-2">
+                      <span className="text-4xl sm:text-5xl font-mono font-semibold text-zinc-950 tracking-tight">
+                        {current.risk48h || '100%'}
                       </span>
-                      <span className="text-xs font-mono text-zinc-500 ml-auto">
-                        {current.vitConfidence ? `${current.vitConfidence}% AI Conf` : 'Phase 3B Validated'}
+                      <span className="text-xs font-mono px-2 py-0.5 rounded-full border border-zinc-200 text-zinc-700 bg-zinc-50">
+                        {current.vitConfidence ? `${current.vitConfidence}% Confidence` : 'Operational Fix'}
                       </span>
                     </div>
 
-                    {/* Minimalist Black Meter */}
-                    <div className="w-full bg-zinc-100 h-1 rounded-full mt-3 overflow-hidden">
-                      <div 
-                        className="h-full bg-zinc-900 rounded-full transition-all duration-500"
-                        style={{ width: current.risk48h?.includes('%') ? current.risk48h : '85%' }}
-                      />
+                    {/* 5-Segment Intensity Gauge */}
+                    <div className="flex items-center gap-1.5 mt-3">
+                      {[1, 2, 3, 4, 5].map((lvl) => {
+                        const rVal = parseInt(current.risk48h || 100);
+                        const threshold = Math.min(5, Math.max(1, Math.ceil(rVal / 20)));
+                        const isLit = lvl <= threshold;
+                        return (
+                          <div
+                            key={lvl}
+                            className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${
+                              isLit ? 'bg-zinc-950' : 'bg-zinc-200'
+                            }`}
+                          />
+                        );
+                      })}
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between text-[11px] font-mono pt-2 border-t border-zinc-100 text-zinc-500">
+                  <div className="flex items-center justify-between text-xs font-mono pt-2.5 border-t border-zinc-100 text-zinc-500">
                     <span>{isHindi ? 'डोवोरक पैमाना' : 'Dvorak Intensity'}</span>
                     <span className="font-semibold text-black">
-                      {current.dvorak || 'T3.5'} • {current.vitPattern || 'Curved Banding'}
+                      {current.dvorak || 'T6.0'} • Cat 4 Intensity
                     </span>
                   </div>
                 </div>
@@ -1980,41 +2018,52 @@ const Welcome = () => {
                 {/* Metric 4: Forward Track & Speed */}
                 <div 
                   onClick={() => navigate('/threat-map')}
-                  className="bg-white border border-zinc-200 hover:border-zinc-400 p-5 rounded-xl flex flex-col justify-between transition-colors cursor-pointer group"
+                  className="bg-white border border-zinc-200 hover:border-zinc-400 p-5 rounded-2xl flex flex-col justify-between transition-all cursor-pointer group shadow-2xs"
                 >
-                  <div className="flex items-center justify-between text-xs font-mono uppercase tracking-wider text-zinc-500">
-                    <span className="flex items-center gap-1.5">
+                  <div className="flex items-center justify-between text-xs font-sans font-medium uppercase tracking-wider text-zinc-500">
+                    <span className="flex items-center gap-1.5 font-semibold">
                       <Navigation2 className="w-3.5 h-3.5 text-zinc-900" />
-                      {isHindi ? 'आगे बढ़ने की गति' : 'Forward Track & Speed'}
+                      {isHindi ? 'आगे बढ़ने की गति' : 'Forward Velocity'}
                     </span>
-                    <span className="text-zinc-400 font-mono">GRU SEQ</span>
+                    <span className="text-xs font-mono font-bold px-2 py-0.5 rounded bg-zinc-100 text-zinc-800 border border-zinc-200">GRU SEQ</span>
                   </div>
 
-                  <div className="my-3">
-                    <div className="flex items-baseline gap-1.5">
-                      <span className="text-4xl font-light font-mono text-black tracking-tight">
-                        {current.speed}
-                      </span>
-                      <span className="text-sm font-mono text-zinc-400 uppercase">km/h</span>
-                      <span className="text-xs font-mono text-zinc-500 ml-auto flex items-center gap-1">
-                        <Compass className="w-3 h-3 text-zinc-700" />
+                  <div className="my-2.5">
+                    <div className="flex items-baseline justify-between gap-2">
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-4xl sm:text-5xl font-mono font-semibold text-zinc-950 tracking-tight">
+                          {current.speed || '22'}
+                        </span>
+                        <span className="text-xs font-mono font-bold uppercase text-zinc-400">km/h</span>
+                      </div>
+                      <span className="text-xs font-mono px-2 py-0.5 rounded-full border border-zinc-200 text-zinc-700 bg-zinc-50 flex items-center gap-1">
+                        <Compass className="w-3 h-3 text-zinc-800" />
                         <span>{isHindi ? (current.directionHindi || current.direction) : current.direction}</span>
                       </span>
                     </div>
 
-                    {/* Minimalist Black Meter */}
-                    <div className="w-full bg-zinc-100 h-1 rounded-full mt-3 overflow-hidden">
-                      <div 
-                        className="h-full bg-zinc-900 rounded-full transition-all duration-500"
-                        style={{ width: `${Math.min(100, (parseInt(current.speed || 14) / 30) * 100)}%` }}
-                      />
+                    {/* 5-Segment Intensity Gauge */}
+                    <div className="flex items-center gap-1.5 mt-3">
+                      {[1, 2, 3, 4, 5].map((lvl) => {
+                        const sVal = parseInt(current.speed || 22);
+                        const threshold = Math.min(5, Math.max(1, Math.round(sVal / 6)));
+                        const isLit = lvl <= threshold;
+                        return (
+                          <div
+                            key={lvl}
+                            className={`h-1.5 flex-1 rounded-full transition-all duration-500 ${
+                              isLit ? 'bg-zinc-950' : 'bg-zinc-200'
+                            }`}
+                          />
+                        );
+                      })}
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between text-[11px] font-mono pt-2 border-t border-zinc-100 text-zinc-500">
+                  <div className="flex items-center justify-between text-xs font-mono pt-2.5 border-t border-zinc-100 text-zinc-500">
                     <span>{isHindi ? 'दिशा प्रवाह' : 'Steer Current'}</span>
                     <span className="font-semibold text-black">
-                      Consistent Steer Flow
+                      Subtropical Ridge Steering
                     </span>
                   </div>
                 </div>
@@ -2022,12 +2071,12 @@ const Welcome = () => {
               </div>
 
               {/* Thermodynamic Diagnostics Strip */}
-              <div className="border border-zinc-200 rounded-xl p-3.5 bg-zinc-50/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs font-mono text-zinc-600">
+              <div className="border border-zinc-200 rounded-2xl p-3.5 bg-zinc-50/70 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs font-mono text-zinc-600">
                 <div className="flex items-center gap-2">
                   <Thermometer className="w-3.5 h-3.5 text-zinc-900" />
-                  <span>{isHindi ? 'एसएसटी: ' : 'SST: '}</span>
-                  <strong className="text-black font-semibold">{current.sst || 30.5}°C</strong>
-                  <span className="text-zinc-400 text-[11px]">(&gt;26.5°C)</span>
+                  <span>{isHindi ? 'समुद्री सतह तापमान: ' : 'SST: '}</span>
+                  <strong className="text-black font-semibold">{current.sst || 30.8}°C</strong>
+                  <span className="text-zinc-400 text-[11px]">(&gt;26.5°C Optimal)</span>
                 </div>
 
                 <div className="hidden sm:block w-px h-4 bg-zinc-200" />
@@ -2035,48 +2084,48 @@ const Welcome = () => {
                 <div className="flex items-center gap-2">
                   <Waves className="w-3.5 h-3.5 text-zinc-900" />
                   <span>{isHindi ? 'विंड शीयर: ' : 'VWS: '}</span>
-                  <strong className="text-black font-semibold">{current.shear || 11.2} kt</strong>
-                  <span className="text-zinc-400 text-[11px]">(&lt;15 kt)</span>
+                  <strong className="text-black font-semibold">{current.shear || 8.4} kt</strong>
+                  <span className="text-zinc-400 text-[11px]">(Low Shear)</span>
                 </div>
 
                 <div className="hidden sm:block w-px h-4 bg-zinc-200" />
 
-                <div className="flex items-center gap-2 truncate max-w-[200px]">
+                <div className="flex items-center gap-2 truncate max-w-[240px]">
                   <BrainCircuit className="w-3.5 h-3.5 text-zinc-900 shrink-0" />
-                  <span className="truncate">{current.vitPattern || 'Curved Banding (LLCC)'}</span>
+                  <span className="truncate">{current.vitPattern || 'Symmetric Eyewall (LLCC)'}</span>
                 </div>
               </div>
 
               {/* Coastal Corridor Alert Strip & Quick Navigation Buttons */}
-              <div className="border border-zinc-200 rounded-xl p-4 bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                <div>
+              <div className="border border-zinc-200 rounded-2xl p-4 bg-zinc-50/50 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div className="space-y-1">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <span className="text-xs font-mono uppercase tracking-wider text-zinc-400">
-                      {isHindi ? 'प्रभाव क्षेत्र:' : 'Projected Corridor:'}
+                    <span className="text-[10px] font-mono uppercase font-bold tracking-wider px-2 py-0.5 rounded bg-zinc-200 text-zinc-800">
+                      {isHindi ? 'प्रभाव कॉरिडोर' : 'LANDFALL CORRIDOR'}
                     </span>
-                    <strong className="text-sm font-semibold text-black">
+                    <strong className="text-sm font-semibold text-zinc-950 font-sans">
                       {isHindi ? (current.targetHindi || current.target) : current.target}
                     </strong>
                   </div>
-                  <p className="text-xs font-mono text-zinc-500 mt-1">
-                    {isHindi ? 'अनुमानित समय: ' : 'Window: '}
-                    <span className="text-zinc-800 font-medium">
+                  <p className="text-xs font-mono text-zinc-600">
+                    {isHindi ? 'अनुमानित लैंडफॉल समय: ' : 'Impact Window: '}
+                    <span className="text-zinc-900 font-semibold">
                       {isHindi ? (current.windowHindi || current.window) : current.window}
                     </span>
                   </p>
                 </div>
 
-                <div className="flex items-center gap-2.5 shrink-0">
+                <div className="flex items-center gap-2 shrink-0">
                   <button
                     onClick={() => navigate('/threat-map')}
-                    className="px-4 py-2 rounded-lg bg-black hover:bg-zinc-800 text-white font-medium text-xs transition-colors flex items-center gap-1.5 cursor-pointer"
+                    className="px-4 py-2 rounded-xl bg-black hover:bg-zinc-800 text-white font-medium text-xs transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
                   >
                     <span>{isHindi ? 'डॉपलर रडार' : 'Doppler Radar'}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </button>
                   <button
                     onClick={() => navigate('/bulletins')}
-                    className="px-4 py-2 rounded-lg border border-zinc-200 bg-white hover:bg-zinc-50 text-zinc-800 font-medium text-xs transition-colors cursor-pointer"
+                    className="px-4 py-2 rounded-xl border border-zinc-300 bg-white hover:bg-zinc-100 text-zinc-900 font-medium text-xs transition-colors cursor-pointer"
                   >
                     <span>{isHindi ? 'बुलेटिन' : 'Bulletins'}</span>
                   </button>
@@ -2085,19 +2134,19 @@ const Welcome = () => {
 
             </div>
 
-            {/* RIGHT COLUMN: Minimalist Studio Viewport (5 cols) */}
+            {/* RIGHT COLUMN: State-of-the-art Aerospace Satellite Terminal (5 cols) */}
             <div className="lg:col-span-5 flex flex-col">
               
-              <div className="bg-white border border-zinc-200 rounded-xl p-4 flex flex-col h-full min-h-[460px]">
+              <div className="bg-white border border-zinc-200 rounded-2xl p-4 flex flex-col h-full min-h-[480px] shadow-xs">
                 
                 {/* Visualizer Header: Mode Switcher Tabs + Controls */}
                 <div className="flex items-center justify-between gap-2 border-b border-zinc-100 pb-3 mb-3">
-                  <div className="inline-flex p-1 bg-zinc-100 rounded-lg border border-zinc-200 text-xs">
+                  <div className="inline-flex p-1 bg-zinc-100 rounded-xl border border-zinc-200 text-xs">
                     <button
                       onClick={() => setHeroVisualizerMode('globe')}
-                      className={`flex items-center gap-1.5 px-3 py-1 rounded transition-all cursor-pointer text-xs font-medium ${
+                      className={`flex items-center gap-1.5 px-3 py-1 rounded-lg transition-all cursor-pointer text-xs font-mono font-medium ${
                         heroVisualizerMode === 'globe'
-                          ? 'bg-black text-white shadow-xs'
+                          ? 'bg-black text-white shadow-xs font-semibold'
                           : 'text-zinc-600 hover:text-black'
                       }`}
                     >
@@ -2107,9 +2156,9 @@ const Welcome = () => {
 
                     <button
                       onClick={() => setHeroVisualizerMode('trajectory')}
-                      className={`flex items-center gap-1.5 px-3 py-1 rounded transition-all cursor-pointer text-xs font-medium ${
+                      className={`flex items-center gap-1.5 px-3 py-1 rounded-lg transition-all cursor-pointer text-xs font-mono font-medium ${
                         heroVisualizerMode === 'trajectory'
-                          ? 'bg-black text-white shadow-xs'
+                          ? 'bg-black text-white shadow-xs font-semibold'
                           : 'text-zinc-600 hover:text-black'
                       }`}
                     >
@@ -2119,9 +2168,9 @@ const Welcome = () => {
 
                     <button
                       onClick={() => setHeroVisualizerMode('radar')}
-                      className={`flex items-center gap-1.5 px-3 py-1 rounded transition-all cursor-pointer text-xs font-medium ${
+                      className={`flex items-center gap-1.5 px-3 py-1 rounded-lg transition-all cursor-pointer text-xs font-mono font-medium ${
                         heroVisualizerMode === 'radar'
-                          ? 'bg-black text-white shadow-xs'
+                          ? 'bg-black text-white shadow-xs font-semibold'
                           : 'text-zinc-600 hover:text-black'
                       }`}
                     >
@@ -2135,7 +2184,7 @@ const Welcome = () => {
                     {heroVisualizerMode === 'globe' && (
                       <button
                         onClick={() => setIsGlobeAutoRotate(prev => !prev)}
-                        className={`p-1.5 rounded-lg border text-xs transition-colors cursor-pointer ${
+                        className={`p-1.5 rounded-xl border text-xs transition-colors cursor-pointer ${
                           isGlobeAutoRotate 
                             ? 'bg-black text-white border-black' 
                             : 'bg-white text-zinc-700 border-zinc-200 hover:bg-zinc-50'
@@ -2149,7 +2198,7 @@ const Welcome = () => {
                     {heroVisualizerMode === 'trajectory' && (
                       <button
                         onClick={() => setIsPlayingTimeline(prev => !prev)}
-                        className={`flex items-center gap-1 px-2.5 py-1 rounded-lg border text-xs font-medium transition-colors cursor-pointer ${
+                        className={`flex items-center gap-1 px-2.5 py-1 rounded-xl border text-xs font-mono font-medium transition-colors cursor-pointer ${
                           isPlayingTimeline 
                             ? 'bg-black text-white border-black' 
                             : 'bg-white text-zinc-800 border-zinc-200 hover:bg-zinc-50'
@@ -2162,7 +2211,7 @@ const Welcome = () => {
 
                     <button
                       onClick={() => navigate('/threat-map')}
-                      className="p-1.5 rounded-lg border border-zinc-200 bg-white text-zinc-700 hover:text-black hover:bg-zinc-50 transition cursor-pointer"
+                      className="p-1.5 rounded-xl border border-zinc-200 bg-white text-zinc-700 hover:text-black hover:bg-zinc-50 transition cursor-pointer"
                       title="Open Fullscreen Threat Map"
                     >
                       <Maximize2 className="w-3.5 h-3.5" />
@@ -2170,9 +2219,15 @@ const Welcome = () => {
                   </div>
                 </div>
 
-                {/* Viewport Canvas Container */}
-                <div className="flex-1 w-full rounded-lg overflow-hidden relative min-h-[380px] bg-black border border-zinc-200">
+                {/* Viewport Canvas Container: Aerospace Tactical Satellite Console */}
+                <div className="flex-1 w-full rounded-2xl overflow-hidden relative min-h-[400px] bg-gradient-to-b from-[#080d1a] via-[#040812] to-[#010206] border border-zinc-800/80 shadow-inner">
                   
+                  {/* Tactical Corner Crosshairs */}
+                  <span className="absolute top-2 left-2 text-[10px] font-mono text-zinc-600 select-none pointer-events-none z-10">+</span>
+                  <span className="absolute top-2 right-2 text-[10px] font-mono text-zinc-600 select-none pointer-events-none z-10">+</span>
+                  <span className="absolute bottom-2 left-2 text-[10px] font-mono text-zinc-600 select-none pointer-events-none z-10">+</span>
+                  <span className="absolute bottom-2 right-2 text-[10px] font-mono text-zinc-600 select-none pointer-events-none z-10">+</span>
+
                   {/* MODE 1: 3D THREE.JS EARTH GLOBE */}
                   {heroVisualizerMode === 'globe' && (
                     <div className="w-full h-full relative">
@@ -2181,28 +2236,33 @@ const Welcome = () => {
                         targetLon={current.lon}
                         systemName={isHindi ? (current.shortNameHindi || current.shortName) : current.shortName}
                         category={isHindi ? (current.stageHindi || current.stage) : current.stage}
-                        risk={current.risk48h || '68%'}
+                        risk={current.risk48h || '100%'}
                         autoRotate={isGlobeAutoRotate}
                         showTelemetry={false}
                         className="w-full h-full relative"
                       />
                       
-                      {/* Floating Minimalist HUD Badge */}
+                      {/* Floating Tactical Satellite HUD Badge */}
                       <div className="absolute top-3 left-3 z-10 pointer-events-none">
-                        <div className="bg-black/90 backdrop-blur-md px-3 py-1.5 rounded border border-zinc-800 text-[11px] text-zinc-200 space-y-0.5">
-                          <div className="flex items-center gap-1.5 font-mono text-white">
-                            <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
-                            <span>{current.shortName}</span>
+                        <div className="bg-black/75 backdrop-blur-md px-3 py-1.5 rounded-xl border border-zinc-800 text-[11px] font-mono text-zinc-200 space-y-0.5 shadow-lg">
+                          <div className="flex items-center gap-2 text-white font-semibold">
+                            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                            <span>INSAT-3DR / 3D ORBITAL VIEW</span>
                           </div>
-                          <div className="text-[10px] text-zinc-400 font-mono">
-                            {current.lat}°N, {current.lon}°E
+                          <div className="text-[10px] text-zinc-400">
+                            VORTEX EYE: <strong className="text-white">{current.lat}°N, {current.lon}°E</strong> • {current.wind} KM/H
                           </div>
                         </div>
                       </div>
 
-                      <div className="absolute bottom-3 inset-x-3 z-10 pointer-events-none flex justify-center">
-                        <span className="text-[10px] font-mono text-zinc-400 px-3 py-0.5 rounded bg-black/80 border border-zinc-800">
-                          {isHindi ? 'घुमाने के लिए ड्रैग करें • ज़ूम के लिए स्क्रॉल करें' : 'Drag to rotate • Scroll to zoom'}
+                      {/* Bottom Tactical Controls & Orbit Status */}
+                      <div className="absolute bottom-3 inset-x-3 z-10 pointer-events-none flex items-center justify-between px-2 text-[10px] font-mono text-zinc-400">
+                        <span className="px-2.5 py-1 rounded-lg bg-black/70 backdrop-blur-md border border-zinc-800/80">
+                          {isHindi ? 'घुमाने के लिए ड्रैग करें • ज़ूम के लिए स्क्रॉल' : 'DRAG TO ROTATE • SCROLL TO ZOOM'}
+                        </span>
+                        <span className="px-2.5 py-1 rounded-lg bg-black/70 backdrop-blur-md border border-zinc-800/80 text-emerald-400 flex items-center gap-1.5">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+                          {isGlobeAutoRotate ? 'ORBIT ACTIVE' : 'MANUAL CONTROL'}
                         </span>
                       </div>
                     </div>
@@ -2213,7 +2273,7 @@ const Welcome = () => {
                     <div className="w-full h-full p-4 flex flex-col justify-between bg-zinc-950 text-white select-none">
                       
                       {/* Top Step Info Card */}
-                      <div className="bg-zinc-900 border border-zinc-800 rounded-lg p-3">
+                      <div className="bg-zinc-900 border border-zinc-800 rounded-xl p-3">
                         <div className="flex items-center justify-between text-xs mb-1">
                           <span className="text-zinc-400 font-mono uppercase tracking-wider text-[10px]">
                             {current.waypoints?.[activeStepIndex]?.step || '+00h'} {isHindi ? 'पूर्वानुमान बिंदु' : 'Forecast Point'}
@@ -2278,7 +2338,7 @@ const Welcome = () => {
                           <span>{isHindi ? 'समय चरण' : 'Timestep'}</span>
                           <span>{activeStepIndex + 1} of {(current.waypoints || []).length || 6}</span>
                         </div>
-                        <div className="grid grid-cols-6 gap-1 bg-zinc-900 p-1 rounded-lg border border-zinc-800">
+                        <div className="grid grid-cols-6 gap-1 bg-zinc-900 p-1 rounded-xl border border-zinc-800">
                           {(current.waypoints || []).map((wp, idx) => (
                             <button
                               key={wp.step || idx}
@@ -2286,7 +2346,7 @@ const Welcome = () => {
                                 setActiveStepIndex(idx);
                                 setIsPlayingTimeline(false);
                               }}
-                              className={`py-1.5 px-1 rounded text-center font-mono text-[11px] font-semibold transition-all cursor-pointer ${
+                              className={`py-1.5 px-1 rounded-lg text-center font-mono text-[11px] font-semibold transition-all cursor-pointer ${
                                 activeStepIndex === idx
                                   ? 'bg-white text-black'
                                   : 'text-zinc-400 hover:text-white hover:bg-zinc-800'
@@ -2307,7 +2367,7 @@ const Welcome = () => {
                       <CycloneAtmosphericLiveView />
                       
                       <div className="absolute top-3 left-3 z-10 pointer-events-none">
-                        <div className="bg-black/90 backdrop-blur-md px-3 py-1.5 rounded border border-zinc-800 text-[11px] text-zinc-200">
+                        <div className="bg-black/90 backdrop-blur-md px-3 py-1.5 rounded-xl border border-zinc-800 text-[11px] text-zinc-200">
                           <span className="font-mono text-white flex items-center gap-1.5">
                             <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
                             {isHindi ? 'इनसैट-३डीआर इन्फ्रारेड' : 'INSAT-3DR IR-1 Loop'}
